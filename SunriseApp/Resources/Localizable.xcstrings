@@ -1,0 +1,545 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "A little guidance. A glow that's yours.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little guidance. A glow that's yours."
+          }
+        }
+      }
+    },
+    "AR and the camera are not implemented. The next proof of concept will render blush on the tracked face mesh. Other makeup overlays remain out of scope.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AR and the camera are not implemented. The next proof of concept will render blush on the tracked face mesh. Other makeup overlays remain out of scope."
+          }
+        }
+      }
+    },
+    "Before and after": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before and after"
+          }
+        }
+      }
+    },
+    "Calibration is not implemented. No camera is running and no face has been detected. This screen only demonstrates a future integration point.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Calibration is not implemented. No camera is running and no face has been detected. This screen only demonstrates a future integration point."
+          }
+        }
+      }
+    },
+    "Comparison will show actual user captures in a future milestone. There are no captures, scoring or persistence in this scaffold.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comparison will show actual user captures in a future milestone. There are no captures, scoring or persistence in this scaffold."
+          }
+        }
+      }
+    },
+    "Device support has not been checked. Mock service only.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device support has not been checked. Mock service only."
+          }
+        }
+      }
+    },
+    "Discover": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discover"
+          }
+        }
+      }
+    },
+    "Entries could not be loaded.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entries could not be loaded."
+          }
+        }
+      }
+    },
+    "Explore calibration placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore calibration placeholder"
+          }
+        }
+      }
+    },
+    "Explore comparison placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore comparison placeholder"
+          }
+        }
+      }
+    },
+    "Explore live guide placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore live guide placeholder"
+          }
+        }
+      }
+    },
+    "Explore reference import placeholder": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore reference import placeholder"
+          }
+        }
+      }
+    },
+    "Explore scaffold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore scaffold"
+          }
+        }
+      }
+    },
+    "Explore the SunriseApp project scaffold. All references and saved entries are sample data. Camera, AR, photo import and saving are not implemented. Onboarding resets when the app restarts.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore the SunriseApp project scaffold. All references and saved entries are sample data. Camera, AR, photo import and saving are not implemented. Onboarding resets when the app restarts."
+          }
+        }
+      }
+    },
+    "Face calibration": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Face calibration"
+          }
+        }
+      }
+    },
+    "Future integration: system PhotosPicker, image preview and import error handling.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Future integration: system PhotosPicker, image preview and import error handling."
+          }
+        }
+      }
+    },
+    "Injected support result: supported. This does not mean a camera session is active.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Injected support result: supported. This does not mean a camera session is active."
+          }
+        }
+      }
+    },
+    "Live AR guide": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live AR guide"
+          }
+        }
+      }
+    },
+    "Loading references": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading references"
+          }
+        }
+      }
+    },
+    "Loading sample entries": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading sample entries"
+          }
+        }
+      }
+    },
+    "MOCK COLLECTION · NOT YOUR SAVED RESULTS": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MOCK COLLECTION · NOT YOUR SAVED RESULTS"
+          }
+        }
+      }
+    },
+    "My Looks": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My Looks"
+          }
+        }
+      }
+    },
+    "Next step": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next step"
+          }
+        }
+      }
+    },
+    "No camera preview or simulated face tracking is shown.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No camera preview or simulated face tracking is shown."
+          }
+        }
+      }
+    },
+    "No entries": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No entries"
+          }
+        }
+      }
+    },
+    "No references": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No references"
+          }
+        }
+      }
+    },
+    "No steps": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No steps"
+          }
+        }
+      }
+    },
+    "Only step navigation works. Tutorial instructions, completion tracking and all AR overlays remain unimplemented.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only step navigation works. Tutorial instructions, completion tracking and all AR overlays remain unimplemented."
+          }
+        }
+      }
+    },
+    "Photos import will be implemented here. No photo library is opened, no image is imported, and automatic makeup analysis is not planned for this milestone.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photos import will be implemented here. No photo library is opened, no image is imported, and automatic makeup analysis is not planned for this milestone."
+          }
+        }
+      }
+    },
+    "Previous step": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous step"
+          }
+        }
+      }
+    },
+    "Reference detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reference detail"
+          }
+        }
+      }
+    },
+    "Reference import": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reference import"
+          }
+        }
+      }
+    },
+    "References could not be loaded.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "References could not be loaded."
+          }
+        }
+      }
+    },
+    "Retry": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        }
+      }
+    },
+    "Return to Discover": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Return to Discover"
+          }
+        }
+      }
+    },
+    "SAMPLE CATALOG · SCAFFOLD": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SAMPLE CATALOG · SCAFFOLD"
+          }
+        }
+      }
+    },
+    "SCAFFOLD · NOT IMPLEMENTED": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SCAFFOLD · NOT IMPLEMENTED"
+          }
+        }
+      }
+    },
+    "Sample entry — detail scaffold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample entry — detail scaffold"
+          }
+        }
+      }
+    },
+    "Sample reference": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample reference"
+          }
+        }
+      }
+    },
+    "Save unavailable": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save unavailable"
+          }
+        }
+      }
+    },
+    "Saved look detail": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved look detail"
+          }
+        }
+      }
+    },
+    "Skip calibration and explore tutorial scaffold": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip calibration and explore tutorial scaffold"
+          }
+        }
+      }
+    },
+    "There are no references to show.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There are no references to show."
+          }
+        }
+      }
+    },
+    "This collection is empty. Saving is not implemented.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This collection is empty. Saving is not implemented."
+          }
+        }
+      }
+    },
+    "This is sample metadata to demonstrate navigation. It is not a captured or persisted user result. No images have been saved.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is sample metadata to demonstrate navigation. It is not a captured or persisted user result. No images have been saved."
+          }
+        }
+      }
+    },
+    "This screen will explain the chosen makeup reference. The catalog is sample data; no personalized recommendation or photo analysis is available.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This screen will explain the chosen makeup reference. The catalog is sample data; no personalized recommendation or photo analysis is available."
+          }
+        }
+      }
+    },
+    "This tutorial has no configured steps.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tutorial has no configured steps."
+          }
+        }
+      }
+    },
+    "Tutorial flow": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutorial flow"
+          }
+        }
+      }
+    },
+    "Your next glow starts here": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your next glow starts here"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
