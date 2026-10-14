@@ -1,0 +1,72 @@
+name: iOS Build and Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Toolchain information
+        run: xcodebuild -version
+      - name: Choose an installed iPhone Simulator
+        id: simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcrun simctl list devices available --json > "$RUNNER_TEMP/simulators.json"
+          python3 - <<'PYTHON'
+          import json, os
+          from pathlib import Path
+          data = json.loads(Path(os.environ['RUNNER_TEMP'], 'simulators.json').read_text())
+          candidates = [device for runtime, devices in data['devices'].items()
+                        if '.iOS-' in runtime
+                        for device in devices
+                        if device.get('isAvailable') and device['name'].startswith('iPhone')]
+          if not candidates:
+              raise SystemExit('No available iPhone Simulator. Check runner images and Xcode selection.')
+          device = sorted(candidates, key=lambda device: device['name'])[0]
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('id=' + device['udid'] + '\n')
+          print('Selected:', device['name'], device['udid'])
+          PYTHON
+      - name: Build and run unit tests
+        shell: bash
+        env:
+          SUNRISE_SIMULATOR_ID: ${{ steps.simulator.outputs.id }}
+        run: |
+          set -euo pipefail
+          xcodebuild test \
+            -project SunriseApp.xcodeproj \
+            -scheme SunriseApp \
+            -configuration Debug \
+            -destination "platform=iOS Simulator,id=$SUNRISE_SIMULATOR_ID" \
+            -destination-timeout 120 \
+            -parallel-testing-enabled NO \
+            -derivedDataPath "$RUNNER_TEMP/SunriseDerived" \
+            -resultBundlePath "$RUNNER_TEMP/SunriseTests.xcresult" \
+            CODE_SIGNING_ALLOWED=NO | tee "$RUNNER_TEMP/sunrise-tests.log"
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: sunrise-test-evidence
+          path: |
+            ${{ runner.temp }}/SunriseTests.xcresult
+            ${{ runner.temp }}/sunrise-tests.log
+          if-no-files-found: warn
+          retention-days: 7
