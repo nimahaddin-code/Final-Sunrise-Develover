@@ -1,0 +1,28 @@
+# macOS / editor state
+.DS_Store
+*.swp
+.idea/
+.vscode/
+# Xcode local state and build products
+DerivedData/
+build/
+.build/
+*.xcuserstate
+xcuserdata/
+*.xcresult/
+*.ipa
+*.dSYM/
+*.dSYM.zip
+*.xcarchive/
+# Local signing and secrets
+.env
+.env.*
+!.env.example
+*.p12
+*.p8
+*.key
+*.mobileprovision
+*.provisionprofile
+*.xcconfig.local
+# Swift package checkouts; keep lockfiles if packages are added later
+.swiftpm/
