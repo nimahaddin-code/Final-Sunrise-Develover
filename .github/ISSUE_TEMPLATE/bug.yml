@@ -1,0 +1,27 @@
+name: Bug
+description: Laporkan masalah dengan langkah reproduksi
+title: "[Bug] "
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Langkah reproduksi
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Hasil yang diharapkan dan hasil aktual
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Xcode, iOS, perangkat atau Simulator, dan commit
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Bukti dan batas pengujian
+      description: Lampirkan log atau screenshot tanpa data pribadi. Jelaskan apakah memakai mock.

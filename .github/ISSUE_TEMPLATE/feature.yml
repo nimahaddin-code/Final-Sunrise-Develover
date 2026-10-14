@@ -1,0 +1,30 @@
+name: Feature
+description: Usulan atau pembagian implementasi fitur
+title: "[Feature] "
+body:
+  - type: input
+    id: workstream
+    attributes:
+      label: Workstream dan PIC
+      description: Pilih workstream di Docs/TeamWorkstreams.md; PIC dapat ditetapkan kemudian.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Tujuan dan scope
+      description: Jelaskan hasil untuk pengguna serta batas pekerjaan.
+    validations:
+      required: true
+  - type: textarea
+    id: integration
+    attributes:
+      label: Folder, kontrak, dan dependensi
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria dan rencana test
+    validations:
+      required: true
