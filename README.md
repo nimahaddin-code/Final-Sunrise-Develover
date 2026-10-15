@@ -1,69 +1,66 @@
-# Final-Sunrise-Develover
+# Final-Sunrise-Develover — MVP
 
-**SunriseApp** adalah nama produk sementara untuk aplikasi panduan makeup berbasis AR. Repository ini berisi **project scaffold untuk kolaborasi tim**, belum aplikasi selesai.
+Produk sementara: **SunriseApp**, aplikasi iPhone SwiftUI untuk belajar makeup. Implementasi MVP ini diberi komentar `// -Nimah:`. Khalish dan Hanum adalah rekan coder; usulan pembagian iterasi berikut ada di [TeamWorkstreams](Docs/TeamWorkstreams.md).
 
-## Mulai di sini
+## Menjalankan
 
-- Tech lead: [pembagian workstream](Docs/TeamWorkstreams.md).
-- Engineer: [arsitektur](Docs/Architecture.md), [kontrak integrasi](Docs/IntegrationContracts.md), [kontribusi](CONTRIBUTING.md).
-- QA: [test dan checklist](Docs/Testing.md), [hasil validasi](Docs/Validation.md).
-- Produk: [scope milestone](Docs/ProductScope.md), [alur navigasi](Docs/NavigationFlow.md), [keputusan fondasi](Docs/Decisions/0001-project-foundation.md).
+1. Ekstrak paket MVP dan buka `SunriseApp.xcodeproj`.
+2. Gunakan Xcode 15+ lengkap, scheme **SunriseApp**, minimum iOS 17.
+3. Simulator: pilih iPhone Simulator dan Run. Katalog serta tutorial manual dapat didemokan; Simulator tidak menjalankan live face tracking.
+4. iPhone: pilih development Team di Signing & Capabilities, gunakan bundle identifier unik bila perlu, hubungkan/trust iPhone, aktifkan Developer Mode, lalu Run.
+5. Pilih look → Start my tutorial → izinkan kamera → hadapkan wajah dan tahan stabil 2 detik → Capture before → ikuti 5 langkah → Capture after → Save → buka My Looks.
 
-## Requirement dan setup
+Dukungan AR diputuskan lewat `ARFaceTrackingConfiguration.isSupported`. Jika tidak mendukung atau kamera ditolak, jalur tutorial manual tetap tersedia. Jangan memakai hasil Simulator sebagai bukti tracking perangkat fisik.
 
-- Mac dengan Xcode 15+ lengkap dan iOS Simulator runtime yang terpasang. Build environment yang benar-benar diperiksa tercantum di Validation.md.
-- Minimum iOS 17, iPhone portrait. Tidak ada dependency eksternal atau langkah package installation.
-- Buka `SunriseApp.xcodeproj`, pilih scheme **SunriseApp**, pilih iPhone Simulator, lalu Run (Cmd+R).
-- Untuk iPhone fisik: pilih target → Signing & Capabilities → development Team milikmu, gunakan bundle identifier unik bila diperlukan, trust perangkat dan aktifkan Developer Mode, lalu Run. Team ID pribadi tidak disimpan di repository.
-- Untuk test: Product → Test (Cmd+U) atau ikuti CLI di Docs/Testing.md.
+## Fitur yang diimplementasikan
 
-## Apa yang bekerja
+- Onboarding dengan preferensi tersimpan.
+- Katalog Douyin, Clean Girl, Soft Glam, Latte; ilustrasi wajah dan detail langkah.
+- Import PhotosPicker: preview/removal, pilih style tutorial manual, error/cancel, batas input 25 MB. Foto inspirasi tidak dianalisis dan hanya berada dalam memori sesi.
+- Runtime support check, izin kamera/Settings, tracking readiness 2 detik, interruption/retry, pause saat background/tab berubah atau comparison dibuka.
+- Blush POC: mask warna vertex pada face mesh yang mengikuti anchor dan deformasi wajah; toggle overlay. Penempatan pipi masih perkiraan, perlu penyesuaian hasil uji iPhone.
+- Tutorial lima langkah dengan instruksi per look; contour, eyeshadow, eyeliner, dan lips adalah **manual**, tanpa overlay AR.
+- Capture Before saat overlay belum aktif; After setelah langkah lips dengan overlay off. Comparison dua foto nyata, tanpa scoring atau automatic alignment.
+- Simpan lokal metadata + dua JPEG per look, reload daftar/detail, dan delete dengan konfirmasi. Folder foto tidak ikut backup otomatis. Tidak ada akun, server, atau analytics.
+- Manual mode tidak membuat capture/hasil palsu dan tidak menawarkan save tanpa foto.
 
-Onboarding session-only, dua tab, typed navigation dengan path terpisah, empat reference sample, detail, jalur placeholder seluruh fitur, previous/next langkah tutorial, loading/empty/error state, mock injection, design tokens light/dark, dan kerangka unit test/CI.
+## Batas MVP
 
-## Apa yang belum diimplementasikan
+Live AR **belum diverifikasi di iPhone fisik**. Build yang berhasil bukan bukti posisi blush sudah tepat. Tidak ada AI analysis, face-shape/skin analysis, auto-personalization, reference transfer, AR empat langkah lain, photorealistic skin blending, atau occlusion tangan/rambut. Artwork katalog merupakan ilustrasi. Portrait iPhone saja, English UI, belum ada app icon final.
 
-Kamera, ARKit face tracking, cek dukungan perangkat asli, face calibration, import Photos, capture, comparison foto, persistence, dan analisis gambar. Setiap layar terkait berlabel scaffold. My Looks menampilkan metadata contoh, bukan hasil pengguna; tombol Save disabled dan mock save melempar notImplemented. Onboarding tampil ulang pada app launch berikutnya.
-
-Target berikutnya adalah blush yang mengikuti face mesh pada iPhone. Empat langkah lainnya tetap manual sampai implementasinya benar-benar ada. Import reference tidak mencakup analisis makeup otomatis.
-
-Tidak ada permission kamera/foto, networking, analytics, penyimpanan data pengguna, app icon final, atau brand final pada tahap ini. Nama SunriseApp dipusatkan pada target/configuration dan pengenalan scaffold agar mudah diganti.
+Data foto hilang jika aplikasi dihapus; tidak ada cloud sync atau ekspor Photos. Koleksi tidak punya thumbnail cache/pagination dan perlu pengembangan untuk banyak foto. Import saat ini membaca Data lalu UIImage; foto besar tetap memerlukan pengujian memory pada perangkat rendah.
 
 ## Struktur
 
 ```text
-.github/                  CI, template PR dan issue
-Docs/                     scope, arsitektur, kontrak, workstream, test, ADR
-SunriseApp.xcodeproj/      app + unit test target, shared scheme
 SunriseApp/
-  App/                    entry point, composition root, navigation
-  Core/                   model bersama dan service contracts
-  DesignSystem/           warna, typography, spacing, komponen
-  Features/               satu area per fitur
-  Resources/              named colors dan string catalog
-  PreviewSupport/         sample data + mock untuk scaffold/preview
-  Configuration/          Info.plist tanpa permission hardware
-SunriseAppTests/           Navigation, Features, TestSupport
+  App/                  entry point, DI, navigation
+  Core/                 shared models + service contracts
+  DesignSystem/         tokens, buttons, look artwork
+  Features/
+    Onboarding/         first launch
+    ReferenceCatalog/   bundled catalog + loading state
+    ReferenceDetail/    look overview
+    ReferenceImport/    PhotosPicker inspiration
+    FaceCalibration/    support check + readiness
+    LiveGuide/          ARSCNView, camera lifecycle, mesh mask
+    Tutorial/           session orchestration + step instructions
+    Comparison/         capture comparison + save
+    SavedLooks/         actor-backed local files, journal, delete
+  PreviewSupport/       mocks only, not production composition
+  Resources/            colors and source strings
+  Configuration/        Info.plist + camera description
+SunriseAppTests/         navigation, service state, storage, readiness
+Docs/                   architecture, contracts, testing, team handoff
+.github/                CI and issue/PR templates
 ```
 
-## Menambah fitur dan menggunakan mock
+## Kolaborasi dan test
 
-Inject service via initializer seperti ReferenceCatalogView(service:). Untuk preview, gunakan MockReferenceCatalog(items:), MockFaceTrackingChecker(result:) atau MockSavedLooksStore(items:). Default seluruh mock dikomposisikan di AppContainer.scaffold(); jangan akses container dari fitur.
+MVVM ringan memakai MainActor/ObservableObject, initializer DI, service Sendable, dan storage actor. `AppContainer.live()` memakai service nyata; `scaffold()` tetap tersedia untuk preview/test. Mock save tetap menolak sukses palsu. Baca [Architecture](Docs/Architecture.md), [IntegrationContracts](Docs/IntegrationContracts.md), [CONTRIBUTING](CONTRIBUTING.md).
 
-Buat file dalam Features/<Feature>, tambahkan ke group/target Xcode yang tepat, tulis test perilaku yang bermakna, lalu update status fitur dan docs. Kontrak bersama diubah melalui PR terkoordinasi. Stateless View tidak memerlukan ViewModel. ViewModel memakai MainActor, ObservableObject dan Published secara konsisten.
+Cmd+U menjalankan unit test. Perintah CLI, checklist perangkat, dan bukti pemeriksaan ada di [Testing](Docs/Testing.md) serta [Validation](Docs/Validation.md).
 
-String UI memakai string catalog berbahasa sumber English. Copy placeholder panjang dan konten sample sengaja masih untuk pengembangan. Tambahkan translation/localization review pada milestone UI nyata. Warna berasal dari named asset dan mendukung dark mode; font memakai text styles Dynamic Type. UI belum dianggap terverifikasi sampai checklist visual dijalankan.
+## Status versi
 
-## Status GitHub
-
-Repository publik: [nimahaddin-code/Final-Sunrise-Develover](https://github.com/nimahaddin-code/Final-Sunrise-Develover), branch utama `main`.
-
-Clone untuk mulai bekerja:
-
-```sh
-git clone https://github.com/nimahaddin-code/Final-Sunrise-Develover.git
-cd Final-Sunrise-Develover
-open SunriseApp.xcodeproj
-```
-
-Status build/test lokal ada di Validation.md; hasil CI remote dapat dilihat di tab Actions. Tidak ada branch protection atau pengaturan akun yang diubah.
+Repository publik awal: [Final-Sunrise-Develover](https://github.com/nimahaddin-code/Final-Sunrise-Develover). Perubahan MVP dikerjakan pada branch lokal `feature/nimah-mvp`; paket ini berisi versi MVP. Jangan mengasumsikan branch main di GitHub sudah memuat perubahan lokal ini. Tidak ada deployment App Store atau upload data pengguna.

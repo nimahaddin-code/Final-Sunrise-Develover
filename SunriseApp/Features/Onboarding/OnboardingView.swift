@@ -1,13 +1,19 @@
+// -Nimah: OnboardingView.swift — implementasi MVP SunriseApp.
 import SwiftUI
 
 struct OnboardingView: View {
     var onContinue: () -> Void
     var body: some View {
-        FeaturePlaceholderView(title: "Your next glow starts here", symbol: "sparkles",
-            explanation: "Explore the SunriseApp project scaffold. All references and saved entries are sample data. Camera, AR, photo import and saving are not implemented. Onboarding resets when the app restarts.") {
-                PrimaryButton(title: "Explore scaffold", action: onContinue)
-            }
+        ScrollView {
+            VStack(spacing: AppSpacing.large) {
+                Text("SUNRISE").font(.caption.weight(.semibold)).tracking(5)
+                LookArtwork(referenceID: "douyin")
+                Text("Your face. Your kind of glow.").font(AppTypography.title).multilineTextAlignment(.center)
+                Text("Choose a look you love. Learn one step at a time, with a live blush guide on your own face.").multilineTextAlignment(.center)
+                Text("MVP · Blush is the only AR overlay. Other steps are manual. Camera photos stay on this device.").font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                PrimaryButton(title: "Find my glow", action: onContinue)
+            }.padding(AppSpacing.large)
+        }.background(AppColors.background).foregroundStyle(AppColors.ink)
     }
 }
-
 #Preview { OnboardingView(onContinue: {}) }

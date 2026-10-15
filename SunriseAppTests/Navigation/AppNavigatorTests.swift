@@ -1,3 +1,4 @@
+// -Nimah: Uji regresi route MVP dan pemisahan stack tab.
 import XCTest
 @testable import SunriseApp
 
@@ -14,9 +15,9 @@ final class AppNavigatorTests: XCTestCase {
         let navigator = AppNavigator()
         let savedRoute = AppRoute.savedLookDetail(SampleData.savedLook)
         navigator.open(savedRoute, in: .myLooks)
-        navigator.open(.faceCalibration(referenceID: "reference"), in: .discover)
-        navigator.open(.tutorial(referenceID: "reference"), in: .discover)
-        navigator.open(.comparison(referenceID: "reference"), in: .discover)
+        navigator.open(.referenceDetail(SampleData.references[0]), in: .discover)
+        navigator.open(.session(SampleData.references[0]), in: .discover)
+        navigator.open(.referenceImport, in: .discover)
         navigator.returnToRoot(of: .discover)
         XCTAssertEqual(navigator.selectedTab, .discover)
         XCTAssertTrue(navigator.discoverPath.isEmpty)

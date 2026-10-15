@@ -1,21 +1,17 @@
+// -Nimah: FaceCalibrationView.swift — implementasi MVP SunriseApp.
 import SwiftUI
 
 struct FaceCalibrationView: View {
-    let referenceID: String
-    @StateObject private var model: FaceCalibrationViewModel
-    init(referenceID: String, checker: any FaceTrackingAvailabilityChecking) {
-        self.referenceID = referenceID
-        _model = StateObject(wrappedValue: FaceCalibrationViewModel(checker: checker))
-    }
+    let calibrated: Bool
+    let tracked: Bool
+    var onCapture: () -> Void
+    var onManual: () -> Void
     var body: some View {
-        FeaturePlaceholderView(title: "Face calibration", symbol: "faceid",
-            explanation: "Calibration is not implemented. No camera is running and no face has been detected. This screen only demonstrates a future integration point.") {
-                switch model.availability {
-                case .notChecked: Text("Device support has not been checked. Mock service only.")
-                case .supported: Text("Injected support result: supported. This does not mean a camera session is active.")
-                case .unsupported(let reason): Text("Injected support result: unsupported. \(reason)")
-                }
-                NavigationLink("Skip calibration and explore tutorial scaffold", value: AppRoute.tutorial(referenceID: referenceID))
-            }.task { await model.loadAvailability() }
+        VStack(alignment: .leading, spacing: AppSpacing.large) {
+            Text("Let's find your face").font(AppTypography.title)
+            Text("Face the camera in even light at arm's length. Hold still for two seconds. Calibration checks tracking stability, not your face shape.")
+            PrimaryButton(title: calibrated ? "Capture before & begin" : "Hold still to calibrate", action: onCapture).disabled(!calibrated || !tracked)
+            Button("Continue with manual tutorial", action: onManual)
+        }
     }
 }

@@ -1,41 +1,23 @@
-# Kontrak integrasi
+# Kontrak integrasi MVP
 
-Kontrak berada di `Core/Services/Contracts`. Semua Sendable; fungsi async dapat dipanggil dari ViewModel MainActor. Implementasi nyata bertanggung jawab mengisolasi state mutable dan pekerjaan berat. Framework UI/AR tidak boleh bocor ke kontrak domain.
+Semua service di Core Sendable; ViewModel MainActor menerima dependency via initializer. Framework rendering tetap berada di fitur LiveGuide.
 
-| Kontrak | Pemilik | Input → output | Error / cancellation | Mock | Konsumen |
-| --- | --- | --- | --- | --- | --- |
-| ReferenceCatalogProviding.references | Katalog | Tidak ada → array MakeupReference, ID stabil | throws; ViewModel mengubah error ke failed dan CancellationError ke idle | MockReferenceCatalog (data configurable, default 4 sample) | ReferenceCatalogViewModel; detail menerima selected reference |
-| FaceTrackingAvailabilityChecking.availability | Kalibrasi/AR | Tidak ada → notChecked/supported/unsupported(reason) | Nonthrowing; belum cek harus tetap notChecked. Tidak mewakili permission/session state | MockFaceTrackingChecker (default notChecked) | FaceCalibrationViewModel; nanti fallback live guide |
-| SavedLooksStoring.list | Comparison/Saved | Tidak ada → metadata hasil | throws; ViewModel menangani failed/cancellation | MockSavedLooksStore (default 1 metadata berlabel sample) | SavedLooksViewModel |
-| SavedLooksStoring.save | Comparison/Saved | SavedLookMetadata → Void hanya jika benar-benar tersimpan | Mock selalu throws SavedLooksError.notImplemented; error I/O riil ditentukan pada milestone persistence | MockSavedLooksStore, tidak mengubah koleksi | Belum dipanggil UI; Save disabled. Test memverifikasi penolakan |
+| Kontrak | Live implementation | Input / output dan error |
+| --- | --- | --- |
+| ReferenceCatalogProviding.references | BundledReferenceCatalog | Async array empat look, ID tetap; signature throws untuk sumber lain |
+| FaceTrackingAvailabilityChecking.availability | DeviceFaceTrackingChecker | Runtime ARFaceTrackingConfiguration.isSupported; Simulator unsupported; tidak meminta kamera dan tidak mengklaim tracking aktif |
+| SavedLooksStoring.list | LocalSavedLooksStore actor | Metadata Codable sorted descending; corrupt file dilaporkan |
+| save(referenceID:before:after:) | LocalSavedLooksStore actor | Dua Data JPEG nonempty <15MB per file → metadata UUID; directory staging dipindah atomik; errors diteruskan |
+| imageData(for:kind:) | LocalSavedLooksStore actor | UUID + before/after → Data; missingCapture/invalidIdentifier/I/O error |
+| delete(id:) | LocalSavedLooksStore actor | Hapus satu folder; UUID wajib; I/O error tampil di UI |
+| legacy save(metadata) | Tidak dipakai oleh UI | Live menolak karena capture tidak ada; mock throws notImplemented |
 
-## Model bersama
+Mock default media operations menolak notImplemented; fitur tidak boleh menganggap mock sebagai penyimpanan asli. Sample metadata hanya untuk preview/test, bukan koleksi pengguna live.
 
-- MakeupReference: String ID stabil, nama, ringkasan. Konten saat ini sample.
-- Tutorial: referenceID, urutan TutorialStep. TutorialStep adalah enum lima elemen dengan ID rawValue stabil.
-- SavedLookMetadata: String ID stabil, referenceID, Date. Tidak membawa foto atau path disk.
-- FaceTrackingAvailability: status kapabilitas saja; supported tidak berarti wajah terdeteksi.
+Session capture hanya melalui FaceCameraState di MainActor dengan snapshot ARSCNView. Tidak ada UIImage/ARFaceAnchor di shared model. FaceCameraState memiliki weak view dan callback pause yang weak terhadap coordinator/view untuk menghindari siklus retain.
 
-Error katalog/saved saat ini dipetakan ke pesan UI generik; detail logging tanpa data pribadi bisa ditambahkan saat ada layanan nyata. Error unsupported bukan exception; tampilkan fallback. Mock error lebih lanjut dapat dibuat dalam test support.
+ARSessionDelegate queue mengukur tracking readiness; renderer memutakhirkan mesh; MainActor mempublikasikan tracking/error. Indikator supported terpisah dari permission, anchor tracked, readiness, serta failure. Failure/retry/lifecycle harus dipertahankan ketika tim mengubah session.
 
-## Batas AR yang sengaja belum dikunci
+Photos import memakai system picker, batas input 25MB, dan selection task cancellation. Reference hanya inspirasi lokal; user memilih style tutorial sendiri. Tidak ada analisis otomatis.
 
-Belum ada protocol rendering atau FaceSessionManager. Tim AR terlebih dahulu membuktikan tracking blush pada iPhone. Pisahkan lifecycle session, permission, tracking status, dan rendering. Tetapkan kontrak session setelah spike menemukan kebutuhan nyata; hindari mendesain semua overlay dari awal.
-
-Wajib pada PR AR:
-
-- Check ARFaceTrackingConfiguration.isSupported sebelum sesi dijalankan.
-- Handle permission, denial/Settings, session failure, interruption, tracking loss, background pause/resume.
-- Mesh/anchor benar-benar mengikuti wajah dan deformasi; bukan gambar di screen coordinates.
-- Kalibrasi hanya mengukur readiness/stabilitas, bukan analisis bentuk wajah.
-- Fallback manual tetap dapat dijalankan.
-- Blush satu-satunya target overlay awal; langkah lainnya manual.
-- Jangan persist mesh atau kirim foto ke server tanpa kebutuhan dan keputusan produk.
-
-## Batas media yang perlu keputusan sebelum implementasi
-
-Import reference hanya untuk inspirasi; tidak otomatis menjadi tutorial. Proposal berikutnya harus menentukan owned media ID, format thumbnail, cancellation, batas ukuran gambar, dan cleanup lifecycle. Comparison harus memakai dua capture nyata yang dapat dibedakan, tanpa scoring. Kontrak metadata `save` belum cukup untuk media: sepakati transaksi metadata+file, deletion, migration, dan error sebelum mengaktifkan Save. Tidak ada API palsu yang mengaku sudah menyimpan foto.
-
-## Proses perubahan kontrak
-
-Buat PR kontrak dengan contoh input/output dan error. Tech lead serta konsumen memberi review, lalu update mock, test, docs, dan composition root dalam satu rangkaian yang dapat dibuild. Jangan mengganti mock default menjadi service produksi tanpa memeriksa efek ke semua layar.
+AR implementation mengikuti [Apple ARFaceTrackingConfiguration](https://developer.apple.com/documentation/arkit/arfacetrackingconfiguration) dan pola geometry pada [Tracking and visualizing faces](https://developer.apple.com/documentation/arkit/tracking-and-visualizing-faces). Simulator tidak memvalidasi tracking. Physical acceptance test wajib sebelum mengklaim placement berhasil.

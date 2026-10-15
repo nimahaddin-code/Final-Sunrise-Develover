@@ -1,25 +1,32 @@
+// -Nimah: TutorialView.swift — implementasi MVP SunriseApp.
 import SwiftUI
 
 struct TutorialView: View {
+    @ObservedObject var model: TutorialViewModel
     let referenceID: String
-    @StateObject private var model: TutorialViewModel
-    init(referenceID: String) {
-        self.referenceID = referenceID
-        _model = StateObject(wrappedValue: TutorialViewModel(tutorial: Tutorial(referenceID: referenceID, steps: TutorialStep.allCases)))
-    }
+    let manual: Bool
+    @Binding var overlay: Bool
+    let canCapture: Bool
+    var onCapture: () -> Void
+    var onFinishManual: () -> Void
     var body: some View {
-        FeaturePlaceholderView(title: "Tutorial flow", symbol: "list.number",
-            explanation: "Only step navigation works. Tutorial instructions, completion tracking and all AR overlays remain unimplemented.") {
-                if let step = model.currentStep {
-                    Text(step.title).font(AppTypography.heading)
-                    HStack {
-                        Button("Previous step", action: model.previous).disabled(!model.canGoBack)
-                        Spacer()
-                        Button("Next step", action: model.next).disabled(!model.canGoNext)
-                    }
-                } else { EmptyStateView(title: "No steps", message: "This tutorial has no configured steps.") }
-                NavigationLink("Explore live guide placeholder", value: AppRoute.liveGuide(referenceID: referenceID))
-                NavigationLink("Explore comparison placeholder", value: AppRoute.comparison(referenceID: referenceID))
+        VStack(alignment: .leading, spacing: AppSpacing.large) {
+            if let step = model.currentStep {
+                ProgressView(value: Double(model.stepIndex + 1), total: Double(model.tutorial.steps.count)).tint(AppColors.rose)
+                Text(step.title).font(AppTypography.title)
+                Text(TutorialInstructions.text(for: step, referenceID: referenceID))
+                Text(step == .blush && !manual ? "LIVE AR · Approximate cheek placement" : "MANUAL GUIDE · Apply at your own pace").font(.caption).foregroundStyle(AppColors.rose)
+                if step == .blush && !manual { Toggle("Show blush guide", isOn: $overlay) }
+                HStack {
+                    Button("Previous step") { model.previous(); overlay = model.currentStep == .blush && !manual }.disabled(!model.canGoBack)
+                    Spacer()
+                    if model.canGoNext { Button("Next step") { model.next(); overlay = model.currentStep == .blush && !manual } }
+                }.font(.headline)
+                if !model.canGoNext {
+                    if manual { PrimaryButton(title: "Finish manual tutorial", action: onFinishManual) }
+                    else { PrimaryButton(title: "Capture after", action: onCapture).disabled(!canCapture) }
+                }
             }
+        }
     }
 }

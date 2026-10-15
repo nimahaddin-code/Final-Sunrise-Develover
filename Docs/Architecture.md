@@ -1,45 +1,31 @@
-# Arsitektur fondasi
+# Arsitektur MVP
 
-## Pilihan utama
+Fondasi tetap SwiftUI + MVVM ringan, iOS 17+, ObservableObject/Published dan MainActor untuk UI. Satu app target, satu test target; tidak ada dependency eksternal.
 
-SwiftUI, iOS 17+, MVVM ringan, satu app target dan satu unit test target. Tidak ada dependency eksternal atau package internal. Observasi konsisten menggunakan `ObservableObject` + `@Published`; semua ViewModel dan navigator adalah `@MainActor`.
+## Composition
 
-Organisasi berdasarkan fitur. Model yang dibagi katalog/detail/tutorial/saved berada di Core. Rendering dan media belum memiliki model karena belum ada kebutuhan implementasi yang terbukti. Tidak ada UIImage atau ARFaceAnchor di domain bersama.
+`SunriseApp → AppContainer.live() → AppRootView → feature initializer`.
 
-## Aliran dependency
+Live composition memilih BundledReferenceCatalog, DeviceFaceTrackingChecker, dan LocalSavedLooksStore. Mock di PreviewSupport tidak dipakai saat run normal. AppContainer bukan service locator: fitur menerima dependency spesifik.
 
-```text
-SunriseApp
-  -> AppContainer.scaffold() (composition root)
-  -> AppRootView
-       -> AppNavigator (onboarding + tab + stack)
-       -> Feature View(initializer dependency)
-            -> Feature ViewModel(initializer service)
-                 -> Sendable service contract
-                      -> mock saat ini / implementasi nyata di milestone berikut
-```
+AppRootView menyimpan onboarding melalui AppStorage. AppNavigator memisahkan stack Discover dan My Looks. AppRoute membawa reference atau metadata; UIKit tidak masuk model domain.
 
-AppContainer tidak diakses dari ViewModel, singleton, atau Environment. Root memilih service dan meneruskannya ke layar yang memerlukan. Layar stateless memakai input immutable dan callback atau typed NavigationLink. Navigator hanya mengelola navigasi, bukan state fitur.
+## Sesi makeup
 
-## State
+MakeupSessionView memegang satu FaceCameraState, FaceCalibrationViewModel, dan TutorialViewModel selama sesi. Komponen LiveGuideView membungkus ARSCNView; camera tetap satu selama kalibrasi dan langkah tutorial. Beralih manual menutup sesi dan membuang capture sementara. Comparison membuka sheet, menjeda kamera, dan memakai dua UIImage capture aktual; tidak ada image di route atau container.
 
-- AppNavigator: onboarding session-only, tab terpilih, path Discover dan My Looks yang terpisah.
-- Katalog/Saved: idle, loading, loaded (termasuk empty), failed. Cancellation kembali ke idle; retry eksplisit.
-- Tutorial: langkah aktif dan batas previous/next, tidak ada klaim completion atau persistensi.
-- Kalibrasi: availability hasil injection; default mock `.notChecked`. Tidak ada runtime hardware check.
+Sesi pause saat scene tidak aktif, layar tidak terlihat, manual mode, atau comparison. Tracking loss mereset readiness; snapshot memerlukan anchor tracked yang fresh dan overlay off. ARSessionDelegate queue terpisah mengukur readiness, UI dipublikasikan melalui MainActor. SceneKit render callback memutakhirkan mesh; akses flag overlay lintas thread dilindungi NSLock. Coordinator memakai unchecked Sendable hanya untuk batas framework delegate tersebut; jangan menambah state lintas-thread tanpa isolasi.
 
-Semua service bersifat async, Sendable. File I/O dan pemrosesan gambar di implementasi nyata harus berjalan di luar main actor; ViewModel menerima hasil dan memperbarui state di main actor. Mock saat ini adalah value types immutable. Stub test yang perlu mutasi memakai actor.
+## Mesh blush
 
-## Menambah implementasi nyata
+Bobot warna dihitung dari vertex face-local awal untuk dua pipi; mask per anchor tetap dan seluruh vertex/triangle diperbarui dari geometry terbaru. Node otomatis mengikuti transform anchor. Material constant/alpha, transparan di luar pipi, single-sided, tanpa depth writes. Ini POC placement; bukan render makeup fotorealistik atau klasifikasi wajah. Penempatan dan alpha wajib diuji pada iPhone.
 
-1. Setujui kontrak dan error semantics melalui PR kecil.
-2. Buat implementasi dalam fitur pemilik; jangan menaruh framework hardware di domain.
-3. Ganti dependency di composition root pada PR integrasi, pertahankan mock untuk preview/test.
-4. Implementasikan state loading/empty/error/permission dan cancellation yang relevan.
-5. Baru hapus label placeholder pada fitur yang terverifikasi.
+## Persistence
 
-AppRoute memakai ID stabil untuk alur tutorial. Detail reference dan sample saved detail menerima snapshot metadata melalui route untuk menghindari service lookup tersembunyi. Deep link dan pemulihan navigasi lintas peluncuran belum termasuk; tinjau ulang route payload jika fitur tersebut ditambahkan.
+LocalSavedLooksStore adalah actor. Application Support/SunriseApp/Looks/<UUID> memuat metadata.json, before.jpg, after.jpg. Semua file ditulis di folder staging tersembunyi, kemudian folder dipindahkan ke nama final setelah lengkap. List mengabaikan staging dan melaporkan metadata rusak. IDs divalidasi UUID untuk mencegah path traversal. Save batal/gagal tidak menerbitkan metadata sukses; default mock tetap menolak. Folder dikecualikan dari backup, file memakai protection until first unlock.
 
-## Keterbatasan fondasi
+Deletion menghapus folder hasil secara utuh; error diteruskan ke UI. App deletion menghapus koleksi. Belum ada migrasi schema, thumbnail cache, quota total, cloud sync, atau recovery data corrupt otomatis.
 
-Tidak ada runtime camera/AR/Photos, persistence, analytics, networking, atau app icon final. No camera capability dibuat. Jangan tambahkan entitlement ARKit wajib yang akan menghalangi instalasi perangkat dengan fallback manual.
+## Attribution
+
+Komentar `// -Nimah:` ada di tiap source Swift yang dibuat/diubah pada implementasi MVP. File lama yang tidak berubah tidak diberi atribusi baru. Konfigurasi memakai komentar sesuai format file. Khalish dan Hanum tidak diberi atribusi penulisan kode yang bukan pekerjaannya.

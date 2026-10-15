@@ -1,8 +1,9 @@
+// -Nimah: SavedLookMetadata.swift — implementasi MVP SunriseApp.
 import Foundation
 
-/// Metadata only. Capture files and persistence belong to a future milestone.
-struct SavedLookMetadata: Identifiable, Hashable, Sendable {
+struct SavedLookMetadata: Identifiable, Hashable, Codable, Sendable {
     let id: String
     let referenceID: String
     let createdAt: Date
 }
+enum CaptureKind: String, Sendable { case before, after }

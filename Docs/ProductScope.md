@@ -1,27 +1,17 @@
-# Scope produk dan milestone
+# Scope MVP
 
-Repository: **Final-Sunrise-Develover**. Produk sementara: **SunriseApp**.
+Tanggal: 15 Oktober 2026. Author kode implementasi: `-Nimah`. Produk sementara: SunriseApp.
 
-## Fondasi saat ini
-
-Dua tab, onboarding session-only, katalog empat sample reference, layar detail/import/kalibrasi/live guide/comparison/saved detail, navigasi langkah tutorial, DI, mock services, design tokens, unit test, dan workflow CI.
-
-UI menunjukkan label scaffold. Onboarding tampil lagi saat app diluncurkan ulang. My Looks berisi satu metadata contoh yang diberi label, tanpa foto. Tombol Save dinonaktifkan dan kontrak mock menolak save.
-
-## Milestone selanjutnya
-
-| Area | Target berikutnya | Belum termasuk |
+| Fitur | Status implementasi | Verifikasi yang diperlukan |
 | --- | --- | --- |
-| Katalog | Konten nyata dan detail look | Rekomendasi otomatis |
-| Import | System PhotosPicker, preview, hapus, error/cancel | Analisis makeup atau transfer reference otomatis |
-| Kalibrasi | Status dukungan perangkat, permission, tracking stability | Bentuk wajah, analisis kulit, identifikasi pengguna |
-| AR | Blush mengikuti face mesh/anchor | AR contour/eyeshadow/eyeliner/lips, photorealistic filter |
-| Tutorial | Instruksi manual per look, navigasi, integrasi sesi | Penilaian otomatis hasil makeup |
-| Comparison | Dua capture pengguna yang jelas asalnya | Scoring, penyelarasan otomatis, capture palsu |
-| Saved Looks | Penyimpanan lokal dan penghapusan metadata+foto | Cloud, akun pengguna, social sharing |
+| Onboarding / empat look / detail | Implemented | UI dan relaunch |
+| Photo inspiration | System PhotosPicker, preview, pilih style manual | iCloud/large asset/cancellation di perangkat |
+| Support check / permission | Implemented, fallback manual | Supported/denied Settings return |
+| Calibration / blush mesh | POC implemented | Wajib uji iPhone fisik, placement belum tervalidasi |
+| Lima langkah tutorial | Implemented, empat langkah manual | Content/layout accessibility |
+| Before/After | Actual camera snapshots, no scoring | Orientasi/mirroring/lighting di iPhone |
+| Save/load/delete | Local actor per-result folder | Unit regression + physical end-to-end |
 
-## Aturan kejujuran produk
+Manual mode hanya tutorial, tanpa camera capture/save. Foto referensi tetap di memori; hanya capture Before/After yang disimpan. Belum ada AI analysis, skin/face-shape analysis, cloud, atau AR contour/eyeshadow/eyeliner/lips.
 
-Jangan menamai tombol import sebagai Analyze. Jangan mengubah availability menjadi klaim tracking aktif. Jangan menamai metadata contoh sebagai hasil pengguna. Jangan menghapus label placeholder sebelum fitur asli dan acceptance criteria-nya selesai.
-
-Belum ada permission strings kamera/foto karena tidak ada akses hardware/library. Tambahkan penggunaan kamera beserta deskripsi permission pada PR implementasi kamera. System PhotosPicker cukup memberi akses pilihan pengguna; broad library access memerlukan keputusan implementasi dan permission yang sesuai.
+Label `-Nimah` menandai kode yang dibuat dalam fase ini. Nama Khalish/Hanum di dokumen adalah usulan tanggung jawab iterasi, bukan klaim siapa menulis kode tersebut.

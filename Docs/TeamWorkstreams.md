@@ -1,6 +1,16 @@
-# Usulan pembagian pekerjaan tim
+# Pembagian iterasi MVP — Nimah, Khalish, Hanum
 
 Ini daftar area kerja, bukan asumsi jumlah anggota. Satu PIC dapat memegang beberapa area; tech lead menetapkan nama melalui issue. Area bisa mulai paralel menggunakan mock setelah kontrak minimum disepakati.
+
+## Tim dan handoff saat ini
+
+| Nama | Usulan area iterasi berikut | Pekerjaan berikutnya |
+| --- | --- | --- |
+| Nimah (tech lead) | Integrasi, camera/calibration/AR | Uji iPhone, tuning pipi, lifecycle dan capture orientation |
+| Khalish | Katalog/detail/import dan tutorial | Review konten look, import memory, UI/accessibility |
+| Hanum | Comparison, local persistence, My Looks | End-to-end save/relaunch/delete, thumbnail dan storage quota |
+
+Implementasi MVP pada paket ini diberi komentar `// -Nimah:` sesuai permintaan. Ini tidak mengklaim Khalish atau Hanum menulis kode yang dibuat pada fase ini. Status fitur dan batas pengujian terbaru ada di ProductScope.md dan Validation.md. Rincian delapan area di bawah menjadi backlog/handoff; beberapa deliverable awal sudah diimplementasikan dan perlu divalidasi lebih lanjut.
 
 ## 1. Foundation dan integrasi
 
@@ -26,7 +36,7 @@ Ini daftar area kerja, bukan asumsi jumlah anggota. Satu PIC dapat memegang bebe
 
 - Tujuan: memilih foto inspirasi pribadi tanpa janji analisis otomatis.
 - Area: Features/ReferenceImport.
-- Kontrak: belum ada media contract; sepakati owned reference ID/lifecycle dengan tutorial dan persistence sebelum wiring.
+- Kontrak: media import session-only; koordinasikan perubahan ownership jika reference kelak ikut disimpan.
 - Dependensi: API media milestone berikut; UI dapat dimulai dari placeholder dan fixture berlabel.
 - Deliverable: PhotosPicker, preview/removal, cancellation/error, pengelolaan ukuran gambar.
 - Acceptance: cancel tidak dianggap error; iCloud/unreadable asset ditangani; tidak ada klaim makeup extraction; foto tidak terkirim ke server.
@@ -56,7 +66,7 @@ Ini daftar area kerja, bukan asumsi jumlah anggota. Satu PIC dapat memegang bebe
 
 - Tujuan: membandingkan capture nyata dan menyimpan koleksi lokal.
 - Area: Features/Comparison, Features/SavedLooks; kontrak SavedLooksStoring melalui koordinasi.
-- Kontrak: SavedLookMetadata, SavedLooksStoring; proposal transaksi media diperlukan sebelum save aktif.
+- Kontrak: SavedLookMetadata, SavedLooksStoring; save dua JPEG memakai staging folder; pertahankan kontrak transaksi saat mengembangkannya.
 - Dependensi: capture dari AR/camera dan media ownership dari import bila reference ikut disimpan. UI boleh menggunakan metadata sample tanpa foto palsu.
 - Deliverable: comparison, file storage, metadata, reload/delete, error/cleanup policy.
 - Acceptance: capture asalnya jelas; tanpa overlay jika dipilih produk; simpan/relaunch/hapus konsisten; gagal I/O tidak menampilkan sukses; media dan metadata tidak orphan.

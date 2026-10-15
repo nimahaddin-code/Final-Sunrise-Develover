@@ -2,6 +2,7 @@
   "sourceLanguage": "en",
   "strings": {
     "A little guidance. A glow that's yours.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -12,62 +13,200 @@
         }
       }
     },
-    "AR and the camera are not implemented. The next proof of concept will render blush on the tracked face mesh. Other makeup overlays remain out of scope.": {
+    "AR is available on supported iPhones. Manual tutorials work on every device. Placement is an approximate guide, not automatic face-shape analysis.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "AR and the camera are not implemented. The next proof of concept will render blush on the tracked face mesh. Other makeup overlays remain out of scope."
+            "value": "AR is available on supported iPhones. Manual tutorials work on every device. Placement is an approximate guide, not automatic face-shape analysis."
           }
         }
       }
     },
-    "Before and after": {
+    "Actual camera captures. Different framing or lighting can affect comparison. No beauty scoring or automatic assessment.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Before and after"
+            "value": "Actual camera captures. Different framing or lighting can affect comparison. No beauty scoring or automatic assessment."
           }
         }
       }
     },
-    "Calibration is not implemented. No camera is running and no face has been detected. This screen only demonstrates a future integration point.": {
+    "After": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Calibration is not implemented. No camera is running and no face has been detected. This screen only demonstrates a future integration point."
+            "value": "After"
           }
         }
       }
     },
-    "Comparison will show actual user captures in a future milestone. There are no captures, scoring or persistence in this scaffold.": {
+    "Artwork is illustrative. Uploaded inspiration is not analyzed automatically.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comparison will show actual user captures in a future milestone. There are no captures, scoring or persistence in this scaffold."
+            "value": "Artwork is illustrative. Uploaded inspiration is not analyzed automatically."
           }
         }
       }
     },
-    "Device support has not been checked. Mock service only.": {
+    "Before": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Device support has not been checked. Mock service only."
+            "value": "Before"
+          }
+        }
+      }
+    },
+    "Before & after": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Before & after"
+          }
+        }
+      }
+    },
+    "Camera access is off. Allow access in Settings or continue with the manual tutorial.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera access is off. Allow access in Settings or continue with the manual tutorial."
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "Capture after": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture after"
+          }
+        }
+      }
+    },
+    "Choose a look you love. Learn one step at a time, with a live blush guide on your own face.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a look you love. Learn one step at a time, with a live blush guide on your own face."
+          }
+        }
+      }
+    },
+    "Choose a photo, then select a tutorial style yourself. No automatic makeup analysis is included.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a photo, then select a tutorial style yourself. No automatic makeup analysis is included."
+          }
+        }
+      }
+    },
+    "Choose from Photos": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose from Photos"
+          }
+        }
+      }
+    },
+    "Complete a camera tutorial and save your Before and After photos here.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete a camera tutorial and save your Before and After photos here."
+          }
+        }
+      }
+    },
+    "Continue with manual tutorial": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue with manual tutorial"
+          }
+        }
+      }
+    },
+    "Delete look": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete look"
+          }
+        }
+      }
+    },
+    "Delete this look": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this look"
           }
         }
       }
     },
     "Discover": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -78,128 +217,104 @@
         }
       }
     },
-    "Entries could not be loaded.": {
+    "Face the camera in even light at arm's length. Hold still for two seconds. Calibration checks tracking stability, not your face shape.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Entries could not be loaded."
+            "value": "Face the camera in even light at arm's length. Hold still for two seconds. Calibration checks tracking stability, not your face shape."
           }
         }
       }
     },
-    "Explore calibration placeholder": {
+    "Find my glow": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Explore calibration placeholder"
+            "value": "Find my glow"
           }
         }
       }
     },
-    "Explore comparison placeholder": {
+    "Finish manual tutorial": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Explore comparison placeholder"
+            "value": "Finish manual tutorial"
           }
         }
       }
     },
-    "Explore live guide placeholder": {
+    "Let's find your face": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Explore live guide placeholder"
+            "value": "Let's find your face"
           }
         }
       }
     },
-    "Explore reference import placeholder": {
+    "Live camera guide": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Explore reference import placeholder"
+            "value": "Live camera guide"
           }
         }
       }
     },
-    "Explore scaffold": {
+    "Loading looks": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Explore scaffold"
+            "value": "Loading looks"
           }
         }
       }
     },
-    "Explore the SunriseApp project scaffold. All references and saved entries are sample data. Camera, AR, photo import and saving are not implemented. Onboarding resets when the app restarts.": {
+    "Loading photo": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Explore the SunriseApp project scaffold. All references and saved entries are sample data. Camera, AR, photo import and saving are not implemented. Onboarding resets when the app restarts."
+            "value": "Loading photo"
           }
         }
       }
     },
-    "Face calibration": {
+    "Loading photos": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Face calibration"
-          }
-        }
-      }
-    },
-    "Future integration: system PhotosPicker, image preview and import error handling.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Future integration: system PhotosPicker, image preview and import error handling."
-          }
-        }
-      }
-    },
-    "Injected support result: supported. This does not mean a camera session is active.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Injected support result: supported. This does not mean a camera session is active."
-          }
-        }
-      }
-    },
-    "Live AR guide": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Live AR guide"
+            "value": "Loading photos"
           }
         }
       }
     },
     "Loading references": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -210,29 +325,44 @@
         }
       }
     },
-    "Loading sample entries": {
+    "MVP · Blush is the only AR overlay. Other steps are manual. Camera photos stay on this device.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Loading sample entries"
+            "value": "MVP · Blush is the only AR overlay. Other steps are manual. Camera photos stay on this device."
           }
         }
       }
     },
-    "MOCK COLLECTION · NOT YOUR SAVED RESULTS": {
+    "Makeup placement illustration": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "MOCK COLLECTION · NOT YOUR SAVED RESULTS"
+            "value": "Makeup placement illustration"
+          }
+        }
+      }
+    },
+    "Manual tutorial · camera is off": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual tutorial · camera is off"
           }
         }
       }
     },
     "My Looks": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -243,7 +373,32 @@
         }
       }
     },
+    "My inspiration": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My inspiration"
+          }
+        }
+      }
+    },
+    "My tutorial": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My tutorial"
+          }
+        }
+      }
+    },
     "Next step": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -254,29 +409,8 @@
         }
       }
     },
-    "No camera preview or simulated face tracking is shown.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No camera preview or simulated face tracking is shown."
-          }
-        }
-      }
-    },
-    "No entries": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No entries"
-          }
-        }
-      }
-    },
     "No references": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -287,40 +421,44 @@
         }
       }
     },
-    "No steps": {
+    "OK": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "No steps"
+            "value": "OK"
           }
         }
       }
     },
-    "Only step navigation works. Tutorial instructions, completion tracking and all AR overlays remain unimplemented.": {
+    "Open Settings": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Only step navigation works. Tutorial instructions, completion tracking and all AR overlays remain unimplemented."
+            "value": "Open Settings"
           }
         }
       }
     },
-    "Photos import will be implemented here. No photo library is opened, no image is imported, and automatic makeup analysis is not planned for this milestone.": {
+    "Preparing your camera. You can also continue manually.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Photos import will be implemented here. No photo library is opened, no image is imported, and automatic makeup analysis is not planned for this milestone."
+            "value": "Preparing your camera. You can also continue manually."
           }
         }
       }
     },
     "Previous step": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -331,29 +469,8 @@
         }
       }
     },
-    "Reference detail": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reference detail"
-          }
-        }
-      }
-    },
-    "Reference import": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reference import"
-          }
-        }
-      }
-    },
     "References could not be loaded.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -364,7 +481,20 @@
         }
       }
     },
+    "Remove photo": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove photo"
+          }
+        }
+      }
+    },
     "Retry": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -375,29 +505,32 @@
         }
       }
     },
-    "Return to Discover": {
+    "Retry camera": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Return to Discover"
+            "value": "Retry camera"
           }
         }
       }
     },
-    "SAMPLE CATALOG · SCAFFOLD": {
+    "Retry loading": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "SAMPLE CATALOG · SCAFFOLD"
+            "value": "Retry loading"
           }
         }
       }
     },
     "SCAFFOLD · NOT IMPLEMENTED": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -408,62 +541,116 @@
         }
       }
     },
-    "Sample entry — detail scaffold": {
+    "SUNRISE": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sample entry — detail scaffold"
+            "value": "SUNRISE"
           }
         }
       }
     },
-    "Sample reference": {
+    "Saved look": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sample reference"
+            "value": "Saved look"
           }
         }
       }
     },
-    "Save unavailable": {
+    "Saved only on this device. Delete the result from My Looks whenever you like.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Save unavailable"
+            "value": "Saved only on this device. Delete the result from My Looks whenever you like."
           }
         }
       }
     },
-    "Saved look detail": {
+    "Start my tutorial": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saved look detail"
+            "value": "Start my tutorial"
           }
         }
       }
     },
-    "Skip calibration and explore tutorial scaffold": {
+    "Start with this inspiration": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skip calibration and explore tutorial scaffold"
+            "value": "Start with this inspiration"
+          }
+        }
+      }
+    },
+    "Switch to manual tutorial": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch to manual tutorial"
+          }
+        }
+      }
+    },
+    "THE LOOK EDIT": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "THE LOOK EDIT"
+          }
+        }
+      }
+    },
+    "The look": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The look"
+          }
+        }
+      }
+    },
+    "The reference stays in memory for this session. Only Before and After camera captures are saved when you choose Save.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The reference stays in memory for this session. Only Before and After camera captures are saved when you choose Save."
           }
         }
       }
     },
     "There are no references to show.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
@@ -474,68 +661,122 @@
         }
       }
     },
-    "This collection is empty. Saving is not implemented.": {
+    "Use my own inspiration": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This collection is empty. Saving is not implemented."
+            "value": "Use my own inspiration"
           }
         }
       }
     },
-    "This is sample metadata to demonstrate navigation. It is not a captured or persisted user result. No images have been saved.": {
+    "YOUR FIVE-STEP RITUAL": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This is sample metadata to demonstrate navigation. It is not a captured or persisted user result. No images have been saved."
+            "value": "YOUR FIVE-STEP RITUAL"
           }
         }
       }
     },
-    "This screen will explain the chosen makeup reference. The catalog is sample data; no personalized recommendation or photo analysis is available.": {
+    "YOUR GLOW SESSION": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This screen will explain the chosen makeup reference. The catalog is sample data; no personalized recommendation or photo analysis is available."
+            "value": "YOUR GLOW SESSION"
           }
         }
       }
     },
-    "This tutorial has no configured steps.": {
+    "Your captures, kept on this device.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "This tutorial has no configured steps."
+            "value": "Your captures, kept on this device."
           }
         }
       }
     },
-    "Tutorial flow": {
+    "Your face. Your kind of glow.": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tutorial flow"
+            "value": "Your face. Your kind of glow."
           }
         }
       }
     },
-    "Your next glow starts here": {
+    "Your first glow awaits": {
+      "comment": "-Nimah: MVP source copy.",
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Your next glow starts here"
+            "value": "Your first glow awaits"
+          }
+        }
+      }
+    },
+    "Your glow journal": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your glow journal"
+          }
+        }
+      }
+    },
+    "Your glow, captured.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your glow, captured."
+          }
+        }
+      }
+    },
+    "Your inspiration, your way.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your inspiration, your way."
+          }
+        }
+      }
+    },
+    "Your saved looks could not be loaded. Your files have not been removed.": {
+      "comment": "-Nimah: MVP source copy.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your saved looks could not be loaded. Your files have not been removed."
           }
         }
       }

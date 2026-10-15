@@ -1,41 +1,35 @@
+// -Nimah: ReferenceCatalogView.swift — implementasi MVP SunriseApp.
 import SwiftUI
 
 struct ReferenceCatalogView: View {
     @StateObject private var model: ReferenceCatalogViewModel
-    init(service: any ReferenceCatalogProviding) {
-        _model = StateObject(wrappedValue: ReferenceCatalogViewModel(service: service))
-    }
+    init(service: any ReferenceCatalogProviding) { _model = StateObject(wrappedValue: ReferenceCatalogViewModel(service: service)) }
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.large) {
                 Text("A little guidance. A glow that's yours.").font(AppTypography.title)
-                Text("SAMPLE CATALOG · SCAFFOLD").font(AppTypography.caption).foregroundStyle(AppColors.rose)
+                Text("THE LOOK EDIT").font(.caption.weight(.semibold)).tracking(3).foregroundStyle(AppColors.rose)
                 switch model.state {
                 case .idle, .loading: ProgressView("Loading references")
                 case .failed:
                     Text("References could not be loaded.")
                     Button("Retry") { Task { await model.load() } }
-                case .loaded(let references):
-                    if references.isEmpty { EmptyStateView(title: "No references", message: "There are no references to show.") }
-                    ForEach(references) { reference in
+                case .loaded(let items):
+                    if items.isEmpty { EmptyStateView(title: "No references", message: "There are no references to show.") }
+                    ForEach(items) { reference in
                         NavigationLink(value: AppRoute.referenceDetail(reference)) {
-                            VStack(alignment: .leading, spacing: AppSpacing.small) {
-                                Label(reference.name, systemImage: "sparkle").font(AppTypography.heading)
-                                Text(reference.summary).font(AppTypography.body)
-                                Text("Sample reference").font(AppTypography.caption).foregroundStyle(AppColors.subtle)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading).padding(AppSpacing.large)
-                            .background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
+                            VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                                LookArtwork(referenceID: reference.id)
+                                Text(reference.name).font(AppTypography.heading)
+                                Text(reference.summary).font(.subheadline).foregroundStyle(AppColors.subtle)
+                            }.padding(AppSpacing.medium).background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
                         }.foregroundStyle(AppColors.ink)
                     }
                 }
-                NavigationLink("Explore reference import placeholder", value: AppRoute.referenceImport)
+                NavigationLink(value: AppRoute.referenceImport) { Label("Use my own inspiration", systemImage: "photo.on.rectangle.angled").font(.headline) }
+                Text("Artwork is illustrative. Uploaded inspiration is not analyzed automatically.").font(AppTypography.caption).foregroundStyle(AppColors.subtle)
             }.padding(AppSpacing.large)
-        }
-        .background(AppColors.background).foregroundStyle(AppColors.ink)
-        .navigationTitle("Discover")
-        .task { await model.load() }
+        }.background(AppColors.background).foregroundStyle(AppColors.ink).navigationTitle("Discover").task { await model.load() }
     }
 }
-
 #Preview { NavigationStack { ReferenceCatalogView(service: MockReferenceCatalog()) } }
