@@ -13,7 +13,7 @@ enum LinerGeometry {
     /// lower liner), negative moves it into the eye. 0.006 is the spike's own lash offset.
     static let linerLashOffset: Float = 0.006
     /// Scales every style's widths. 1 draws the widths as written. The live view is smaller and softer than the spike's screen overlay, so the line is drawn thicker to stay noticeable.
-    static let linerThicknessScale: Float = 1.8
+    static let linerThicknessScale: Float = 2.0
     /// How far the upper line is extended past the inner corner; the inner side curves down, so none by default.
     static let innerExtension: Float = 0
     /// How far the upper line is extended past the outer corner; the landmark usually sits inside the visible corner.
