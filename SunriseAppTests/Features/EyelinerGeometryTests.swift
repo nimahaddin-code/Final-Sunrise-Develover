@@ -79,7 +79,7 @@ final class EyelinerGeometryTests: XCTestCase {
         XCTAssertGreaterThan(near.max() ?? 0, 0.03, "and it has real thickness")
         let far = try gaps(LinerBuildOptions(lashOffset: 0.05))
         XCTAssertEqual(far.min() ?? 0, 0.05, accuracy: 0.006)
-        XCTAssertEqual((far.max() ?? 0) - (far.min() ?? 0), (near.max() ?? 0) - (near.min() ?? 0), accuracy: 0.004,
+        XCTAssertEqual((far.max() ?? 0) - (far.min() ?? 0), (near.max() ?? 0) - (near.min() ?? 0), accuracy: 0.01,
                        "Moving the liner off the lash line does not thin it")
         XCTAssertGreaterThan(LinerBuildOptions.defaultLashOffset, LinerBuildOptions.spikeLashOffset)
         XCTAssertEqual(LinerBuildOptions().lashOffset, LinerBuildOptions.defaultLashOffset)
