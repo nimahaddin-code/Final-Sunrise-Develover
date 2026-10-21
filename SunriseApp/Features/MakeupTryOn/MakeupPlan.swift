@@ -133,13 +133,25 @@ enum MakeupPersonalizer {
 
     static func eyeliner(_ styles: [(LinerStyle, Float)], shade: MakeupShade, deviation: FaceProportions) -> LinerStyle {
         let length = strength(deviation.length)
+        // Numbers are averaged; flags and enums come from the strongest-weighted style.
+        let lead = styles.max { $0.1 < $1.1 }?.0
+        // The mid width only exists when at least one style has one; the others contribute their own taper midpoint.
+        let hasMid = styles.contains { $0.0.midWidth != nil }
         return LinerStyle(
             innerWidth: mean(styles) { $0.innerWidth },
             outerWidth: mean(styles) { $0.outerWidth },
+            midWidth: hasMid ? mean(styles) { $0.midWidth ?? ($0.innerWidth + $0.outerWidth) / 2 } : nil,
             start: mean(styles) { $0.start },
             // A shorter face benefits from a longer, more lifted wing.
             wingLength: max(0, mean(styles) { $0.wingLength } * (1 - 0.3 * length)),
             wingAngle: clamp(mean(styles) { $0.wingAngle } - 5 * length, 0, 40),
+            wingOrigin: lead?.wingOrigin ?? .outerCorner,
+            wingBase: lead?.wingBase ?? .horizontal,
+            wingTargetsBrowTail: lead?.wingTargetsBrowTail ?? false,
+            tightline: lead?.tightline ?? false,
+            lowerLine: LowerLine(enabled: lead?.lowerLine.enabled ?? false,
+                                 extent: mean(styles) { $0.lowerLine.extent },
+                                 thickness: mean(styles) { $0.lowerLine.thickness }),
             shade: shade)
     }
 

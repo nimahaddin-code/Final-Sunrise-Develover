@@ -29,18 +29,25 @@ enum MakeupTextureRenderer {
     /// slider can go above the default.
     static let defaultIntensity: Double = 0.65
 
-    static func image(for style: MakeupStyle, features: FaceFeatureMap) -> UIImage? {
+    /// Intensity a category starts at. The liner is a thin line, so it starts fully opaque to stay noticeable.
+    static func startingIntensity(for category: MakeupCategory) -> Double {
+        category == .eyeliner ? 1 : defaultIntensity
+    }
+
+    /// `fit` is measured from `features` unless given; pass one when `features` carries live, moving points
+    /// (see `FaceFeatureMap.replacingEyes`) so the fitting does not jump with every frame.
+    static func image(for style: MakeupStyle, features: FaceFeatureMap, fit: FaceFit? = nil) -> UIImage? {
         guard features.isPlausible else { return nil }
         let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         format.opaque = false
         // Every style is fitted to the measured features; without them it is drawn as designed.
-        let fit = FaceFit(features: features)
+        let fit = fit ?? FaceFit(features: features)
         return UIGraphicsImageRenderer(size: CGSize(width: size, height: size), format: format).image { context in
             let cg = context.cgContext
-            for side in features.sides {
+            for (index, side) in features.sides.enumerated() {
                 let frame = FeatureFrame(side: side, in: features)
-                let sideFit = fit?.side(for: frame)
+                let sideFit = fit.map { index == 0 ? $0.left : $0.right }
                 switch style {
                 case .blush(let blush):
                     draw(sideFit.map { MakeupFitter.blush(blush, side: $0) } ?? blush, frame: frame, in: cg)
@@ -49,7 +56,9 @@ enum MakeupTextureRenderer {
                          blur: 10, in: cg)
                 case .eyeliner(let liner):
                     let fitted = fit.map { MakeupFitter.eyeliner(liner, fit: $0) } ?? liner
-                    fill(linerOutline(fitted, eye: side.eye, frame: frame), shade: liner.shade, blur: 2, in: cg)
+                    for outline in linerOutlines(fitted, eye: side.eye, brow: side.brow, frame: frame) {
+                        fill(outline, shade: liner.shade, blur: 1, in: cg)
+                    }
                 }
             }
         }
@@ -120,44 +129,14 @@ enum MakeupTextureRenderer {
         return style.archHeight * (smooth + (angular - smooth) * style.angularity)
     }
 
-    /// Polygon of a liner along the upper lash line, with an optional wing past the outer corner.
-    static func linerOutline(_ style: LinerStyle, eye: [SIMD2<Float>], frame: FeatureFrame) -> [SIMD2<Float>] {
-        guard eye.count >= 3,
-              let inner = eye.min(by: { frame.across($0) < frame.across($1) }),
-              let outer = eye.max(by: { frame.across($0) < frame.across($1) }) else { return [] }
-        let axis = outer - inner
-        let eyeWidth = simd_length(axis)
-        guard eyeWidth > 0 else { return [] }
-        let lidNormal = oriented(perpendicular(axis), toward: frame.up)
-        let upper = eye.filter { simd_dot($0 - inner, lidNormal) > eyeWidth * 0.02 }
-            .sorted { frame.across($0) < frame.across($1) }
-        let lid = smoothed([inner] + upper + [outer])
+    /// Draw the tightline (a strip on the inner rim of the upper lid). Off because the face renderer fills the whole
+    /// mesh, so anything inside the eye opening would be painted over the eyeball.
+    static let drawsTightline = false
 
-        // Arc length along the lid, 0 at the inner corner and 1 at the outer corner.
-        var lengths: [Float] = [0]
-        for index in 1..<lid.count { lengths.append(lengths[index - 1] + simd_distance(lid[index - 1], lid[index])) }
-        guard let total = lengths.last, total > 0 else { return [] }
-
-        var top: [SIMD2<Float>] = [], bottom: [SIMD2<Float>] = []
-        for (index, point) in lid.enumerated() {
-            let s = lengths[index] / total
-            guard s >= style.start else { continue }
-            let progress = style.start < 1 ? (s - style.start) / (1 - style.start) : 1
-            let taper = min(1, 0.2 + progress * 5)
-            let width = (style.innerWidth + (style.outerWidth - style.innerWidth) * progress) * eyeWidth * taper
-            let tangent = lid[min(index + 1, lid.count - 1)] - lid[max(index - 1, 0)]
-            let normal = oriented(perpendicular(tangent), toward: frame.up)
-            // Mostly above the lash line, slightly into it so no skin gap shows.
-            top.append(point + normal * width * 0.75)
-            bottom.append(point - normal * width * 0.25)
-        }
-        guard !top.isEmpty else { return [] }
-
-        let direction = simd_normalize(axis)
-        let angle = style.wingAngle * .pi / 180
-        let wingDirection = direction * cos(angle) + lidNormal * sin(angle)
-        let tip = outer + wingDirection * max(style.wingLength, 0.03) * eyeWidth
-        return bottom + [tip] + top.reversed()
+    /// Polygons of a liner along the upper lash line, with an optional wing past the outer corner and lower line.
+    static func linerOutlines(_ style: LinerStyle, eye: [SIMD2<Float>], brow: [SIMD2<Float>],
+                              frame: FeatureFrame) -> [[SIMD2<Float>]] {
+        LinerGeometry.shape(style, eye: eye, brow: brow, frame: frame, includeTightline: drawsTightline)?.outlines ?? []
     }
 
     /// Catmull-Rom curve through `points`, eight samples per segment.

@@ -14,7 +14,7 @@ enum MakeupRecommender {
             case .diamond: ([Brow.roundedArch, Brow.softArch], [Blush.centered, Blush.apples], [Liner.classicWing, Liner.softFlick])
             case .triangle: ([Brow.fullExtended, Brow.highArch], [Blush.highCheekbones, Blush.liftedTemples], [Liner.outerLift, Liner.catEye])
             }
-        return brows + blush + liner
+        return brows + blush + liner + Liner.spikeVariants
     }
 
     static func recommendations(for shape: FaceShape, in category: MakeupCategory) -> [MakeupRecommendation] {
@@ -135,5 +135,57 @@ enum MakeupRecommender {
             detail: "Liner on the outer half, flicked upward.",
             style: .eyeliner(LinerStyle(innerWidth: 0.02, outerWidth: 0.07, start: 0.4, wingLength: 0.16, wingAngle: 30,
                                         shade: black)))
+
+        // The eyeliner spike's variants, so each can be tried on, with the spike's own widths (drawn above the
+        // lash line, see `LinerGeometry.linerAboveFraction`).
+        static let spikeVariants = [naturalLine, spikeClassicWing, elongatedOuter, liftedFlick, hoodedTightlineWing,
+                                    monolidBold, monolidUnderWing, closeSetOutward, upturnedLowerWeighted,
+                                    wideSetInnerFocused]
+
+        static let naturalLine = MakeupRecommendation(id: "liner.naturalLine", name: "Natural line",
+            detail: "Thin, even line along the upper lash line, no wing.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.012, outerWidth: 0.016, midWidth: 0.014, start: 0,
+                                        wingLength: 0, wingAngle: 0, wingBase: .lowerLidTangent, shade: brown)))
+        static let spikeClassicWing = MakeupRecommendation(id: "liner.almondWing", name: "Almond wing",
+            detail: "Follows the natural curve, builds toward the outer corner with a small flick.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.01, outerWidth: 0.036, midWidth: 0.022, start: 0.05,
+                                        wingLength: 0.22, wingAngle: 10, wingBase: .lowerLidTangent, shade: black)))
+        static let elongatedOuter = MakeupRecommendation(id: "liner.elongatedOuter", name: "Elongated outer",
+            detail: "Concentrated on the outer third and extended outward for a longer look.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.01, outerWidth: 0.04, midWidth: 0.018, start: 0.55,
+                                        wingLength: 0.38, wingAngle: 4, wingBase: .lowerLidTangent, shade: black)))
+        static let liftedFlick = MakeupRecommendation(id: "liner.liftedFlick", name: "Lifted flick",
+            detail: "Inner corner left open, thin to thick, with a clearly upward flick.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.008, outerWidth: 0.034, midWidth: 0.02, start: 0.1,
+                                        wingLength: 0.3, wingAngle: 22, wingBase: .lowerLidTangent, shade: black)))
+        static let hoodedTightlineWing = MakeupRecommendation(id: "liner.hoodedTightlineWing",
+            name: "Tightline + small wing", detail: "Mostly tightline with a thin start and a small wing.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.006, outerWidth: 0.02, midWidth: 0.012, start: 0.05,
+                                        wingLength: 0.16, wingAngle: 12, wingBase: .lowerLidTangent,
+                                        tightline: true, shade: black)))
+        static let monolidBold = MakeupRecommendation(id: "liner.monolidBold", name: "Bold lash line",
+            detail: "A thicker line along the upper lash line.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.02, outerWidth: 0.045, midWidth: 0.032, start: 0,
+                                        wingLength: 0.08, wingAngle: 3, wingBase: .lowerLidTangent, shade: black)))
+        static let monolidUnderWing = MakeupRecommendation(id: "liner.monolidUnderWing", name: "Under-wing",
+            detail: "The wing starts under the lower lash line and extends straight out.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.01, outerWidth: 0.018, midWidth: 0.014, start: 0,
+                                        wingLength: 0.28, wingAngle: 0, wingOrigin: .underLowerLash,
+                                        wingBase: .horizontal, shade: black)))
+        static let closeSetOutward = MakeupRecommendation(id: "liner.closeSetOutward", name: "Outward focus",
+            detail: "Bare on the inner half, thickest at the outer end, wing aimed at the brow tail.",
+            style: .eyeliner(LinerStyle(innerWidth: 0, outerWidth: 0.034, midWidth: 0.008, start: 0.5,
+                                        wingLength: 0.28, wingAngle: 0, wingBase: .lowerLidTangent,
+                                        wingTargetsBrowTail: true, shade: black)))
+        static let upturnedLowerWeighted = MakeupRecommendation(id: "liner.upturnedLowerWeighted",
+            name: "Wing + lower liner", detail: "A subtle upper wing with lower liner on the outer half.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.008, outerWidth: 0.022, midWidth: 0.014, start: 0,
+                                        wingLength: 0.14, wingAngle: 5, wingBase: .lowerLidTangent,
+                                        lowerLine: LowerLine(enabled: true, extent: 0.5, thickness: 0.016),
+                                        shade: black)))
+        static let wideSetInnerFocused = MakeupRecommendation(id: "liner.wideSetInnerFocused",
+            name: "Inner focus", detail: "Starts at the inner corner, thinning outward, with a minimal wing.",
+            style: .eyeliner(LinerStyle(innerWidth: 0.026, outerWidth: 0.012, midWidth: 0.02, start: 0,
+                                        wingLength: 0.06, wingAngle: 2, wingBase: .lowerLidTangent, shade: black)))
     }
 }

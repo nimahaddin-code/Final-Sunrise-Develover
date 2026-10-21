@@ -92,17 +92,68 @@ struct BlushStyle: Hashable, Sendable {
     var shade: MakeupShade
 }
 
-/// Liner along the upper lash line. Lengths are fractions of the eye width.
+/// Where a liner's wing starts.
+enum WingOrigin: String, Hashable, Sendable {
+    case outerCorner, underLowerLash
+}
+
+/// Which direction a liner's wing follows before `wingAngle` is added.
+enum WingBase: String, Hashable, Sendable {
+    /// The eye's own axis, inner to outer corner.
+    case horizontal
+    /// The tangent of the lower lash line at the outer corner.
+    case lowerLidTangent
+}
+
+/// Liner along the lower lash line. Lengths are fractions of the eye width.
+struct LowerLine: Hashable, Sendable {
+    var enabled = false
+    /// Fraction of the lower lash line, measured from the outer corner inward.
+    var extent: Float = 0.5
+    /// Total width, as `LinerStyle.innerWidth`.
+    var thickness: Float = 0.015
+}
+
+/// Liner along the upper lash line. Lengths are fractions of the eye width; widths are total widths, drawn mostly
+/// above the lash line (see `LinerGeometry.linerAboveFraction`).
 struct LinerStyle: Hashable, Sendable {
     var innerWidth: Float
     var outerWidth: Float
+    /// Width halfway along the drawn liner; `nil` is the straight taper between inner and outer.
+    var midWidth: Float?
     /// Fraction of the lid, from the inner corner, left bare.
     var start: Float
     /// Wing length past the outer corner; 0 means no wing.
     var wingLength: Float
-    /// Wing angle above the eye's horizontal axis, in degrees.
+    /// Wing angle above the wing's base direction, in degrees.
     var wingAngle: Float
+    var wingOrigin: WingOrigin
+    var wingBase: WingBase
+    /// Aims the wing partly toward the brow tail.
+    var wingTargetsBrowTail: Bool
+    /// A thin line on the inner rim of the upper lid. Modelled, but only drawn when
+    /// `MakeupTextureRenderer.drawsTightline` is on.
+    var tightline: Bool
+    var lowerLine: LowerLine
     var shade: MakeupShade
+
+    init(innerWidth: Float, outerWidth: Float, midWidth: Float? = nil, start: Float, wingLength: Float,
+         wingAngle: Float, wingOrigin: WingOrigin = .outerCorner, wingBase: WingBase = .horizontal,
+         wingTargetsBrowTail: Bool = false, tightline: Bool = false, lowerLine: LowerLine = LowerLine(),
+         shade: MakeupShade) {
+        self.innerWidth = innerWidth
+        self.outerWidth = outerWidth
+        self.midWidth = midWidth
+        self.start = start
+        self.wingLength = wingLength
+        self.wingAngle = wingAngle
+        self.wingOrigin = wingOrigin
+        self.wingBase = wingBase
+        self.wingTargetsBrowTail = wingTargetsBrowTail
+        self.tightline = tightline
+        self.lowerLine = lowerLine
+        self.shade = shade
+    }
 }
 
 enum MakeupStyle: Hashable, Sendable {

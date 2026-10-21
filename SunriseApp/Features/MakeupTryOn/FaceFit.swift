@@ -117,7 +117,10 @@ enum MakeupFitter {
         let spacing = fit.eyeSpacing - FaceFit.typicalEyeSpacing
         // Close-set eyes look wider with liner on the outer half; wide-set eyes with liner from the inner corner.
         fitted.start = min(max(style.start - spacing * 0.6, 0), 0.6)
-        if spacing > 0.15 { fitted.innerWidth = style.innerWidth * 1.3 }
+        if spacing > 0.15 {
+            fitted.innerWidth = style.innerWidth * 1.3
+            fitted.midWidth = style.midWidth.map { $0 * 1.15 }
+        }
         return fitted
     }
 
