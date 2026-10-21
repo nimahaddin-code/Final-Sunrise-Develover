@@ -28,7 +28,9 @@ struct MakeupTryOnView: View {
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         Button("Place again", systemImage: "arrow.triangle.2.circlepath", action: model.relocate)
                         Button("Take photo", systemImage: "camera") {
-                            if let image = snapshotter.snapshot() { photo = TryOnPhoto(image: image) }
+                            if let image = snapshotter.snapshot() {
+                                photo = TryOnPhoto(image: model.linerOverlay.composed(image))
+                            }
                         }
                     }
                 }
@@ -83,6 +85,8 @@ struct MakeupTryOnView: View {
         ZStack {
             MakeupARView(session: model.session, layers: model.layers, showsMakeup: !isComparing,
                          snapshotter: snapshotter)
+                .ignoresSafeArea()
+            LinerOverlayView(model: model.linerOverlay, isVisible: !isComparing)
                 .ignoresSafeArea()
             VStack {
                 if let status {

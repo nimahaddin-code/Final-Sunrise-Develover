@@ -41,6 +41,8 @@ import UIKit
     /// the eye shape measured in the face scan instead.
     @Published private(set) var fit: FaceFit?
     let session = ARSession()
+    /// The eyeliner is a 2D overlay driven by MediaPipe landmarks, not part of the face-mesh texture.
+    let linerOverlay = LinerOverlayModel()
 
     private var features: FaceFeatureMap?
     /// `features` with the eyes following the person's current eyes; only the liner is drawn from it.
@@ -86,6 +88,7 @@ import UIKit
 
     func setIntensity(_ intensity: Double, for category: MakeupCategory) {
         intensities[category] = min(max(intensity, 0), 1)
+        if category == .eyeliner { syncLiner() }
     }
 
     /// What the AR view draws: only categories with a finished texture.
@@ -95,7 +98,16 @@ import UIKit
         }
     }
 
-    var hasMakeup: Bool { !textures.isEmpty }
+    var hasMakeup: Bool { !textures.isEmpty || selection[.eyeliner] != nil }
+
+    /// Passes the selected liner, shade and intensity to the overlay (switched off when the mesh liner is being compared).
+    private func syncLiner() {
+        guard !MakeupTextureRenderer.legacyMeshEyeliner, case .eyeliner(let liner)? = selection[.eyeliner]?.style else {
+            linerOverlay.setStyle(nil, shade: nil, intensity: 1)
+            return
+        }
+        linerOverlay.setStyle(liner, shade: shade(for: .eyeliner), intensity: intensity(for: .eyeliner))
+    }
 
     func start() async {
         guard ARFaceTrackingConfiguration.isSupported else { phase = .unsupported; return }
@@ -103,6 +115,7 @@ import UIKit
         session.delegate = self
         session.run(ARFaceTrackingConfiguration(), options: [.resetTracking, .removeExistingAnchors])
         isSessionRunning = true
+        syncLiner()
         // Placement is kept across pauses; the same person is most likely still in front of the camera.
         if features == nil { resetPlacement() } else { phase = .ready }
     }
@@ -116,6 +129,7 @@ import UIKit
 
     func stop() {
         session.pause()
+        linerOverlay.stop()
         isSessionRunning = false
         switch phase {
         case .locating, .ready, .interrupted: phase = .idle
@@ -150,6 +164,15 @@ import UIKit
     /// Draws one category's texture in the background; a newer request for the same category replaces it.
     private func redraw(_ category: MakeupCategory) {
         renderTasks[category]?.cancel()
+        if category == .eyeliner {
+            syncLiner()
+            // The mesh texture only draws the liner for the DEBUG side-by-side comparison.
+            if !MakeupTextureRenderer.legacyMeshEyeliner {
+                renderTasks[category] = nil
+                textures[category] = nil
+                return
+            }
+        }
         let drawn = category == .eyeliner ? liveFeatures ?? features : features
         guard let features = drawn, let recommendation = selection[category] else {
             renderTasks[category] = nil
@@ -183,7 +206,7 @@ import UIKit
     /// Keeps the liner on the person's actual eyes, so it follows when they squint, stretch the lid or blink.
     private func followEyes(with input: FeatureLocatorInput) {
         facingFrames += 1
-        guard selection[.eyeliner] != nil, features != nil, !isLocatingLive, renderTasks[.eyeliner] == nil,
+        guard MakeupTextureRenderer.legacyMeshEyeliner, selection[.eyeliner] != nil, features != nil, !isLocatingLive, renderTasks[.eyeliner] == nil,
               facingFrames.isMultiple(of: Self.liveEyeInterval) else { return }
         isLocatingLive = true
         let preferred = orientation, locateID = locateID
@@ -270,7 +293,10 @@ extension MakeupTryOnViewModel: ARSessionDelegate {
     nonisolated func session(_ session: ARSession, didUpdate frame: ARFrame) {
         let face = frame.anchors.lazy.compactMap { $0 as? ARFaceAnchor }.first
         let sample = face.map { TryOnSample(face: $0, frame: frame) }
-        MainActor.assumeIsolated { handle(sample) }
+        MainActor.assumeIsolated {
+            handle(sample)
+            if let face, face.isTracked { linerOverlay.submit(frame, face: face) }
+        }
     }
 
     nonisolated func session(_ session: ARSession, didFailWithError error: any Error) {

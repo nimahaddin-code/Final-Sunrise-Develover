@@ -29,6 +29,16 @@ enum MakeupTextureRenderer {
     /// slider can go above the default.
     static let defaultIntensity: Double = 0.65
 
+    /// DEBUG only, default off: draw the eyeliner into the face-mesh texture (the old way) instead of the MediaPipe
+    /// overlay, to compare the two. Launch with `-legacyMeshEyeliner YES` (scheme arguments).
+    static var legacyMeshEyeliner: Bool {
+        #if DEBUG
+        UserDefaults.standard.bool(forKey: "legacyMeshEyeliner")
+        #else
+        false
+        #endif
+    }
+
     /// Intensity a category starts at. The liner is a thin line, so it starts fully opaque to stay noticeable.
     static func startingIntensity(for category: MakeupCategory) -> Double {
         category == .eyeliner ? 1 : defaultIntensity
