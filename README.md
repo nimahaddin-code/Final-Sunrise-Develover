@@ -12,7 +12,8 @@
 ## Requirement dan setup
 
 - Mac dengan Xcode 15+ lengkap dan iOS Simulator runtime yang terpasang. Build environment yang benar-benar diperiksa tercantum di Validation.md.
-- Minimum iOS 17, iPhone portrait. Tidak ada dependency eksternal atau langkah package installation.
+- Minimum iOS 17, iPhone portrait. Satu dependency eksternal: MediaPipe Tasks Vision (eyeliner), berupa xcframework di `Vendor/MediaPipe` yang tidak di-commit (±370 MB). Jalankan `Scripts/fetch-mediapipe.sh` sekali setelah clone; tidak ada CocoaPods atau SPM. Simulator hanya arm64 (Apple Silicon). Lihat [ADR 0002](Docs/Decisions/0002-mediapipe-eyeliner.md).
+- Setelah clone: `Scripts/fetch-mediapipe.sh`.
 - Buka `SunriseApp.xcodeproj`, pilih scheme **SunriseApp**, pilih iPhone Simulator, lalu Run (Cmd+R).
 - Untuk iPhone fisik: pilih target → Signing & Capabilities → development Team milikmu, gunakan bundle identifier unik bila diperlukan, trust perangkat dan aktifkan Developer Mode, lalu Run. Team ID pribadi tidak disimpan di repository.
 - Untuk test: Product → Test (Cmd+U) atau ikuti CLI di Docs/Testing.md.

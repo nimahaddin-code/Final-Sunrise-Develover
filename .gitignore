@@ -26,3 +26,6 @@ xcuserdata/
 *.xcconfig.local
 # Swift package checkouts; keep lockfiles if packages are added later
 .swiftpm/
+
+# MediaPipe xcframeworks (~370 MB): fetched by Scripts/fetch-mediapipe.sh, never committed
+Vendor/MediaPipe/

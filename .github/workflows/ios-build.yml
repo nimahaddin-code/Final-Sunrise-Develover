@@ -44,6 +44,8 @@ jobs:
               output.write('id=' + device['udid'] + '\n')
           print('Selected:', device['name'], device['udid'])
           PYTHON
+      - name: Fetch MediaPipe frameworks
+        run: Scripts/fetch-mediapipe.sh
       - name: Build and run unit tests
         shell: bash
         env:
