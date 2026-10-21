@@ -3,12 +3,15 @@ import SwiftUI
 struct FaceShapeResultView: View {
     let result: FaceShapeResult
     var onScanAgain: () -> Void
+    /// Called when the person answers the hooded / monolid question.
+    var onLidTypeChange: (LidType) -> Void = { _ in }
     var onShowMakeup: (() -> Void)?
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.large) {
                 summaryCard
+                eyeCard
                 card(title: "Blush tip") { Text(result.shape.blushTip).font(AppTypography.body) }
                 card(title: "Closest matches") {
                     ForEach(result.rankedShapes.prefix(3), id: \.shape) { match in
@@ -23,8 +26,11 @@ struct FaceShapeResultView: View {
                         }
                     }
                 }
-                Text("An estimate from ARKit's face mesh, not a professional assessment. Only the face shape result is kept on this device; no photos are saved or uploaded.")
+                Text("An estimate from ARKit's face mesh, not a professional assessment. Only the face shape and eye measurements are kept on this device; no photos are saved or uploaded.")
                     .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                #if DEBUG
+                EyeDebugView(eyes: result.eyes)
+                #endif
                 if let onShowMakeup {
                     PrimaryButton(title: "Try on recommended makeup", action: onShowMakeup)
                     Button("Scan again", action: onScanAgain)
@@ -34,6 +40,39 @@ struct FaceShapeResultView: View {
                 }
             }
             .padding(AppSpacing.large)
+        }
+    }
+
+    /// The eye shape from the scan, and the question the camera cannot answer: hooded or monolid lids.
+    private var eyeCard: some View {
+        card(title: "Your eye shape") {
+            if let eyes = result.eyes {
+                let plan = EyelinerPlanner.plan(for: eyes)
+                if plan.isNeutral {
+                    Text("Your eye shape was not clear enough to tell. Scan again with your eyes relaxed and open for a tailored eyeliner.")
+                        .font(AppTypography.body)
+                } else {
+                    ForEach(plan.blend, id: \.shape) { item in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(Text(item.shape.title)) \(item.weight, format: .percent.precision(.fractionLength(0)))")
+                                .font(AppTypography.body.weight(.semibold))
+                            Text(item.shape.summary).font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                        }
+                    }
+                }
+                VStack(alignment: .leading, spacing: AppSpacing.small) {
+                    Text("Do your eyelids look hooded or monolid?").font(AppTypography.body)
+                    Picker("Eyelids", selection: Binding(get: { eyes.lidType }, set: onLidTypeChange)) {
+                        ForEach(LidType.allCases) { Text($0.title).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    Text("The camera cannot see the crease, so this one is up to you.")
+                        .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                }
+            } else {
+                Text("Your eyes were not measured in this scan. Scan again to get an eyeliner chosen for your eye shape.")
+                    .font(AppTypography.body)
+            }
         }
     }
 

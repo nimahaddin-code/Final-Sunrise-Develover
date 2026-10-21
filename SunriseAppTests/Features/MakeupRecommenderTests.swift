@@ -12,6 +12,13 @@ final class MakeupRecommenderTests: XCTestCase {
         }
     }
 
+    func testEyelinerDoesNotDependOnFaceShape() {
+        let ids = FaceShape.allCases.map { MakeupRecommender.recommendations(for: $0, in: .eyeliner).map(\.id) }
+        XCTAssertEqual(Set(ids).count, 1)
+        // One liner per eye shape, then the neutral natural line.
+        XCTAssertEqual(ids[0], EyeShape.allCases.map { "liner.eye.\($0.rawValue)" } + ["liner.eye.neutral"])
+    }
+
     func testRecommendationsAreGroupedByCategoryWithoutDuplicates() {
         for shape in FaceShape.allCases {
             let recommendations = MakeupRecommender.recommendations(for: shape)

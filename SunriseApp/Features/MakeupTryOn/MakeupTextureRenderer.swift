@@ -55,8 +55,8 @@ enum MakeupTextureRenderer {
                     fill(browOutline(brow, brow: side.brow, frame: frame, fit: sideFit), shade: brow.shade,
                          blur: 10, in: cg)
                 case .eyeliner(let liner):
-                    let fitted = fit.map { MakeupFitter.eyeliner(liner, fit: $0) } ?? liner
-                    for outline in linerOutlines(fitted, eye: side.eye, brow: side.brow, frame: frame) {
+                    // Already chosen for this person's eye shape in the face scan; not fitted again here.
+                    for outline in linerOutlines(liner, eye: side.eye, brow: side.brow, frame: frame) {
                         fill(outline, shade: liner.shade, blur: 1, in: cg)
                     }
                 }

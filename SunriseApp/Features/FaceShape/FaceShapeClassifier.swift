@@ -11,6 +11,9 @@ struct FaceShapeResult: Equatable, Codable, Sendable {
     let deviation: FaceProportions
     /// Camera frames whose Vision face outline refined the mesh measurements; 0 means mesh only.
     var contourSamples = 0
+    /// Eye measurements from the eye phase of the scan, with the person's lid answer; `nil` for scans made without
+    /// them (older versions, or eyes that could not be read). The eyeliner is chosen from these.
+    var eyes: EyeScan?
 
     var rankedShapes: [(shape: FaceShape, score: Double)] {
         FaceShape.allCases.map { ($0, scores[$0] ?? 0) }.sorted { $0.score > $1.score }

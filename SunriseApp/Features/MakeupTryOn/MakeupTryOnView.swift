@@ -176,14 +176,25 @@ struct MakeupTryOnView: View {
             }
             .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
             .fixedSize(horizontal: false, vertical: true)
-            if selected != nil, let fit = model.fit {
-                fitNotes(fit.notes(for: category))
+            #if DEBUG
+            if category == .eyeliner { EyeDebugView(eyes: model.plan.eyes) }
+            #endif
+            if let selected, let notes = notes(for: category, selected: selected), !notes.isEmpty {
+                fitNotes(notes)
             }
         }
         .padding(AppSpacing.medium)
         .background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
         .padding(AppSpacing.medium)
         .animation(.easeInOut(duration: 0.2), value: selected)
+    }
+
+    /// Why the selected style looks the way it does on this face. The eyeliner's reasons come from the face scan.
+    private func notes(for category: MakeupCategory, selected: MakeupRecommendation) -> [LocalizedStringResource]? {
+        if category == .eyeliner {
+            return MakeupPlan.isMadeForYou(selected) ? model.plan.eyeliner.notes : nil
+        }
+        return model.fit?.notes(for: category)
     }
 
     /// How the selected style was fitted to this face.

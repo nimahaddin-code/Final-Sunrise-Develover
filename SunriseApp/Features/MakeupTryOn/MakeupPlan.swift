@@ -14,6 +14,9 @@ struct MakeupPlan: Hashable, Sendable {
     let shape: FaceShape
     /// Shapes mixed into the made-for-you styles, strongest first; weights sum to 1.
     let blend: [ShapeWeight]
+    /// The eye measurements from the face scan; the eyeliner follows these, not the face shape. `nil` when the
+    /// scan has none (an older scan, or the eyes could not be read).
+    let eyes: EyeScan?
     /// Grouped by category in `MakeupCategory.allCases` order, made-for-you first in each category.
     let recommendations: [MakeupRecommendation]
 
@@ -21,20 +24,21 @@ struct MakeupPlan: Hashable, Sendable {
     ///   use only that shape, still tuned to the scanned proportions.
     init(scan: FaceShapeResult, chosenShape: FaceShape? = nil) {
         let blend = chosenShape.map { [ShapeWeight(shape: $0, weight: 1)] } ?? Self.blend(of: scan)
-        self.init(shape: chosenShape ?? scan.shape, blend: blend, deviation: scan.deviation)
+        self.init(shape: chosenShape ?? scan.shape, blend: blend, deviation: scan.deviation, eyes: scan.eyes)
     }
 
     /// A plan for a shape alone, without scan measurements.
     init(shape: FaceShape) {
         self.init(shape: shape, blend: [ShapeWeight(shape: shape, weight: 1)],
-                  deviation: FaceProportions(length: 0, forehead: 0, jaw: 0, chin: 0))
+                  deviation: FaceProportions(length: 0, forehead: 0, jaw: 0, chin: 0), eyes: nil)
     }
 
-    private init(shape: FaceShape, blend: [ShapeWeight], deviation: FaceProportions) {
+    private init(shape: FaceShape, blend: [ShapeWeight], deviation: FaceProportions, eyes: EyeScan?) {
         self.shape = shape
         self.blend = blend
+        self.eyes = eyes
         recommendations = MakeupCategory.allCases.flatMap { category in
-            [MakeupPersonalizer.recommendation(for: category, blend: blend, deviation: deviation)]
+            [MakeupPersonalizer.recommendation(for: category, blend: blend, deviation: deviation, eyes: eyes)]
                 + MakeupRecommender.recommendations(for: shape, in: category)
         }
     }
@@ -45,8 +49,11 @@ struct MakeupPlan: Hashable, Sendable {
 
     var madeForYou: [MakeupRecommendation] { recommendations.filter(Self.isMadeForYou) }
 
+    /// The made-for-you eyeliner and why; it depends on the eyes only.
+    var eyeliner: EyelinerPlan { EyelinerPlanner.plan(for: eyes) }
+
     func reason(for category: MakeupCategory) -> LocalizedStringResource {
-        MakeupRecommender.reason(for: shape, category: category)
+        category == .eyeliner ? eyeliner.reason : MakeupRecommender.reason(for: shape, category: category)
     }
 
     static func isMadeForYou(_ recommendation: MakeupRecommendation) -> Bool {
@@ -63,14 +70,15 @@ struct MakeupPlan: Hashable, Sendable {
     }
 }
 
-/// Builds the made-for-you styles: the best-match styles of the blended shapes, averaged by weight, then nudged by
-/// the measured proportions so two people with the same shape label still get different styles.
+/// Builds the made-for-you styles: the best-match brow and blush styles of the blended shapes, averaged by weight,
+/// then nudged by the measured proportions so two people with the same shape label still get different styles.
+/// The eyeliner comes from the eye shape instead (`EyelinerPlanner`).
 enum MakeupPersonalizer {
     /// Relative deviation from the average face that counts as a full-strength adjustment.
     static let fullDeviation: Float = 0.06
 
     static func recommendation(for category: MakeupCategory, blend: [ShapeWeight],
-                               deviation: FaceProportions) -> MakeupRecommendation {
+                               deviation: FaceProportions, eyes: EyeScan?) -> MakeupRecommendation {
         let styles = blend.compactMap { weight in
             MakeupRecommender.recommendations(for: weight.shape, in: category).first.map { ($0.style, Float(weight.weight)) }
         }
@@ -93,13 +101,19 @@ enum MakeupPersonalizer {
                 detail: "Placement and angle blended from your closest shapes and tuned to your proportions.",
                 style: .blush(blush(blushes, shade: shade, deviation: deviation)))
         case .eyeliner:
-            let liners = styles.compactMap { style, weight -> (LinerStyle, Float)? in
-                if case .eyeliner(let liner) = style { (liner, weight) } else { nil }
-            }
-            return MakeupRecommendation(id: id, name: "Made for you",
-                detail: "Line weight and wing blended from your closest shapes and tuned to your proportions.",
-                style: .eyeliner(eyeliner(liners, shade: shade, deviation: deviation)))
+            return eyeliner(eyes)
         }
+    }
+
+    /// The made-for-you eyeliner, chosen from the eye shape alone.
+    static func eyeliner(_ eyes: EyeScan?) -> MakeupRecommendation {
+        let plan = EyelinerPlanner.plan(for: eyes)
+        let shapes = plan.blend.map { "\($0.shape.rawValue)\(Int(($0.weight * 100).rounded()))" }
+        return MakeupRecommendation(
+            id: MakeupPlan.personalPrefix + MakeupCategory.eyeliner.rawValue + "."
+                + (shapes.isEmpty ? "neutral" : shapes.joined(separator: "-")),
+            name: "Made for you", detail: "Line weight, start and wing chosen from your eye shape.",
+            style: .eyeliner(plan.style))
     }
 
     /// Deviation scaled to -1...1.
@@ -128,30 +142,6 @@ enum MakeupPersonalizer {
             // A longer face gets a wider, flatter sweep; a shorter one a steeper lift.
             radii: SIMD2(radii.x * (1 + 0.15 * length), radii.y),
             tilt: clamp(mean(styles) { $0.tilt } - 12 * length, -10, 35),
-            shade: shade)
-    }
-
-    static func eyeliner(_ styles: [(LinerStyle, Float)], shade: MakeupShade, deviation: FaceProportions) -> LinerStyle {
-        let length = strength(deviation.length)
-        // Numbers are averaged; flags and enums come from the strongest-weighted style.
-        let lead = styles.max { $0.1 < $1.1 }?.0
-        // The mid width only exists when at least one style has one; the others contribute their own taper midpoint.
-        let hasMid = styles.contains { $0.0.midWidth != nil }
-        return LinerStyle(
-            innerWidth: mean(styles) { $0.innerWidth },
-            outerWidth: mean(styles) { $0.outerWidth },
-            midWidth: hasMid ? mean(styles) { $0.midWidth ?? ($0.innerWidth + $0.outerWidth) / 2 } : nil,
-            start: mean(styles) { $0.start },
-            // A shorter face benefits from a longer, more lifted wing.
-            wingLength: max(0, mean(styles) { $0.wingLength } * (1 - 0.3 * length)),
-            wingAngle: clamp(mean(styles) { $0.wingAngle } - 5 * length, 0, 40),
-            wingOrigin: lead?.wingOrigin ?? .outerCorner,
-            wingBase: lead?.wingBase ?? .horizontal,
-            wingTargetsBrowTail: lead?.wingTargetsBrowTail ?? false,
-            tightline: lead?.tightline ?? false,
-            lowerLine: LowerLine(enabled: lead?.lowerLine.enabled ?? false,
-                                 extent: mean(styles) { $0.lowerLine.extent },
-                                 thickness: mean(styles) { $0.lowerLine.thickness }),
             shade: shade)
     }
 

@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E80000001C043450B0C3F54A /* EyelinerPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70000003EEB62383567027B /* EyelinerPlannerTests.swift */; };
+		E8000000257DD8D4770AABC1 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70000007A577EC19F38EF9E /* EyeScanTests.swift */; };
+		E80000005D30E5A2A05DAB6C /* EyeDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7000000671282B495B3FED6 /* EyeDebugView.swift */; };
+		E800000032E0F403F6771AC6 /* EyelinerPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */; };
+		E80000003E82AF829A521803 /* EyeSampleGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E700000020C97B84D2D8442F /* EyeSampleGate.swift */; };
+		E800000003D22F33B62A98FD /* EyeScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70000000C39BF83BDEA70CC /* EyeScan.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		0BB1180441D5C292FDF1D87B /* MakeupRecommendationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4E2FA16FB3D83A6DDC1EDB /* MakeupRecommendationsView.swift */; };
 		0BDB05D65645A9D73C294F55 /* AppNavigatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D529D8EB6F4607AD5BC97B1D /* AppNavigatorTests.swift */; };
@@ -92,6 +98,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		E70000003EEB62383567027B /* EyelinerPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerPlannerTests.swift; sourceTree = "<group>"; };
+		E70000007A577EC19F38EF9E /* EyeScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanTests.swift; sourceTree = "<group>"; };
+		E7000000671282B495B3FED6 /* EyeDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeDebugView.swift; sourceTree = "<group>"; };
+		E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerPlanner.swift; sourceTree = "<group>"; };
+		E700000020C97B84D2D8442F /* EyeSampleGate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeSampleGate.swift; sourceTree = "<group>"; };
+		E70000000C39BF83BDEA70CC /* EyeScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScan.swift; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
 		087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommendation.swift; sourceTree = "<group>"; };
 		09018C00875BE2006F222659 /* HeadPoseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadPoseTests.swift; sourceTree = "<group>"; };
@@ -284,6 +296,8 @@
 				C46FF01BBC0933B3F49A571A /* FaceContourDetector.swift */,
 				314DC6D186608E3225706A28 /* PhotoFaceMeasurer.swift */,
 				5F6D1A9D904A10807700F875 /* FaceShapeClassifier.swift */,
+				E700000020C97B84D2D8442F /* EyeSampleGate.swift */,
+				E70000000C39BF83BDEA70CC /* EyeScan.swift */,
 				21CE064275C7C47713A1B7F0 /* FaceShapeViewModel.swift */,
 				454D9F210C849C41D0E8378C /* FaceMeshARView.swift */,
 				7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */,
@@ -347,6 +361,8 @@
 				7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */,
 				B4BCF3A0D2A9C2618147EA0C /* MakeupTextureGeometryTests.swift */,
 				B1B2C3D4E5F60718293A4B5D /* LinerGeometryTests.swift */,
+				E70000003EEB62383567027B /* EyelinerPlannerTests.swift */,
+				E70000007A577EC19F38EF9E /* EyeScanTests.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -489,6 +505,8 @@
 				DE9F70FB20C8710887FFDCCC /* FaceFeatureMap.swift */,
 				5CDF09D2EC207E4F4D908C7C /* FaceFit.swift */,
 				A1B2C3D4E5F60718293A4B5D /* LinerGeometry.swift */,
+				E7000000671282B495B3FED6 /* EyeDebugView.swift */,
+				E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */,
 				7ED8B4D9166DBE43F2B1D643 /* FaceFeatureLocator.swift */,
 				F9A809519AC15D1F2A75FC7E /* MakeupTextureRenderer.swift */,
 				119AD822ABE98DE2B5B45183 /* MakeupTryOnViewModel.swift */,
@@ -619,6 +637,8 @@
 				4D3D248B5F57A2BCC5B92F45 /* MakeupPersonalizationTests.swift in Sources */,
 				CDDE58AF819DFCD6735F185F /* MakeupTextureGeometryTests.swift in Sources */,
 				B1B2C3D4E5F60718293A4B5C /* LinerGeometryTests.swift in Sources */,
+				E80000001C043450B0C3F54A /* EyelinerPlannerTests.swift in Sources */,
+				E8000000257DD8D4770AABC1 /* EyeScanTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -667,6 +687,8 @@
 				8390F5679DF570C890190E7C /* FaceContourDetector.swift in Sources */,
 				2B212B32757D21783FE89B2C /* PhotoFaceMeasurer.swift in Sources */,
 				CF8FDEBEDA76C3A34E0A02AF /* FaceShapeClassifier.swift in Sources */,
+				E80000003E82AF829A521803 /* EyeSampleGate.swift in Sources */,
+				E800000003D22F33B62A98FD /* EyeScan.swift in Sources */,
 				685BC99DAFA493FCEB389B85 /* FaceShapeViewModel.swift in Sources */,
 				E12D0FA8EDEAC708EA387AC1 /* FaceMeshARView.swift in Sources */,
 				F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */,
@@ -678,6 +700,8 @@
 				3CCD94BF36631D735AC50DD0 /* FaceFeatureMap.swift in Sources */,
 				370710197E3F693AF3786C43 /* FaceFit.swift in Sources */,
 				A1B2C3D4E5F60718293A4B5C /* LinerGeometry.swift in Sources */,
+				E80000005D30E5A2A05DAB6C /* EyeDebugView.swift in Sources */,
+				E800000032E0F403F6771AC6 /* EyelinerPlanner.swift in Sources */,
 				111C7B4BC1597B419627963B /* FaceFeatureLocator.swift in Sources */,
 				43FFB232E616855EF7D5438E /* MakeupTextureRenderer.swift in Sources */,
 				57F069CE67A2ED299049886A /* MakeupTryOnViewModel.swift in Sources */,

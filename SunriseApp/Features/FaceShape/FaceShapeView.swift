@@ -19,7 +19,8 @@ struct FaceShapeView: View {
             .onDisappear { model.stop() }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {
-                    FaceShapeResultView(result: result, onScanAgain: model.scanAgain) {
+                    FaceShapeResultView(result: result, onScanAgain: model.scanAgain,
+                                        onLidTypeChange: model.setLidType) {
                         // Stopping clears the result, which closes this popup before leaving the scan.
                         model.stop()
                         onShowMakeup()
@@ -116,6 +117,9 @@ private extension FaceShapeViewModel.ScanGuidance {
         case .moveBack: "Hold the phone a little farther away"
         case .relaxFace: "Relax your face and close your mouth"
         case .holdStill: "Hold still, measuring…"
+        case .lookStraight: "Look straight at the camera, eyes relaxed and open"
+        case .openEyes: "Keep both eyes relaxed and open"
+        case .measuringEyes: "Hold still, measuring your eyes…"
         }
     }
 }

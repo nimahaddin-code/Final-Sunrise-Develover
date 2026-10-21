@@ -37,7 +37,8 @@ import UIKit
     @Published private(set) var shadeChoices: [MakeupCategory: MakeupShade] = [:]
     @Published private(set) var intensities: [MakeupCategory: Double] = [:]
     @Published private(set) var textures: [MakeupCategory: UIImage] = [:]
-    /// The person's measured features once makeup is placed; every style is fitted to them.
+    /// The person's measured features once makeup is placed; brows and blush are fitted to them. The eyeliner follows
+    /// the eye shape measured in the face scan instead.
     @Published private(set) var fit: FaceFit?
     let session = ARSession()
 
@@ -156,11 +157,9 @@ import UIKit
             return
         }
         let style = shade(for: category).map(recommendation.style.with(shade:)) ?? recommendation.style
-        // The liner's eyes move, so it is fitted to the steady averaged measurements.
-        let fit = category == .eyeliner ? fit : nil
         renderTasks[category] = Task {
             let image = await Task.detached(priority: .userInitiated) {
-                MakeupTextureRenderer.image(for: style, features: features, fit: fit)
+                MakeupTextureRenderer.image(for: style, features: features)
             }.value
             guard !Task.isCancelled else { return }
             textures[category] = image
