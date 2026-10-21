@@ -7,6 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9909AED933CB17E8692EAA5B /* EyelinerMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */; };
+		C9587CEBB39B613D7953399F /* EyelinerGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */; };
+		61802B9A9C3D59B870EFDC76 /* EyeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */; };
+		0A446418A8546A3886FD1C8C /* EyeLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 231A9D8B5701EDA4305C3266 /* EyeLandmarks.swift */; };
+		144217C9FAD1C040EBD2F294 /* GeometryHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF01F605BF92435DC324B13 /* GeometryHelpers.swift */; };
+		D078C19892C5D07129B54516 /* ImageToViewMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2A5C04A75A9061E0632676 /* ImageToViewMapping.swift */; };
+		BBC1AC7A0CD90B0E7BC75223 /* LandmarkSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E763EDC56C953EA58AFBB1 /* LandmarkSpace.swift */; };
+		14E0BA1614926FA5ABDBDC1A /* LinerGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A7AA6990D68C43A68511C9 /* LinerGuide.swift */; };
+		0D4BF23384C86F7A04F21AF1 /* LinerOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C42CEFA28CA243E75B5D3DA1 /* LinerOverlayModel.swift */; };
+		984FD73DF3F4DCFF8AB8A6BF /* LinerOverlayRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C5565CCE7AF4F0C16F9F0A /* LinerOverlayRenderer.swift */; };
+		8C189615D8A8DC30B4B5789D /* LinerPathBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792977CAD0396D693A58DE24 /* LinerPathBuilder.swift */; };
+		CB14CD6B60CC4F8DA016C314 /* LinerSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A319A247AA300149353ECC2 /* LinerSpec.swift */; };
+		E44486D30307E00936281E51 /* LinerTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB847F5E015413B5B6CDA3FB /* LinerTracker.swift */; };
+		7189D665D4AB23779ACB830A /* MediaPipeEyeLandmarkProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FD918F6AD3EFDBC821053 /* MediaPipeEyeLandmarkProvider.swift */; };
+		8A9B3447C705CB2A8F902152 /* OneEuroFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEA34095C8C9C53CE42CE4 /* OneEuroFilter.swift */; };
+		A396190238DC046DE24594FB /* MediaPipeTasksVision.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5B542634CE626ADE4075E85 /* MediaPipeTasksVision.xcframework */; };
+		2DEBF29F44FB937FBE58C224 /* MediaPipeTasksCommon.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40CFDB6FB4A08DA45F4D8C80 /* MediaPipeTasksCommon.xcframework */; };
+		5AAFF6D122A3DC3026D2860E /* MediaPipeTaskGraphs_library.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4C3EE49E98583E2B2497E67 /* MediaPipeTaskGraphs_library.xcframework */; };
+		CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */ = {isa = PBXBuildFile; fileRef = CD73965C5395C3CFB4F69902 /* face_landmarker.task */; };
 		E80000001C043450B0C3F54A /* EyelinerPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70000003EEB62383567027B /* EyelinerPlannerTests.swift */; };
 		E8000000257DD8D4770AABC1 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E70000007A577EC19F38EF9E /* EyeScanTests.swift */; };
 		E80000005D30E5A2A05DAB6C /* EyeDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7000000671282B495B3FED6 /* EyeDebugView.swift */; };
@@ -98,6 +117,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerMappingTests.swift; sourceTree = "<group>"; };
+		06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerGeometryTests.swift; sourceTree = "<group>"; };
+		8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeGeometry.swift; sourceTree = "<group>"; };
+		231A9D8B5701EDA4305C3266 /* EyeLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeLandmarks.swift; sourceTree = "<group>"; };
+		CEF01F605BF92435DC324B13 /* GeometryHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeometryHelpers.swift; sourceTree = "<group>"; };
+		0C2A5C04A75A9061E0632676 /* ImageToViewMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageToViewMapping.swift; sourceTree = "<group>"; };
+		36E763EDC56C953EA58AFBB1 /* LandmarkSpace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandmarkSpace.swift; sourceTree = "<group>"; };
+		43A7AA6990D68C43A68511C9 /* LinerGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerGuide.swift; sourceTree = "<group>"; };
+		C42CEFA28CA243E75B5D3DA1 /* LinerOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerOverlayModel.swift; sourceTree = "<group>"; };
+		49C5565CCE7AF4F0C16F9F0A /* LinerOverlayRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerOverlayRenderer.swift; sourceTree = "<group>"; };
+		792977CAD0396D693A58DE24 /* LinerPathBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerPathBuilder.swift; sourceTree = "<group>"; };
+		2A319A247AA300149353ECC2 /* LinerSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerSpec.swift; sourceTree = "<group>"; };
+		EB847F5E015413B5B6CDA3FB /* LinerTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerTracker.swift; sourceTree = "<group>"; };
+		4D6FD918F6AD3EFDBC821053 /* MediaPipeEyeLandmarkProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeLandmarkProvider.swift; sourceTree = "<group>"; };
+		0DCEA34095C8C9C53CE42CE4 /* OneEuroFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OneEuroFilter.swift; sourceTree = "<group>"; };
+		D5B542634CE626ADE4075E85 /* MediaPipeTasksVision.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MediaPipeTasksVision.xcframework; sourceTree = "<group>"; };
+		40CFDB6FB4A08DA45F4D8C80 /* MediaPipeTasksCommon.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MediaPipeTasksCommon.xcframework; sourceTree = "<group>"; };
+		A4C3EE49E98583E2B2497E67 /* MediaPipeTaskGraphs_library.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = MediaPipeTaskGraphs_library.xcframework; sourceTree = "<group>"; };
+		CD73965C5395C3CFB4F69902 /* face_landmarker.task */ = {isa = PBXFileReference; lastKnownFileType = file; path = face_landmarker.task; sourceTree = "<group>"; };
 		E70000003EEB62383567027B /* EyelinerPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerPlannerTests.swift; sourceTree = "<group>"; };
 		E70000007A577EC19F38EF9E /* EyeScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanTests.swift; sourceTree = "<group>"; };
 		E7000000671282B495B3FED6 /* EyeDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeDebugView.swift; sourceTree = "<group>"; };
@@ -193,12 +231,46 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A396190238DC046DE24594FB /* MediaPipeTasksVision.xcframework in Frameworks */,
+				2DEBF29F44FB937FBE58C224 /* MediaPipeTasksCommon.xcframework in Frameworks */,
+				5AAFF6D122A3DC3026D2860E /* MediaPipeTaskGraphs_library.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9396F6A95EDCA8291DBA3E21 /* Eyeliner */ = {
+			isa = PBXGroup;
+			children = (
+				8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */,
+				231A9D8B5701EDA4305C3266 /* EyeLandmarks.swift */,
+				CEF01F605BF92435DC324B13 /* GeometryHelpers.swift */,
+				0C2A5C04A75A9061E0632676 /* ImageToViewMapping.swift */,
+				36E763EDC56C953EA58AFBB1 /* LandmarkSpace.swift */,
+				43A7AA6990D68C43A68511C9 /* LinerGuide.swift */,
+				C42CEFA28CA243E75B5D3DA1 /* LinerOverlayModel.swift */,
+				49C5565CCE7AF4F0C16F9F0A /* LinerOverlayRenderer.swift */,
+				792977CAD0396D693A58DE24 /* LinerPathBuilder.swift */,
+				2A319A247AA300149353ECC2 /* LinerSpec.swift */,
+				EB847F5E015413B5B6CDA3FB /* LinerTracker.swift */,
+				4D6FD918F6AD3EFDBC821053 /* MediaPipeEyeLandmarkProvider.swift */,
+				0DCEA34095C8C9C53CE42CE4 /* OneEuroFilter.swift */,
+			);
+			path = Eyeliner;
+			sourceTree = "<group>";
+		};
+		9C749B9854C4B491C515C1D4 /* MediaPipe */ = {
+			isa = PBXGroup;
+			children = (
+				D5B542634CE626ADE4075E85 /* MediaPipeTasksVision.xcframework */,
+				40CFDB6FB4A08DA45F4D8C80 /* MediaPipeTasksCommon.xcframework */,
+				A4C3EE49E98583E2B2497E67 /* MediaPipeTaskGraphs_library.xcframework */,
+			);
+			name = MediaPipe;
+			path = Vendor/MediaPipe;
+			sourceTree = SOURCE_ROOT;
+		};
 		0EB509C6F62AD9CF0B9F3D96 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -213,6 +285,7 @@
 			children = (
 				133DCD5B481F352F758A1E3F /* Assets.xcassets */,
 				98F393F180238C7106FB99C0 /* Localizable.xcstrings */,
+				CD73965C5395C3CFB4F69902 /* face_landmarker.task */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -361,6 +434,8 @@
 				7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */,
 				B4BCF3A0D2A9C2618147EA0C /* MakeupTextureGeometryTests.swift */,
 				B1B2C3D4E5F60718293A4B5D /* LinerGeometryTests.swift */,
+				87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */,
+				06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */,
 				E70000003EEB62383567027B /* EyelinerPlannerTests.swift */,
 				E70000007A577EC19F38EF9E /* EyeScanTests.swift */,
 			);
@@ -399,6 +474,7 @@
 		B28B7AF69320201D1CF206EB = {
 			isa = PBXGroup;
 			children = (
+				9C749B9854C4B491C515C1D4 /* MediaPipe */,
 				7A1EF99F369FF90802A9EE53 /* SunriseApp */,
 				6018AF2785A5C14223064FCC /* SunriseAppTests */,
 				FBDC4F23F93125BBEEAE800C /* Products */,
@@ -505,6 +581,7 @@
 				DE9F70FB20C8710887FFDCCC /* FaceFeatureMap.swift */,
 				5CDF09D2EC207E4F4D908C7C /* FaceFit.swift */,
 				A1B2C3D4E5F60718293A4B5D /* LinerGeometry.swift */,
+				9396F6A95EDCA8291DBA3E21 /* Eyeliner */,
 				E7000000671282B495B3FED6 /* EyeDebugView.swift */,
 				E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */,
 				7ED8B4D9166DBE43F2B1D643 /* FaceFeatureLocator.swift */,
@@ -608,6 +685,7 @@
 			files = (
 				7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */,
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
+				CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,6 +715,8 @@
 				4D3D248B5F57A2BCC5B92F45 /* MakeupPersonalizationTests.swift in Sources */,
 				CDDE58AF819DFCD6735F185F /* MakeupTextureGeometryTests.swift in Sources */,
 				B1B2C3D4E5F60718293A4B5C /* LinerGeometryTests.swift in Sources */,
+				9909AED933CB17E8692EAA5B /* EyelinerMappingTests.swift in Sources */,
+				C9587CEBB39B613D7953399F /* EyelinerGeometryTests.swift in Sources */,
 				E80000001C043450B0C3F54A /* EyelinerPlannerTests.swift in Sources */,
 				E8000000257DD8D4770AABC1 /* EyeScanTests.swift in Sources */,
 			);
@@ -700,6 +780,19 @@
 				3CCD94BF36631D735AC50DD0 /* FaceFeatureMap.swift in Sources */,
 				370710197E3F693AF3786C43 /* FaceFit.swift in Sources */,
 				A1B2C3D4E5F60718293A4B5C /* LinerGeometry.swift in Sources */,
+				61802B9A9C3D59B870EFDC76 /* EyeGeometry.swift in Sources */,
+				0A446418A8546A3886FD1C8C /* EyeLandmarks.swift in Sources */,
+				144217C9FAD1C040EBD2F294 /* GeometryHelpers.swift in Sources */,
+				D078C19892C5D07129B54516 /* ImageToViewMapping.swift in Sources */,
+				BBC1AC7A0CD90B0E7BC75223 /* LandmarkSpace.swift in Sources */,
+				14E0BA1614926FA5ABDBDC1A /* LinerGuide.swift in Sources */,
+				0D4BF23384C86F7A04F21AF1 /* LinerOverlayModel.swift in Sources */,
+				984FD73DF3F4DCFF8AB8A6BF /* LinerOverlayRenderer.swift in Sources */,
+				8C189615D8A8DC30B4B5789D /* LinerPathBuilder.swift in Sources */,
+				CB14CD6B60CC4F8DA016C314 /* LinerSpec.swift in Sources */,
+				E44486D30307E00936281E51 /* LinerTracker.swift in Sources */,
+				7189D665D4AB23779ACB830A /* MediaPipeEyeLandmarkProvider.swift in Sources */,
+				8A9B3447C705CB2A8F902152 /* OneEuroFilter.swift in Sources */,
 				E80000005D30E5A2A05DAB6C /* EyeDebugView.swift in Sources */,
 				E800000032E0F403F6771AC6 /* EyelinerPlanner.swift in Sources */,
 				111C7B4BC1597B419627963B /* FaceFeatureLocator.swift in Sources */,
@@ -733,6 +826,26 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-all_load",
+					"-lc++",
+					"-lsqlite3",
+					"-framework",
+					Accelerate,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					AVFoundation,
+					"-framework",
+					CoreImage,
+					"-framework",
+					CoreMedia,
+					"-framework",
+					CoreVideo,
+					"-framework",
+					QuartzCore,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunrise.foundation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -775,6 +888,26 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-all_load",
+					"-lc++",
+					"-lsqlite3",
+					"-framework",
+					Accelerate,
+					"-framework",
+					AudioToolbox,
+					"-framework",
+					AVFoundation,
+					"-framework",
+					CoreImage,
+					"-framework",
+					CoreMedia,
+					"-framework",
+					CoreVideo,
+					"-framework",
+					QuartzCore,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.sunrise.foundation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -790,6 +923,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				ENABLE_TESTABILITY = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				SDKROOT = iphoneos;
@@ -805,6 +939,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				ENABLE_TESTABILITY = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				SDKROOT = iphoneos;
