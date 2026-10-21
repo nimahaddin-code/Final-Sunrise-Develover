@@ -19,12 +19,12 @@ Spike `EyelinerSpike` (MediaPipe Face Landmarker + overlay 2D + `LinerPathBuilde
 - Overlay digambar di SwiftUI `Canvas` di atas `MakeupARView`, dipetakan ke ruang view oleh `ImageToViewMapping`: `ARFrame.displayTransform` (rotasi + aspect-fill), dengan cermin selfie. Pemetaan dicek terhadap proyeksi titik wajah sendiri (ARKit memproyeksikan ke gambar dan ke layar), dicoba dengan cermin, dan sebagai upaya terakhir dihitung (least squares). Foto dari tombol kamera ikut menggambar overlay.
 - Bentuk liner = `LinerSpec` (satuan spike, pecahan lebar mata) yang dikonversi dari `LinerStyle`. Gaya dipilih dari bentuk mata hasil face scan (`EyelinerPlanner`, tabel dari `Docs/Research/makeup_placement_rules.json`; riset menang atas angka spike), bukan dari bentuk wajah. `lashOffset` adalah konstanta bernama (`LinerBuildOptions.defaultLashOffset` 0.012; spike 0.006 terasa terlalu dekat ke mata) dan sekarang menggeser seluruh strip, bukan hanya tepi bawah, sehingga ketebalan tidak berkurang.
 - Alis dan blush tidak berubah: tetap di tekstur face mesh. Jalur eyeliner lama di mesh dipertahankan di balik flag DEBUG (`-legacyMeshEyeliner YES`, default mati) untuk perbandingan.
-- Dependency: xcframework MediaPipeTasksVision, MediaPipeTasksCommon, dan MediaPipeTaskGraphs 1.1.1 (binary dan checksum sama dengan manifest SPM Google). Di-vendor di `Vendor/MediaPipe` tetapi **tidak di-commit** (±370 MB, melebihi batas file GitHub); `Scripts/fetch-mediapipe.sh` mengunduh dan memverifikasi checksum, dan CI menjalankannya. Model `face_landmarker.task` (float16, 3,6 MB) di-commit di Resources.
+- Dependency: paket Swift `https://github.com/google-ai-edge/mediapipe` (produk MediaPipeTasksVision), ditambahkan lewat Swift Package Manager di Xcode. Model `face_landmarker.task` (float16, 3,6 MB) di-commit di Resources.
 
 ## Konsekuensi
 
-- Dependency eksternal pertama. Build butuh satu langkah `Scripts/fetch-mediapipe.sh` setelah clone; tanpa CocoaPods atau SPM, sehingga `SunriseApp.xcodeproj` tetap dibuka langsung.
-- Ukuran: binary ±2,6 MB menjadi ±46 MB, ditambah model 3,6 MB; app ±2,5 MB menjadi ±47,5 MB tidak terkompres (±16 MB zip, Release perangkat tanpa signing). Link memakai `-all_load` karena registrasi calculator C++ MediaPipe akan dibuang linker jika tidak.
+- Dependency eksternal pertama. Xcode mengunduh paket saat project pertama dibuka (butuh internet); tanpa CocoaPods.
+- Ukuran: binary ±2,6 MB menjadi ±46 MB, ditambah model 3,6 MB; app ±2,5 MB menjadi ±47,5 MB tidak terkompres (±16 MB zip, Release perangkat tanpa signing).
 - Slice simulator hanya arm64: `EXCLUDED_ARCHS[sdk=iphonesimulator*] = x86_64`; Mac Intel tidak didukung untuk simulator.
 - Pengecualian aturan "overlay mengikuti face mesh": liner adalah overlay 2D di koordinat layar yang dihitung ulang tiap frame dari landmark (bukan koordinat layar tetap). Ada latensi deteksi (±1-2 frame) antara video AR dan liner.
 - Deteksi hanya berjalan saat eyeliner dipilih. Tidak ada foto atau landmark yang disimpan atau dikirim.

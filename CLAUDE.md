@@ -3,7 +3,7 @@
 SwiftUI, iOS 17+, light MVVM. Docs are in Indonesian: `Docs/Architecture.md`, `Docs/IntegrationContracts.md`.
 
 ## Rules (from Docs)
-- One external dependency: MediaPipe Tasks Vision (eyeliner only), vendored as xcframeworks in `Vendor/MediaPipe` (git-ignored, ~370 MB; run `Scripts/fetch-mediapipe.sh` after cloning). No Pods/SPM. One app target + one unit test target. See `Docs/Decisions/0002-mediapipe-eyeliner.md`.
+- One external dependency: MediaPipe Tasks Vision (eyeliner only), added with Swift Package Manager (`google-ai-edge/mediapipe`, product MediaPipeTasksVision). No Pods. One app target + one unit test target. See `Docs/Decisions/0002-mediapipe-eyeliner.md`.
 - Feature-based folders. `ObservableObject` + `@Published`; ViewModels and navigator are `@MainActor`.
 - No AppContainer access from ViewModels/singletons/Environment; root passes services via initializers.
 - Services are async + Sendable; heavy work (images, Vision, file I/O) off the main actor.
@@ -23,9 +23,8 @@ Eyeliner: ARKit frames -> MediaPipe Face Landmarker (`Eyeliner/MediaPipeEyeLandm
 Models: `MakeupRecommendation.swift` (BrowStyle, BlushStyle, LinerStyle, MakeupPalette).
 
 ## Build / test (simulator: iPhone 17 Pro; `xcode-select` points at CommandLineTools, so set DEVELOPER_DIR)
-Never read full xcodebuild logs; always use these filters. Fetch the MediaPipe frameworks first if `Vendor/MediaPipe` is empty.
+Never read full xcodebuild logs; always use these filters.
 ```
-Scripts/fetch-mediapipe.sh
 export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 # Build
 xcodebuild -project SunriseApp.xcodeproj -scheme SunriseApp -destination 'generic/platform=iOS Simulator' build 2>&1 | grep -E "error:|warning:.*(Liner|Makeup)|BUILD (SUCCEEDED|FAILED)" | head -40
