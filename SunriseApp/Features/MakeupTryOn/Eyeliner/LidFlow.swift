@@ -169,12 +169,10 @@ final class LidFollower: @unchecked Sendable {
     /// Share of the gap to the detector closed per detector result (about 30 per second): slow enough that a held
     /// pull stays, fast enough that tracking drift is corrected within a couple of seconds.
     static let pullPerResult: CGFloat = 0.02
-    /// The outer corner (which the wing grows from) is pulled back even more slowly: the detector's idea of it barely
-    /// moves when the skin there is stretched.
-    static let cornerPullPerResult: CGFloat = 0.008
-    /// With no hand near the eye nothing is being pulled, so the detector corrects the points quickly (a head turned
-    /// or tilted, drift); a hand within `handNear` of the eye means the lid may be held, and the slow rates apply.
-    static let freePull: CGFloat = 0.3
+    /// With no hand near the eye nothing is being pulled, so the detector's points are used as they are (no lag, no
+    /// drift); a hand within `handNear` of the eye means the lid may be held, and the skin is followed. The hand reading
+    /// is kept for `handLinger` so a flickering mask does not switch back and forth.
+    static let handLinger: TimeInterval = 0.3
     static let handNear: Double = 0.04
     /// After a blink starts the detector alone is trusted for this long.
     static let blinkHold: TimeInterval = 0.3
@@ -192,6 +190,8 @@ final class LidFollower: @unchecked Sendable {
         var openBase: CGFloat = 0
         var lastRatio: CGFloat = 0
         var holdUntil: TimeInterval = 0
+        /// Until when a hand counts as near the eye.
+        var heldUntil: TimeInterval = 0
         /// Bumped when the detector re-seeds the points, so a picture-based update computed meanwhile is dropped.
         var generation = 0
     }
@@ -291,7 +291,14 @@ final class LidFollower: @unchecked Sendable {
                 continue
             }
             // The tracked points: the upper lid, then the outer corner (the wing follows it).
-            let detected = (eye.upperLid + [eye.outerCorner]).map(toImage.applyInverse)
+            guard let eyeFrame = EyeCoordinateFrame(inner: eye.innerCorner, outer: eye.outerCorner, upper: eye.upperLid,
+                                                    lower: eye.lowerLid, brow: eye.browPoints) else {
+                tracks[side] = nil
+                continue
+            }
+            // Where the wing's skin anchor would be if the skin moved rigidly with the eye.
+            let wingDetected = eyeFrame.toWorld(LinerBuildOptions.wingAnchorLocal)
+            let detected = (eye.upperLid + [eye.outerCorner, wingDetected]).map(toImage.applyInverse)
             let eyeWidth = hypot(eye.outerCorner.x - eye.innerCorner.x, eye.outerCorner.y - eye.innerCorner.y)
                 / max(scale, 1e-6)
             var track = tracks[side] ?? Track(canonical: detected, eyeWidth: eyeWidth)
@@ -299,6 +306,7 @@ final class LidFollower: @unchecked Sendable {
             // Blink: the opening shrinks or changes fast relative to this person's normal opening.
             let ratio = eye.eyeOpenRatio
             track.openBase = max(ratio, track.openBase * 0.995)
+            // (a closed or squeezed eye, below 75% of the normal opening, stays on the detector: no lid to pull)
             if track.openBase > 0.02, ratio < track.openBase * 0.75 || abs(ratio - track.lastRatio) > track.openBase * 0.25 {
                 track.holdUntil = now + Self.blinkHold
             }
@@ -308,24 +316,36 @@ final class LidFollower: @unchecked Sendable {
             let gap = track.canonical.count == detected.count
                 ? zip(track.canonical, detected).map { hypot($0.x - $1.x, $0.y - $1.y) }.reduce(0, +) / CGFloat(detected.count)
                 : .infinity
-            if !track.valid || now < track.holdUntil || gap > Self.maximumGap * eyeWidth {
+            if (hand[side] ?? 0) >= Self.handNear { track.heldUntil = now + Self.handLinger }
+            let held = now < track.heldUntil
+            if !held {
+                // Nothing is pulling the lid: the detector as it is. The picture stays, so following can start at once.
+                track.canonical = detected
+                track.valid = true
+                track.generation += 1
+            } else if !track.valid || now < track.holdUntil || gap > Self.maximumGap * eyeWidth {
                 track.canonical = detected
                 track.valid = true
                 track.pyramid = nil
                 track.generation += 1
             } else {
                 following += 1
-                let held = (hand[side] ?? 0) >= Self.handNear
-                track.canonical = zip(track.canonical, detected).enumerated().map { index, pair in
-                    let rate = !held ? Self.freePull
-                        : index == detected.count - 1 ? Self.cornerPullPerResult : Self.pullPerResult
-                    return pair.0 + (pair.1 - pair.0) * rate
-                }
+                track.canonical = zip(track.canonical, detected).map { $0 + ($1 - $0) * Self.pullPerResult }
+            }
+            let lidCount = detected.count - 2
+            // The outer corner (the wing grows from it) is hard to follow on its own: it has little texture, and the
+            // detector barely moves it when the skin there is stretched. It moves with the lid points next to it
+            // instead: wherever they are away from the detector, so is the corner.
+            if lidCount >= 3, track.canonical.count == detected.count {
+                let near = (lidCount - 3)..<lidCount
+                let offset = near.reduce(CGPoint.zero) { $0 + (track.canonical[$1] - detected[$1]) } * (1.0 / 3)
+                track.canonical[lidCount] = detected[lidCount] + offset
             }
             tracks[side] = track
             let followed = track.canonical.map(toImage.apply)
-            eye.upperLid = Array(followed.dropLast())
-            if let corner = followed.last { eye.outerCorner = corner }
+            eye.upperLid = Array(followed[0..<lidCount])
+            eye.outerCorner = followed[lidCount]
+            eye.wingAnchor = followed[lidCount + 1]
             if side == .subjectLeft { result.subjectLeft = eye } else { result.subjectRight = eye }
         }
         followingCount = following

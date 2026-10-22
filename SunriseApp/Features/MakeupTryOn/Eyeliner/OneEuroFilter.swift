@@ -13,7 +13,8 @@ struct OneEuroConfig: Equatable {
     var deadband: Double = 0.008
 
     /// Filter-like steadiness: head motion is taken from ARKit (see `FrameContext.headAnchors`), so these only have to
-    /// calm the eye's own landmarks. The spike used 0.6 / 0.02 / 0.004.
+    /// calm the eye's own landmarks. The spike used 0.6 / 0.02 / 0.004. (A faster speed estimate, 3 Hz with beta 0.08,
+    /// made a still face shake; blinks get their own quick config instead, see `EyeLandmarksSmoother.blinking`.)
     static let steady = OneEuroConfig()
     /// Quicker to follow a pulled or squeezed lid, at the cost of visible jitter.
     static let responsive = OneEuroConfig(minCutoff: 1.2, beta: 0.06, dCutoff: 1.0, deadband: 0.002)
@@ -69,6 +70,12 @@ final class EyeLandmarksSmoother {
     private var canonical: [CGPoint]?
     private var lastAnchorOut: [CGPoint] = []
     private var lastPointOut: [EyeSide: [CGPoint]] = [:]
+    private var lastRatio: [EyeSide: (ratio: Double, t: Double)] = [:]
+
+    /// While the eye opens or closes faster than this (open ratio per second; a blink is about 3) its points follow
+    /// almost directly, so the liner keeps up with the lid; otherwise the steady config holds a still face still.
+    static let blinkSpeed = 1.0
+    static let blinking = OneEuroConfig(minCutoff: 6, beta: 0.04, dCutoff: 1, deadband: 0)
 
     private static func spread(_ pts: [CGPoint]) -> CGFloat {
         guard !pts.isEmpty else { return 0 }
@@ -97,6 +104,7 @@ final class EyeLandmarksSmoother {
         canonical = nil
         lastAnchorOut = []
         lastPointOut.removeAll()
+        lastRatio.removeAll()
     }
 
     func smoothAnchors(_ pts: [CGPoint], t: Double, config: OneEuroConfig) -> [CGPoint] {
@@ -114,17 +122,26 @@ final class EyeLandmarksSmoother {
         pointFilters[side] = nil
         ratioFilters[side] = nil
         lastPointOut[side] = nil
+        lastRatio[side] = nil
     }
 
     func smooth(_ eye: EyeLandmarks, anchors: [CGPoint], t: Double, config: OneEuroConfig) -> EyeLandmarks {
         if canonical == nil, anchors.count >= 3 { canonical = anchors }
         var xf: SimilarityTransform?
         if let c = canonical, c.count == anchors.count { xf = SimilarityTransform(from: anchors, to: c) }
+        var rf = ratioFilters[eye.side] ?? OneEuroFilter()
+        // Fixed, fairly responsive config so blinks are not delayed.
+        let ratio = rf.filter(Double(eye.eyeOpenRatio), t: t,
+                              config: OneEuroConfig(minCutoff: 4.0, beta: 0.0, dCutoff: 1.0))
+        ratioFilters[eye.side] = rf
+        let speed = lastRatio[eye.side].map { abs(ratio - $0.ratio) / max(t - $0.t, 1e-3) } ?? 0
+        lastRatio[eye.side] = (ratio, t)
+        let config = speed > Self.blinkSpeed ? Self.blinking : config
+
         let pts = eye.flattened.map { xf?.apply($0) ?? $0 }
         var filters = pointFilters[eye.side] ?? []
         if filters.count != pts.count {
             filters = Array(repeating: OneEuroFilter2D(), count: pts.count)
-            ratioFilters[eye.side] = OneEuroFilter()
             lastPointOut[eye.side] = nil
         }
         var out: [CGPoint] = []
@@ -136,12 +153,6 @@ final class EyeLandmarksSmoother {
         let sp = canonical.map { Self.spread($0) } ?? Self.spread(pts)
         out = Self.dead(out, last: lastPointOut[eye.side] ?? [], db: CGFloat(config.deadband) * sp)
         lastPointOut[eye.side] = out
-
-        var rf = ratioFilters[eye.side] ?? OneEuroFilter()
-        // Fixed, fairly responsive config so blinks are not delayed.
-        let ratio = rf.filter(Double(eye.eyeOpenRatio), t: t,
-                              config: OneEuroConfig(minCutoff: 4.0, beta: 0.0, dCutoff: 1.0))
-        ratioFilters[eye.side] = rf
 
         let back = out.map { xf?.applyInverse($0) ?? $0 }
         var result = eye.replacingPoints(with: back) ?? eye

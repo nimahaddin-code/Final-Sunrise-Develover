@@ -18,6 +18,9 @@ struct EyeLandmarks: Equatable {
     var lowerLid: [CGPoint]      // ordered inner -> outer
     var browPoints: [CGPoint]    // ordered inner -> outer (last = brow tail)
     var eyeOpenRatio: CGFloat    // lid gap / eye width; ~0 when closed
+    /// A skin point beside the outer corner, where the wing ends up. The detector does not report it: lid tracking
+    /// follows it, and the wing stretches with it. `nil` = the wing keeps its rigid place.
+    var wingAnchor: CGPoint? = nil
 }
 
 struct EyeLandmarkFrame {

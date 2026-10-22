@@ -74,26 +74,46 @@ final class LidFlowTests: XCTestCase {
         }
     }
 
-    func testOuterCornerIsPulledBackSlowerThanTheLid() throws {
+    func testOuterCornerMovesWithTheLidPointsNextToIt() throws {
         let follower = LidFollower()
         for t in 0..<3 { _ = follower.fuse(frame(t: TimeInterval(t)), now: TimeInterval(t)) }
-        let base = try XCTUnwrap(follower.fuse(frame(t: 3), now: 3).subjectRight?.outerCorner)
-        var moved = frame(t: 4)
-        moved.subjectRight?.outerCorner.y -= 10
-        let out = try XCTUnwrap(follower.fuse(moved, now: 4, hand: [.subjectRight: 1]).subjectRight?.outerCorner)
-        XCTAssertEqual(base.y - out.y, 10 * LidFollower.cornerPullPerResult, accuracy: 0.05)
-        XCTAssertLessThan(LidFollower.cornerPullPerResult, LidFollower.pullPerResult)
+        _ = follower.fuse(frame(t: 3), now: 3, hand: [.subjectRight: 1])
+        // The detector now says the lid is 10 px higher (its corner did not move): the followed lid stays, and so
+        // does the corner, because it goes with the lid points beside it.
+        let input = frame(t: 4, lift: 10)
+        let out = try XCTUnwrap(follower.fuse(input, now: 4, hand: [.subjectRight: 1]).subjectRight)
+        let detectedCorner = try XCTUnwrap(input.subjectRight?.outerCorner)
+        XCTAssertEqual(out.outerCorner.y - detectedCorner.y, 10 * (1 - LidFollower.pullPerResult), accuracy: 0.1)
     }
 
-    func testWithoutAHandTheDetectorCorrectsQuickly() throws {
+    func testWingAnchorStartsWhereTheSkinWouldBeRigidly() throws {
+        let follower = LidFollower()
+        let input = frame(t: 0)
+        let eye = try XCTUnwrap(follower.fuse(input, now: 0).subjectRight)
+        let source = try XCTUnwrap(input.subjectRight)
+        let rigid = try XCTUnwrap(EyeCoordinateFrame(inner: source.innerCorner, outer: source.outerCorner,
+                                                     upper: source.upperLid, lower: source.lowerLid, brow: source.browPoints))
+            .toWorld(LinerBuildOptions.wingAnchorLocal)
+        let anchor = try XCTUnwrap(eye.wingAnchor)
+        XCTAssertEqual(anchor.x, rigid.x, accuracy: 1e-6)
+        XCTAssertEqual(anchor.y, rigid.y, accuracy: 1e-6)
+    }
+
+    func testWithoutAHandTheDetectorIsUsedAsItIs() throws {
         let follower = LidFollower()
         for t in 0..<3 { _ = follower.fuse(frame(t: TimeInterval(t)), now: TimeInterval(t)) }
-        let base = try XCTUnwrap(follower.fuse(frame(t: 3), now: 3).subjectRight?.upperLid)
-        let lifted = try XCTUnwrap(follower.fuse(frame(t: 4, lift: 10), now: 4).subjectRight?.upperLid)
-        for (a, b) in zip(base, lifted) {
-            XCTAssertEqual(a.y - b.y, 10 * LidFollower.freePull, accuracy: 0.05)
-        }
-        XCTAssertGreaterThan(LidFollower.freePull, LidFollower.pullPerResult * 5)
+        let input = frame(t: 4, lift: 10)
+        let output = follower.fuse(input, now: 4)
+        XCTAssertEqual(output.subjectRight?.upperLid, input.subjectRight?.upperLid, "no lag behind the detector")
+        XCTAssertEqual(follower.followingCount, 0)
+    }
+
+    func testAFlickeringHandReadingKeepsFollowing() throws {
+        let follower = LidFollower()
+        for t in 0..<3 { _ = follower.fuse(frame(t: Double(t) * 0.1), now: Double(t) * 0.1, hand: [.subjectRight: 1]) }
+        // One reading without the hand, 0.1 s later: still following, so the lid does not jump back.
+        _ = follower.fuse(frame(t: 0.3, lift: 10), now: 0.3)
+        XCTAssertEqual(follower.followingCount, 1)
     }
 
     func testBlinkGivesTheDetectorFullControl() throws {
