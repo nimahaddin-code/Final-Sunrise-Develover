@@ -1,18 +1,21 @@
 // Ported from the EyelinerSpike.
 import CoreGraphics
 
-/// Spike defaults were 0.6 / 0.02 / 0.004: steadier but too slow to follow a lid that is pulled or squeezed, so the
-/// liner now reacts faster (a little more jitter on a still face; tune here).
 struct OneEuroConfig: Equatable {
     /// Lower = smoother when still (more lag). Units: Hz.
-    var minCutoff: Double = 1.2
+    var minCutoff: Double = 0.6
     /// Higher = less lag when moving fast. Landmarks are in pixels, so beta is small.
-    var beta: Double = 0.06
+    var beta: Double = 0.02
     var dCutoff: Double = 1.0
     /// Stillness dead-band as a fraction of the face-anchor spread (~0.004 = about half a pixel on a normal face).
     /// A point only moves once its filtered position drifts further than this from where it was last drawn,
     /// so a still face gives a still guide. 0 = off.
-    var deadband: Double = 0.002
+    var deadband: Double = 0.004
+
+    /// The spike's steady setting: the default, because a still face must give a still liner.
+    static let steady = OneEuroConfig()
+    /// Quicker to follow a pulled or squeezed lid, at the cost of visible jitter (tried and rejected as the default).
+    static let responsive = OneEuroConfig(minCutoff: 1.2, beta: 0.06, dCutoff: 1.0, deadband: 0.002)
 }
 
 struct OneEuroFilter {
