@@ -12,6 +12,9 @@ measurement mathematics is unchanged. Both sets of eye tests are retained.
 Catalog/import/save and Nimah studio are implemented MVP features, not placeholder-only services.
 See `Docs/CodeOwnership.md`, `Docs/Performance.md`, and `Docs/Validation.md`; historical notes below may predate integration.
 
+Home screen: after onboarding the app opens on `Features/TryOnHome/TryOnHomeView` (no tab bar). `TryOnHomeModel` swaps the camera
+card between Nimah's blush/eyebrow engine and Hanum's eyeliner engine; profile and tutorial are blank placeholder routes for now.
+
 Saved-analysis flow: onboarding runs Khalish face scan then eye scan. `FaceShapeStore.latest` supplies Nimah
 eyebrow/blush presets; `FaceShapeStore.eyes` supplies Hanum eyeliner via the `MakeupPlan` adapter. Saved analysis
 opens eyebrow/blush preview directly, with tutorial immediately available. Live geometric alignment is automatic,

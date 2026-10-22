@@ -8,26 +8,12 @@ struct AppRootView: View {
     var body: some View {
         Group {
             if navigator.onboardingComplete {
-                TabView(selection: $navigator.selectedTab) {
-                    NavigationStack(path: $navigator.tryOnPath) {
-                        MakeupRecommendationsView(store: faceShapeStore, onScanFace: { navigator.open(.faceScan, in: .tryOn) },
-                                                  onScanEyes: { navigator.open(.eyeScan, in: .tryOn) })
-                            .navigationDestination(for: AppRoute.self, destination: destination)
-                    }
-                    .tabItem { Label("Try On", systemImage: "wand.and.stars") }
-                    .tag(AppTab.tryOn)
-                    NavigationStack(path: $navigator.discoverPath) {
-                        ReferenceCatalogView(service: container.catalog)
-                            .navigationDestination(for: AppRoute.self, destination: destination)
-                    }
-                    .tabItem { Label("Discover", systemImage: "sparkles") }
-                    .tag(AppTab.discover)
-                    NavigationStack(path: $navigator.savedPath) {
-                        SavedLooksView(store: container.savedLooks)
-                            .navigationDestination(for: AppRoute.self, destination: destination)
-                    }
-                    .tabItem { Label("My Looks", systemImage: "heart") }
-                    .tag(AppTab.myLooks)
+                // Try On is the only screen: no tab bar.
+                NavigationStack(path: $navigator.tryOnPath) {
+                    TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
+                                  onProfile: { navigator.open(.profile, in: .tryOn) },
+                                  onTutorial: { navigator.open(.tutorial, in: .tryOn) })
+                        .navigationDestination(for: AppRoute.self, destination: destination)
                 }
             } else {
                 OnboardingView(store: faceShapeStore, onFinish: navigator.completeOnboarding)
@@ -56,6 +42,8 @@ struct AppRootView: View {
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
             FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
+        case .profile: BlankPageView(title: "Profile")
+        case .tutorial: BlankPageView(title: "Tutorial")
         case .eyeScan:
             EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }
         }

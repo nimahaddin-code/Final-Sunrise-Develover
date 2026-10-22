@@ -27,6 +27,13 @@ enum EyebrowGuideMode: String, CaseIterable, Identifiable, Sendable {
     var id: String { rawValue }
     var title: String { switch self { case .dots: return "Dots"; case .dashed: return "Dashed"; case .both: return "Both" } }
 }
+/// One makeup layer in the layered preview (home screen), where eyebrow and blush can show together.
+struct PreviewLayer: Equatable, Sendable {
+    var on = false
+    var intensity: Float = 0.65
+    var tint: SIMD3<Float>? = nil
+}
+
 struct EyebrowConfiguration: Equatable, Sendable {
     // -Nimah: Region/style selection untuk dua modul pada shared tracking pipeline.
     var region:FaceGuideRegion = .eyebrows
@@ -43,6 +50,14 @@ struct EyebrowConfiguration: Equatable, Sendable {
     // -Nimah: Before hides every guide/effect; After is a live simulation.
     var previewAfter = true
     var previewIntensity:Float = 0.65
+    // Optional shade (RGB 0...1) for the brow/blush preview; nil keeps the built-in tint.
+    var shadeTint:SIMD3<Float>? = nil
+    // Layered preview: brow and blush are drawn together from these layers, and `region` is ignored.
+    var layered = false
+    var browLayer = PreviewLayer()
+    var blushLayer = PreviewLayer()
+    var needsBrow: Bool { layered ? browLayer.on : (region == .eyebrows || showAllRegions) }
+    var needsBlush: Bool { layered ? blushLayer.on : region == .blush }
     var showMakeupPreview = false
     var debugMesh = false
 }

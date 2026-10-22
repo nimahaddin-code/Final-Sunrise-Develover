@@ -10,6 +10,8 @@ struct LiveGuideView: UIViewRepresentable {
     let active: Bool
     // -Nimah: Region configuration memungkinkan modul lain memakai foundation sesi yang sama.
     var eyebrowConfiguration: EyebrowConfiguration? = nil
+    // Called on the session queue for every frame with a tracked face, so another overlay can share this camera.
+    var onFrame: (@Sendable (ARFrame, ARFaceAnchor) -> Void)? = nil
     func makeCoordinator() -> Coordinator { Coordinator(camera: camera, referenceID: referenceID, manager:camera.trackingManager) }
     func makeUIView(context: Context) -> ARSCNView {
         let view=ARSCNView(frame:.zero)
@@ -27,6 +29,7 @@ struct LiveGuideView: UIViewRepresentable {
         context.coordinator.configure(visible:camera.overlay, step:camera.guideStep, mode:camera.previewMode,
             fullLook:camera.previewFullLook, strength:camera.previewStrength, previous:camera.showPreviousSteps,
             style:camera.eyelinerStyle, debug:camera.debugMode, eyebrows:eyebrowConfiguration)
+        context.coordinator.setFrameHandler(onFrame)
         if active && camera.authorized && camera.failure == nil { context.coordinator.start(view) }
         else { context.coordinator.pause(view) }
     }
@@ -42,6 +45,7 @@ struct LiveGuideView: UIViewRepresentable {
         private let referenceID: String
         private let lock=NSLock()
         private var settings=Settings()
+        private var frameHandler: (@Sendable (ARFrame, ARFaceAnchor) -> Void)?
         private var tracked=false, fitAllowed=false
         private var generation=UUID()
         private var sessionActive=false
@@ -77,6 +81,7 @@ struct LiveGuideView: UIViewRepresentable {
             let dots=SCNNode()
             let eyebrowRenderer=EyebrowSceneRenderer()
             let previewRenderer=FaceRegionPreviewRenderer()
+            let blushPreviewRenderer=FaceRegionPreviewRenderer()
             let foreheadRenderer=ForeheadSceneRenderer()
             let blushRenderer=ForeheadSceneRenderer()
             let trackingDots=FaceTrackingDotsRenderer()
@@ -130,6 +135,7 @@ struct LiveGuideView: UIViewRepresentable {
             settings.fullLook=fullLook; settings.strength=max(0,min(1,strength))
             settings.previous=previous; settings.style=style.clamped; settings.debug=debug; settings.eyebrows=eyebrows
         }
+        func setFrameHandler(_ handler: (@Sendable (ARFrame, ARFaceAnchor) -> Void)?) { lock.lock(); frameHandler=handler; lock.unlock() }
         private func snapshot() -> (Settings,Bool,Bool,UUID) {
             lock.lock(); defer { lock.unlock() }; return (settings,sessionActive && tracked && ProcessInfo.processInfo.systemUptime-lastFrameArrival<0.35,fitAllowed,generation)
         }
@@ -166,7 +172,7 @@ struct LiveGuideView: UIViewRepresentable {
             root.addChildNode(face.eyebrowRenderer.root)
             root.addChildNode(face.foreheadRenderer.root)
             root.addChildNode(face.blushRenderer.root)
-            root.addChildNode(face.previewRenderer.root); root.addChildNode(face.trackingDots.root)
+            root.addChildNode(face.previewRenderer.root); root.addChildNode(face.blushPreviewRenderer.root); root.addChildNode(face.trackingDots.root)
             root.addChildNode(face.depthNode); root.addChildNode(face.makeupNode); root.addChildNode(face.dots)
             root.addChildNode(face.eyelinerRoot); root.addChildNode(face.diagnosticNode); root.addChildNode(face.labels)
             face.generation=snapshot().3
@@ -270,12 +276,23 @@ struct LiveGuideView: UIViewRepresentable {
             SCNTransaction.begin(); SCNTransaction.disableActions=true
             face.makeupNode.isHidden=true; face.dots.isHidden=true; face.eyelinerRoot.isHidden=true; face.labels.isHidden=true
             face.depth.update(from:anchor.geometry)
-            let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.showAllRegions,blushStyle:configuration.region == .blush ? configuration.blushStyle : nil)
+            let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.showAllRegions,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
             let vertices=Array(anchor.geometry.vertices)
-            face.eyebrowRenderer.update(guide:(configuration.region == .eyebrows || configuration.showAllRegions) ? result.guide : nil,vertices:vertices,configuration:configuration)
+            face.eyebrowRenderer.update(guide:configuration.needsBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
             face.foreheadRenderer.update(guide:result.foreheadGuide,vertices:vertices,configuration:configuration)
             face.blushRenderer.update(blush:result.blushGuide,vertices:vertices,configuration:configuration)
-            face.previewRenderer.update(brow:result.guide,forehead:result.foreheadGuide,blush:result.blushGuide,vertices:vertices,triangles:Array(anchor.geometry.triangleIndices),configuration:configuration)
+            let triangles=Array(anchor.geometry.triangleIndices)
+            if configuration.layered {
+                // Home screen: brow and blush previews are separate layers with their own shade and strength.
+                var brow=configuration; brow.region = .eyebrows; brow.showMakeupPreview=configuration.browLayer.on
+                brow.previewIntensity=configuration.browLayer.intensity; brow.shadeTint=configuration.browLayer.tint
+                var blush=configuration; blush.region = .blush; blush.showMakeupPreview=configuration.blushLayer.on
+                blush.previewIntensity=configuration.blushLayer.intensity; blush.shadeTint=configuration.blushLayer.tint
+                face.previewRenderer.update(brow:result.guide,forehead:nil,vertices:vertices,triangles:triangles,configuration:brow)
+                face.blushPreviewRenderer.update(brow:nil,forehead:nil,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:blush)
+            } else {
+                face.previewRenderer.update(brow:result.guide,forehead:result.foreheadGuide,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:configuration)
+            }
             face.trackingDots.update(vertices:vertices,visible:configuration.showTrackingPoints)
             face.diagnosticNode.isHidden = !configuration.debugMesh
             if configuration.debugMesh {
@@ -388,6 +405,8 @@ struct LiveGuideView: UIViewRepresentable {
             lock.lock(); let ticket=generation, active=sessionActive; lock.unlock()
             guard active else { return }
             let face=frame.anchors.compactMap { $0 as? ARFaceAnchor }.first
+            lock.lock(); let handler=frameHandler; lock.unlock()
+            if let face,face.isTracked,let handler { handler(frame,face) }
             let normal:Bool
             if case .normal=frame.camera.trackingState { normal=true } else { normal=false }
             let isTracked=normal && face?.isTracked==true
@@ -398,7 +417,7 @@ struct LiveGuideView: UIViewRepresentable {
             let options=snapshot().0
             if let configuration=options.eyebrows {
                 if isTracked,let face {
-                    eyebrowPipeline.observe(frame:frame,anchor:face,canCalibrate:self.fitStable && relaxed && abs(relative.columns.2.z)>0.85,style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,blushStyle:configuration.region == .blush ? configuration.blushStyle : nil)
+                    eyebrowPipeline.observe(frame:frame,anchor:face,canCalibrate:self.fitStable && relaxed && abs(relative.columns.2.z)>0.85,style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
                 } else { eyebrowPipeline.trackingLost() }
             }
             guard frame.timestamp-lastReport>=0.1 else { return }; lastReport=frame.timestamp
@@ -409,7 +428,7 @@ struct LiveGuideView: UIViewRepresentable {
             let ready=readiness.update(timestamp:frame.timestamp,tracked:isTracked,steady:steady)
             fitStable=ready
             let distance=isTracked ? Double(simd_length(position)) : nil
-            let brow=options.eyebrows.map { eyebrowPipeline.snapshot(style:$0.style,foreheadStyle:($0.region == .forehead || $0.showAllRegions) ? $0.foreheadStyle : nil,height:$0.foreheadHeight,includeBrow:$0.showAllRegions,blushStyle:$0.region == .blush ? $0.blushStyle : nil) }
+            let brow=options.eyebrows.map { eyebrowPipeline.snapshot(style:$0.style,foreheadStyle:($0.region == .forehead || $0.showAllRegions) ? $0.foreheadStyle : nil,height:$0.foreheadHeight,includeBrow:$0.showAllRegions || ($0.layered && $0.browLayer.on),blushStyle:$0.needsBlush ? $0.blushStyle : nil) }
             Task { @MainActor in
                 guard self.isCurrent(ticket) else { return }
                 if let brow {

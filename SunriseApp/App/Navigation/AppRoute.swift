@@ -13,4 +13,6 @@ enum AppRoute: Hashable {
     case makeupTryOn(plan: MakeupPlan, applied: [MakeupRecommendation])
     case faceScan
     case eyeScan
+    case profile
+    case tutorial
 }
