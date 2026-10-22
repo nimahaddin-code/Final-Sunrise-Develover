@@ -8,6 +8,7 @@ struct MakeupTryOnView: View {
     @State private var isComparing = false
     @State private var snapshotter = ARSnapshotter()
     @State private var photo: TryOnPhoto?
+    @AppStorage(DeveloperTools.key) private var developerTools = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
@@ -180,9 +181,12 @@ struct MakeupTryOnView: View {
             }
             .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
             .fixedSize(horizontal: false, vertical: true)
-            #if DEBUG
-            if category == .eyeliner { EyeDebugView(eyes: model.plan.eyes, overlay: model.linerOverlay) }
-            #endif
+            // Long press: developer tools (landmark dots, hand mask, readout) in any build.
+            .onLongPressGesture(minimumDuration: 1.2) { developerTools.toggle() }
+            .sensoryFeedback(.impact, trigger: developerTools)
+            if category == .eyeliner, DeveloperTools.isOn(developerTools) {
+                EyeDebugView(eyes: model.plan.eyes, overlay: model.linerOverlay)
+            }
             if let selected, let notes = notes(for: category, selected: selected), !notes.isEmpty {
                 fitNotes(notes)
             }

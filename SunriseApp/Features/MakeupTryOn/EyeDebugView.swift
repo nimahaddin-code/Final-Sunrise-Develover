@@ -1,16 +1,19 @@
-#if DEBUG
 import SwiftUI
 
-/// Debug-only readout of the measured eye values and how they became the eyeliner, for calibrating the thresholds.
+/// Developer-tools readout (always in Debug builds; in any other build after a long press, see `DeveloperTools`) of the measured eye values and how they became the eyeliner, for calibrating the thresholds.
 struct EyeDebugView: View {
     let eyes: EyeScan?
     var overlay: LinerOverlayModel?
     @AppStorage("debugEyeLandmarks") private var showsLandmarks = false
+    @AppStorage("debugOcclusionMask") private var showsMask = false
+    @AppStorage("disableOcclusion") private var disablesOcclusion = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("DEBUG eye measurements").font(.caption.weight(.bold))
+            Text("DEVELOPER eye measurements").font(.caption.weight(.bold))
             Toggle("Show eyeliner landmark dots (red raw, green smoothed)", isOn: $showsLandmarks)
+            Toggle("Turn off hand cut-out (needs re-opening the try-on)", isOn: $disablesOcclusion)
+            Toggle("Show hand mask (red: liner is hidden there)", isOn: $showsMask)
             if let overlay { OverlayStatusLine(model: overlay) }
             if let eyes {
                 let plan = EyelinerPlanner.plan(for: eyes)
@@ -46,4 +49,16 @@ private struct OverlayStatusLine: View {
     @ObservedObject var model: LinerOverlayModel
     var body: some View { Text(model.debugStatus.isEmpty ? "MediaPipe: waiting" : model.debugStatus) }
 }
-#endif
+
+/// Developer tools (the readout above, landmark dots, hand mask) are always on in Debug builds and can be switched on in
+/// any other build by long-pressing the explanation text under the eyeliner shades.
+enum DeveloperTools {
+    static let key = "developerTools"
+    static func isOn(_ stored: Bool) -> Bool {
+        #if DEBUG
+        true
+        #else
+        stored
+        #endif
+    }
+}

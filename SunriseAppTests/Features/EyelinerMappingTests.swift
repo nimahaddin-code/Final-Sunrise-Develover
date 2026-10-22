@@ -204,3 +204,114 @@ final class EyelinerMappingTests: XCTestCase {
         XCTAssertEqual(none.pngData(), blank.pngData())
     }
 }
+
+final class HandOcclusionTests: XCTestCase {
+    private let raw = CGSize(width: 1280, height: 720)
+
+    func testUprightToRawMatrixMatchesThePointMapping() {
+        for rotation in DetectorRotation.allCases {
+            let matrix = rotation.uprightToRaw(raw: raw)
+            for p in [CGPoint(x: 10, y: 20), CGPoint(x: 300, y: 900), CGPoint(x: 700, y: 100)] {
+                let a = p.applying(matrix), b = rotation.rawPoint(fromUpright: p, raw: raw)
+                XCTAssertEqual(a.x, b.x, accuracy: 1e-9, "\(rotation)")
+                XCTAssertEqual(a.y, b.y, accuracy: 1e-9, "\(rotation)")
+            }
+        }
+    }
+
+    func testSimilarityAsAMatrixMovesPointsLikeApply() throws {
+        let from = [CGPoint(x: 0, y: 0), CGPoint(x: 100, y: 0), CGPoint(x: 0, y: 80), CGPoint(x: 100, y: 80)]
+        let to = from.map { CGPoint(x: -$0.y * 1.2 + 300, y: $0.x * 1.2 + 50) }   // quarter turn, 1.2x, moved
+        let t = try XCTUnwrap(SimilarityTransform(from: from, to: to))
+        for p in [CGPoint(x: 40, y: 30), CGPoint(x: -20, y: 90)] {
+            XCTAssertEqual(p.applying(t.affine).x, t.apply(p).x, accuracy: 1e-6)
+            XCTAssertEqual(p.applying(t.affine).y, t.apply(p).y, accuracy: 1e-6)
+        }
+        XCTAssertTrue(t.isPlausible)
+        XCTAssertFalse(SimilarityTransform(from: from, to: Array(repeating: CGPoint(x: 1, y: 1), count: 4))!.isPlausible,
+                       "A collapsed reading is not a head motion")
+    }
+
+    func testBodySkinBecomesTheMask() throws {
+        // 3 x 2 category mask: classes 0 background, 2 body skin, 3 face skin.
+        let image = try XCTUnwrap(OcclusionMask.alphaImage(categories: [0, 2, 3, 2, 3, 0], width: 3, height: 2, occluders: [2]))
+        XCTAssertEqual(image.width, 3)
+        XCTAssertEqual(image.height, 2)
+        let data = try XCTUnwrap(image.dataProvider?.data as Data?)
+        let alpha = stride(from: 3, to: data.count, by: 4).map { data[$0] }
+        XCTAssertEqual(alpha, [0, 255, 0, 255, 0, 0])
+        XCTAssertNil(OcclusionMask.alphaImage(categories: [0, 1], width: 3, height: 2, occluders: [2]), "Too few classes")
+    }
+
+    private func mask(time: CFTimeInterval = 10) throws -> OcclusionMask {
+        // Segmenter saw the upright 720 x 1280 frame at 100 x 200.
+        let image = try XCTUnwrap(OcclusionMask.alphaImage(categories: [UInt8](repeating: 2, count: 20_000), width: 100,
+                                                           height: 200, occluders: [2]))
+        return OcclusionMask(image: image, size: CGSize(width: 100, height: 200), uprightSize: CGSize(width: 720, height: 1280),
+                             rotation: .right, rawSize: raw, headAnchors: [CGPoint(x: 0, y: 0), CGPoint(x: 100, y: 0),
+                             CGPoint(x: 0, y: 100), CGPoint(x: 100, y: 100)], time: time)
+    }
+
+    func testMaskPixelsLandWhereTheHandIsOnScreen() throws {
+        let mask = try mask()
+        // Identity screen mapping and a head that has not moved: a mask pixel goes to the raw image, as the rotation says.
+        let identity = ImageToViewMapping(transform: .identity, source: .displayTransform)
+        let placement = try XCTUnwrap(mask.placement(headAnchors: mask.headAnchors, mapping: identity, at: 10.1))
+        let centre = CGPoint(x: 50, y: 100).applying(placement.transform)     // upright (360, 640) -> raw (640, 360)
+        XCTAssertEqual(centre.x, 640, accuracy: 1e-6)
+        XCTAssertEqual(centre.y, 360, accuracy: 1e-6)
+        // The head moved 30 px right: so does the mask.
+        let moved = mask.headAnchors.map { CGPoint(x: $0.x + 30, y: $0.y) }
+        let shifted = try XCTUnwrap(mask.placement(headAnchors: moved, mapping: identity, at: 10.1))
+        XCTAssertEqual(CGPoint(x: 50, y: 100).applying(shifted.transform).x, 670, accuracy: 1e-6)
+    }
+
+    func testAnOldMaskIsNotUsed() throws {
+        let identity = ImageToViewMapping(transform: .identity, source: .displayTransform)
+        let mask = try mask(time: 10)
+        XCTAssertNil(mask.placement(headAnchors: mask.headAnchors, mapping: identity, at: 10 + OcclusionMask.maxAge + 0.1))
+    }
+
+    func testTheLinerIsErasedBehindAHandInThePhoto() throws {
+        let tracker = LinerTracker()
+        var eyes: [RenderedEye] = []
+        for i in 0..<5 {
+            eyes = tracker.render(SyntheticEye.frame(t: Double(i) / 30), spec: LinerSpec(style: EyelinerPlanner.variant(for: .almond)))
+        }
+        let size = CGSize(width: 640, height: 480)
+        let identity = ImageToViewMapping(transform: .identity, source: .displayTransform)
+        let hand = Occlusion(image: try XCTUnwrap(OcclusionMask.alphaImage(categories: [2], width: 1, height: 1, occluders: [2])),
+                             size: CGSize(width: 1, height: 1), transform: CGAffineTransform(scaleX: size.width, y: size.height))
+        func photo(occlusion: Occlusion?) -> UIImage {
+            let frame = LinerOverlayFrame(eyes: eyes, mapping: identity, receivedAt: CACurrentMediaTime(), occlusion: occlusion)
+            let format = UIGraphicsImageRendererFormat(); format.scale = 1
+            let blank = UIGraphicsImageRenderer(size: size, format: format).image { context in
+                UIColor.white.setFill(); context.fill(CGRect(origin: .zero, size: size))
+            }
+            return LinerOverlayRenderer.compose(blank, overlay: frame, shade: MakeupPalette.black, intensity: 1)
+        }
+        /// The darkest pixel (0 black ... 1 white) in `rect` of `image`.
+        func darkest(_ image: UIImage, in rect: CGRect) throws -> CGFloat {
+            let cg = try XCTUnwrap(image.cgImage)
+            let width = cg.width, height = cg.height
+            var pixels = [UInt8](repeating: 0, count: width * height * 4)
+            let context = try XCTUnwrap(CGContext(data: &pixels, width: width, height: height, bitsPerComponent: 8,
+                                                  bytesPerRow: width * 4, space: CGColorSpaceCreateDeviceRGB(),
+                                                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+            context.draw(cg, in: CGRect(x: 0, y: 0, width: width, height: height))
+            var lowest: CGFloat = 1
+            for y in Int(rect.minY)..<Int(rect.maxY) { for x in Int(rect.minX)..<Int(rect.maxX) {
+                lowest = min(lowest, CGFloat(pixels[(y * width + x) * 4]) / 255)
+            } }
+            return lowest
+        }
+        let aroundTheEye = CGRect(x: 160, y: 340, width: 120, height: 80)
+        XCTAssertLessThan(try darkest(photo(occlusion: nil), in: aroundTheEye), 0.6, "Without a hand the liner is in the photo")
+        XCTAssertGreaterThan(try darkest(photo(occlusion: hand), in: aroundTheEye), 0.97,
+                             "A hand over the eye hides the liner there")
+        // A hand over only the far side of the picture leaves the liner alone.
+        let farHand = Occlusion(image: hand.image, size: hand.size,
+                                transform: CGAffineTransform(scaleX: 100, y: 100).translatedBy(x: 5, y: 0))
+        XCTAssertLessThan(try darkest(photo(occlusion: farHand), in: aroundTheEye), 0.6)
+    }
+}
