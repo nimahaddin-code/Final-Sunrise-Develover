@@ -1,5 +1,7 @@
 # Testing MVP
 
+> -Nimah: Acuan placement terbaru: [MakeupAccuracyPlan](MakeupAccuracyPlan.md) dan [EyelinerDeviceTesting](EyelinerDeviceTesting.md). Catatan di bawah dapat mencakup iterasi historis. Eyeliner kini strip attachment, bukan atlas; full look default OFF.
+
 ## Build / unit test
 
 Buka SunriseApp.xcodeproj, scheme SunriseApp, pilih iPhone Simulator, Cmd+U. Tidak perlu Team untuk Simulator.
@@ -44,3 +46,33 @@ Test fondasi: navigation stack, boundaries/empty tutorial, catalog retry/cancel,
 ## CI
 
 Workflow macOS Simulator di .github/workflows tetap tersedia. Hasil lokal terbaru dicatat di Validation.md; jangan menyatakan CI remote lulus sebelum ada workflow run yang mendukung klaim tersebut.
+
+## Checklist dotted Glam — -Nimah
+
+- Catalog menampilkan Sculpted Glam dengan foto referensi pilihan pengguna. Detail menjelaskan breakdown manual dan keterbatasan hasil.
+- Manual mode: sketsa titik berganti tiap langkah. Tidak ada kamera palsu atau capture palsu.
+- iPhone: Dots/Soft area untuk blush; toggle visibility dan Back/Next harus menampilkan area yang tepat.
+- Smile, blink, buka/tutup mulut, turn/tilt dan tracking loss. Pastikan titik menempel pada mesh; cek area mata/bibir dengan cermat sebelum menyebut placement valid.
+- Capture saat titik tampil, lalu periksa hasil Before/After bebas marker dan orientasi/mirroring benar.
+- Regresi unit: target per langkah tidak kosong, pemetaan indeks valid, tidak ada duplikasi, mesh kosong aman.
+
+## Protokol validasi iPhone 17 — belum dijalankan
+
+1. Jalankan versi terbaru dari source ini, bukan GlowGuide lama. Catat model/iOS/build dan kondisi cahaya.
+2. Kalibrasi frontal dengan mata/bibir rileks; pastikan fit lengkap atau area partial dinyatakan hidden.
+3. Gunakan Points + makeup lalu Makeup only dan Original. Periksa bahwa Original benar-benar baseline kamera.
+4. Gerakkan jarak perlahan sekitar 20, 30, 40, dan 60 cm, kemudian maju-mundur lebih cepat. Angka ini titik pengujian, bukan janji range sensor. Catat frame tracking loss dan marker yang meleset.
+5. Uji putar/tilt kiri-kanan, senyum, blink, mulut buka/tutup. Periksa lip bleed ke gigi, liner ke sclera, sisi jauh menembus wajah, dan lag antara kamera serta makeup.
+6. Jika membuat video evaluasi lokal, anotasi eyelid/lip corners dan bandingkan error yang dinormalisasi terhadap lebar wajah. Tentukan kriteria penerimaan tim dari bukti ini; unit test tidak mengukur error camera pixels.
+7. Profiling Instruments untuk CPU/GPU/frame time dan thermal. Request 60 FPS tidak berarti actual FPS konstan. Uji sekurangnya beberapa menit, termasuk refit dan background/resume.
+8. Capture/save tetap unfiltered; verifikasi orientasi, mirroring dan tidak ada marker/virtual color tersimpan.
+
+Regresi tambahan: topology fit pada synthetic holes, scale invariance, partial-fit hiding, invalid topology/UV handling, cached texture alpha, preview mode flags, dan readiness menunggu fit. Synthetic fixture bukan wajah asli dan bukan klaim akurasi hardware.
+
+## Retest preview warna — -Nimah
+
+1. Jalankan build terbaru dari proyek SunriseApp yang sama pada iPhone 17, buka Sculpted Glam dan selesaikan kalibrasi.
+2. Aktifkan full look, pilih Makeup only dan intensitas 80–100%. Bandingkan dengan Original camera dalam cahaya yang sama: pipi, bibir dan kelopak seharusnya berubah warna.
+3. Pilih Points + makeup: titik dan warna harus berada di area yang sama. Uji maju/mundur perlahan dan menoleh; catat area meleset, jitter atau warna tersembunyi.
+4. Turunkan intensitas ke nol: warna harus hilang. Points only hanya menampilkan panduan. Foto tersimpan masih raw camera, tidak memuat efek virtual.
+5. Bila perbedaan warna belum terlihat pada perangkat, hasil tetap dianggap belum lolos acceptance test walaupun tes simulator lulus.

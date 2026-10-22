@@ -1,6 +1,24 @@
 # Pembagian iterasi MVP — Nimah, Khalish, Hanum
 
+> -Nimah · 22 October 2026: Pembagian dari tech lead saat ini: **Holly: deteksi/analisis bentuk wajah; Nimah: eyebrow + blush; Hanum: eyeliner**. Katalog preferensi dan preview eyebrow/blush sudah tersedia, analisis Holly belum tersambung. [Kontrak, referensi dan acceptance](BrowBlushPreferences.md). Pembagian lama di bawah merupakan riwayat/usulan sebelumnya.
+
+> -Nimah, 19 October 2026: scope terbaru mencakup closed eyebrow outline, lima forehead style dan tutorial manual. Baca [BrowForeheadGuide](BrowForeheadGuide.md) untuk status terbaru, batas hairline dan testing; catatan sebelumnya di bawah adalah riwayat.
+
+> -Nimah: Instruksi terbaru menetapkan tech lead mengerjakan Eyes & Eyebrows. Kontrak modul dan handoff region lain ada di [EyebrowModule](EyebrowModule.md). Nama PIC Lips/Nose dan Cheeks/Forehead/Jaw/Chin belum ditetapkan di instruksi baru; tabel lama di bawah tetap usulan historis.
+
 Ini daftar area kerja, bukan asumsi jumlah anggota. Satu PIC dapat memegang beberapa area; tech lead menetapkan nama melalui issue. Area bisa mulai paralel menggunakan mock setelah kontrak minimum disepakati.
+
+## Prioritas placement eyeliner — -Nimah
+
+Pembagian berikut adalah **usulan tugas berikutnya**, bukan atribusi penulis kode atau delegasi otomatis. Tech lead dapat menyesuaikan PIC. Kode iterasi ini ditandai -Nimah.
+
+| PIC usulan | Deliverable | Dependensi | Acceptance |
+| --- | --- | --- | --- |
+| Nimah | Integrasi build, pengujian iPhone 17, review anatomy bersama makeup artist/tester | Source eyeliner + perangkat + persetujuan tester | Original vs eyeliner only diuji pada wajah; anotasi lokasi; hasil PASS/FAIL jujur dan keputusan toleransi dicatat |
+| Khalish | Audit upper-rim attachment dan opsi landmark untuk eyelid sulit | Debug region + sampel yang diizinkan | Tidak ada pigmen hidung/pipi; dokumentasikan batas mesh; detektor tambahan hanya jika error/latency terukur membaik |
+| Hanum | QA scope tutorial, kontrol style, debug UI dan regresi lifecycle | Kontrak state di MakeupAccuracyPlan.md | Previous/next kembali satu layer; full look eksplisit; refit/background/anchor replacement tidak memunculkan hasil lama |
+
+Urutan wajib: audit/debug → eyeliner → **gate wajah nyata** → baru perluas attachment/fine adjustment shadow/lips/blush/contour → integrasi full look tervalidasi. Buat satu PR kecil per area, koordinasikan project.pbxproj dan file kontrak. Panduan acceptance ada di EyelinerDeviceTesting.md; usulan metrik belum disepakati dan belum diukur.
 
 ## Tim dan handoff saat ini
 

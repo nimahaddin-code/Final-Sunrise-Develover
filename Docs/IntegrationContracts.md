@@ -1,5 +1,9 @@
 # Kontrak integrasi MVP
 
+> -Nimah · 22 October 2026: Kontrak baru FaceShapeAssessment → katalog eyebrow/blush → preview/tutorial dijelaskan di [BrowBlushPreferences](BrowBlushPreferences.md). Origin manual/analysis dibedakan; unknown tidak menghasilkan klasifikasi palsu.
+
+> -Nimah: Acuan placement terbaru: [MakeupAccuracyPlan](MakeupAccuracyPlan.md) dan [EyelinerDeviceTesting](EyelinerDeviceTesting.md). Catatan di bawah dapat mencakup iterasi historis. Eyeliner kini strip attachment, bukan atlas; full look default OFF.
+
 Semua service di Core Sendable; ViewModel MainActor menerima dependency via initializer. Framework rendering tetap berada di fitur LiveGuide.
 
 | Kontrak | Live implementation | Input / output dan error |
@@ -21,3 +25,11 @@ ARSessionDelegate queue mengukur tracking readiness; renderer memutakhirkan mesh
 Photos import memakai system picker, batas input 25MB, dan selection task cancellation. Reference hanya inspirasi lokal; user memilih style tutorial sendiri. Tidak ada analisis otomatis.
 
 AR implementation mengikuti [Apple ARFaceTrackingConfiguration](https://developer.apple.com/documentation/arkit/arfacetrackingconfiguration) dan pola geometry pada [Tracking and visualizing faces](https://developer.apple.com/documentation/arkit/tracking-and-visualizing-faces). Simulator tidak memvalidasi tracking. Physical acceptance test wajib sebelum mengklaim placement berhasil.
+
+## Native try-on contracts — -Nimah
+
+FaceCameraState memegang previewMode (points+look/look/points/original), previewStrength, previewFullLook, fitReady, fitMessage, distanceMeters. Readiness tidak boleh mengaktifkan Begin sebelum fit tersedia. FaceSurfaceProfile/Baker memakai value arrays dan immutable CGImage hasil bake; tidak menyimpan geometry pengguna ke disk/server. Session generation membuang bake lama setelah restart. Live renderer dimiliki render thread, tracking/readiness dimiliki session queue, konfigurasi/pending result memakai NSLock, dan UI MainActor. Mocks tetap tidak mengakses kamera.
+
+## Eyebrow shared-session contract — -Nimah
+
+Jangan membuat sesi AR/AVCapture per facial region. Pakai ARFaceTrackingManager.shared dan lease aktif. Hasil asynchronous harus terikat epoch/anchor; region guide memakai triangle attachment dari snapshot frame yang sama. Lihat [EyebrowModule](EyebrowModule.md) sebelum menambahkan Lips/Nose/Cheeks.

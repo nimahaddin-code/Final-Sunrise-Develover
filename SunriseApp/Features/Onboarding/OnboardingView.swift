@@ -10,7 +10,7 @@ struct OnboardingView: View {
                 LookArtwork(referenceID: "douyin")
                 Text("Your face. Your kind of glow.").font(AppTypography.title).multilineTextAlignment(.center)
                 Text("Choose a look you love. Learn one step at a time, with a live blush guide on your own face.").multilineTextAlignment(.center)
-                Text("MVP · Blush is the only AR overlay. Other steps are manual. Camera photos stay on this device.").font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                Text("MVP · Try virtual makeup with placement points. Preview colors are a simulation. Camera photos stay on this device.").font(AppTypography.caption).foregroundStyle(AppColors.subtle)
                 PrimaryButton(title: "Find my glow", action: onContinue)
             }.padding(AppSpacing.large)
         }.background(AppColors.background).foregroundStyle(AppColors.ink)

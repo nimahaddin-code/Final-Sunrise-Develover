@@ -26,18 +26,44 @@ struct MakeupSessionView: View {
     var body: some View {
         ScrollView { VStack(alignment: .leading, spacing: AppSpacing.large) {
             HStack { Text(reference.name).font(AppTypography.heading); Spacer(); Text("YOUR GLOW SESSION").font(.caption2).foregroundStyle(AppColors.rose) }
-            if manual { LookArtwork(referenceID: reference.id); Text("Manual tutorial · camera is off").font(.caption).foregroundStyle(AppColors.subtle) }
+            if manual {
+                if reference.id == "sculpted-glam" { PlacementDiagram(step: tutorial.currentStep ?? .blush) }
+                else { LookArtwork(referenceID: reference.id) }; Text("Manual tutorial · camera is off").font(.caption).foregroundStyle(AppColors.subtle) }
             else if availability.availability == .supported && camera.authorized && camera.failure == nil {
-                LiveGuideView(camera: camera, color: UIColor(LookArtwork.color(for: reference.id)), active: visible && scenePhase == .active && !comparing)
-                    .frame(height: 360).clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
+                LiveGuideView(camera: camera, referenceID: reference.id, active: visible && scenePhase == .active && !comparing)
+                    .frame(height: 460).clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
                     .overlay(alignment: .bottom) { Text(camera.message).font(.caption).multilineTextAlignment(.center).padding().background(.ultraThinMaterial, in: Capsule()).padding() }
+                    .overlay(alignment: .topTrailing) {
+                        if started {
+                            Picker("Preview view", selection: $camera.previewMode) {
+                                ForEach(MakeupPreviewMode.allCases) { Text($0.title).tag($0) }
+                            }.pickerStyle(.menu).padding(AppSpacing.small)
+                                .background(.regularMaterial, in: Capsule()).padding(AppSpacing.small)
+                        }
+                    }
+                if started {
+                    Text(camera.renderMessage).font(.caption).foregroundStyle(AppColors.rose)
+                }
+                #if DEBUG
+                DisclosureGroup("Developer diagnostics · no recording") {
+                    Picker("Diagnostic overlay",selection:$camera.debugMode) {
+                        ForEach(LiveGuideDebugMode.allCases) { Text($0.title).tag($0) }
+                    }
+                    Text(camera.debugMessage).font(.caption.monospaced())
+                    Text("Face ±X labels use face-local coordinates. Check selfie mirroring on device. UV atlas is diagnostic, not makeup.").font(.caption)
+                }
+                #endif
+                Text(camera.fitMessage).font(.caption).foregroundStyle(AppColors.subtle)
+                if let distance = camera.distanceHint { Text(distance).font(.caption.monospacedDigit()).foregroundStyle(AppColors.subtle) }
+                Button("Refit face", action: camera.refitFace)
             } else { cameraFallback }
+            if reference.id == "sculpted-glam" { DisclosureGroup("View selected glam reference") { LookArtwork(referenceID: reference.id) } }
             if let inspiration { DisclosureGroup("My inspiration · manually selected") { Image(uiImage: inspiration).resizable().scaledToFit().frame(maxHeight: 220) } }
             if !started {
                 FaceCalibrationView(calibrated: camera.calibrated, tracked: camera.tracked, onCapture: captureBefore) { beginManual() }
             } else {
-                TutorialView(model: tutorial, referenceID: reference.id, manual: manual, overlay: $camera.overlay,
-                             canCapture: camera.tracked && !camera.overlay, onCapture: captureAfter, onFinishManual: onFinish)
+                TutorialView(model: tutorial, referenceID: reference.id, manual: manual, overlay: $camera.overlay, guideStep: $camera.guideStep, previewMode: $camera.previewMode, previewFullLook: $camera.previewFullLook, previewStrength: $camera.previewStrength, showPreviousSteps: $camera.showPreviousSteps, eyelinerStyle: $camera.eyelinerStyle,
+                             canCapture: camera.tracked, onCapture: captureAfter, onFinishManual: onFinish)
                 if !manual { Button("Switch to manual tutorial") { beginManual() } }
             }
         }.padding(AppSpacing.large) }.background(AppColors.background).foregroundStyle(AppColors.ink)
@@ -71,7 +97,7 @@ struct MakeupSessionView: View {
     }
     private func beginManual() { manual = true; started = true; camera.overlay = false; camera.stopSession?(); camera.suspend(); before = nil; after = nil }
     private func captureBefore() {
-        guard camera.calibrated, let photo = camera.capture() else { captureError = "Face tracking is not ready. Face the camera and try again."; return }
+        guard camera.calibrated, camera.fitReady, let photo = camera.capture() else { captureError = "Face tracking is not ready. Face the camera and try again."; return }
         before = photo; started = true; camera.overlay = true
     }
     private func captureAfter() {

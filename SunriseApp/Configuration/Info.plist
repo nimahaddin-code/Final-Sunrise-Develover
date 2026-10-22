@@ -33,6 +33,6 @@
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>SunriseApp uses the front camera for a face-following blush guide and Before/After photos you choose to save on this device.</string>
+	<string>SunriseApp uses the front camera for face-following eyebrow and makeup guides. Eyebrow landmarks are processed on this device. Before/After photos are saved only when you choose.</string>
 </dict>
 </plist>

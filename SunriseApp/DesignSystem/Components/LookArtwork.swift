@@ -5,6 +5,7 @@ struct LookArtwork: View {
     let referenceID: String
     static func color(for id: String) -> Color {
         switch id {
+        case "sculpted-glam": return Color(red: 0.66, green: 0.35, blue: 0.28)
         case "clean-girl": return Color(red: 0.87, green: 0.47, blue: 0.40)
         case "soft-glam": return Color(red: 0.65, green: 0.28, blue: 0.41)
         case "latte": return Color(red: 0.65, green: 0.39, blue: 0.25)
@@ -12,6 +13,15 @@ struct LookArtwork: View {
         }
     }
     var body: some View {
+        Group {
+            if referenceID == "sculpted-glam" {
+                Image("GlamReference").resizable().scaledToFit().frame(maxWidth: .infinity).frame(height: 280)
+                    .background(AppColors.card).clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
+                    .accessibilityLabel("Selected glam reference: bronze cheeks, brown eyes and rose-brown lips")
+            } else { illustratedFace }
+        }
+    }
+    @ViewBuilder private var illustratedFace: some View {
         let color = Self.color(for: referenceID)
         ZStack {
             RoundedRectangle(cornerRadius: AppSpacing.cornerRadius).fill(color.opacity(0.12))
@@ -22,5 +32,26 @@ struct LookArtwork: View {
             Capsule().fill(color).frame(width: 24, height: 6).offset(y: 46)
             Image(systemName: "sparkles").font(.title).foregroundStyle(color).offset(x: 68, y: -48)
         }.frame(height: 190).accessibilityLabel("Makeup placement illustration")
+    }
+}
+
+// -Nimah: Sketsa edukasi terpisah dari foto referensi dan kamera; tidak menyimulasikan hasil pada user.
+struct PlacementDiagram: View {
+    let step: TutorialStep
+    var body: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.small) {
+            LookArtwork(referenceID: "soft-glam")
+                .overlay {
+                    Canvas { context, size in
+                        for point in PlacementDots.targets(for: step) {
+                            let center = CGPoint(x: size.width / 2 + CGFloat(point.x) * 900, y: 95 - CGFloat(point.y) * 850)
+                            let rect = CGRect(x: center.x - 3.5, y: center.y - 3.5, width: 7, height: 7)
+                            context.fill(Path(ellipseIn: rect), with: .color(.white))
+                            context.stroke(Path(ellipseIn: rect), with: .color(AppColors.rose), lineWidth: 1.8)
+                        }
+                    }.accessibilityHidden(true)
+                }
+            Text("Placement sketch · approximate starting points").font(.caption).foregroundStyle(AppColors.subtle)
+        }.accessibilityElement(children: .combine).accessibilityLabel("Approximate dotted placement sketch for \(step.title)")
     }
 }

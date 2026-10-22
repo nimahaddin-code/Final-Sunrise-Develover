@@ -8,6 +8,17 @@ struct ReferenceCatalogView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: AppSpacing.large) {
                 Text("A little guidance. A glow that's yours.").font(AppTypography.title)
+                // -Nimah: Pintu masuk modul alis terpisah dari tutorial makeup lama.
+                NavigationLink(value:AppRoute.eyebrowGuide) {
+                    HStack(spacing:AppSpacing.medium) {
+                        Image(systemName:"eyebrow").font(.title2)
+                        VStack(alignment:.leading) {
+                            Text("Brow & Blush Studio").font(.headline)
+                            Text("Face shape · placement preferences · live preview").font(.caption)
+                        }
+                        Spacer(); Image(systemName:"chevron.right")
+                    }.padding(AppSpacing.large).background(AppColors.card,in:RoundedRectangle(cornerRadius:AppSpacing.cornerRadius))
+                }.foregroundStyle(AppColors.rose)
                 Text("THE LOOK EDIT").font(.caption.weight(.semibold)).tracking(3).foregroundStyle(AppColors.rose)
                 switch model.state {
                 case .idle, .loading: ProgressView("Loading references")
