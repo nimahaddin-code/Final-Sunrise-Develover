@@ -53,6 +53,8 @@ import UIKit
     private var isLocating = false
     private var facingFrames = 0
     private var isSessionRunning = false
+    // -Nimah: Permission completion must not restart a screen that has already been left.
+    private var sessionRequestID=UUID()
     private var renderTasks: [MakeupCategory: Task<Void, Never>] = [:]
     /// Bumped whenever placement restarts so late Vision results are dropped.
     private var locateID = 0
@@ -110,14 +112,21 @@ import UIKit
     }
 
     func start() async {
+        sessionRequestID=UUID(); let request=sessionRequestID
         guard ARFaceTrackingConfiguration.isSupported else { phase = .unsupported; return }
-        guard await Self.cameraAccessGranted() else { phase = .cameraDenied; return }
+        let granted=await Self.cameraAccessGranted()
+        guard request==sessionRequestID,!Task.isCancelled else { return }
+        guard granted else { phase = .cameraDenied; return }
         session.delegate = self
         session.run(ARFaceTrackingConfiguration(), options: [.resetTracking, .removeExistingAnchors])
         isSessionRunning = true
         syncLiner()
         // Placement is kept across pauses; the same person is most likely still in front of the camera.
-        if features == nil { resetPlacement() } else { phase = .ready }
+        if features == nil { resetPlacement() } else {
+            phase = .ready
+            // -Nimah: Resume cancelled pending textures only; keep completed layers cached.
+            for category in selection.keys where textures[category]==nil { redraw(category) }
+        }
     }
 
     func startIfNeeded() async {
@@ -128,7 +137,11 @@ import UIKit
     }
 
     func stop() {
-        session.pause()
+        // -Nimah: Leaving a feature cancels pending work and rejects late Vision results.
+        sessionRequestID=UUID(); locateID += 1
+        renderTasks.values.forEach { $0.cancel() }; renderTasks.removeAll()
+        isLocating=false; isLocatingLive=false
+        session.pause(); session.delegate=nil
         linerOverlay.stop()
         isSessionRunning = false
         switch phase {

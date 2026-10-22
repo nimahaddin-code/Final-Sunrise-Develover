@@ -45,8 +45,9 @@ struct MakeupTryOnView: View {
             .task { await model.startIfNeeded() }
             .onDisappear { model.stop() }
             .onChange(of: scenePhase) { _, newPhase in
-                // Re-check camera access after returning from Settings.
-                if newPhase == .active, model.phase == .cameraDenied { Task { await model.start() } }
+                // -Nimah: Pause all camera/model work off-screen; resume through one guarded lifecycle.
+                if newPhase == .active { Task { await model.startIfNeeded() } }
+                else { model.stop() }
             }
     }
 

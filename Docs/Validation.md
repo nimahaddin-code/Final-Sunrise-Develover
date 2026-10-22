@@ -131,3 +131,7 @@ Deteksi Vision tetap dapat salah dan koordinat kamera live perlu acceptance pera
 ## Xcode local registration repair — -Nimah
 
 User reported build errors after merge. Reproduction found the local project file had 132 objects instead of the merged 322; missing compile membership produced cannot-find-type errors for FaceShapeStore, MakeupPlan and the live guide modules. Closed the open Xcode workspace before repairing, restored the complete graph from main, saved in native OpenStep format and retained local Nimah signing team WP97CT3PT7. Semantic comparison against main confirms all merged object IDs remain; only app development-team values change. Signed generic iPhone build then succeeded. All 43 teammate module files remain identical. No native camera acceptance is implied. Reopen the repaired project to refresh Xcode's in-memory graph.
+
+## Feature transition lifecycle optimization — -Nimah
+
+User approved lifecycle-only edits in Hanum modules. Simulator: 197 tests / 193 pass / 4 skip / 0 fail; signed iPhone build succeeded. See Performance.md. No measured device FPS or transition-latency improvement is claimed. Unrelated local localization changes were left untouched.

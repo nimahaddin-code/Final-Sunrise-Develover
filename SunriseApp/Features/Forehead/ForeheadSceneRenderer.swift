@@ -91,9 +91,10 @@ final class FaceRegionPreviewRenderer {
     private struct Patch {
         let node:SCNNode
         let attachments:[SurfaceAttachment]
-        let alpha:[Float]
-        let triangles:[Int32]
-        let tint:SIMD3<Float>
+        // -Nimah: Immutable colors/topology are built once per placement, not every frame.
+        let colors:SCNGeometrySource
+        let element:SCNGeometryElement
+        let material:SCNMaterial
     }
     private var patches:[Patch]=[]
     func update(brow:EyebrowGuide?,forehead:ForeheadGuide?,blush:BlushPlacementGuide? = nil,vertices:[SIMD3<Float>],triangles:[Int16],configuration:EyebrowConfiguration) {
@@ -133,12 +134,10 @@ final class FaceRegionPreviewRenderer {
             let positions=patch.attachments.compactMap { $0.position(in:vertices,lift:0.0004) }
             guard positions.count==patch.attachments.count else { patch.node.isHidden=true; continue }
             patch.node.isHidden=false
-            let colors=patch.alpha.map { SIMD4(patch.tint.x,patch.tint.y,patch.tint.z,$0*strength) }
             let source=SCNGeometrySource(vertices:positions.map { SCNVector3($0.x,$0.y,$0.z) })
-            let color=SCNGeometrySource(data:colors.withUnsafeBytes { Data($0) },semantic:.color,vectorCount:colors.count,
-                usesFloatComponents:true,componentsPerVector:4,bytesPerComponent:4,dataOffset:0,dataStride:MemoryLayout<SIMD4<Float>>.stride)
-            let geometry=SCNGeometry(sources:[source,color],elements:[SCNGeometryElement(indices:patch.triangles,primitiveType:.triangles)])
-            geometry.materials=patch.node.geometry?.materials ?? [EyelinerRenderer.material(tint:.white)]
+            let geometry=SCNGeometry(sources:[source,patch.colors],elements:[patch.element])
+            patch.material.transparency=CGFloat(strength)
+            geometry.materials=[patch.material]
             patch.node.geometry=geometry
         }
     }
@@ -172,7 +171,12 @@ final class FaceRegionPreviewRenderer {
         }
         guard !indices.isEmpty else { return }
         let node=SCNNode(); root.addChildNode(node)
-        patches.append(Patch(node:node,attachments:attachments,alpha:alphas,triangles:indices,tint:tint))
+        let colors=alphas.map { SIMD4(tint.x,tint.y,tint.z,$0) }
+        let colorSource=SCNGeometrySource(data:colors.withUnsafeBytes { Data($0) },semantic:.color,vectorCount:colors.count,
+            usesFloatComponents:true,componentsPerVector:4,bytesPerComponent:4,dataOffset:0,dataStride:MemoryLayout<SIMD4<Float>>.stride)
+        let element=SCNGeometryElement(indices:indices,primitiveType:.triangles)
+        let material=EyelinerRenderer.material(tint:.white)
+        patches.append(Patch(node:node,attachments:attachments,colors:colorSource,element:element,material:material))
     }
     // -Nimah: Feather stays inside the intended polygon, including concave hairline bands.
     static func coverage(_ point:SIMD2<Float>,polygon:[SIMD2<Float>],feather:Float) -> Float {

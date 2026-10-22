@@ -17,3 +17,7 @@ Shared integration edits by -Nimah: AppRootView destinations retain Try On/scan 
 Two implementations coexist: Try On uses the existing Khalish/Hanum recommendation and MediaPipe eyeliner flow. Discover → Brow & Blush Studio uses Nimah's ARKit/Vision guide. They are separate screens, not one unified rendering pipeline; face-shape handoff into the studio remains a separate integration task. Native camera acceptance is pending.
 
 Integration validation: simulator build succeeded; 196 tests executed, 192 passed, 4 skipped, 0 failed. Existing compiler warnings were not refactored in teammate modules. Live face/device accuracy has not been validated by these tests.
+
+## Approved lifecycle optimization — -Nimah
+
+After the preservation baseline above, Nimah explicitly approved lifecycle changes in four Hanum files: LinerOverlayModel.swift, MediaPipeEyeLandmarkProvider.swift, MakeupTryOnView.swift and MakeupTryOnViewModel.swift. These changes are marked -Nimah, leave eyeliner geometry/formulas intact, and are described in Performance.md. The other 39 teammate source files remain identical to the recorded baseline. TeamSourcePreservation.json remains the original merge baseline, not a claim that the four approved files are still identical.

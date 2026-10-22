@@ -204,3 +204,18 @@ final class EyelinerMappingTests: XCTestCase {
         XCTAssertEqual(none.pngData(), blank.pngData())
     }
 }
+
+// -Nimah: Regression for user-approved model lifecycle optimization; no eyeliner geometry changes.
+extension EyelinerMappingTests {
+    func testDetectorConstructionRunsOffUIThread() async {
+        enum Expected:Error { case probe }
+        let provider=MediaPipeEyeLandmarkProvider(detectorFactory:{
+            XCTAssertFalse(Thread.isMainThread,"Native model initialization must not block screen navigation")
+            throw Expected.probe
+        })
+        do { try await provider.start(); XCTFail("Probe should throw") }
+        catch { XCTAssertTrue(error is Expected) }
+        provider.stop()
+        XCTAssertFalse(provider.isBusy)
+    }
+}

@@ -149,9 +149,17 @@ extension ForeheadGuideTests {
         XCTAssertGreaterThan(initial.sources(for:.color).first?.vectorCount ?? 0,0)
         let source=try XCTUnwrap(initial.sources(for:.vertex).first)
         let initialData=source.data
+        // -Nimah: Per-frame mesh updates reuse immutable topology/color buffers.
+        let cachedColor=try XCTUnwrap(initial.sources(for:.color).first)
+        let cachedElement=try XCTUnwrap(initial.elements.first)
+        options.previewIntensity=0.3
         let moved=region.restVertices.map { $0+SIMD3<Float>(0,0.01,0) }
         renderer.update(brow:nil,forehead:guide,vertices:moved,triangles:region.triangles,configuration:options)
-        XCTAssertNotEqual(initialData,renderer.root.childNodes.first?.geometry?.sources(for:.vertex).first?.data)
+        let updated=try XCTUnwrap(renderer.root.childNodes.first?.geometry)
+        XCTAssertNotEqual(initialData,updated.sources(for:.vertex).first?.data)
+        XCTAssertTrue(cachedColor === updated.sources(for:.color).first)
+        XCTAssertTrue(cachedElement === updated.elements.first)
+        XCTAssertEqual(updated.firstMaterial?.transparency ?? -1,0.3,accuracy:0.001)
         options.previewAfter=false
         renderer.update(brow:nil,forehead:guide,vertices:moved,triangles:region.triangles,configuration:options)
         XCTAssertTrue(renderer.root.isHidden)
