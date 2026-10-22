@@ -158,3 +158,13 @@ Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. R
   BrowBlushPreferences.md), adjust shade/intensity, compare Before/After, open tutorial; rescan with a different
   result and confirm labels and overlays refresh. Missing scan/unsupported catalog shape must leave that layer off.
 - References are an on-device catalog. Pear/rectangle lack an assignment and are explicitly unavailable.
+
+## Reference shades and palette picker — -Nimah
+
+- Simulator suite: **259 tests, 255 passed, 4 skipped, 0 failures**. Follow-up palette/preference suite:
+  **11 tests, 0 failures**, including EXIF rotation, letterbox rejection, pixel sampling and shade/intensity transfer.
+- Signed generic iPhone build: **BUILD SUCCEEDED**. No physical camera capture or live colour/overlay acceptance
+  was performed. Use the manual checklist in BrowBlushPreferences.md on iPhone 17.
+- Photos stay in memory, processing is off the UI thread, maximum raster dimension 1024 pixels. The existing
+  camera usage description now covers rear-camera palette capture. System PhotosPicker requires no full-library read grant.
+- Preset colours are approximate sRGB interpretations of the supplied product images; no calibrated match is claimed.

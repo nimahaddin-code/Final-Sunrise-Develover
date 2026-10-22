@@ -1,6 +1,75 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "01 Pink" : {
+      "extractionState" : "manual"
+    },
+    "02 Peach" : {
+      "extractionState" : "manual"
+    },
+    "03 Winter Pink" : {
+      "extractionState" : "manual"
+    },
+    "04 Muted Mauve" : {
+      "extractionState" : "manual"
+    },
+    "B201 Bistre" : {
+      "extractionState" : "manual"
+    },
+    "B202 Brown" : {
+      "extractionState" : "manual"
+    },
+    "B203 Chocolate" : {
+      "extractionState" : "manual"
+    },
+    "B204 Tan" : {
+      "extractionState" : "manual"
+    },
+    "Choose makeup colour" : {
+      "extractionState" : "manual"
+    },
+    "Palette from Photos" : {
+      "extractionState" : "manual"
+    },
+    "Photograph palette" : {
+      "extractionState" : "manual"
+    },
+    "Loading palette" : {
+      "extractionState" : "manual"
+    },
+    "Tap a colour on your palette photo" : {
+      "extractionState" : "manual"
+    },
+    "Palette photo. Tap a colour, or use the colour picker above." : {
+      "extractionState" : "manual"
+    },
+    "Selected colour" : {
+      "extractionState" : "manual"
+    },
+    "Photo colours are approximate: lighting and the camera affect the result. Photos stay on this device and are not saved by the app." : {
+      "extractionState" : "manual"
+    },
+    "Use this colour" : {
+      "extractionState" : "manual"
+    },
+    "Custom colour" : {
+      "extractionState" : "manual"
+    },
+    "Makeup colour" : {
+      "extractionState" : "manual"
+    },
+    "Could not open this photo. Try another image." : {
+      "extractionState" : "manual"
+    },
+    "Allow camera access in Settings to photograph your palette." : {
+      "extractionState" : "manual"
+    },
+    "Choosing makeup colour" : {
+      "extractionState" : "manual"
+    },
+    "Custom makeup colour" : {
+      "extractionState" : "manual"
+    },
     "Your recommendation" : {
       "extractionState" : "manual"
     },

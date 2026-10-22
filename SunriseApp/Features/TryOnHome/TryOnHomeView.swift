@@ -7,14 +7,15 @@ import Combine
 struct TryOnHomeView: View {
     @StateObject private var home: TryOnHomeModel
     var onProfile: () -> Void
-    var onTutorial: (TryOnTool) -> Void
+    var onTutorial: (TryOnTool,MakeupShade?,Double) -> Void
     @ObservedObject private var store: FaceShapeStore
     @AppStorage(DeveloperTools.key) private var developerTools = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible=false
+    @State private var showColours=false
 
     init(store: FaceShapeStore, assessment: FaceShapeAssessment?, checker: any FaceTrackingAvailabilityChecking,
-         onProfile: @escaping () -> Void, onTutorial: @escaping (TryOnTool) -> Void) {
+         onProfile: @escaping () -> Void, onTutorial: @escaping (TryOnTool,MakeupShade?,Double) -> Void) {
         let plan = store.latest.map { MakeupPlan(scan: $0, eyeScan: store.eyes) } ?? MakeupPlan(shape: .oval, eyeScan: store.eyes)
         _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment ?? FaceShapeAssessment(shape: .unknown),
                                                          checker: checker))
@@ -26,11 +27,19 @@ struct TryOnHomeView: View {
     var body: some View {
         VStack(spacing: AppSpacing.medium) {
             header
-            TryOnLiveCard(home: home)
-                .frame(maxHeight: .infinity)
+            // -Nimah: Dismantle the face camera while the palette picker owns the rear camera.
+            if showColours {
+                RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(AppColors.cocoa)
+                    .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
+            } else {
+                TryOnLiveCard(home: home).frame(maxHeight:.infinity)
+            }
             toolStrip
             Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
             shadeRow.disabled(!home.canTry(home.tool))
+            if let shade=home.currentShade { Text(shade.name).font(AppTypography.caption) }
+            Picker("Live comparison",selection:$home.isComparing) { Text("Before").tag(true);Text("After").tag(false) }
+                .pickerStyle(.segmented)
             IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
                          tint: home.currentShade?.color ?? AppColors.flamingo)
                 .disabled(!home.canTry(home.tool))
@@ -45,11 +54,15 @@ struct TryOnHomeView: View {
         .onReceive(store.$latest.combineLatest(store.$eyes)) { face,eyes in
             home.updateRecommendations(face:face,eyes:eyes)
         }
-        .onAppear { isVisible=true; home.activate() }
+        .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
+            PaletteColorPicker(initial:home.currentShade ?? home.swatches[0]) { home.choose(shade:$0) }
+                .presentationDetents([.large])
+        }
+        .onAppear { isVisible=true; if !showColours { home.activate() } }
         .onDisappear { isVisible=false; home.deactivate() }
         .onChange(of: scenePhase) { _, phase in
             // Pause the camera off-screen; resume through the same guarded path.
-            if phase == .active && isVisible { home.activate() } else { home.deactivate() }
+            if phase == .active && isVisible && !showColours { home.activate() } else { home.deactivate() }
         }
     }
 
@@ -75,7 +88,7 @@ struct TryOnHomeView: View {
                 }
                 .accessibilityLabel("Profile")
                 Spacer()
-                Button { onTutorial(home.tool) } label: {
+                Button { onTutorial(home.tool,home.shades[home.tool],home.intensity) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)
@@ -137,12 +150,14 @@ struct TryOnHomeView: View {
                 }
                 .padding(.horizontal, 2)
             }
-            // Custom colour is reserved for the design team's picker; nothing happens yet.
-            circleButton(selected: false, label: "Custom colour, coming soon", action: {}) {
-                Image(systemName: "plus").font(.title2)
+            // -Nimah: Keep custom and sampled colour visible even when it is not a preset swatch.
+            circleButton(selected:home.currentShade?.id.hasPrefix("custom.") == true,label:"Custom makeup colour",action:{
+                home.deactivate();showColours=true
+            }) {
+                if let shade=home.currentShade,shade.id.hasPrefix("custom.") {
+                    Circle().fill(shade.color).frame(width:30,height:30).overlay(Image(systemName:"eyedropper").foregroundStyle(.white))
+                } else { Image(systemName:"eyedropper").font(.title2) }
             }
-            .disabled(true)
-            .opacity(0.6)
         }
         .frame(height: 56)
     }

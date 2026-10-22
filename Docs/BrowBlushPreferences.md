@@ -1,3 +1,24 @@
+## Warna dan foto palet — -Nimah
+
+User melihat try-on rekomendasi terlebih dahulu. Shade tidak mengubah assignment wajah/placement.
+Blush: 01 Pink, 02 Peach, 03 Winter Pink, 04 Muted Mauve; eyebrow: B201 Bistre, B202 Brown,
+B203 Chocolate, B204 Tan, serta Soft black. Nilai sRGB adalah pendekatan visual dari referensi pengguna,
+bukan hasil pengukuran produk. Intensitas dan Before/After tersedia sebelum tutorial.
+
+Tombol eyedropper membuka color picker manual, pilih foto dari Photos, atau foto palet menggunakan kamera belakang.
+Ketuk bagian warna pada foto, cek swatch, lalu Use this colour. Cancel tidak mengubah shade.
+Foto dibatasi maksimum 1024 pixel, disesuaikan orientasi EXIF, dan disampling dari piksel sRGB dengan area 3×3;
+ketukan pada letterbox diabaikan. Pemrosesan gambar di background. Foto hanya di memori, tidak disimpan/upload.
+Kamera wajah dihentikan selama sheet terbuka sehingga kamera belakang tidak berebut sesi.
+Panah tutorial membawa warna/intensitas yang sudah dicoba ke langkah pertama tutorial rekomendasi yang sama.
+
+Uji iPhone: pilih semua preset; ubah warna manual; import foto portrait/landscape; tap pan warna, bukan packaging;
+ambil foto kamera belakang, Apply, lalu pastikan tracking wajah kembali; batalkan picker; buka tutorial dan cocokkan
+warna/placement. Ulangi setelah background/foreground dan cek penolakan akses kamera. Foto tidak menjamin colour match
+karena cahaya, white balance, dan warna layar berbeda.
+
+---
+
 ## Rekomendasi otomatis dari hasil scan — -Nimah
 
 Alur pengguna menampilkan satu hasil per kategori, bukan pilihan semua referensi.

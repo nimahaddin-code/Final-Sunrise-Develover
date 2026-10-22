@@ -8,7 +8,7 @@ struct EyebrowOverlayView:View {
     @State private var showOptions=false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
-    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil) { _model=StateObject(wrappedValue:EyebrowViewModel(checker:checker,assessment:assessment,initialRegion:initialRegion)) }
+    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil,initialShade:MakeupShade? = nil,initialIntensity:Double? = nil,startTutorial:Bool = false) { _model=StateObject(wrappedValue:EyebrowViewModel(checker:checker,assessment:assessment,initialRegion:initialRegion,initialShade:initialShade,initialIntensity:initialIntensity,startTutorial:startTutorial)) }
     private var supported:Bool { model.availability == .supported }
     private var lessons:[FaceGuideLesson] { model.lessons }
     var body:some View {

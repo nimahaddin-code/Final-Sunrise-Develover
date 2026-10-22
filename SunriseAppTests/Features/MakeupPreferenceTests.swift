@@ -1,6 +1,8 @@
 // -Nimah: Preference provenance, missing coverage and real mesh binding regression, not on-face acceptance.
 import XCTest
 import SceneKit
+import UIKit
+import ImageIO
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
@@ -47,6 +49,49 @@ final class MakeupPreferenceTests:XCTestCase {
         model.beginTutorial(); XCTAssertEqual(model.phase,.chooseStyle)
         model.applyAssessment(.init(shape:.oval))
         XCTAssertFalse(model.hasRecommendation,"Manual labels are not saved scan outputs")
+    }
+    // -Nimah: Sampling must ignore letterboxing and use upright pixels, not view coordinates directly.
+    func testPalettePhotoSamplingUsesAspectFitAndPixelColours() throws {
+        var pixels=[UInt8]()
+        for _ in 0..<20 { for x in 0..<10 { pixels += x<5 ? [255,0,0,255] : [0,0,255,255] } }
+        let provider=try XCTUnwrap(CGDataProvider(data:Data(pixels) as CFData))
+        let image=try XCTUnwrap(CGImage(width:10,height:20,bitsPerComponent:8,bitsPerPixel:32,bytesPerRow:40,
+            space:CGColorSpace(name:CGColorSpace.sRGB)!,bitmapInfo:CGBitmapInfo(rawValue:CGImageAlphaInfo.premultipliedLast.rawValue),
+            provider:provider,decode:nil,shouldInterpolate:false,intent:.defaultIntent))
+        let data=try XCTUnwrap(UIImage(cgImage:image).pngData())
+        let photo=try XCTUnwrap(PalettePhoto.decode(data))
+        let bounds=CGSize(width:200,height:200)
+        XCTAssertNil(photo.sample(at:CGPoint(x:10,y:100),in:bounds),"Outside the fitted photo")
+        var r:CGFloat=0,g:CGFloat=0,b:CGFloat=0,a:CGFloat=0
+        try XCTUnwrap(photo.sample(at:CGPoint(x:70,y:100),in:bounds)).getRed(&r,green:&g,blue:&b,alpha:&a)
+        XCTAssertGreaterThan(r,0.95);XCTAssertLessThan(b,0.05)
+        try XCTUnwrap(photo.sample(at:CGPoint(x:130,y:100),in:bounds)).getRed(&r,green:&g,blue:&b,alpha:&a)
+        XCTAssertGreaterThan(b,0.95);XCTAssertLessThan(r,0.05)
+        // -Nimah: A phone photo with EXIF rotation must display and sample the same upright raster.
+        let rotatedData=NSMutableData()
+        let destination=try XCTUnwrap(CGImageDestinationCreateWithData(rotatedData,"public.jpeg" as CFString,1,nil))
+        CGImageDestinationAddImage(destination,image,[kCGImagePropertyOrientation:6] as CFDictionary)
+        XCTAssertTrue(CGImageDestinationFinalize(destination))
+        let rotated=try XCTUnwrap(PalettePhoto.decode(rotatedData as Data))
+        XCTAssertEqual(rotated.width,20);XCTAssertEqual(rotated.height,10)
+        XCTAssertNil(PalettePhoto.decode(Data([0,1,2])))
+    }
+    @MainActor func testCustomColourKeepsPlacementAndTransfersToTutorial() throws {
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        let assigned=try XCTUnwrap(home.brow.selectedBlush).id
+        let shade=MakeupShade(id:"custom.test",name:"Custom colour",red:0.8,green:0.2,blue:0.4,opacity:0.36)
+        home.choose(shade:shade);home.setIntensity(0.8)
+        XCTAssertEqual(home.brow.selectedBlush?.id,assigned)
+        XCTAssertEqual(home.liveConfiguration.blushLayer.tint,SIMD3<Float>(0.8,0.2,0.4))
+        home.choose(.eyebrow)
+        XCTAssertEqual(home.shades[.blush],shade)
+        let tutorial=EyebrowViewModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.heart,origin:.analysis),initialRegion:.blush,
+            initialShade:shade,initialIntensity:0.8,startTutorial:true)
+        XCTAssertEqual(tutorial.phase,.tutorial)
+        XCTAssertEqual(tutorial.configuration.shadeTint,SIMD3<Float>(0.8,0.2,0.4))
+        XCTAssertEqual(tutorial.configuration.previewIntensity,0.8)
+        XCTAssertEqual(tutorial.selectedBlush?.id,assigned)
+        home.deactivate()
     }
     func testAllBlushStylesStayOnCheeksAndClosedAreasFollowMesh() throws {
         let f=BrowFixture(),region=try f.region()

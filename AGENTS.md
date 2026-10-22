@@ -2,6 +2,15 @@
 
 ## Current merged scope — -Nimah
 
+Palette try-on — -Nimah: `Features/TryOnHome/PaletteColorPicker.swift` provides a native ColorPicker,
+PhotosPicker import and rear-camera capture, followed by tap-to-sample from bounded upright sRGB pixels.
+Photos are memory-only and never uploaded/saved. Home dismantles the face camera while picking a palette,
+then resumes it; custom RGB only changes shade, not the scan assignment. Presets follow the supplied blush/brow
+references approximately (not colour-calibrated product swatches). `AppRoute.recommendedTutorial` carries the
+chosen shade/intensity into the assigned Nimah tutorial after the live try-on. Existing camera permission text
+includes palette capture; PhotosPicker needs no broad photo-library read permission.
+
+
 Scan-assigned results — -Nimah: user-facing eyebrow/blush use exactly one stable assigned catalog ID for the saved
 face shape (`MakeupPreferenceCatalog.assignedBrow/assignedBlush`); no source/style picker or manual face override.
 Uncovered shapes and absent scans leave those layers off. Eyeliner exposes only Hanum's personal eye-scan result,

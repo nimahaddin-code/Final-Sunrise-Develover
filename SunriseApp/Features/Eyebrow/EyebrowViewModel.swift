@@ -101,12 +101,16 @@ import SwiftUI
         default:return true
         }
     }
-    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil) {
+    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil,initialShade:MakeupShade? = nil,initialIntensity:Double? = nil,startTutorial:Bool = false) {
         self.checker=checker; self.entryRegion=initialRegion
         if let assessment { applyAssessment(assessment) }
         if let initialRegion { configuration.region=initialRegion }
+        // -Nimah: Preserve the coloured try-on when opening its tutorial.
+        if let shade=initialShade { configuration.shadeTint=SIMD3(Float(shade.red),Float(shade.green),Float(shade.blue)) }
+        if let intensity=initialIntensity,intensity.isFinite { configuration.previewIntensity=Float(min(max(intensity,0),1)) }
         // -Nimah: Reuse onboarding analysis and enter preview directly, without another scan flow.
         if assessment != nil { phase=initialRegion == nil ? .chooseRegion : .chooseStyle }
+        if startTutorial { beginTutorial() }
     }
     // -Nimah: Face-shape classification is reused; eye/brow fitting remains a separate live calibration.
     func nextAfterScan() {

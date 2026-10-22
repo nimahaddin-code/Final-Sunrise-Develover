@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		033A5C6F22B5AC3CD0D490DB /* LiveGuideDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */; };
 		07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */; };
@@ -181,6 +182,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteColorPicker.swift; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
 		01F40072E3CF347862554017 /* face_landmarker.task */ = {isa = PBXFileReference; lastKnownFileType = file; path = face_landmarker.task; sourceTree = "<group>"; };
 		045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSavedLooksStore.swift; sourceTree = "<group>"; };
@@ -823,6 +825,7 @@
 			children = (
 				BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */,
 				9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */,
+				FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */,
 				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
 				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
 			);
@@ -998,6 +1001,7 @@
 				91D0BE9D95201FF3451E8D68 /* OnboardingView.swift in Sources */,
 				AD829C69DD73C01C6DCD473D /* TryOnHomeModel.swift in Sources */,
 				65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */,
+				5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */,
 				EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */,
 				B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */,
 				2C53F0CCE66A98AF04B7B2D4 /* ReferenceCatalogView.swift in Sources */,
