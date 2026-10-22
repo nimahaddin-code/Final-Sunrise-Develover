@@ -77,11 +77,11 @@ struct TryOnLiveCard: View {
         }
     }
 
-    /// Tells the person what the face scan is waiting for. Only blush and eyebrow need the scan; eyeliner follows the eyes
-    /// on its own.
+    /// Tells the person what the face scan is waiting for, for the selected tool only. Eyeliner follows the eyes on its own,
+    /// so it never shows the blush/eyebrow scan messages, even while those looks are on.
     private var status: String? {
         if !camera.tracked { return String(localized: "Position your face in the frame") }
-        let needsScan = home.enabled.contains(.blush) || home.enabled.contains(.eyebrow)
+        let needsScan = home.tool != .eyeliner && home.enabled.contains(home.tool)
         guard needsScan, !camera.eyebrowGuideReady else { return nil }
         return camera.eyebrowMessage
     }
