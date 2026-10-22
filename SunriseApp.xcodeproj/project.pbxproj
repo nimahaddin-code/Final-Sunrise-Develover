@@ -79,6 +79,12 @@
 		F88C4B1A73633332F0DE36C2 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */; };
 		F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */; };
 		FD2E311FC44972331A578843 /* TutorialViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */; };
+		747CE2C2522E1795A858B118 /* EyeLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1144E237A35DD2DE14C612B /* EyeLandmarks.swift */; };
+		7949BB244D59EAC66163BCBF /* EyeMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */; };
+		B4A68F2B3FF0993A80DC8193 /* EyeShapeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */; };
+		44431B838956C0B3B1E95ABB /* EyeShapeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */; };
+		1ABF13B48BB7A217862917C2 /* EyeMeasurerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */; };
+		1A5307ED011AADB5879ED95C /* EyeShapeClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,6 +172,12 @@
 		F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeClassifierTests.swift; sourceTree = "<group>"; };
 		F9A809519AC15D1F2A75FC7E /* MakeupTextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupTextureRenderer.swift; sourceTree = "<group>"; };
 		FE2B5E1913561C0593FD7840 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
+		F1144E237A35DD2DE14C612B /* EyeLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeLandmarks.swift; sourceTree = "<group>"; };
+		396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeMeasurer.swift; sourceTree = "<group>"; };
+		9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeResult.swift; sourceTree = "<group>"; };
+		544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeClassifier.swift; sourceTree = "<group>"; };
+		CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeMeasurerTests.swift; sourceTree = "<group>"; };
+		CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeClassifierTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -341,6 +353,8 @@
 				D7E30CC8B590F5ADA8D7A700 /* ServiceStateTests.swift */,
 				57783D5A5FD3B135956ABDC4 /* TutorialViewModelTests.swift */,
 				F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */,
+				CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */,
+				CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */,
 				0E7BF5D5F430CF008106DB07 /* PhotoFaceMeasurerTests.swift */,
 				719471221F004F211C0E7FF8 /* FaceShapeDatasetEvalTests.swift */,
 				09018C00875BE2006F222659 /* HeadPoseTests.swift */,
@@ -364,6 +378,7 @@
 				6ACE9C80936BA0AA803627E9 /* SavedLooks */,
 				C4208C4BC220C4C631815466 /* Tutorial */,
 				78BC181F4289544F053C7765 /* FaceShape */,
+				B95177704166936436E03B4B /* EyeShape */,
 				F62FFB0088DC3F46B57C2CA3 /* MakeupTryOn */,
 			);
 			path = Features;
@@ -507,6 +522,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		B95177704166936436E03B4B /* EyeShape */ = {
+			isa = PBXGroup;
+			children = (
+				F1144E237A35DD2DE14C612B /* EyeLandmarks.swift */,
+				396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */,
+				9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */,
+				544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */,
+			);
+			path = EyeShape;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -617,6 +643,8 @@
 				0BDB05D65645A9D73C294F55 /* AppNavigatorTests.swift in Sources */,
 				D9D6D606230E23D7BC356D38 /* ServiceStubs.swift in Sources */,
 				9BBFBF26B88D5A1CB066AA9D /* FaceShapeClassifierTests.swift in Sources */,
+				1ABF13B48BB7A217862917C2 /* EyeMeasurerTests.swift in Sources */,
+				1A5307ED011AADB5879ED95C /* EyeShapeClassifierTests.swift in Sources */,
 				6A5998FB4332B2D926ADD348 /* PhotoFaceMeasurerTests.swift in Sources */,
 				178C1E0195A44823A4CD0811 /* FaceShapeDatasetEvalTests.swift in Sources */,
 				C96E85543600CBE3B51E79C7 /* HeadPoseTests.swift in Sources */,
@@ -671,6 +699,10 @@
 				8390F5679DF570C890190E7C /* FaceContourDetector.swift in Sources */,
 				2B212B32757D21783FE89B2C /* PhotoFaceMeasurer.swift in Sources */,
 				CF8FDEBEDA76C3A34E0A02AF /* FaceShapeClassifier.swift in Sources */,
+				747CE2C2522E1795A858B118 /* EyeLandmarks.swift in Sources */,
+				7949BB244D59EAC66163BCBF /* EyeMeasurer.swift in Sources */,
+				B4A68F2B3FF0993A80DC8193 /* EyeShapeResult.swift in Sources */,
+				44431B838956C0B3B1E95ABB /* EyeShapeClassifier.swift in Sources */,
 				685BC99DAFA493FCEB389B85 /* FaceShapeViewModel.swift in Sources */,
 				E12D0FA8EDEAC708EA387AC1 /* FaceMeshARView.swift in Sources */,
 				F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */,

@@ -57,6 +57,8 @@ SunriseApp/
     FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
     MakeupTryOn/          makeup recommendations and live AR try-on
     Onboarding/           welcome screen, then the face scan
+    EyeShape/             eye shape (openness, tilt, spacing) from MediaPipe landmarks. In progress: measuring and classifying are done and tested,
+                          the camera, MediaPipe detector and UI are not built yet
     ReferenceCatalog/ ReferenceDetail/ ReferenceImport/ FaceCalibration/ Tutorial/ LiveGuide/ Comparison/ SavedLooks/
                           scaffold features: mostly placeholder UI on mock data
   PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
@@ -120,6 +122,19 @@ FaceShapeStore(latest: result)                      // in-memory store for previ
   category is drawn into its own texture (`MakeupTextureRenderer`) on its own copy of the mesh (`MakeupARView`), so
   makeup follows the face.
 - Try-on photos are only saved when the user shares or saves them (`NSPhotoLibraryAddUsageDescription`).
+
+### Eye shape — `Features/EyeShape` (in progress)
+
+Pure logic so far, tested without a camera or MediaPipe. The detector, camera session, scan screen and onboarding step come next
+(plan: `Docs/Decisions/0002-mediapipe-eye-scan.md`).
+
+- `EyeLandmarks`: plain 2D eye points. `EyeLandmarks(normalizedMesh:imageSize:)` maps MediaPipe's 478-point mesh using its published
+  indices (`MeshIndex`); **those indices still have to be checked against a real scan on a device**.
+- `EyeMeasurer.measure(_:)` gives `EyeMeasurements` (openness, tilt, spacing, lidSpace in iris diameters). It derives the face's own axes
+  from the points, so roll, scale, mirroring and y-down images do not matter. `EyeMeasurementsSampler` takes the per-field median and skips blinks.
+- `EyeShapeClassifier` turns measurements into `EyeShapeResult` (`EyeOpenness`, `EyeTilt`, `EyeSpacing`, `mayBeHooded`, `confidence`). The eyelid
+  (`EyeLid`) cannot be seen in landmarks, so the person chooses it later; it stays `nil` until then.
+- The thresholds in `EyeShapeClassifier.Thresholds` and `EyeMeasurer.minimumOpenness` are starting guesses, not tuned on real faces.
 
 ### Scaffold features
 
