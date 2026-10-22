@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FaceShapeResultView: View {
     let result: FaceShapeResult
+    @AppStorage(DeveloperTools.key) private var developerTools = false
     var onScanAgain: () -> Void
     /// Called when the person answers the hooded / monolid question.
     var onLidTypeChange: (LidType) -> Void = { _ in }
@@ -28,9 +29,7 @@ struct FaceShapeResultView: View {
                 }
                 Text("An estimate from ARKit's face mesh, not a professional assessment. Only the face shape and eye measurements are kept on this device; no photos are saved or uploaded.")
                     .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
-                #if DEBUG
-                EyeDebugView(eyes: result.eyes)
-                #endif
+                if DeveloperTools.isOn(developerTools) { EyeDebugView(eyes: result.eyes) }
                 if let onShowMakeup {
                     PrimaryButton(title: "Try on recommended makeup", action: onShowMakeup)
                     Button("Scan again", action: onScanAgain)

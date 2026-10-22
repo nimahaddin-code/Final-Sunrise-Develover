@@ -20,6 +20,16 @@ enum DetectorRotation: Equatable, CaseIterable {
         }
     }
 
+    /// The same mapping as `rawPoint(fromUpright:raw:)`, as a matrix.
+    func uprightToRaw(raw: CGSize) -> CGAffineTransform {
+        switch self {
+        case .up: .identity
+        case .right: CGAffineTransform(a: 0, b: -1, c: 1, d: 0, tx: 0, ty: raw.height)
+        case .left: CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: raw.width, ty: 0)
+        case .down: CGAffineTransform(a: -1, b: 0, c: 0, d: -1, tx: raw.width, ty: raw.height)
+        }
+    }
+
     /// Maps a pixel of the upright (rotated) image back to the raw captured image.
     func rawPoint(fromUpright p: CGPoint, raw: CGSize) -> CGPoint {
         switch self {
