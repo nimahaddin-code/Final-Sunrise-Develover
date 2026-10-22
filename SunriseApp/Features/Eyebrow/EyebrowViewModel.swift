@@ -64,7 +64,7 @@ import SwiftUI
     // -Nimah: A new try explicitly restores visible preview; Before/Hide from the previous try must not silently carry over.
     func restorePreview() {
         configuration.previewAfter=true; configuration.showGuide=true
-        if configuration.previewIntensity<=0 { configuration.previewIntensity=0.65 }
+        if configuration.previewIntensity<=0 { configuration.previewIntensity=0.85 }
     }
     func choose(_ preference:BrowPreference) {
         guard browOptions.contains(where:{ $0.id==preference.id }) else { return }

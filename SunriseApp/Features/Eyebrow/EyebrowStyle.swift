@@ -30,7 +30,7 @@ enum EyebrowGuideMode: String, CaseIterable, Identifiable, Sendable {
 /// One makeup layer in the layered preview (home screen), where eyebrow and blush can show together.
 struct PreviewLayer: Equatable, Sendable {
     var on = false
-    var intensity: Float = 0.65
+    var intensity: Float = 0.85
     var tint: SIMD3<Float>? = nil
 }
 
@@ -49,7 +49,7 @@ struct EyebrowConfiguration: Equatable, Sendable {
     var showGuide = true
     // -Nimah: Before hides every guide/effect; After is a live simulation.
     var previewAfter = true
-    var previewIntensity:Float = 0.65
+    var previewIntensity:Float = 0.85
     // Optional shade (RGB 0...1) for the brow/blush preview; nil keeps the built-in tint.
     var shadeTint:SIMD3<Float>? = nil
     // Layered preview: brow and blush are drawn together from these layers, and `region` is ignored.

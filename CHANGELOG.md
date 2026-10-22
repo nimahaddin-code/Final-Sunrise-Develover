@@ -5,6 +5,12 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Fixed — visible brow and blush pigment -Nimah
+- Keep the brow input in the layered snapshot when blush is enabled; a ready status could previously coexist with no brow rendering.
+- Increase pigment core alpha/default strength, narrow the feather and raise patches above the depth mesh to reduce clipping.
+- Preserve recommendations, chosen RGB, comparison and user intensity controls. Device visual acceptance still required.
+
+
 ### Added — reference colours and palette picker -Nimah
 - Blush presets: Pink, Peach, Winter Pink, Muted Mauve. Brows: Bistre, Brown, Chocolate, Tan, Soft black.
   RGB values approximate the supplied photos; they are not measured brand shade matches.

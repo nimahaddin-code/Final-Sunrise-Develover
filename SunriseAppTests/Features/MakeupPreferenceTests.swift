@@ -3,6 +3,7 @@ import XCTest
 import SceneKit
 import UIKit
 import ImageIO
+import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
@@ -116,6 +117,55 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertNotEqual(footprints[.wideHorizontal],footprints[.diagonalBlend])
         let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.wideHorizontal))
         XCTAssertFalse(guide.blendArrows.isEmpty)
+    }
+    // -Nimah: A combined request must retain both render inputs; hiding guides must not hide makeup.
+    func testCombinedSnapshotContainsBrowAndBlush() async throws {
+        struct Provider:FaceLandmarkProviding {
+            let result:DetectedEyebrows
+            func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] { [result] }
+        }
+        let f=BrowFixture(),pipeline=EyebrowTrackingPipeline(provider:Provider(result:f.detection()),requiredScanSamples:1)
+        pipeline.reset(anchorID:f.anchor)
+        pipeline.calibrate(input:try f.input(),style:.softArch,blushStyle:.apple)
+        for _ in 0..<100 {
+            if pipeline.snapshot(style:.softArch,includeBrow:true,blushStyle:.apple).ready { break }
+            try await Task.sleep(for:.milliseconds(25))
+        }
+        var configuration=EyebrowConfiguration();configuration.layered=true;configuration.showGuide=false
+        configuration.browLayer.on=true;configuration.blushLayer.on=true
+        let snapshot=pipeline.snapshot(style:.softArch,includeBrow:configuration.needsBrow,blushStyle:configuration.needsBlush ? .apple : nil)
+        XCTAssertNotNil(snapshot.guide);XCTAssertNotNil(snapshot.blushGuide)
+        let renderer=FaceRegionPreviewRenderer()
+        configuration.region = .blush;configuration.showMakeupPreview=true
+        renderer.update(brow:nil,forehead:nil,blush:snapshot.blushGuide,vertices:f.vertices,triangles:try f.region().triangles,configuration:configuration)
+        XCTAssertFalse(renderer.root.isHidden)
+        XCTAssertFalse(renderer.root.childNodes.isEmpty)
+        for node in renderer.root.childNodes {
+            XCTAssertEqual(node.renderingOrder,1)
+            XCTAssertEqual(try XCTUnwrap(node.geometry?.firstMaterial?.transparency),0.85,accuracy:0.00001)
+        }
+    }
+    // -Nimah: Render the actual pigment mesh, not just assert that a node exists.
+    @MainActor func testBlushRendersVisibleColourPixels() throws {
+        guard let device=MTLCreateSystemDefaultDevice() else { throw XCTSkip("Metal renderer unavailable") }
+        let f=BrowFixture(),region=try f.region()
+        let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.apple))
+        let pigment=FaceRegionPreviewRenderer()
+        var configuration=EyebrowConfiguration();configuration.region = .blush;configuration.showMakeupPreview=true
+        configuration.shadeTint=SIMD3(1,0,0)
+        pigment.update(brow:nil,forehead:nil,blush:guide,vertices:region.restVertices,triangles:region.triangles,configuration:configuration)
+        let scene=SCNScene();scene.background.contents=UIColor.white;scene.rootNode.addChildNode(pigment.root)
+        let camera=SCNNode();camera.camera=SCNCamera();camera.camera?.usesOrthographicProjection=true
+        camera.camera?.orthographicScale=0.2;camera.camera?.zNear=0.01;camera.position=SCNVector3(0,0,1)
+        scene.rootNode.addChildNode(camera)
+        let renderer=SCNRenderer(device:device,options:nil);renderer.scene=scene;renderer.pointOfView=camera
+        let image=renderer.snapshot(atTime:0,with:CGSize(width:256,height:256),antialiasingMode:.none)
+        let photo=try XCTUnwrap(image.pngData().flatMap(PalettePhoto.decode))
+        var coloured=0
+        for offset in stride(from:0,to:photo.rgba.count,by:4) {
+            if photo.rgba[offset]>photo.rgba[offset+1]+min(40,255-photo.rgba[offset+1]) && photo.rgba[offset+1]<200 { coloured += 1 }
+        }
+        XCTAssertGreaterThan(coloured,40,"Actual SceneKit output must contain visible blush pigment")
     }
     func testBlushRendererBeforeAndNoGuideClearStaleLayers() throws {
         let f=BrowFixture(),region=try f.region()

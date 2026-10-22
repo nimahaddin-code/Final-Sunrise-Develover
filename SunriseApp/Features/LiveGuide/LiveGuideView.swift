@@ -276,7 +276,7 @@ struct LiveGuideView: UIViewRepresentable {
             SCNTransaction.begin(); SCNTransaction.disableActions=true
             face.makeupNode.isHidden=true; face.dots.isHidden=true; face.eyelinerRoot.isHidden=true; face.labels.isHidden=true
             face.depth.update(from:anchor.geometry)
-            let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.showAllRegions,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
+            let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.needsBrow,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
             let vertices=Array(anchor.geometry.vertices)
             face.eyebrowRenderer.update(guide:configuration.needsBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
             face.foreheadRenderer.update(guide:result.foreheadGuide,vertices:vertices,configuration:configuration)
