@@ -4,7 +4,7 @@ Baca README, Docs/Architecture.md, dan Docs/IntegrationContracts.md sebelum mula
 
 ## Workflow
 
-1. Tech lead memilih workstream dan acceptance criteria di Docs/TeamWorkstreams.md, lalu menunjuk PIC melalui issue. Nama anggota belum ditetapkan dalam scaffold.
+1. Tech lead memilih workstream dan acceptance criteria di Docs/TeamWorkstreams.md, lalu menunjuk PIC melalui issue. Tim saat ini: Nimah, Khalish, dan Hanum; PIC per iterasi dikonfirmasi tech lead.
 2. Mulai dari `main`, gunakan `feature/<short-name>`, `fix/<short-name>`, atau `chore/<short-name>`.
 3. Kerjakan perubahan kecil dalam folder fitur. Gunakan mock untuk pekerjaan yang belum menunggu implementasi layanan asli.
 4. Perubahan model/kontrak bersama harus dijelaskan di issue/PR dan dikoordinasikan sebelum integrasi. Jangan mengubah kontrak diam-diam.
@@ -30,4 +30,6 @@ Commit singkat dengan maksud yang jelas: `feat: add reference import preview`, `
 
 ## Scope honesty
 
-Pertahankan label scaffold/mock sampai fitur asli teruji. Save belum tersedia; mock wajib melempar `notImplemented`. Tidak ada kamera, Photos, ARKit, foto hasil, atau analisis otomatis pada fondasi ini.
+Pertahankan pemisahan implementasi nyata dan mock. Live MVP memiliki kamera/Photos/AR blush serta penyimpanan lokal; mock save tetap melempar `notImplemented`. AR belum dianggap tervalidasi sampai diuji iPhone fisik. Tidak ada analisis makeup otomatis.
+
+Kode baru/perubahan pada fase MVP diberi komentar `// -Nimah:` per file atau bagian logika. Jangan memberi nama Khalish/Hanum pada kode yang bukan ditulis mereka; penugasan PIC terpisah dari atribusi penulis.

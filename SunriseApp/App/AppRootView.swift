@@ -37,13 +37,12 @@ struct AppRootView: View {
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
         case .referenceDetail(let reference): ReferenceDetailView(reference: reference)
-        case .referenceImport: ReferenceImportView()
-        case .faceCalibration(let id): FaceCalibrationView(referenceID: id, checker: container.faceTracking)
-        case .tutorial(let id): TutorialView(referenceID: id)
-        case .liveGuide(let id): LiveGuideView(referenceID: id)
-        case .comparison(let id):
-            ComparisonView(referenceID: id) { navigator.returnToRoot(of: .discover) }
-        case .savedLookDetail(let look): SavedLookDetailView(look: look)
+        // -Nimah: Integration routing; teammate feature implementations remain unchanged.
+        case .eyebrowGuide: EyebrowOverlayView(checker: container.faceTracking)
+        case .referenceImport: ReferenceImportView(checker: container.faceTracking, store: container.savedLooks)
+        case .session(let reference):
+            MakeupSessionView(reference: reference, checker: container.faceTracking, store: container.savedLooks) { navigator.returnToRoot(of: .discover) }
+        case .savedLookDetail(let look): SavedLookDetailView(look: look, store: container.savedLooks)
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
             FaceShapeView(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }

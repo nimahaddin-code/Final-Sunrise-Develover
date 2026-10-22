@@ -1,22 +1,19 @@
-# Navigasi
+# Navigasi MVP
 
 ```text
-Onboarding [session-only]
-└── Main tabs
-    ├── Discover [sample catalog]
-    │   ├── Reference Detail
-    │   │   └── Face Calibration [placeholder; skip]
-    │   │       └── Tutorial [previous/next state works]
-    │   │           ├── Live Guide [placeholder]
-    │   │           │   └── Comparison [placeholder]
-    │   │           └── Comparison [placeholder]
-    │   └── Reference Import [placeholder]
-    └── My Looks [sample metadata only]
-        └── Saved Look Detail [no photo]
+Onboarding (persistent)
+└── Main Tabs
+    ├── Discover
+    │   ├── Reference Detail → Makeup Session
+    │   └── Reference Import → choose photo + style → Makeup Session
+    │       Makeup Session:
+    │       ├── supported + permission → stable calibration → Capture Before
+    │       │   → Blush AR → Contour → Eyeshadow → Eyeliner → Lips
+    │       │   → Capture After → Comparison sheet → Save / finish
+    │       └── unsupported / denied / user choice → manual five steps → finish
+    └── My Looks → Saved Detail → delete confirmation
 ```
 
-`AppRoute` mendefinisikan semua destination; `AppRootView.destination` memasangnya untuk kedua NavigationStack. UI hanya menampilkan link yang sesuai diagram. Stack dipisah per tab agar switching tab mempertahankan riwayat masing-masing.
+AppRoute memuat detail, import, session, saved detail. Phase kalibrasi/tutorial/comparison dikelola di dalam session agar camera/captures tidak berpindah via global state. Snapshot sementara hilang saat session keluar; photo inspiration juga session-only.
 
-`AppNavigator.completeOnboarding()` membuka tab. `returnToRoot(of: .discover)` mengakhiri eksplorasi comparison tanpa menghapus riwayat My Looks. Tombol sistem Back digunakan pada layar detail; alur import tidak mengembalikan hasil karena belum diimplementasikan.
-
-Onboarding tidak disimpan. Langkah tutorial kembali ke awal jika view dibuat ulang. Tidak ada deep link atau restore app state. Uji dengan unit test navigator dan checklist manual di Testing.md; tidak ada UI automation target dalam fondasi.
+Return to Discover dari sesi katalog mereset stack Discover. Selesai sesi hasil import kembali ke layar import. My Looks reload saat tampil. Tidak ada deep link atau restore session lintas relaunch; onboarding tersimpan, koleksi tersimpan.
