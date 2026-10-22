@@ -120,7 +120,10 @@ struct LinerOverlayView: View {
                 guard isVisible, let frame = model.frame, let shade = model.shade else { return }
                 let color = Color(red: shade.red, green: shade.green, blue: shade.blue)
                 for fill in LinerOverlayRenderer.fills(frame, shade: shade, intensity: model.intensity) {
-                    context.fill(Path(fill.path), with: .color(color.opacity(fill.alpha)), style: FillStyle(eoFill: false))
+                    context.drawLayer { layer in
+                        layer.addFilter(.blur(radius: fill.blur))
+                        layer.fill(Path(fill.path), with: .color(color.opacity(fill.alpha)), style: FillStyle(eoFill: false))
+                    }
                 }
             }
             .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }

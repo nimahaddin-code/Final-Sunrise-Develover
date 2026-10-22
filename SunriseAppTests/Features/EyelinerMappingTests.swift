@@ -168,7 +168,9 @@ final class EyelinerMappingTests: XCTestCase {
         let black = MakeupPalette.black
         let full = LinerOverlayRenderer.fills(frame, shade: black, intensity: 1, now: 100.1)
         XCTAssertEqual(full.count, 2)
-        XCTAssertEqual(full[0].alpha, MakeupTextureRenderer.drawnOpacity(black), accuracy: 1e-9)
+        XCTAssertEqual(full[0].alpha, min(MakeupTextureRenderer.drawnOpacity(black), LinerOverlayRenderer.maxOpacity), accuracy: 1e-9)
+        XCTAssertLessThan(full[0].alpha, 1, "Some skin always shows through")
+        XCTAssertTrue(LinerOverlayRenderer.blurRange.contains(full[0].blur), "The edge is softened to match the video")
         let half = LinerOverlayRenderer.fills(frame, shade: black, intensity: 0.5, now: 100.1)
         XCTAssertEqual(half[0].alpha, full[0].alpha / 2, accuracy: 1e-9)
         XCTAssertTrue(LinerOverlayRenderer.fills(frame, shade: black, intensity: 0, now: 100.1).isEmpty)

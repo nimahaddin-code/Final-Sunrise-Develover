@@ -14,27 +14,36 @@ enum LinerOverlayRenderer {
     /// A frame older than this is not drawn (the face was lost, or the detector stalled).
     static let maxAge: CFTimeInterval = 0.4
 
-    /// One filled shape per eye, in view points, with the opacity to fill it with.
+    /// Even at full intensity the ink lets a little skin show through, so it does not read as a sticker.
+    static let maxOpacity = 0.88
+    /// Edge softness as a fraction of the eye's width on screen. The camera image is soft (upscaled video), so a crisp
+    /// vector edge looks pasted on; this matches the liner's edge to the picture. Clamped to `blurRange` points.
+    static let blurFraction: CGFloat = 0.015
+    static let blurRange: ClosedRange<CGFloat> = 0.6...2.0
+
+    /// One filled shape per eye, in view points, with the opacity to fill it with and how much to soften its edge.
     struct Fill {
         let path: CGPath
         let alpha: Double
+        let blur: CGFloat
     }
 
     static func fills(_ frame: LinerOverlayFrame, shade: MakeupShade, intensity: Double,
                       now: CFTimeInterval = CACurrentMediaTime()) -> [Fill] {
         guard now - frame.receivedAt <= maxAge, intensity > 0.01 else { return [] }
-        let opacity = MakeupTextureRenderer.drawnOpacity(shade) * intensity
+        let opacity = min(MakeupTextureRenderer.drawnOpacity(shade), maxOpacity) * intensity
         return frame.eyes.compactMap { eye in
             let alpha = opacity * eye.alpha
             guard alpha > 0.005 else { return nil }
             let path = CGMutablePath()
             for outline in eye.guide.outlines { add(outline, to: path, mapping: frame.mapping) }
             if !eye.guide.tightline.isEmpty { add(eye.guide.tightline, to: path, mapping: frame.mapping) }
-            return Fill(path: path, alpha: alpha)
+            let width = (frame.mapping.map(eye.guide.anchors.outerCorner) - frame.mapping.map(eye.guide.anchors.innerCorner)).length
+            return Fill(path: path, alpha: alpha, blur: min(max(width * blurFraction, blurRange.lowerBound), blurRange.upperBound))
         }
     }
 
-    /// Fills the liner into a UIKit-style context (origin top left, units of view points).
+    /// Fills the liner into a UIKit-style context (origin top left, units of view points), edges unsoftened.
     static func draw(_ frame: LinerOverlayFrame, shade: MakeupShade, intensity: Double, in cg: CGContext,
                      now: CFTimeInterval = CACurrentMediaTime()) {
         for fill in fills(frame, shade: shade, intensity: intensity, now: now) {
@@ -50,9 +59,24 @@ enum LinerOverlayRenderer {
                         intensity: Double) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.scale = snapshot.scale
-        return UIGraphicsImageRenderer(size: snapshot.size, format: format).image { context in
-            snapshot.draw(at: .zero)
+        let renderer = UIGraphicsImageRenderer(size: snapshot.size, format: format)
+        let fills = fills(frame, shade: shade, intensity: intensity)
+        // The liner alone on a transparent layer, softened like the live overlay, then laid over the photo.
+        var layer = renderer.image { context in
             draw(frame, shade: shade, intensity: intensity, in: context.cgContext)
+        }
+        if let blur = fills.map(\.blur).max(), let input = CIImage(image: layer),
+           let filter = CIFilter(name: "CIGaussianBlur") {
+            filter.setValue(input.clampedToExtent(), forKey: kCIInputImageKey)
+            filter.setValue(blur * snapshot.scale, forKey: kCIInputRadiusKey)
+            if let output = filter.outputImage?.cropped(to: input.extent),
+               let cg = CIContext().createCGImage(output, from: output.extent) {
+                layer = UIImage(cgImage: cg, scale: snapshot.scale, orientation: .up)
+            }
+        }
+        return renderer.image { _ in
+            snapshot.draw(at: .zero)
+            layer.draw(at: .zero)
         }
     }
 
