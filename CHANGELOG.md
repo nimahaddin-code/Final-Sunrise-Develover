@@ -6,6 +6,9 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 ## Unreleased
 
 ### Integrated — -Nimah
+- Saved face/eye results now drive recommendations: Nimah eyebrow/blush open preview and tutorial without a repeat
+  scan step; Hanum eyeliner consumes the newer separate eye result. Live alignment remains automatic.
+- Preserve off-UI-thread model startup for Hanum's newly merged optional hand-occlusion model.
 - Merge latest Hanum eyeliner/lid-flow/hand occlusion and Khalish separate eye-scan/onboarding updates.
 - Preserve Nimah-only eyebrow/blush routing and asynchronous eyeliner model lifecycle.
 - Resolve scan/liner landmark type and output-file collisions with scan-specific naming; retain both test suites.

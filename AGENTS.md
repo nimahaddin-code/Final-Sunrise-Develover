@@ -12,6 +12,13 @@ measurement mathematics is unchanged. Both sets of eye tests are retained.
 Catalog/import/save and Nimah studio are implemented MVP features, not placeholder-only services.
 See `Docs/CodeOwnership.md`, `Docs/Performance.md`, and `Docs/Validation.md`; historical notes below may predate integration.
 
+Saved-analysis flow: onboarding runs Khalish face scan then eye scan. `FaceShapeStore.latest` supplies Nimah
+eyebrow/blush presets; `FaceShapeStore.eyes` supplies Hanum eyeliner via the `MakeupPlan` adapter. Saved analysis
+opens eyebrow/blush preview directly, with tutorial immediately available. Live geometric alignment is automatic,
+not another classification step. Eye-scan measurements are converted using matching units; the lid is never
+guessed from `mayBeHooded`. Missing/unclear measurements use the neutral liner. Older scans can still use the
+eye measurements embedded in the face result when no separate eye result exists. Eyeshadow is outside this scope.
+
 Shared brief for anyone working on this repo with an AI coding assistant (Claude Code, Codex, Cursor, Copilot, …).
 It covers the project structure, what each feature does and how to use it, and the rules to follow.
 `CHANGELOG.md` records what changed. Team docs in `Docs/` are written in Indonesian and give more detail.

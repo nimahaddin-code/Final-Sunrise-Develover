@@ -55,7 +55,7 @@ struct EyebrowOverlayView:View {
         }
         .onAppear { visible=true; camera.overlay=true }
         .onDisappear { visible=false; camera.stopSession?(); camera.suspend() }
-        .onChange(of:camera.tracked) { _,tracked in if tracked && model.phase == .positionFace { model.phase = .tracking } }
+        .onChange(of:camera.tracked) { _,tracked in if tracked && model.phase == .positionFace { model.nextAfterScan() } }
         .onChange(of:scenePhase) { _,phase in
             if phase != .active { camera.stopSession?(); camera.suspend() }
             else if supported { Task { await camera.requestPermission() } }
@@ -63,8 +63,8 @@ struct EyebrowOverlayView:View {
     }
     private var header:some View {
         HStack {
-            Button { if model.phase == .positionFace || model.phase == .tracking { dismiss() } else { model.back() } } label: {
-                Image(systemName:model.phase == .positionFace || model.phase == .tracking ? "xmark" : "chevron.left")
+            Button { if model.backLeavesStudio { dismiss() } else { model.back() } } label: {
+                Image(systemName:model.backLeavesStudio ? "xmark" : "chevron.left")
                     .frame(width:38,height:38).background(.ultraThinMaterial,in:Circle())
             }.accessibilityLabel("Back")
             Spacer()
@@ -136,13 +136,13 @@ struct EyebrowOverlayView:View {
                     Text("Keep the outline within visible skin. Hairline is not detected automatically.").font(.caption).foregroundStyle(.secondary)
                 }
                 previewControls
-                if supported { Button("Tampilkan ulang makeup / Scan ulang") { model.restorePreview(); camera.refitFace() }.font(.caption) }
-                if supported && !camera.eyebrowGuideReady { Text(camera.scanInstruction).font(.caption).foregroundStyle(.secondary) }
+                if supported { Button("Refresh placement") { model.restorePreview(); camera.refitFace() }.font(.caption) }
+                if supported && !camera.eyebrowGuideReady { Text("Aligning makeup automatically · keep your face visible").font(.caption).foregroundStyle(.secondary) }
             }
         case .tutorial:
             panel {
                 previewControls
-                if supported { Button("Tampilkan ulang makeup / Scan ulang") { model.restorePreview(); camera.refitFace() }.font(.caption) }
+                if supported { Button("Refresh placement") { model.restorePreview(); camera.refitFace() }.font(.caption) }
                 HStack(alignment:.top,spacing:16) {
                     VStack(alignment:.leading,spacing:6) {
                         Text("Step \(model.stepIndex+1) · \(lessons[model.stepIndex].title)").font(.headline)
@@ -192,7 +192,8 @@ struct EyebrowOverlayView:View {
                 VStack(alignment:.leading,spacing:12,content:content).padding(18).frame(maxWidth:.infinity,alignment:.leading)
             }
             if model.phase == .chooseStyle {
-                action(supported ? "Start tutorial" : "Preview steps",disabled:supported && !camera.eyebrowGuideReady) { model.beginTutorial() }
+                // -Nimah: Tutorial text is available immediately while live placement aligns automatically.
+                action(supported ? "Start tutorial" : "Preview steps",disabled:false) { model.beginTutorial() }
                     .padding(.horizontal,18).padding(.bottom,14)
             }
         }.frame(height:panelHeight)
@@ -302,7 +303,7 @@ struct EyebrowOverlayView:View {
             Form {
                 Toggle("Show guide",isOn:$model.configuration.showGuide)
                 Picker("Appearance",selection:$model.configuration.mode) { ForEach(EyebrowGuideMode.allCases) { Text($0.title).tag($0) } }
-                Button("Refit face") { camera.refitFace(); showOptions=false; model.phase = .tracking }
+                Button("Refresh placement") { camera.refitFace(); showOptions=false }
                 if let distance=camera.distanceHint { Text(distance).font(.caption) }
                 #if DEBUG
                 Toggle("Debug face mesh + landmarks",isOn:$model.configuration.debugMesh)

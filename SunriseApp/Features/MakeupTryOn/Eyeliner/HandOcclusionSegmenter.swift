@@ -42,7 +42,8 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
     private var pool: CVPixelBufferPool?
     private var poolSize: CGSize = .zero
 
-    var isAvailable: Bool { segmenter != nil }
+    private var lifecycleID=UUID()
+    var isAvailable: Bool { lock.lock(); defer { lock.unlock() }; return segmenter != nil }
 
     var isBusy: Bool {
         lock.lock(); defer { lock.unlock() }
@@ -50,7 +51,19 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
         return CACurrentMediaTime() - since < Self.inFlightTimeout
     }
 
-    func start() throws {
+    // -Nimah: Keep the newly merged optional hand model off the UI thread too.
+    func start() async throws {
+        lock.lock(); lifecycleID=UUID(); let token=lifecycleID; lock.unlock()
+        try await withCheckedThrowingContinuation { (continuation:CheckedContinuation<Void,Error>) in
+            queue.async { [self] in
+                do { try prepare(token:token); continuation.resume() }
+                catch { continuation.resume(throwing:error) }
+            }
+        }
+    }
+    private func prepare(token:UUID) throws {
+        lock.lock(); let current=lifecycleID==token; lock.unlock()
+        guard current else { throw CancellationError() }
         guard let path = Bundle.main.path(forResource: Self.modelName, ofType: "tflite") else {
             throw EyeProviderError.modelMissing
         }
@@ -64,6 +77,7 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
         // The class ids come from the model's own labels; "body-skin" is a hand, "face-skin" is not.
         let body = made.labels.enumerated().filter { $0.element.lowercased().contains("body") }.map { UInt8($0.offset) }
         lock.lock()
+        guard lifecycleID==token else { lock.unlock(); throw CancellationError() }
         segmenter = made
         if !body.isEmpty { occluders = Set(body) }
         lock.unlock()
@@ -71,11 +85,14 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
 
     func stop() {
         lock.lock()
+        lifecycleID=UUID()
+        let retired=segmenter
         segmenter = nil
         pending.removeAll()
         inFlightSince = nil
         lastTimestampMs = -1
         lock.unlock()
+        queue.async { withExtendedLifetime(retired) {} }
     }
 
     func submit(_ input: OcclusionInput) {

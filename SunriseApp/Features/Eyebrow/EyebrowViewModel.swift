@@ -83,10 +83,20 @@ import SwiftUI
     @Published private(set) var availability:FaceTrackingAvailability = .notChecked
     private let checker:any FaceTrackingAvailabilityChecking
     private let entryRegion:FaceGuideRegion?
+    // -Nimah: Back from the entry screen returns home instead of walking into old scan screens.
+    var backLeavesStudio:Bool {
+        switch phase {
+        case .tutorial:return false
+        case .chooseStyle:return entryRegion != nil
+        default:return true
+        }
+    }
     init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil) {
         self.checker=checker; self.entryRegion=initialRegion
         if let assessment { applyAssessment(assessment) }
         if let initialRegion { configuration.region=initialRegion }
+        // -Nimah: Reuse onboarding analysis and enter preview directly, without another scan flow.
+        if assessment != nil { phase=initialRegion == nil ? .chooseRegion : .chooseStyle }
     }
     // -Nimah: Face-shape classification is reused; eye/brow fitting remains a separate live calibration.
     func nextAfterScan() {

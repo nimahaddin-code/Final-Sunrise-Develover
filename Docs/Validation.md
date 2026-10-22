@@ -139,3 +139,9 @@ User approved lifecycle-only edits in Hanum modules. Simulator: 197 tests / 193 
 ## Single implementation per feature — -Nimah
 
 Tech lead requested Khalish eyebrow/blush takeout. Scan/result remain Khalish; eyebrow/blush route to Nimah with scan handoff; eyeliner routes to Hanum only. Simulator 188 tests: 184 pass, 4 skip, 0 fail. Deleted-feature assertions were replaced with checks that the old catalogs are empty, stale requests cannot activate removed filters, and Nimah receives scan/region input. See CodeOwnership.md for the current scope.
+
+## Latest team merge + scan-once flow — -Nimah
+
+Merged Eyeliner-Hanum through 9c8aaf4 (hand occlusion/lid flow) and chore/mediapipe through efdd168 (separate Khalish eye scan and onboarding). Preserved Nimah-only eyebrow/blush. Resolved two independent EyeLandmarks types and duplicate output filenames using EyeScanLandmarks for the scan model; mathematics retained. MediaPipe pinned to revision 50505c8312c7eacb1bd411cecdc4cc9fd08d53cb.
+
+Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. Regressions cover immediate preview/tutorial from saved face shape, eye measurement/lid handoff, eye-plan independence from face shape and neutral fallback for unclear eyes. Live alignment and actual makeup accuracy still need physical acceptance. Saved classification does not remove the camera's need to track current pose; no repeat classification or Continue-scan action is required.
