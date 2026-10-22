@@ -5,14 +5,15 @@ struct OneEuroConfig: Equatable {
     /// Lower = smoother when still (more lag). Units: Hz.
     var minCutoff: Double = 0.6
     /// Higher = less lag when moving fast. Landmarks are in pixels, so beta is small.
-    var beta: Double = 0.02
+    var beta: Double = 0.04
     var dCutoff: Double = 1.0
     /// Stillness dead-band as a fraction of the face-anchor spread (~0.004 = about half a pixel on a normal face).
     /// A point only moves once its filtered position drifts further than this from where it was last drawn,
     /// so a still face gives a still guide. 0 = off.
     var deadband: Double = 0.004
 
-    /// The spike's steady setting: the default, because a still face must give a still liner.
+    /// The spike's steady setting (beta doubled): minCutoff and deadband alone decide how still a still face is, while
+    /// beta only matters during fast motion such as pulling the lid, so a higher beta follows a stretch with little jitter.
     static let steady = OneEuroConfig()
     /// Quicker to follow a pulled or squeezed lid, at the cost of visible jitter (tried and rejected as the default).
     static let responsive = OneEuroConfig(minCutoff: 1.2, beta: 0.06, dCutoff: 1.0, deadband: 0.002)

@@ -28,6 +28,12 @@ struct LinerBuildOptions: Equatable {
     static let spikeLashOffset: CGFloat = 0.006
     static let defaultLashOffset: CGFloat = 0.012
 
+    /// How steeply the wing may point up or down, either way, in radians. The spike clamped it to -20...60 degrees; a
+    /// lid pulled hard sideways or upward needs far more room, so the wing may follow the eye up to 80 degrees.
+    static let wingElevationLimit: CGFloat = 80 * .pi / 180
+    /// Largest slope (rise over run, in eye widths) used to extend the lash line past a corner. The spike used 0.6.
+    static let extensionSlopeLimit: CGFloat = 1.2
+
     /// Gap between the lash line and the liner's base, measured OUTWARD (up for the upper liner, down for the lower).
     /// 0 = liner starts exactly on the lash line (where the tightline would be). Negative = pushes into the eye.
     var lashOffset: CGFloat = LinerBuildOptions.defaultLashOffset

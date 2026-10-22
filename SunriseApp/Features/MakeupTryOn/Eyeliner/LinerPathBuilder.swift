@@ -76,7 +76,7 @@ enum LinerPathBuilder {
 
             // Elevation in radians, positive = up (up is -y locally).
             var elev = atan2(-dir.y, dir.x) + CGFloat(spec.wingAngleDeg) * CGFloat.pi / 180
-            elev = clamp(elev, -20 * CGFloat.pi / 180, 60 * CGFloat.pi / 180)
+            elev = clamp(elev, -LinerBuildOptions.wingElevationLimit, LinerBuildOptions.wingElevationLimit)
             dir = CGPoint(x: cos(elev), y: -sin(elev))
 
             let bottomRoot: CGPoint
@@ -175,7 +175,7 @@ enum LinerPathBuilder {
     private static func extended(_ pts: [CGPoint], inner: CGFloat, outer: CGFloat) -> [CGPoint] {
         guard pts.count >= 2 else { return pts }
         func slope(_ a: CGPoint, _ b: CGPoint) -> CGFloat {
-            clamp((b.y - a.y) / max(b.x - a.x, 1e-3), -0.6, 0.6)
+            clamp((b.y - a.y) / max(b.x - a.x, 1e-3), -LinerBuildOptions.extensionSlopeLimit, LinerBuildOptions.extensionSlopeLimit)
         }
         var out = pts
         if inner > 0 {

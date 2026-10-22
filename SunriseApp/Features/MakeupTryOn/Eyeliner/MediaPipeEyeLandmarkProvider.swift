@@ -84,9 +84,10 @@ final class MediaPipeEyeLandmarkProvider: NSObject, @unchecked Sendable {
         options.baseOptions.modelAssetPath = path
         options.runningMode = .liveStream
         options.numFaces = 1
-        options.minFaceDetectionConfidence = 0.5
-        options.minFacePresenceConfidence = 0.5
-        options.minTrackingConfidence = 0.5
+        // Lower than the defaults (0.5) so tracking survives a hand or a pulled lid in front of part of the face.
+        options.minFaceDetectionConfidence = 0.3
+        options.minFacePresenceConfidence = 0.3
+        options.minTrackingConfidence = 0.3
         options.faceLandmarkerLiveStreamDelegate = self
         landmarker = try FaceLandmarker(options: options)
     }
