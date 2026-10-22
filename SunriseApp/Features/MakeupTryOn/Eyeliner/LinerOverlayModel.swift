@@ -8,6 +8,8 @@ import SwiftUI
     @Published private(set) var frame: LinerOverlayFrame?
     /// Set when the detector could not start (for example the model file is missing).
     @Published private(set) var unavailableReason: String?
+    /// DEBUG: what the detector last reported.
+    @Published private(set) var debugStatus = ""
     private(set) var shade: MakeupShade?
     private(set) var intensity: Double = 1
 
@@ -17,6 +19,7 @@ import SwiftUI
     private let provider = MediaPipeEyeLandmarkProvider()
     private let tracker = LinerTracker()
     private var spec: LinerSpec?
+    private var solution: LinerSolution?
     private var isStarted = false
 
     /// The reference points whose image and screen positions are compared to check the mapping.
@@ -34,6 +37,7 @@ import SwiftUI
         if newSpec != spec {
             spec = newSpec
             // Geometry for the old style must not linger.
+            solution = nil
             frame = nil
         }
         if spec == nil { stop() } else { startIfNeeded() }
@@ -45,6 +49,7 @@ import SwiftUI
         provider.stop()
         provider.onFrame = nil
         tracker.reset()
+        solution = nil
         frame = nil
         isStarted = false
     }
@@ -63,9 +68,10 @@ import SwiftUI
         }
     }
 
-    /// Called for every ARKit frame while the face is tracked; frames are dropped while the detector is busy.
+    /// Called for every ARKit frame while the face is tracked. The detector gets a frame when it is idle (frames are
+    /// dropped while it is busy); every frame the newest measurement is carried to the head's current position.
     func submit(_ arFrame: ARFrame, face: ARFaceAnchor) {
-        guard isStarted, spec != nil, viewport.width > 1, viewport.height > 1, !provider.isBusy else { return }
+        guard isStarted, spec != nil, viewport.width > 1, viewport.height > 1 else { return }
         let contour = ContourInput(pixelBuffer: SendablePixelBuffer(buffer: arFrame.capturedImage),
                                    cameraTransform: arFrame.camera.transform, intrinsics: arFrame.camera.intrinsics,
                                    faceTransform: face.transform)
@@ -82,23 +88,44 @@ import SwiftUI
             displayTransform: arFrame.displayTransform(for: .portrait, viewportSize: viewport),
             imageSize: CGSize(width: CVPixelBufferGetWidth(buffer), height: CVPixelBufferGetHeight(buffer)),
             viewportSize: viewport, references: references)
-        provider.submit(LandmarkInput(pixelBuffer: contour.pixelBuffer, timestamp: arFrame.timestamp,
-                                      headUp: point(raw[2]) - point(raw[0]), headAcross: point(raw[1]) - point(raw[0]),
-                                      context: context))
+        if !provider.isBusy {
+            provider.submit(LandmarkInput(pixelBuffer: contour.pixelBuffer, timestamp: arFrame.timestamp,
+                                          headUp: point(raw[2]) - point(raw[0]),
+                                          headAcross: point(raw[1]) - point(raw[0]), context: context))
+        }
+        publish(context)
+    }
+
+    /// Draws the newest measurement, moved with the head, with this frame's screen mapping.
+    private func publish(_ context: FrameContext) {
+        let now = CACurrentMediaTime()
+        guard let solution, let moved = solution.moved(to: context.references.map(\.image), now: now) else {
+            if frame != nil { frame = nil }
+            return
+        }
+        frame = LinerOverlayFrame(eyes: moved.eyes, mapping: ImageToViewMapping.resolve(context), receivedAt: now,
+                                  debugRaw: moved.raw, debugSmoothed: moved.smoothed)
     }
 
     private func receive(_ landmarks: EyeLandmarkFrame?) {
         guard isStarted, let spec else { return }
         guard let landmarks, let context = landmarks.context else {
-            // No face in this frame: start smoothing afresh when it comes back.
+            // No face in this frame (a hand over it, for example): keep the last measurement on the head for a while,
+            // and smooth afresh when the face comes back.
             tracker.reset()
-            frame = nil
+            noteStatus("MediaPipe: no face")
             return
         }
         let eyes = tracker.render(landmarks, spec: spec)
-        frame = LinerOverlayFrame(eyes: eyes, mapping: ImageToViewMapping.resolve(context),
-                                  receivedAt: CACurrentMediaTime(), debugRaw: tracker.lastRaw,
-                                  debugSmoothed: tracker.lastSmoothed)
+        solution = LinerSolution(eyes: eyes, raw: tracker.lastRaw, smoothed: tracker.lastSmoothed,
+                                 references: context.references.map(\.image), time: CACurrentMediaTime())
+        noteStatus(String(format: "MediaPipe: face, %.0f ms, %d eye(s) drawn", landmarks.providerLatencyMs, eyes.count))
+    }
+
+    private func noteStatus(_ text: String) {
+        #if DEBUG
+        debugStatus = text
+        #endif
     }
 
     /// `snapshot` with the liner on it, for photos.

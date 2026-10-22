@@ -181,7 +181,7 @@ struct MakeupTryOnView: View {
             .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
             .fixedSize(horizontal: false, vertical: true)
             #if DEBUG
-            if category == .eyeliner { EyeDebugView(eyes: model.plan.eyes) }
+            if category == .eyeliner { EyeDebugView(eyes: model.plan.eyes, overlay: model.linerOverlay) }
             #endif
             if let selected, let notes = notes(for: category, selected: selected), !notes.isEmpty {
                 fitNotes(notes)

@@ -42,3 +42,16 @@ struct LinerBuildOptions: Equatable {
     var innerExtension: CGFloat = 0.0
     var outerExtension: CGFloat = 0.07
 }
+
+extension LinerGuide {
+    /// The guide moved by a head-motion transform (translate, rotate, uniform scale); winding is preserved.
+    func transformed(by t: SimilarityTransform) -> LinerGuide {
+        func move(_ points: [CGPoint]) -> [CGPoint] { points.map(t.apply) }
+        let a = anchors
+        return LinerGuide(upperLiner: move(upperLiner), tightline: move(tightline), wing: move(wing),
+                          lowerLiner: move(lowerLiner), outlines: outlines.map(move),
+                          anchors: LinerAnchors(innerCorner: t.apply(a.innerCorner), outerCorner: t.apply(a.outerCorner),
+                                                upperStart: t.apply(a.upperStart), wingRoot: a.wingRoot.map(t.apply),
+                                                wingTip: a.wingTip.map(t.apply), browTail: a.browTail.map(t.apply)))
+    }
+}

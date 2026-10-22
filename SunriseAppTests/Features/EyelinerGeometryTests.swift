@@ -242,3 +242,65 @@ final class EyelinerGeometryTests: XCTestCase {
         XCTAssertLessThan((corner - truth).length, 12)
     }
 }
+
+final class LinerSolutionTests: XCTestCase {
+    private func solution(time: CFTimeInterval = 10) -> LinerSolution {
+        let tracker = LinerTracker()
+        var eyes: [RenderedEye] = []
+        for i in 0..<5 {
+            eyes = tracker.render(SyntheticEye.frame(t: Double(i) / 30),
+                                  spec: LinerSpec(style: EyelinerPlanner.variant(for: .almond)))
+        }
+        // Face reference points as ARKit would project them: origin, +x, +y, -x, -y.
+        let refs = [CGPoint(x: 300, y: 400), CGPoint(x: 360, y: 400), CGPoint(x: 300, y: 340),
+                    CGPoint(x: 240, y: 400), CGPoint(x: 300, y: 460)]
+        return LinerSolution(eyes: eyes, raw: tracker.lastRaw, smoothed: tracker.lastSmoothed, references: refs, time: time)
+    }
+
+    func testTheLinerFollowsTheHeadWhenTheDetectorHasNothingNew() throws {
+        let solution = solution()
+        // The head moved 25 px right and 10 px down, with no detector result.
+        let moved = solution.references.map { CGPoint(x: $0.x + 25, y: $0.y + 10) }
+        let result = try XCTUnwrap(solution.moved(to: moved, now: 10.1))
+        for (before, after) in zip(solution.eyes, result.eyes) {
+            XCTAssertEqual(after.guide.anchors.outerCorner.x, before.guide.anchors.outerCorner.x + 25, accuracy: 1e-6)
+            XCTAssertEqual(after.guide.anchors.outerCorner.y, before.guide.anchors.outerCorner.y + 10, accuracy: 1e-6)
+            XCTAssertEqual(after.guide.upperLiner.count, before.guide.upperLiner.count)
+        }
+        XCTAssertEqual(result.smoothed.count, 2)
+    }
+
+    func testHeadRollAndDistanceMoveTheLinerToo() throws {
+        let solution = solution()
+        // The head rolled a quarter turn about its centre and came 50% closer.
+        let centre = solution.references[0]
+        let moved = solution.references.map { p -> CGPoint in
+            let d = p - centre
+            return centre + CGPoint(x: -d.y, y: d.x) * 1.5
+        }
+        let result = try XCTUnwrap(solution.moved(to: moved, now: 10.1))
+        let before = solution.eyes[0].guide.anchors, after = result.eyes[0].guide.anchors
+        XCTAssertEqual((after.outerCorner - after.innerCorner).length, (before.outerCorner - before.innerCorner).length * 1.5,
+                       accuracy: 1e-6)
+        let d = before.outerCorner - centre
+        XCTAssertEqual(after.outerCorner.x, centre.x - d.y * 1.5, accuracy: 1e-6)
+        XCTAssertEqual(after.outerCorner.y, centre.y + d.x * 1.5, accuracy: 1e-6)
+    }
+
+    func testAMeasurementFadesAndThenExpires() throws {
+        let solution = solution(time: 10)
+        let refs = solution.references
+        XCTAssertEqual(try XCTUnwrap(solution.moved(to: refs, now: 10.3)).eyes[0].alpha, solution.eyes[0].alpha, accuracy: 1e-9)
+        let fading = try XCTUnwrap(solution.moved(to: refs, now: 10 + (LinerSolution.fadeStart + LinerSolution.holdDuration) / 2))
+        XCTAssertEqual(fading.eyes[0].alpha, solution.eyes[0].alpha * 0.5, accuracy: 1e-6)
+        XCTAssertNil(solution.moved(to: refs, now: 10 + LinerSolution.holdDuration + 0.01), "Too old to trust")
+    }
+
+    func testFaceLostDoesNotMakeTheLinerJump() throws {
+        // A degenerate reading (reference points all equal) cannot define a motion: the last shape is kept as it was.
+        let solution = solution()
+        let collapsed = Array(repeating: CGPoint(x: 5, y: 5), count: 5)
+        let result = try XCTUnwrap(solution.moved(to: collapsed, now: 10.1))
+        XCTAssertEqual(result.eyes[0].guide.anchors.outerCorner, solution.eyes[0].guide.anchors.outerCorner)
+    }
+}
