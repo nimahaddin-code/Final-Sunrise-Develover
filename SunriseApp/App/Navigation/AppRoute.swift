@@ -12,4 +12,5 @@ enum AppRoute: Hashable {
     case savedLookDetail(SavedLookMetadata)
     case makeupTryOn(plan: MakeupPlan, applied: [MakeupRecommendation])
     case faceScan
+    case eyeScan
 }

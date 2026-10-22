@@ -4,6 +4,8 @@ import SwiftUI
 struct MakeupRecommendationsView:View {
     @ObservedObject var store:FaceShapeStore
     var onScanFace:()->Void
+    // -Nimah: Connect Khalish's separate eye-scan route without restoring removed filters.
+    var onScanEyes:()->Void = {}
     var body:some View {
         List {
             Section("Face scan") {
@@ -15,6 +17,12 @@ struct MakeupRecommendationsView:View {
                     Text("Scan your face to get a face-shape estimate and eye measurements.")
                     Button("Scan face",action:onScanFace)
                 }
+            }
+            Section("Eye scan") {
+                if let eyes=store.eyes {
+                    HStack { Text(eyes.openness.title); Text(eyes.tilt.title); Text(eyes.spacing.title) }
+                }
+                Button("View eye result / scan again",action:onScanEyes)
             }
             Section("Eyebrow & Blush") {
                 NavigationLink(value:AppRoute.browBlush(.eyebrows)) { Label("Eyebrow",systemImage:"eyebrow") }

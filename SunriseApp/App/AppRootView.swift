@@ -3,14 +3,15 @@ import SwiftUI
 struct AppRootView: View {
     let container: AppContainer
     @StateObject private var navigator = AppNavigator()
-    @StateObject private var faceShapeStore = FaceShapeStore(defaults: .standard)
+    @StateObject private var faceShapeStore = FaceAnalysis.savedResults()
 
     var body: some View {
         Group {
             if navigator.onboardingComplete {
                 TabView(selection: $navigator.selectedTab) {
                     NavigationStack(path: $navigator.tryOnPath) {
-                        MakeupRecommendationsView(store: faceShapeStore) { navigator.open(.faceScan, in: .tryOn) }
+                        MakeupRecommendationsView(store: faceShapeStore, onScanFace: { navigator.open(.faceScan, in: .tryOn) },
+                                                  onScanEyes: { navigator.open(.eyeScan, in: .tryOn) })
                             .navigationDestination(for: AppRoute.self, destination: destination)
                     }
                     .tabItem { Label("Try On", systemImage: "wand.and.stars") }
@@ -54,7 +55,9 @@ struct AppRootView: View {
         case .savedLookDetail(let look): SavedLookDetailView(look: look, store: container.savedLooks)
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
-            FaceShapeView(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
+            FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
+        case .eyeScan:
+            EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }
         }
     }
 }

@@ -5,6 +5,8 @@ struct FaceShapeView: View {
     @ObservedObject var store: FaceShapeStore
     /// Opens the makeup recommendations for the scanned face shape.
     var onShowMakeup: () -> Void = {}
+    /// Label of the result popup's main button.
+    var continueTitle: LocalizedStringKey = "Try on recommended makeup"
     @StateObject private var model = FaceShapeViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
@@ -19,8 +21,7 @@ struct FaceShapeView: View {
             .onDisappear { model.stop() }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {
-                    FaceShapeResultView(result: result, onScanAgain: model.scanAgain,
-                                        onLidTypeChange: model.setLidType) {
+                    FaceShapeResultView(result: result, continueTitle:continueTitle, onScanAgain:model.scanAgain, onLidTypeChange:model.setLidType) {
                         // Stopping clears the result, which closes this popup before leaving the scan.
                         model.stop()
                         onShowMakeup()
