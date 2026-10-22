@@ -83,15 +83,20 @@ import SwiftUI
         }
         // Without the segmentation model the liner simply is not hidden behind hands.
         occluder.onMask = { [weak self] mask in
-            Task { @MainActor in self?.occlusionMask = mask }
+            Task { @MainActor in
+                guard let self,self.runID==token,self.isStarted else { return }
+                self.occlusionMask=mask
+            }
         }
-        if !Self.handOcclusionDisabled { try? occluder.start() }
         startupTask=Task { [weak self] in
             guard let self,!Task.isCancelled,self.runID==token else { return }
             do {
                 try await self.provider.start()
                 guard !Task.isCancelled,self.runID==token,self.spec != nil else { return }
-                self.isStarted=true; self.unavailableReason=nil; self.startupTask=nil
+                self.isStarted=true; self.unavailableReason=nil
+                if !Self.handOcclusionDisabled { try? await self.occluder.start() }
+                guard !Task.isCancelled,self.runID==token else { return }
+                self.startupTask=nil
             } catch {
                 guard self.runID==token else { return }
                 self.startupTask=nil

@@ -38,3 +38,7 @@ Khalish eyebrow/blush catalogs, shape-blending personalizer, texture-drawing fun
 Nimah studio receives the Khalish result as FaceShapeAssessment(origin: .analysis). Triangle maps to Pear; unavailable source recommendations still permit manual exploration. This is a classifier estimate, not identity recognition. Independent eye/brow placement calibration remains required. Before/After and manual overrides are retained. Old catalog/import session routes now open the Nimah studio rather than the superseded mixed tutorial renderer, so they cannot activate the old eyeliner path. Reference images remain inspiration, not automatic makeup transfer.
 
 Tests for deleted legacy brow/blush behavior were removed/replaced with owner-routing regressions. Simulator: 188 tests, 184 pass, 4 skip, 0 fail. Native face alignment remains unverified.
+
+## Latest integration — -Nimah
+
+Hanum source through 9c8aaf4 and Khalish eye-scan source through efdd168 merged. Scan-only EyeLandmarks renamed EyeScanLandmarks to avoid a same-module type and filename collision; no landmark math altered. Nimah integrates saved outputs into preset selection and removes the repeated scan gate. Optional hand model startup keeps the approved asynchronous lifecycle. See IntegrationContracts.md for input conversion and Validation.md for checks.

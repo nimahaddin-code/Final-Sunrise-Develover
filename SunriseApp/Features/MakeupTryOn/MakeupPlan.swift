@@ -21,15 +21,27 @@ struct MakeupPlan: Hashable, Sendable {
 
     /// - Parameter chosenShape: a shape the user picked instead of the scanned one. The made-for-you styles then
     ///   use only that shape, still tuned to the scanned proportions.
-    init(scan: FaceShapeResult, chosenShape: FaceShape? = nil) {
+    init(scan: FaceShapeResult, chosenShape: FaceShape? = nil, eyeScan:EyeShapeResult? = nil) {
         let blend = chosenShape.map { [ShapeWeight(shape: $0, weight: 1)] } ?? Self.blend(of: scan)
-        self.init(shape: chosenShape ?? scan.shape, blend: blend, deviation: scan.deviation, eyes: scan.eyes)
+        self.init(shape: chosenShape ?? scan.shape, blend: blend, deviation: scan.deviation,
+                  eyes: eyeScan == nil ? scan.eyes : eyeScan.flatMap(Self.savedEyeMeasurements))
     }
 
     /// A plan for a shape alone, without scan measurements.
-    init(shape: FaceShape) {
+    init(shape: FaceShape, eyeScan:EyeShapeResult? = nil) {
         self.init(shape: shape, blend: [ShapeWeight(shape: shape, weight: 1)],
-                  deviation: FaceProportions(length: 0, forehead: 0, jaw: 0, chin: 0), eyes: nil)
+                  deviation: FaceProportions(length: 0, forehead: 0, jaw: 0, chin: 0), eyes: eyeScan.flatMap(Self.savedEyeMeasurements))
+    }
+
+    // -Nimah: Adapt saved Khalish eye measurements to Hanum's planner without changing its formulas.
+    // Units agree: opening/width, inner-corner gap/width and tilt degrees. Sample count is not
+    // stored in EyeShapeResult; zero means unknown and is not used by the planner's confidence gate.
+    static func savedEyeMeasurements(_ result:EyeShapeResult)->EyeScan? {
+        let m=result.measurements
+        guard result.confidence.isFinite,result.confidence>0.1,
+              [m.tilt,m.spacing,m.openness].allSatisfy({ $0.isFinite }),m.spacing>0,m.openness>0 else { return nil }
+        let lid:LidType = result.lid == .hooded ? .hooded : (result.lid == .monolid ? .monolid : .neither)
+        return EyeScan(tiltLeft:m.tilt,tiltRight:m.tilt,spacing:m.spacing,openness:m.openness,samples:0,lidType:lid)
     }
 
     private init(shape: FaceShape, blend: [ShapeWeight], deviation: FaceProportions, eyes: EyeScan?) {

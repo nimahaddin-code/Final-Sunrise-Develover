@@ -11,6 +11,40 @@ final class MakeupPersonalizationTests: XCTestCase {
 
     // MARK: Plan from the scan
 
+    // -Nimah: Saved eye output drives Hanum's planner independently of face-shape labels.
+    func testSavedEyeOutputOverridesOldFaceEyeReadings() throws {
+        var eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
+        eyes.lid = .monolid
+        let plan=MakeupPlan(scan:scan(),eyeScan:eyes)
+        let adapted=try XCTUnwrap(plan.eyes)
+        XCTAssertEqual(adapted.spacing,0.72,accuracy:0.001)
+        XCTAssertEqual(adapted.lidType,.monolid)
+        XCTAssertEqual(adapted.samples,0)
+        XCTAssertEqual(plan.eyeliner.style,MakeupPlan(shape:.heart,eyeScan:eyes).eyeliner.style)
+        let defaultLid=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:0.1))
+        XCTAssertEqual(MakeupPlan.savedEyeMeasurements(defaultLid)?.lidType,.neither)
+    }
+
+    func testUnclearSavedEyesUseNeutralRatherThanInventingResults() {
+        let unclear=EyeShapeResult(openness:.almond,tilt:.straight,spacing:.balanced,mayBeHooded:false,lid:nil,
+            measurements:EyeMeasurements(openness:0.30,tilt:4,spacing:1,lidSpace:1),confidence:0)
+        XCTAssertNil(MakeupPlan.savedEyeMeasurements(unclear))
+        XCTAssertTrue(MakeupPlan(scan:scan(),eyeScan:unclear).eyeliner.isNeutral)
+    }
+
+    @MainActor func testSavedFaceOpensPreviewWithoutAnotherScanPhase() {
+        for region in [FaceGuideRegion.eyebrows,.blush] {
+            let model=EyebrowViewModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.heart,origin:.analysis),initialRegion:region)
+            XCTAssertEqual(model.phase,.chooseStyle)
+            XCTAssertTrue(model.backLeavesStudio)
+            XCTAssertEqual(model.configuration.region,region)
+            XCTAssertTrue(model.liveConfiguration.showMakeupPreview)
+            model.beginTutorial()
+            XCTAssertEqual(model.phase,.tutorial)
+            XCTAssertFalse(model.backLeavesStudio)
+        }
+    }
+
     func testPlanBlendsClosestShapesAndPutsMadeForYouFirst() {
         let result = scan()
         let plan = MakeupPlan(scan: result)

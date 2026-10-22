@@ -33,3 +33,11 @@ FaceCameraState memegang previewMode (points+look/look/points/original), preview
 ## Eyebrow shared-session contract — -Nimah
 
 Jangan membuat sesi AR/AVCapture per facial region. Pakai ARFaceTrackingManager.shared dan lease aktif. Hasil asynchronous harus terikat epoch/anchor; region guide memakai triangle attachment dari snapshot frame yang sama. Lihat [EyebrowModule](EyebrowModule.md) sebelum menambahkan Lips/Nose/Cheeks.
+
+## Saved face/eye output → try-on — -Nimah
+
+FaceAnalysis/EyeAnalysis own initial classification; FaceShapeStore persists latest face and separate eyes. AppRootView maps face shape to MakeupFaceShape (triangle → pear) and passes analysis to Nimah studio. Saved analysis enters chooseStyle directly for a requested region, chooseRegion otherwise. Live AR/Vision alignment runs automatically, and tutorial text is not blocked by mapping readiness. Manual shape override remains possible.
+
+MakeupPlan(scan:chosenShape:eyeScan:) and MakeupPlan(shape:eyeScan:) adapt the separate EyeShapeResult to Hanum EyeScan. Both use opening/eye width, inner-corner gap/eye width and canthal tilt degrees. Lid is mapped only from the user's explicit choice; mayBeHooded never becomes a lid diagnosis. No sample count is stored by the separate result, so the adapter uses zero (unknown, unused by planner confidence), not an invented count. Nonfinite/invalid measurements or confidence ≤ 0.1 use a neutral plan; this is a conservative prototype gate, not a measured accuracy threshold. A separate result takes precedence over old embedded face-eye measurements, including when it is unclear. Without a separate result, the old saved eye measurement remains compatible.
+
+Hanum formulas are unchanged. Face-shape labels do not select eyeliner; eye measurements do. No eyeshadow work is included.
