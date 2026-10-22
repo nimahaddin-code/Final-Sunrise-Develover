@@ -127,3 +127,7 @@ Tiga titik tutorial kini head/arch/tail dari shape yang di-fit. Titik dan garis 
 Deteksi Vision tetap dapat salah dan koordinat kamera live perlu acceptance perangkat. Fit ini tidak membuktikan pixel-level eyebrow segmentation atau 3D iris scanning. Jika raw landmark sendiri salah, curve juga bisa salah; gunakan debug landmark/refit untuk diagnosis, bukan menganggap rumus otomatis benar.
 
 -Nimah, final verification 20 October 2026: 72 tests, 69 passed, 3 hardware skipped, 0 failures. Signed iPhone build succeeds. Final observed-brow outline/tutorial build installed successfully on iPhone 17 at 09:13 Asia/Makassar. On-face alignment after installation has not been measured or accepted. Reopen module and Refit to clear previous calibration. Source remains local, not pushed.
+
+## Xcode local registration repair — -Nimah
+
+User reported build errors after merge. Reproduction found the local project file had 132 objects instead of the merged 322; missing compile membership produced cannot-find-type errors for FaceShapeStore, MakeupPlan and the live guide modules. Closed the open Xcode workspace before repairing, restored the complete graph from main, saved in native OpenStep format and retained local Nimah signing team WP97CT3PT7. Semantic comparison against main confirms all merged object IDs remain; only app development-team values change. Signed generic iPhone build then succeeded. All 43 teammate module files remain identical. No native camera acceptance is implied. Reopen the repaired project to refresh Xcode's in-memory graph.

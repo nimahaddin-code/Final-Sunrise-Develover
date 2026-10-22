@@ -1,3602 +1,2167 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>classes</key>
-	<dict/>
-	<key>archiveVersion</key>
-	<string>1</string>
-	<key>objectVersion</key>
-	<string>56</string>
-	<key>rootObject</key>
-	<string>98F54143AB4E86B28C3AFEE0</string>
-	<key>objects</key>
-	<dict>
-		<key>95126388EE2677EABF3CF99B</key>
-		<dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>EXCLUDED_ARCHS[sdk=iphonesimulator*]</key>
-				<string>x86_64</string>
-				<key>CLANG_ENABLE_MODULES</key>
-				<string>YES</string>
-				<key>SWIFT_STRICT_CONCURRENCY</key>
-				<string>complete</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>17.0</string>
-				<key>DEBUG_INFORMATION_FORMAT</key>
-				<string>dwarf-with-dsym</string>
-				<key>SWIFT_OPTIMIZATION_LEVEL</key>
-				<string>-O</string>
-				<key>SDKROOT</key>
-				<string>iphoneos</string>
-				<key>SWIFT_VERSION</key>
-				<string>5.0</string>
-				<key>ENABLE_TESTABILITY</key>
-				<string>NO</string>
-				<key>CLANG_ENABLE_OBJC_ARC</key>
-				<string>YES</string>
-			</dict>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>B2B0023A348FAD79C48161E9</key>
-		<dict>
-			<key>path</key>
-			<string>LookArtwork.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>57783D5A5FD3B135956ABDC4</key>
-		<dict>
-			<key>path</key>
-			<string>TutorialViewModelTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F88C4B1A73633332F0DE36C2</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>5EF702E8CB338F9CCD0196D3</string>
-		</dict>
-		<key>24D41B3F4A893C06684C3C07</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>6A8BAEAF8AB95FED113534A6</string>
-		</dict>
-		<key>19429AD975CE1483E26A2783</key>
-		<dict>
-			<key>path</key>
-			<string>LiveGuideView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>3A07AB7461B6903140D1D165</key>
-		<dict>
-			<key>path</key>
-			<string>BlushPlacementGuide.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>61802B9A9C3D59B870EFDC76</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>8B9309B2A6284F76F3E4AD56</string>
-		</dict>
-		<key>033A5C6F22B5AC3CD0D490DB</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>541EF3DA9C3035E1029E3BF3</string>
-		</dict>
-		<key>3445B0A9ADD7794489F23820</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>FE2B5E1913561C0593FD7840</string>
-		</dict>
-		<key>6018AF2785A5C14223064FCC</key>
-		<dict>
-			<key>path</key>
-			<string>SunriseAppTests</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>A868936FDC1A8D26B1893C4D</string>
-				<string>E122CD75A643278D498BA4DE</string>
-				<string>44D504415A68844C6C1101A8</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>1C3F953C55A05FCE0F8F428E</key>
-		<dict>
-			<key>path</key>
-			<string>SavedLooksView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>7A1EF99F369FF90802A9EE53</key>
-		<dict>
-			<key>path</key>
-			<string>SunriseApp</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>B6C4CDC0872398FC76BC80DE</string>
-				<string>5F9B8B35ACD4D41DDB5411B9</string>
-				<string>28BE0691E5755C999C2D4014</string>
-				<string>E404C04285978FF9C7DE242E</string>
-				<string>AA362B7C903A0815DDE30B52</string>
-				<string>B7BB6F6B68833C5517A0E3C2</string>
-				<string>22C1BB35C6F3190923BD2E6B</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F2CC9653DA95040834114EE5</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceDetailView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>ACDF3453576FADCFE7CD7EEE</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>8DEEF4BC9014B9B481912D63</string>
-		</dict>
-		<key>984FD73DF3F4DCFF8AB8A6BF</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>49C5565CCE7AF4F0C16F9F0A</string>
-		</dict>
-		<key>30ACDA4CE4F7397B938416B4</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>26456AF703170C7814098A8E</string>
-		</dict>
-		<key>7BEE2E6597318E2548E93D3E</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShapeView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>6C1FEB7D8D56B79BC86D794A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>D7E30CC8B590F5ADA8D7A700</string>
-		</dict>
-		<key>29017F5C551F928297695BA1</key>
-		<dict>
-			<key>path</key>
-			<string>LinerSolution.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5F9B8B35ACD4D41DDB5411B9</key>
-		<dict>
-			<key>path</key>
-			<string>Configuration</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>2D140CF26E79A04B1482A674</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>2C53F0CCE66A98AF04B7B2D4</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>EF346AD6D4E7E47701B1DC4C</string>
-		</dict>
-		<key>534FEB0549600234AAE09DB0</key>
-		<dict>
-			<key>files</key>
-			<array>
-				<string>6C1FEB7D8D56B79BC86D794A</string>
-				<string>6BC9DD2E16CE7526E21A93B8</string>
-				<string>0BDB05D65645A9D73C294F55</string>
-				<string>D9D6D606230E23D7BC356D38</string>
-				<string>9BBFBF26B88D5A1CB066AA9D</string>
-				<string>6A5998FB4332B2D926ADD348</string>
-				<string>178C1E0195A44823A4CD0811</string>
-				<string>C96E85543600CBE3B51E79C7</string>
-				<string>66ABECA0E68ED4FBDD399A7A</string>
-				<string>4D3D248B5F57A2BCC5B92F45</string>
-				<string>CDDE58AF819DFCD6735F185F</string>
-				<string>B1B2C3D4E5F60718293A4B5C</string>
-				<string>9909AED933CB17E8692EAA5B</string>
-				<string>C9587CEBB39B613D7953399F</string>
-				<string>E80000001C043450B0C3F54A</string>
-				<string>E8000000257DD8D4770AABC1</string>
-				<string>72DD7AF42DF88A4779FE0BB5</string>
-				<string>92E3BF4E4DF3CB9F19BC11A8</string>
-				<string>A3C86C57A3B3DE9202A267CF</string>
-				<string>4FB931EDE051A5976AE56A63</string>
-				<string>256F015F65C61FE4DD9B6591</string>
-			</array>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>isa</key>
-			<string>PBXSourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>D529D8EB6F4607AD5BC97B1D</key>
-		<dict>
-			<key>path</key>
-			<string>AppNavigatorTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>087F06F4A4D4BC010EF4C720</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupRecommendation.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>256F015F65C61FE4DD9B6591</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>BBBD5B695A0CBBC0FF714575</string>
-		</dict>
-		<key>D5689B7EB895DBD27CC6A82F</key>
-		<dict>
-			<key>path</key>
-			<string>FaceSurfaceProfile.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>9BE83A467EAAC48EF29EBFB8</key>
-		<dict>
-			<key>path</key>
-			<string>BlushPlacementSketch.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>AEAE4B28CDFF08F590396BA5</key>
-		<dict>
-			<key>path</key>
-			<string>SunriseAppTests.xctest</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>explicitFileType</key>
-			<string>wrapper.cfbundle</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>5AF705A9207A9DD3364DC86F</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>7638C7BA24A4126BC5039EA5</string>
-		</dict>
-		<key>F8CAFAEACFDE4C0B40A70B11</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShapeClassifierTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>541EF3DA9C3035E1029E3BF3</key>
-		<dict>
-			<key>path</key>
-			<string>LiveGuideDiagnostics.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C37D0B4D531BBB231AC8A90A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F1601274318B8DCA422ED931</string>
-		</dict>
-		<key>48573999134DD877698BA9F3</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>16A13571086FAC7A101835BA</string>
-		</dict>
-		<key>B37236A944DF5013746B587B</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceCatalogProviding.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>AECE21EC64B858B3E9302E8D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>FE3904FB0A58CD5FFD0DF623</string>
-		</dict>
-		<key>D4923AA4BE3BEDAB38682145</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>0D93637BD45D15F776D9F93A</string>
-		</dict>
-		<key>E404C04285978FF9C7DE242E</key>
-		<dict>
-			<key>path</key>
-			<string>DesignSystem</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>9A7281ADAA9F5DD9A22629E5</string>
-				<string>DC644578E897C547704A6C5E</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>A1B2C3D4E5F60718293A4B5D</key>
-		<dict>
-			<key>path</key>
-			<string>LinerGeometry.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>98F393F180238C7106FB99C0</key>
-		<dict>
-			<key>path</key>
-			<string>Localizable.xcstrings</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.json.xcstrings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>236D9C0C8B7D5C2BB17772D1</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F4C68DD9443BC3C23BD1DD3F</string>
-		</dict>
-		<key>F4C68DD9443BC3C23BD1DD3F</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupPlan.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E800000003D22F33B62A98FD</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E70000000C39BF83BDEA70CC</string>
-		</dict>
-		<key>4B8B87285CBE34CF457FD716</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXResourcesBuildPhase</string>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>7C0E5C02D823502F262C2E96</string>
-				<string>2E1D4D1717EDA3997289816D</string>
-				<string>CAD7754F69D7C7822BCC4CB4</string>
-			</array>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>B8A0C7629D5BE6A59E2A595E</key>
-		<dict>
-			<key>path</key>
-			<string>TrackingReadinessTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>21CE064275C7C47713A1B7F0</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShapeViewModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>41D15C1C9F79A878ABEF7DEE</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>4A6545BC9255A551C688D4B1</string>
-		</dict>
-		<key>8A9B3447C705CB2A8F902152</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>0DCEA34095C8C9C53CE42CE4</string>
-		</dict>
-		<key>E10F58ECBC93C435DE28667D</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>30D720248C1BB5F42984E722</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceImport</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>787FC7E50E3814ED5F8E71BF</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>B6C90B86F0C4B1D69A248C31</key>
-		<dict>
-			<key>path</key>
-			<string>FaceCalibration</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>F1601274318B8DCA422ED931</string>
-				<string>F8BC42C353CA045B4AC94AF5</string>
-				<string>79305ED9810D6D771F5FD4DA</string>
-				<string>86692327C6B7D587C8265F12</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>14E0BA1614926FA5ABDBDC1A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>43A7AA6990D68C43A68511C9</string>
-		</dict>
-		<key>BBC1AC7A0CD90B0E7BC75223</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>36E763EDC56C953EA58AFBB1</string>
-		</dict>
-		<key>6D72E2332D13C1ED4A00C434</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>DAD3B579ADBE7A6A3409A9D8</string>
-		</dict>
-		<key>E80000003E82AF829A521803</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E700000020C97B84D2D8442F</string>
-		</dict>
-		<key>C8B9433F836C41AA8E942950</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>29017F5C551F928297695BA1</string>
-		</dict>
-		<key>CF45679699AC7CB5E530CA1C</key>
-		<dict>
-			<key>path</key>
-			<string>ARFaceTrackingManager.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>BC38DE15F5318E7DBE6A6A6A</key>
-		<dict>
-			<key>path</key>
-			<string>BlushMask.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>2E1D4D1717EDA3997289816D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>98F393F180238C7106FB99C0</string>
-		</dict>
-		<key>E77AFA84C187835C18DD4C98</key>
-		<dict>
-			<key>path</key>
-			<string>MockServices.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>B298E07ED940DDBA94F96CAE</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>2C49459039CEAF042E4919F8</string>
-		</dict>
-		<key>0A54887C42EAF40544B47EFD</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>751181284B03C1E6FB6684D2</string>
-		</dict>
-		<key>B8EAE5AAE0A46180B2B92BC2</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>045449C4CDF0CE2EAAA00D42</string>
-		</dict>
-		<key>21388C21D48CE052BF3392DE</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>9342DC399ECDC1D13247975B</string>
-		</dict>
-		<key>DD56B76AB67D06161485E52A</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceDetail</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>F2CC9653DA95040834114EE5</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>370710197E3F693AF3786C43</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>5CDF09D2EC207E4F4D908C7C</string>
-		</dict>
-		<key>467284EDE20DBAB0C85F1F70</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>B37236A944DF5013746B587B</string>
-		</dict>
-		<key>9BBFBF26B88D5A1CB066AA9D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F8CAFAEACFDE4C0B40A70B11</string>
-		</dict>
-		<key>2D140CF26E79A04B1482A674</key>
-		<dict>
-			<key>path</key>
-			<string>Info.plist</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.xml</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>EC6DBACE90DF9F4964DBD3ED</key>
-		<dict>
-			<key>path</key>
-			<string>FaceTrackingAvailabilityChecking.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C4A5F9A53088B1E800BFECB0</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>productRef</key>
-			<string>C4A5F9A43088B1E800BFECB0</string>
-		</dict>
-		<key>6A8BAEAF8AB95FED113534A6</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowViewModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F9A809519AC15D1F2A75FC7E</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupTextureRenderer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>9DC0612A3CD82563E49C6CB2</key>
-		<dict>
-			<key>path</key>
-			<string>AppRootView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>4A66892916F906242E0EB942</key>
-		<dict>
-			<key>path</key>
-			<string>FaceMeshMeasurer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>045449C4CDF0CE2EAAA00D42</key>
-		<dict>
-			<key>path</key>
-			<string>LocalSavedLooksStore.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>178C1E0195A44823A4CD0811</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>719471221F004F211C0E7FF8</string>
-		</dict>
-		<key>C4ACC8BE3EAE74653E78A54F</key>
-		<dict>
-			<key>path</key>
-			<string>SavedLooksViewModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C5F03830273DCC9E47775164</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowTrackingPipeline.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>1FD98450156D781E8A88FB7A</key>
-		<dict>
-			<key>path</key>
-			<string>SavedLookDetailView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>A674174BCE6CB2E205B8DE7B</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShapeResultView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>A243507A38CDA620F6EA9CFC</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>507F8ABB438F67B20D0A1A2C</string>
-		</dict>
-		<key>57F069CE67A2ED299049886A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>119AD822ABE98DE2B5B45183</string>
-		</dict>
-		<key>3667E0A0C8FB580B1D21C114</key>
-		<dict>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>defaultConfigurationName</key>
-			<string>Release</string>
-			<key>buildConfigurations</key>
-			<array>
-				<string>8B63A0393819EF9DE7F2B473</string>
-				<string>281FF16EF2B60E76A20BAD7F</string>
-			</array>
-		</dict>
-		<key>D9D6D606230E23D7BC356D38</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>3CAF4AC5FE94A9CCBD43461F</string>
-		</dict>
-		<key>13D8455EFF6A75DF7B4631CC</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupSessionView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>507F8ABB438F67B20D0A1A2C</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupRecommender.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>8904D808C7A57AB024FAEFB7</key>
-		<dict>
-			<key>path</key>
-			<string>ComparisonView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>1AC7F6C87C6B78F0AC7DE880</key>
-		<dict>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>defaultConfigurationName</key>
-			<string>Release</string>
-			<key>buildConfigurations</key>
-			<array>
-				<string>3325F69FD4DFE6E6674B1361</string>
-				<string>BB0D77B08ECB0D21E7974168</string>
-			</array>
-		</dict>
-		<key>B6C4CDC0872398FC76BC80DE</key>
-		<dict>
-			<key>path</key>
-			<string>App</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>0EB509C6F62AD9CF0B9F3D96</string>
-				<string>C1810A54CE6D4BC94E7F122D</string>
-				<string>9DC0612A3CD82563E49C6CB2</string>
-				<string>4F5841E6C956B66A11234989</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>6BC9DD2E16CE7526E21A93B8</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>57783D5A5FD3B135956ABDC4</string>
-		</dict>
-		<key>78BC181F4289544F053C7765</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShape</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>2C49459039CEAF042E4919F8</string>
-				<string>2F7F9AFC01F64EED1135CF2A</string>
-				<string>4A66892916F906242E0EB942</string>
-				<string>16A13571086FAC7A101835BA</string>
-				<string>C46FF01BBC0933B3F49A571A</string>
-				<string>314DC6D186608E3225706A28</string>
-				<string>5F6D1A9D904A10807700F875</string>
-				<string>E700000020C97B84D2D8442F</string>
-				<string>E70000000C39BF83BDEA70CC</string>
-				<string>21CE064275C7C47713A1B7F0</string>
-				<string>454D9F210C849C41D0E8378C</string>
-				<string>7BEE2E6597318E2548E93D3E</string>
-				<string>A674174BCE6CB2E205B8DE7B</string>
-				<string>85190E6578A99E0FCFAD9638</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>3CAF4AC5FE94A9CCBD43461F</key>
-		<dict>
-			<key>path</key>
-			<string>ServiceStubs.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>9E232BE73FECBBF8659C79E7</key>
-		<dict>
-			<key>name</key>
-			<string>Debug</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>CLANG_ENABLE_MODULES</key>
-				<string>YES</string>
-				<key>SWIFT_OPTIMIZATION_LEVEL</key>
-				<string>-Onone</string>
-				<key>DEBUG_INFORMATION_FORMAT</key>
-				<string>dwarf</string>
-				<key>SWIFT_ACTIVE_COMPILATION_CONDITIONS</key>
-				<string>$(inherited) DEBUG</string>
-				<key>SDKROOT</key>
-				<string>iphoneos</string>
-				<key>SWIFT_VERSION</key>
-				<string>5.0</string>
-				<key>SWIFT_STRICT_CONCURRENCY</key>
-				<string>complete</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>17.0</string>
-				<key>CLANG_ENABLE_OBJC_ARC</key>
-				<string>YES</string>
-				<key>EXCLUDED_ARCHS[sdk=iphonesimulator*]</key>
-				<string>x86_64</string>
-				<key>ENABLE_TESTABILITY</key>
-				<string>YES</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-		</dict>
-		<key>9342DC399ECDC1D13247975B</key>
-		<dict>
-			<key>path</key>
-			<string>FaceCameraState.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D7970414B769573601655292</key>
-		<dict>
-			<key>path</key>
-			<string>Contracts</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>EC6DBACE90DF9F4964DBD3ED</string>
-				<string>B37236A944DF5013746B587B</string>
-				<string>12A02F902EA495D3DAD7800D</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>0D93637BD45D15F776D9F93A</key>
-		<dict>
-			<key>path</key>
-			<string>FaceTrackingAvailability.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>119AD822ABE98DE2B5B45183</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupTryOnViewModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>AEC597CCC28516E52ED551A2</key>
-		<dict>
-			<key>path</key>
-			<string>BundledReferenceCatalog.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>8DEEF4BC9014B9B481912D63</key>
-		<dict>
-			<key>path</key>
-			<string>PrimaryButton.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>2A319A247AA300149353ECC2</key>
-		<dict>
-			<key>path</key>
-			<string>LinerSpec.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>FBDC4F23F93125BBEEAE800C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Products</string>
-			<key>children</key>
-			<array>
-				<string>6D795F13C8C22E022040EE00</string>
-				<string>AEAE4B28CDFF08F590396BA5</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>685BC99DAFA493FCEB389B85</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>21CE064275C7C47713A1B7F0</string>
-		</dict>
-		<key>5F3C4D0A24B6DEC94B862617</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupReference.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C42CEFA28CA243E75B5D3DA1</key>
-		<dict>
-			<key>path</key>
-			<string>LinerOverlayModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>75CDF97E33C22DE197A5DF55</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>9E2CC9392658B0606CBF7775</string>
-		</dict>
-		<key>CF5B6AFD13E8B16D6706FCDA</key>
-		<dict>
-			<key>path</key>
-			<string>ForeheadGuide.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>BB0D77B08ECB0D21E7974168</key>
-		<dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>GENERATE_INFOPLIST_FILE</key>
-				<string>YES</string>
-				<key>SUPPORTED_PLATFORMS</key>
-				<string>iphoneos iphonesimulator</string>
-				<key>TEST_HOST</key>
-				<string>$(BUILT_PRODUCTS_DIR)/SunriseApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SunriseApp</string>
-				<key>LD_RUNPATH_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>@executable_path/Frameworks</string>
-					<string>@loader_path/Frameworks</string>
-				</array>
-				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.sunrise.foundation.tests</string>
-				<key>CODE_SIGN_STYLE</key>
-				<string>Automatic</string>
-				<key>SUPPORTS_MACCATALYST</key>
-				<string>NO</string>
-				<key>BUNDLE_LOADER</key>
-				<string>$(TEST_HOST)</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>TARGETED_DEVICE_FAMILY</key>
-				<string>1</string>
-			</dict>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>50990270ECCC792E5A17200F</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>AF8D32CBADEAE62284CB8374</string>
-		</dict>
-		<key>8665DA9E4FE5F6175CA2AA8F</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>C4AE33974D71FD4A86072E97</string>
-		</dict>
-		<key>CF8FDEBEDA76C3A34E0A02AF</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>5F6D1A9D904A10807700F875</string>
-		</dict>
-		<key>D79C719E5AD023220CAF0749</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowStyle.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>CEF01F605BF92435DC324B13</key>
-		<dict>
-			<key>path</key>
-			<string>GeometryHelpers.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>111C7B4BC1597B419627963B</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>7ED8B4D9166DBE43F2B1D643</string>
-		</dict>
-		<key>71407E93971344FFC151D513</key>
-		<dict>
-			<key>path</key>
-			<string>Services</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>D7970414B769573601655292</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>9E2CC9392658B0606CBF7775</key>
-		<dict>
-			<key>path</key>
-			<string>FeaturePlaceholderView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>743170BAA00CD2471416D456</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>EA63C523723545C9DAFDF3BC</string>
-		</dict>
-		<key>528DBE5F90FFAE037040249C</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupPreferences.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>929EC20AE526B170AB21CE88</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowOverlayView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>14F00DACEF2734E0FB168738</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>D79C719E5AD023220CAF0749</string>
-		</dict>
-		<key>66ABECA0E68ED4FBDD399A7A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F0CCC055355A1EC0AF155313</string>
-		</dict>
-		<key>E800000032E0F403F6771AC6</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E700000003AA57EB8DEC364F</string>
-		</dict>
-		<key>7115E09FBA46C990F2D232A2</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>EC5645E5A43930BFD723FED7</string>
-		</dict>
-		<key>0BDB05D65645A9D73C294F55</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>D529D8EB6F4607AD5BC97B1D</string>
-		</dict>
-		<key>AA362B7C903A0815DDE30B52</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-			<key>children</key>
-			<array>
-				<string>9C328A77ED15E907F3EE69B1</string>
-				<string>B6C90B86F0C4B1D69A248C31</string>
-				<string>DAD9D2CF91F6E55477A880CE</string>
-				<string>2523D2C8273DE4252AB9D467</string>
-				<string>8F8BDBF2721E1A0E45FAA4A7</string>
-				<string>DD56B76AB67D06161485E52A</string>
-				<string>30D720248C1BB5F42984E722</string>
-				<string>6ACE9C80936BA0AA803627E9</string>
-				<string>C4208C4BC220C4C631815466</string>
-				<string>78BC181F4289544F053C7765</string>
-				<string>F62FFB0088DC3F46B57C2CA3</string>
-				<string>D86BBF720312D2F3CC3CEEAD</string>
-				<string>D087DAE48C0672211810B9AA</string>
-				<string>3023F688733753EB734C8BF9</string>
-			</array>
-			<key>path</key>
-			<string>Features</string>
-		</dict>
-		<key>8F8BDBF2721E1A0E45FAA4A7</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceCatalog</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>AEC597CCC28516E52ED551A2</string>
-				<string>EF346AD6D4E7E47701B1DC4C</string>
-				<string>7638C7BA24A4126BC5039EA5</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>CDDE58AF819DFCD6735F185F</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>B4BCF3A0D2A9C2618147EA0C</string>
-		</dict>
-		<key>F62FFB0088DC3F46B57C2CA3</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupTryOn</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>087F06F4A4D4BC010EF4C720</string>
-				<string>507F8ABB438F67B20D0A1A2C</string>
-				<string>F4C68DD9443BC3C23BD1DD3F</string>
-				<string>DE9F70FB20C8710887FFDCCC</string>
-				<string>5CDF09D2EC207E4F4D908C7C</string>
-				<string>A1B2C3D4E5F60718293A4B5D</string>
-				<string>9396F6A95EDCA8291DBA3E21</string>
-				<string>E7000000671282B495B3FED6</string>
-				<string>E700000003AA57EB8DEC364F</string>
-				<string>7ED8B4D9166DBE43F2B1D643</string>
-				<string>F9A809519AC15D1F2A75FC7E</string>
-				<string>119AD822ABE98DE2B5B45183</string>
-				<string>0DF8905476C966096CB0770C</string>
-				<string>CC4E2FA16FB3D83A6DDC1EDB</string>
-				<string>200202B3E0189B21E1DBA4E5</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D799BAE6088A90139B415FCC</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXContainerItemProxy</string>
-			<key>containerPortal</key>
-			<string>98F54143AB4E86B28C3AFEE0</string>
-			<key>remoteGlobalIDString</key>
-			<string>48338DE28C732258BB72957A</string>
-			<key>remoteInfo</key>
-			<string>SunriseApp</string>
-			<key>proxyType</key>
-			<string>1</string>
-		</dict>
-		<key>6C1CB277BF06946BD753FABB</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>C7EC61DDA286A934C9E046A3</string>
-		</dict>
-		<key>EC5645E5A43930BFD723FED7</key>
-		<dict>
-			<key>path</key>
-			<string>AppRoute.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>94141C2F12528E362C097D97</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>86692327C6B7D587C8265F12</string>
-		</dict>
-		<key>D7E30CC8B590F5ADA8D7A700</key>
-		<dict>
-			<key>path</key>
-			<string>ServiceStateTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>513CE2D3B12E8EE4EB17E942</key>
-		<dict>
-			<key>path</key>
-			<string>TutorialViewModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>4EF7EF1EF1E32DE1D3B45E7A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>79305ED9810D6D771F5FD4DA</string>
-		</dict>
-		<key>6A5998FB4332B2D926ADD348</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>0E7BF5D5F430CF008106DB07</string>
-		</dict>
-		<key>92EBB7356D813A77140C6444</key>
-		<dict>
-			<key>path</key>
-			<string>FaceLandmarkProjection.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E8000000257DD8D4770AABC1</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E70000007A577EC19F38EF9E</string>
-		</dict>
-		<key>97282C821FE1244E279E7756</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F2CC9653DA95040834114EE5</string>
-		</dict>
-		<key>FD2E311FC44972331A578843</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>513CE2D3B12E8EE4EB17E942</string>
-		</dict>
-		<key>54BF7FC5786588B09E8F42EC</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>12A02F902EA495D3DAD7800D</string>
-		</dict>
-		<key>624D0503EC8FAD9DEB266B14</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFrameworksBuildPhase</string>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>C4A5F9A53088B1E800BFECB0</string>
-			</array>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>2196E50059A7DF155BD30CD4</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>1FD98450156D781E8A88FB7A</string>
-		</dict>
-		<key>AC0A6723DBB80D2189C985C6</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>929EC20AE526B170AB21CE88</string>
-		</dict>
-		<key>98F54143AB4E86B28C3AFEE0</key>
-		<dict>
-			<key>hasScannedForEncodings</key>
-			<string>0</string>
-			<key>developmentRegion</key>
-			<string>en</string>
-			<key>projectDirPath</key>
-			<string></string>
-			<key>mainGroup</key>
-			<string>B28B7AF69320201D1CF206EB</string>
-			<key>packageReferences</key>
-			<array>
-				<string>C4A5F9A33088B1E800BFECB0</string>
-			</array>
-			<key>buildConfigurationList</key>
-			<string>614471660AA131A99883C67C</string>
-			<key>attributes</key>
-			<dict>
-				<key>LastUpgradeCheck</key>
-				<string>2600</string>
-				<key>BuildIndependentTargetsInParallel</key>
-				<string>YES</string>
-				<key>TargetAttributes</key>
-				<dict>
-					<key>48338DE28C732258BB72957A</key>
-					<dict>
-						<key>CreatedOnToolsVersion</key>
-						<string>26.0</string>
-					</dict>
-					<key>5263EC3D7F5E85BF38460F22</key>
-					<dict>
-						<key>TestTargetID</key>
-						<string>48338DE28C732258BB72957A</string>
-						<key>CreatedOnToolsVersion</key>
-						<string>26.0</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>compatibilityVersion</key>
-			<string>Xcode 14.0</string>
-			<key>projectRoot</key>
-			<string></string>
-			<key>knownRegions</key>
-			<array>
-				<string>en</string>
-				<string>Base</string>
-			</array>
-			<key>targets</key>
-			<array>
-				<string>48338DE28C732258BB72957A</string>
-				<string>5263EC3D7F5E85BF38460F22</string>
-			</array>
-			<key>isa</key>
-			<string>PBXProject</string>
-			<key>productRefGroup</key>
-			<string>FBDC4F23F93125BBEEAE800C</string>
-		</dict>
-		<key>6D795F13C8C22E022040EE00</key>
-		<dict>
-			<key>path</key>
-			<string>SunriseApp.app</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>explicitFileType</key>
-			<string>wrapper.application</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>FE2B5E1913561C0593FD7840</key>
-		<dict>
-			<key>path</key>
-			<string>TutorialView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>4D3D248B5F57A2BCC5B92F45</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>7A55B196215C21A4854D69BF</string>
-		</dict>
-		<key>5811410751FADBA1C66E1183</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>C1810A54CE6D4BC94E7F122D</string>
-		</dict>
-		<key>CB14CD6B60CC4F8DA016C314</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>2A319A247AA300149353ECC2</string>
-		</dict>
-		<key>0EB509C6F62AD9CF0B9F3D96</key>
-		<dict>
-			<key>path</key>
-			<string>Navigation</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>19A31E43DAD88366AB1ECB5C</string>
-				<string>EC5645E5A43930BFD723FED7</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>A1B2C3D4E5F60718293A4B5C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>A1B2C3D4E5F60718293A4B5D</string>
-		</dict>
-		<key>AA93A80688E1C6D74605DA8D</key>
-		<dict>
-			<key>path</key>
-			<string>Models</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>0D93637BD45D15F776D9F93A</string>
-				<string>5F3C4D0A24B6DEC94B862617</string>
-				<string>00BBB2277B8061F71917B4DB</string>
-				<string>73EEC8668C59A63EE58717BF</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>68347A4A84BC0644A4FE6F07</key>
-		<dict>
-			<key>path</key>
-			<string>EmptyStateView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F0CCC055355A1EC0AF155313</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupRecommenderTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>A868936FDC1A8D26B1893C4D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-			<key>children</key>
-			<array>
-				<string>D7E30CC8B590F5ADA8D7A700</string>
-				<string>57783D5A5FD3B135956ABDC4</string>
-				<string>F8CAFAEACFDE4C0B40A70B11</string>
-				<string>0E7BF5D5F430CF008106DB07</string>
-				<string>719471221F004F211C0E7FF8</string>
-				<string>09018C00875BE2006F222659</string>
-				<string>F0CCC055355A1EC0AF155313</string>
-				<string>7A55B196215C21A4854D69BF</string>
-				<string>B4BCF3A0D2A9C2618147EA0C</string>
-				<string>B1B2C3D4E5F60718293A4B5D</string>
-				<string>87BF2D2EF9709D53B6DC6D0E</string>
-				<string>06E4E253B30DEDB244405B20</string>
-				<string>E70000003EEB62383567027B</string>
-				<string>E70000007A577EC19F38EF9E</string>
-				<string>14857EF32C7DC6CC4325CFA5</string>
-				<string>B8A0C7629D5BE6A59E2A595E</string>
-				<string>E10F58ECBC93C435DE28667D</string>
-				<string>880B8ADAAD4B4CCC9E778686</string>
-				<string>BBBD5B695A0CBBC0FF714575</string>
-			</array>
-			<key>path</key>
-			<string>Features</string>
-		</dict>
-		<key>0C2A5C04A75A9061E0632676</key>
-		<dict>
-			<key>path</key>
-			<string>ImageToViewMapping.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>28BE0691E5755C999C2D4014</key>
-		<dict>
-			<key>path</key>
-			<string>Core</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>AA93A80688E1C6D74605DA8D</string>
-				<string>71407E93971344FFC151D513</string>
-				<string>38FF9B2420102D6F286CBF88</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>DE58E2B17C19600779694943</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXTargetDependency</string>
-			<key>target</key>
-			<string>48338DE28C732258BB72957A</string>
-			<key>targetProxy</key>
-			<string>D799BAE6088A90139B415FCC</string>
-		</dict>
-		<key>5CDF09D2EC207E4F4D908C7C</key>
-		<dict>
-			<key>path</key>
-			<string>FaceFit.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D86BBF720312D2F3CC3CEEAD</key>
-		<dict>
-			<key>path</key>
-			<string>Eyebrow</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>9D7729D7358DFFF14FC0325A</string>
-				<string>929EC20AE526B170AB21CE88</string>
-				<string>FE3904FB0A58CD5FFD0DF623</string>
-				<string>CF9C7F6F108DEC6A46AC8A21</string>
-				<string>D79C719E5AD023220CAF0749</string>
-				<string>C5F03830273DCC9E47775164</string>
-				<string>6A8BAEAF8AB95FED113534A6</string>
-				<string>4A6545BC9255A551C688D4B1</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>86692327C6B7D587C8265F12</key>
-		<dict>
-			<key>path</key>
-			<string>TrackingReadiness.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5EF702E8CB338F9CCD0196D3</key>
-		<dict>
-			<key>path</key>
-			<string>AppTypography.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>73EEC8668C59A63EE58717BF</key>
-		<dict>
-			<key>path</key>
-			<string>Tutorial.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>B28B7AF69320201D1CF206EB</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-			<key>children</key>
-			<array>
-				<string>7A1EF99F369FF90802A9EE53</string>
-				<string>6018AF2785A5C14223064FCC</string>
-				<string>FBDC4F23F93125BBEEAE800C</string>
-			</array>
-		</dict>
-		<key>C1810A54CE6D4BC94E7F122D</key>
-		<dict>
-			<key>path</key>
-			<string>AppContainer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>EB847F5E015413B5B6CDA3FB</key>
-		<dict>
-			<key>path</key>
-			<string>LinerTracker.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>84EA260CF3F8677288CBD734</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>85190E6578A99E0FCFAD9638</string>
-		</dict>
-		<key>D078C19892C5D07129B54516</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>0C2A5C04A75A9061E0632676</string>
-		</dict>
-		<key>E91A2322FF10D46090575498</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>68347A4A84BC0644A4FE6F07</string>
-		</dict>
-		<key>22C1BB35C6F3190923BD2E6B</key>
-		<dict>
-			<key>path</key>
-			<string>Resources</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>133DCD5B481F352F758A1E3F</string>
-				<string>98F393F180238C7106FB99C0</string>
-				<string>CD73965C5395C3CFB4F69902</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>3AD655F060E65569625DDA59</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>4A66892916F906242E0EB942</string>
-		</dict>
-		<key>7C0E5C02D823502F262C2E96</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>133DCD5B481F352F758A1E3F</string>
-		</dict>
-		<key>C7EC61DDA286A934C9E046A3</key>
-		<dict>
-			<key>path</key>
-			<string>AppColors.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F41BF1094B4CE58A41E950AA</key>
-		<dict>
-			<key>path</key>
-			<string>SampleData.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>3CCD94BF36631D735AC50DD0</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>DE9F70FB20C8710887FFDCCC</string>
-		</dict>
-		<key>C4C3C8FAD6B4703ED8D28504</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>BC38DE15F5318E7DBE6A6A6A</string>
-		</dict>
-		<key>28A2D07D18A74048D374D78E</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>087F06F4A4D4BC010EF4C720</string>
-		</dict>
-		<key>8B63A0393819EF9DE7F2B473</key>
-		<dict>
-			<key>name</key>
-			<string>Debug</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>SUPPORTS_MACCATALYST</key>
-				<string>NO</string>
-				<key>CODE_SIGN_STYLE</key>
-				<string>Automatic</string>
-				<key>SWIFT_EMIT_LOC_STRINGS</key>
-				<string>YES</string>
-				<key>SWIFT_ACTIVE_COMPILATION_CONDITIONS</key>
-				<string>$(inherited) DEBUG</string>
-				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.sunrise.foundation</string>
-				<key>DEVELOPMENT_TEAM</key>
-				<string>5NYWSR69FZ</string>
-				<key>INFOPLIST_FILE</key>
-				<string>SunriseApp/Configuration/Info.plist</string>
-				<key>TARGETED_DEVICE_FAMILY</key>
-				<string>1</string>
-				<key>LD_RUNPATH_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>@executable_path/Frameworks</string>
-					<string>@loader_path/Frameworks</string>
-				</array>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>GENERATE_INFOPLIST_FILE</key>
-				<string>NO</string>
-				<key>SUPPORTED_PLATFORMS</key>
-				<string>iphoneos iphonesimulator</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-		</dict>
-		<key>E80000001C043450B0C3F54A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E70000003EEB62383567027B</string>
-		</dict>
-		<key>E122CD75A643278D498BA4DE</key>
-		<dict>
-			<key>path</key>
-			<string>Navigation</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>D529D8EB6F4607AD5BC97B1D</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>614471660AA131A99883C67C</key>
-		<dict>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>defaultConfigurationName</key>
-			<string>Release</string>
-			<key>buildConfigurations</key>
-			<array>
-				<string>9E232BE73FECBBF8659C79E7</string>
-				<string>95126388EE2677EABF3CF99B</string>
-			</array>
-		</dict>
-		<key>85190E6578A99E0FCFAD9638</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShapeStore.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E70000000C39BF83BDEA70CC</key>
-		<dict>
-			<key>path</key>
-			<string>EyeScan.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>43FFB232E616855EF7D5438E</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F9A809519AC15D1F2A75FC7E</string>
-		</dict>
-		<key>B1B2C3D4E5F60718293A4B5D</key>
-		<dict>
-			<key>path</key>
-			<string>LinerGeometryTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>133DCD5B481F352F758A1E3F</key>
-		<dict>
-			<key>path</key>
-			<string>Assets.xcassets</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>folder.assetcatalog</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>3023F688733753EB734C8BF9</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupPreferences</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>3A07AB7461B6903140D1D165</string>
-				<string>9BE83A467EAAC48EF29EBFB8</string>
-				<string>528DBE5F90FFAE037040249C</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>00C25255FB0A55CD254DAB5C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>EC6DBACE90DF9F4964DBD3ED</string>
-		</dict>
-		<key>5F6D1A9D904A10807700F875</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShapeClassifier.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>49C5565CCE7AF4F0C16F9F0A</key>
-		<dict>
-			<key>path</key>
-			<string>LinerOverlayRenderer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>67129ECB6F6B3907B6557698</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>528DBE5F90FFAE037040249C</string>
-		</dict>
-		<key>14857EF32C7DC6CC4325CFA5</key>
-		<dict>
-			<key>path</key>
-			<string>LocalSavedLooksStoreTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>79305ED9810D6D771F5FD4DA</key>
-		<dict>
-			<key>path</key>
-			<string>FaceCalibrationViewModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>09018C00875BE2006F222659</key>
-		<dict>
-			<key>path</key>
-			<string>HeadPoseTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>57A1B7BFE8B58BFECBF5F3E3</key>
-		<dict>
-			<key>path</key>
-			<string>ForeheadSceneRenderer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C983838886352C1E043DE2F7</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F41BF1094B4CE58A41E950AA</string>
-		</dict>
-		<key>9396F6A95EDCA8291DBA3E21</key>
-		<dict>
-			<key>path</key>
-			<string>Eyeliner</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>8B9309B2A6284F76F3E4AD56</string>
-				<string>231A9D8B5701EDA4305C3266</string>
-				<string>CEF01F605BF92435DC324B13</string>
-				<string>0C2A5C04A75A9061E0632676</string>
-				<string>36E763EDC56C953EA58AFBB1</string>
-				<string>43A7AA6990D68C43A68511C9</string>
-				<string>C42CEFA28CA243E75B5D3DA1</string>
-				<string>49C5565CCE7AF4F0C16F9F0A</string>
-				<string>792977CAD0396D693A58DE24</string>
-				<string>2A319A247AA300149353ECC2</string>
-				<string>29017F5C551F928297695BA1</string>
-				<string>EB847F5E015413B5B6CDA3FB</string>
-				<string>4D6FD918F6AD3EFDBC821053</string>
-				<string>0DCEA34095C8C9C53CE42CE4</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>9909AED933CB17E8692EAA5B</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>87BF2D2EF9709D53B6DC6D0E</string>
-		</dict>
-		<key>D2B98367701FA4B350BAD3AB</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>9DC0612A3CD82563E49C6CB2</string>
-		</dict>
-		<key>44D504415A68844C6C1101A8</key>
-		<dict>
-			<key>path</key>
-			<string>TestSupport</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>3CAF4AC5FE94A9CCBD43461F</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>DAD3B579ADBE7A6A3409A9D8</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupTextureBaker.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>3F8BDF6874EA48014D3D2619</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>2F7F9AFC01F64EED1135CF2A</string>
-		</dict>
-		<key>72DD7AF42DF88A4779FE0BB5</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>14857EF32C7DC6CC4325CFA5</string>
-		</dict>
-		<key>760FC0729A32694E12BC9FB9</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>00BBB2277B8061F71917B4DB</string>
-		</dict>
-		<key>38FF9B2420102D6F286CBF88</key>
-		<dict>
-			<key>path</key>
-			<string>AR</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>CF45679699AC7CB5E530CA1C</string>
-				<string>92EBB7356D813A77140C6444</string>
-				<string>EA63C523723545C9DAFDF3BC</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>D087DAE48C0672211810B9AA</key>
-		<dict>
-			<key>path</key>
-			<string>Forehead</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>CF5B6AFD13E8B16D6706FCDA</string>
-				<string>57A1B7BFE8B58BFECBF5F3E3</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>2F7F9AFC01F64EED1135CF2A</key>
-		<dict>
-			<key>path</key>
-			<string>FaceProportions.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>0E7BF5D5F430CF008106DB07</key>
-		<dict>
-			<key>path</key>
-			<string>PhotoFaceMeasurerTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>AF98C397F82E4D7F9517A8E4</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>AEC597CCC28516E52ED551A2</string>
-		</dict>
-		<key>91D0BE9D95201FF3451E8D68</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F40D1704AC0B3B82F035DC3C</string>
-		</dict>
-		<key>39F7DA4E369F5B9BE83ECE6D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>CF9C7F6F108DEC6A46AC8A21</string>
-		</dict>
-		<key>26456AF703170C7814098A8E</key>
-		<dict>
-			<key>path</key>
-			<string>AppSpacing.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>787FC7E50E3814ED5F8E71BF</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceImportView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>751181284B03C1E6FB6684D2</key>
-		<dict>
-			<key>path</key>
-			<string>SurfaceAttachment.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>19A31E43DAD88366AB1ECB5C</key>
-		<dict>
-			<key>path</key>
-			<string>AppNavigator.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>6ACE9C80936BA0AA803627E9</key>
-		<dict>
-			<key>path</key>
-			<string>SavedLooks</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>045449C4CDF0CE2EAAA00D42</string>
-				<string>1FD98450156D781E8A88FB7A</string>
-				<string>1C3F953C55A05FCE0F8F428E</string>
-				<string>C4ACC8BE3EAE74653E78A54F</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F83E4FF1665636FA83213151</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>CF45679699AC7CB5E530CA1C</string>
-		</dict>
-		<key>200202B3E0189B21E1DBA4E5</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupTryOnView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>314DC6D186608E3225706A28</key>
-		<dict>
-			<key>path</key>
-			<string>PhotoFaceMeasurer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>12A02F902EA495D3DAD7800D</key>
-		<dict>
-			<key>path</key>
-			<string>SavedLooksStoring.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>B7BB6F6B68833C5517A0E3C2</key>
-		<dict>
-			<key>path</key>
-			<string>PreviewSupport</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>E77AFA84C187835C18DD4C98</string>
-				<string>F41BF1094B4CE58A41E950AA</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C4A5F9A43088B1E800BFECB0</key>
-		<dict>
-			<key>isa</key>
-			<string>XCSwiftPackageProductDependency</string>
-			<key>package</key>
-			<string>C4A5F9A33088B1E800BFECB0</string>
-			<key>productName</key>
-			<string>MediaPipeTasksVision</string>
-		</dict>
-		<key>2B212B32757D21783FE89B2C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>314DC6D186608E3225706A28</string>
-		</dict>
-		<key>EF346AD6D4E7E47701B1DC4C</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceCatalogView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E44486D30307E00936281E51</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>EB847F5E015413B5B6CDA3FB</string>
-		</dict>
-		<key>48338DE28C732258BB72957A</key>
-		<dict>
-			<key>buildConfigurationList</key>
-			<string>3667E0A0C8FB580B1D21C114</string>
-			<key>productReference</key>
-			<string>6D795F13C8C22E022040EE00</string>
-			<key>productType</key>
-			<string>com.apple.product-type.application</string>
-			<key>packageProductDependencies</key>
-			<array>
-				<string>C4A5F9A43088B1E800BFECB0</string>
-			</array>
-			<key>productName</key>
-			<string>SunriseApp</string>
-			<key>isa</key>
-			<string>PBXNativeTarget</string>
-			<key>buildPhases</key>
-			<array>
-				<string>E4A9877846F7E14E120A0C25</string>
-				<string>624D0503EC8FAD9DEB266B14</string>
-				<string>4B8B87285CBE34CF457FD716</string>
-			</array>
-			<key>dependencies</key>
-			<array/>
-			<key>name</key>
-			<string>SunriseApp</string>
-			<key>buildRules</key>
-			<array/>
-		</dict>
-		<key>BBBD5B695A0CBBC0FF714575</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupPreferenceTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>DAD9D2CF91F6E55477A880CE</key>
-		<dict>
-			<key>path</key>
-			<string>LiveGuide</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>BC38DE15F5318E7DBE6A6A6A</string>
-				<string>9342DC399ECDC1D13247975B</string>
-				<string>19429AD975CE1483E26A2783</string>
-				<string>D5689B7EB895DBD27CC6A82F</string>
-				<string>DAD3B579ADBE7A6A3409A9D8</string>
-				<string>751181284B03C1E6FB6684D2</string>
-				<string>AF8D32CBADEAE62284CB8374</string>
-				<string>541EF3DA9C3035E1029E3BF3</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>89D16D2755C8D02FB1F5A7D8</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>B2B0023A348FAD79C48161E9</string>
-		</dict>
-		<key>92E3BF4E4DF3CB9F19BC11A8</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>B8A0C7629D5BE6A59E2A595E</string>
-		</dict>
-		<key>454D9F210C849C41D0E8378C</key>
-		<dict>
-			<key>path</key>
-			<string>FaceMeshARView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>2C49459039CEAF042E4919F8</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShape.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>0DF8905476C966096CB0770C</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupARView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>36E763EDC56C953EA58AFBB1</key>
-		<dict>
-			<key>path</key>
-			<string>LandmarkSpace.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>2523D2C8273DE4252AB9D467</key>
-		<dict>
-			<key>path</key>
-			<string>Onboarding</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>F40D1704AC0B3B82F035DC3C</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>3063A4C8D849393B67C7EA9E</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>3A07AB7461B6903140D1D165</string>
-		</dict>
-		<key>C4208C4BC220C4C631815466</key>
-		<dict>
-			<key>path</key>
-			<string>Tutorial</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>13D8455EFF6A75DF7B4631CC</string>
-				<string>C4AE33974D71FD4A86072E97</string>
-				<string>FE2B5E1913561C0593FD7840</string>
-				<string>513CE2D3B12E8EE4EB17E942</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>AF8D32CBADEAE62284CB8374</key>
-		<dict>
-			<key>path</key>
-			<string>EyelinerRegion.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>FE3904FB0A58CD5FFD0DF623</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowRegionMapper.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>43A7AA6990D68C43A68511C9</key>
-		<dict>
-			<key>path</key>
-			<string>LinerGuide.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C4A5F9A33088B1E800BFECB0</key>
-		<dict>
-			<key>isa</key>
-			<string>XCRemoteSwiftPackageReference</string>
-			<key>repositoryURL</key>
-			<string>https://github.com/google-ai-edge/mediapipe</string>
-			<key>requirement</key>
-			<dict>
-				<key>kind</key>
-				<string>branch</string>
-				<key>branch</key>
-				<string>master</string>
-			</dict>
-		</dict>
-		<key>C9F55A457B8EFEC9E02BD7AA</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>57A1B7BFE8B58BFECBF5F3E3</string>
-		</dict>
-		<key>87BF2D2EF9709D53B6DC6D0E</key>
-		<dict>
-			<key>path</key>
-			<string>EyelinerMappingTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>231A9D8B5701EDA4305C3266</key>
-		<dict>
-			<key>path</key>
-			<string>EyeLandmarks.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>00BBB2277B8061F71917B4DB</key>
-		<dict>
-			<key>path</key>
-			<string>SavedLookMetadata.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F69EBE2B5722EEBEF5B9B0A7</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>C4ACC8BE3EAE74653E78A54F</string>
-		</dict>
-		<key>E700000003AA57EB8DEC364F</key>
-		<dict>
-			<key>path</key>
-			<string>EyelinerPlanner.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>7A55B196215C21A4854D69BF</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupPersonalizationTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F9B2EA3A6046C331C92A991C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>7BEE2E6597318E2548E93D3E</string>
-		</dict>
-		<key>4A6545BC9255A551C688D4B1</key>
-		<dict>
-			<key>path</key>
-			<string>FaceGuideFlow.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5263EC3D7F5E85BF38460F22</key>
-		<dict>
-			<key>buildConfigurationList</key>
-			<string>1AC7F6C87C6B78F0AC7DE880</string>
-			<key>productReference</key>
-			<string>AEAE4B28CDFF08F590396BA5</string>
-			<key>productType</key>
-			<string>com.apple.product-type.bundle.unit-test</string>
-			<key>productName</key>
-			<string>SunriseAppTests</string>
-			<key>isa</key>
-			<string>PBXNativeTarget</string>
-			<key>buildPhases</key>
-			<array>
-				<string>534FEB0549600234AAE09DB0</string>
-				<string>462B790ABA6A17A67726AAFD</string>
-				<string>918D048E2D5158FF62BC656E</string>
-			</array>
-			<key>dependencies</key>
-			<array>
-				<string>DE58E2B17C19600779694943</string>
-			</array>
-			<key>name</key>
-			<string>SunriseAppTests</string>
-			<key>buildRules</key>
-			<array/>
-		</dict>
-		<key>388033139935F97DCFECDAC1</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>200202B3E0189B21E1DBA4E5</string>
-		</dict>
-		<key>9D7729D7358DFFF14FC0325A</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowGuideGenerator.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>C9587CEBB39B613D7953399F</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>06E4E253B30DEDB244405B20</string>
-		</dict>
-		<key>5CB96A3A7D31F2FC76679F9C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>9D7729D7358DFFF14FC0325A</string>
-		</dict>
-		<key>C46FF01BBC0933B3F49A571A</key>
-		<dict>
-			<key>path</key>
-			<string>FaceContourDetector.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E8A4161080FEE103C1D2E314</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>13D8455EFF6A75DF7B4631CC</string>
-		</dict>
-		<key>918D048E2D5158FF62BC656E</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXResourcesBuildPhase</string>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array/>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>E28CA8BC201771E861AFEA21</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>19A31E43DAD88366AB1ECB5C</string>
-		</dict>
-		<key>41A32CF5459F7BA7ED67B290</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>F8BC42C353CA045B4AC94AF5</string>
-		</dict>
-		<key>880B8ADAAD4B4CCC9E778686</key>
-		<dict>
-			<key>path</key>
-			<string>ForeheadGuideTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>8390F5679DF570C890190E7C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>C46FF01BBC0933B3F49A571A</string>
-		</dict>
-		<key>B1B2C3D4E5F60718293A4B5C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>B1B2C3D4E5F60718293A4B5D</string>
-		</dict>
-		<key>7ED8B4D9166DBE43F2B1D643</key>
-		<dict>
-			<key>path</key>
-			<string>FaceFeatureLocator.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E70000003EEB62383567027B</key>
-		<dict>
-			<key>path</key>
-			<string>EyelinerPlannerTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>7B2C5442D94A8D5854261CCB</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>787FC7E50E3814ED5F8E71BF</string>
-		</dict>
-		<key>B3C5787F1841D0350274F90E</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>92EBB7356D813A77140C6444</string>
-		</dict>
-		<key>144217C9FAD1C040EBD2F294</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>CEF01F605BF92435DC324B13</string>
-		</dict>
-		<key>5F3395078FFF3780060850A7</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>1C3F953C55A05FCE0F8F428E</string>
-		</dict>
-		<key>DC644578E897C547704A6C5E</key>
-		<dict>
-			<key>path</key>
-			<string>Theme</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>C7EC61DDA286A934C9E046A3</string>
-				<string>26456AF703170C7814098A8E</string>
-				<string>5EF702E8CB338F9CCD0196D3</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F1601274318B8DCA422ED931</key>
-		<dict>
-			<key>path</key>
-			<string>DeviceFaceTrackingChecker.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E70000007A577EC19F38EF9E</key>
-		<dict>
-			<key>path</key>
-			<string>EyeScanTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>0BB1180441D5C292FDF1D87B</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>CC4E2FA16FB3D83A6DDC1EDB</string>
-		</dict>
-		<key>3325F69FD4DFE6E6674B1361</key>
-		<dict>
-			<key>name</key>
-			<string>Debug</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>SUPPORTS_MACCATALYST</key>
-				<string>NO</string>
-				<key>TEST_HOST</key>
-				<string>$(BUILT_PRODUCTS_DIR)/SunriseApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SunriseApp</string>
-				<key>BUNDLE_LOADER</key>
-				<string>$(TEST_HOST)</string>
-				<key>CODE_SIGN_STYLE</key>
-				<string>Automatic</string>
-				<key>SWIFT_ACTIVE_COMPILATION_CONDITIONS</key>
-				<string>$(inherited) DEBUG</string>
-				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.sunrise.foundation.tests</string>
-				<key>TARGETED_DEVICE_FAMILY</key>
-				<string>1</string>
-				<key>LD_RUNPATH_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>@executable_path/Frameworks</string>
-					<string>@loader_path/Frameworks</string>
-				</array>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>GENERATE_INFOPLIST_FILE</key>
-				<string>YES</string>
-				<key>SUPPORTED_PLATFORMS</key>
-				<string>iphoneos iphonesimulator</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-		</dict>
-		<key>EA63C523723545C9DAFDF3BC</key>
-		<dict>
-			<key>path</key>
-			<string>FaceLandmarkProvider.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E7000000671282B495B3FED6</key>
-		<dict>
-			<key>path</key>
-			<string>EyeDebugView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>7638C7BA24A4126BC5039EA5</key>
-		<dict>
-			<key>path</key>
-			<string>ReferenceCatalogViewModel.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>8C189615D8A8DC30B4B5789D</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>792977CAD0396D693A58DE24</string>
-		</dict>
-		<key>C4AE33974D71FD4A86072E97</key>
-		<dict>
-			<key>path</key>
-			<string>TutorialInstructions.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E700000020C97B84D2D8442F</key>
-		<dict>
-			<key>path</key>
-			<string>EyeSampleGate.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>A1B8254BAD7ABE34EFF29C32</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>0DF8905476C966096CB0770C</string>
-		</dict>
-		<key>F8BC42C353CA045B4AC94AF5</key>
-		<dict>
-			<key>path</key>
-			<string>FaceCalibrationView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>DB800B2849D00487C7191B04</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>4F5841E6C956B66A11234989</string>
-		</dict>
-		<key>792977CAD0396D693A58DE24</key>
-		<dict>
-			<key>path</key>
-			<string>LinerPathBuilder.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>46A06406CEEB25CB293B7899</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>CF5B6AFD13E8B16D6706FCDA</string>
-		</dict>
-		<key>CC4E2FA16FB3D83A6DDC1EDB</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupRecommendationsView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>4F5841E6C956B66A11234989</key>
-		<dict>
-			<key>path</key>
-			<string>SunriseApp.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>4D6FD918F6AD3EFDBC821053</key>
-		<dict>
-			<key>path</key>
-			<string>MediaPipeEyeLandmarkProvider.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>4FB931EDE051A5976AE56A63</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>880B8ADAAD4B4CCC9E778686</string>
-		</dict>
-		<key>0DCEA34095C8C9C53CE42CE4</key>
-		<dict>
-			<key>path</key>
-			<string>OneEuroFilter.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>DE9F70FB20C8710887FFDCCC</key>
-		<dict>
-			<key>path</key>
-			<string>FaceFeatureMap.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E4CAF00BBAA64D3952EDDB1A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>73EEC8668C59A63EE58717BF</string>
-		</dict>
-		<key>A3C86C57A3B3DE9202A267CF</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E10F58ECBC93C435DE28667D</string>
-		</dict>
-		<key>81C6BD9EDD701F40A703E2F6</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>5F3C4D0A24B6DEC94B862617</string>
-		</dict>
-		<key>5BB89CA48CF97ABD604521AF</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>C5F03830273DCC9E47775164</string>
-		</dict>
-		<key>C96E85543600CBE3B51E79C7</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>09018C00875BE2006F222659</string>
-		</dict>
-		<key>8C5FB2BC20E8B4BB996A74A6</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>D5689B7EB895DBD27CC6A82F</string>
-		</dict>
-		<key>63A3A48CCC399EC783EE5E76</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>9BE83A467EAAC48EF29EBFB8</string>
-		</dict>
-		<key>0D4BF23384C86F7A04F21AF1</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>C42CEFA28CA243E75B5D3DA1</string>
-		</dict>
-		<key>16A13571086FAC7A101835BA</key>
-		<dict>
-			<key>path</key>
-			<string>FaceContourMeasurer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>462B790ABA6A17A67726AAFD</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFrameworksBuildPhase</string>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array/>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>7189D665D4AB23779ACB830A</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>4D6FD918F6AD3EFDBC821053</string>
-		</dict>
-		<key>9A7281ADAA9F5DD9A22629E5</key>
-		<dict>
-			<key>path</key>
-			<string>Components</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>68347A4A84BC0644A4FE6F07</string>
-				<string>9E2CC9392658B0606CBF7775</string>
-				<string>B2B0023A348FAD79C48161E9</string>
-				<string>8DEEF4BC9014B9B481912D63</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>513BAB4E537BC7E6398BE794</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>19429AD975CE1483E26A2783</string>
-		</dict>
-		<key>8B9309B2A6284F76F3E4AD56</key>
-		<dict>
-			<key>path</key>
-			<string>EyeGeometry.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>281FF16EF2B60E76A20BAD7F</key>
-		<dict>
-			<key>name</key>
-			<string>Release</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>SUPPORTS_MACCATALYST</key>
-				<string>NO</string>
-				<key>CODE_SIGN_STYLE</key>
-				<string>Automatic</string>
-				<key>SWIFT_EMIT_LOC_STRINGS</key>
-				<string>YES</string>
-				<key>PRODUCT_BUNDLE_IDENTIFIER</key>
-				<string>com.sunrise.foundation</string>
-				<key>DEVELOPMENT_TEAM</key>
-				<string>5NYWSR69FZ</string>
-				<key>INFOPLIST_FILE</key>
-				<string>SunriseApp/Configuration/Info.plist</string>
-				<key>TARGETED_DEVICE_FAMILY</key>
-				<string>1</string>
-				<key>LD_RUNPATH_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>@executable_path/Frameworks</string>
-					<string>@loader_path/Frameworks</string>
-				</array>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>GENERATE_INFOPLIST_FILE</key>
-				<string>NO</string>
-				<key>SUPPORTED_PLATFORMS</key>
-				<string>iphoneos iphonesimulator</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-		</dict>
-		<key>B4BCF3A0D2A9C2618147EA0C</key>
-		<dict>
-			<key>path</key>
-			<string>MakeupTextureGeometryTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>CAD7754F69D7C7822BCC4CB4</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>CD73965C5395C3CFB4F69902</string>
-		</dict>
-		<key>06E4E253B30DEDB244405B20</key>
-		<dict>
-			<key>path</key>
-			<string>EyelinerGeometryTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>719471221F004F211C0E7FF8</key>
-		<dict>
-			<key>path</key>
-			<string>FaceShapeDatasetEvalTests.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E4A9877846F7E14E120A0C25</key>
-		<dict>
-			<key>files</key>
-			<array>
-				<string>E28CA8BC201771E861AFEA21</string>
-				<string>7115E09FBA46C990F2D232A2</string>
-				<string>5811410751FADBA1C66E1183</string>
-				<string>D2B98367701FA4B350BAD3AB</string>
-				<string>DB800B2849D00487C7191B04</string>
-				<string>D4923AA4BE3BEDAB38682145</string>
-				<string>81C6BD9EDD701F40A703E2F6</string>
-				<string>760FC0729A32694E12BC9FB9</string>
-				<string>E4CAF00BBAA64D3952EDDB1A</string>
-				<string>00C25255FB0A55CD254DAB5C</string>
-				<string>467284EDE20DBAB0C85F1F70</string>
-				<string>54BF7FC5786588B09E8F42EC</string>
-				<string>E91A2322FF10D46090575498</string>
-				<string>75CDF97E33C22DE197A5DF55</string>
-				<string>ACDF3453576FADCFE7CD7EEE</string>
-				<string>6C1CB277BF06946BD753FABB</string>
-				<string>30ACDA4CE4F7397B938416B4</string>
-				<string>F88C4B1A73633332F0DE36C2</string>
-				<string>965089157E47007D209C0413</string>
-				<string>41A32CF5459F7BA7ED67B290</string>
-				<string>4EF7EF1EF1E32DE1D3B45E7A</string>
-				<string>513BAB4E537BC7E6398BE794</string>
-				<string>91D0BE9D95201FF3451E8D68</string>
-				<string>2C53F0CCE66A98AF04B7B2D4</string>
-				<string>5AF705A9207A9DD3364DC86F</string>
-				<string>97282C821FE1244E279E7756</string>
-				<string>7B2C5442D94A8D5854261CCB</string>
-				<string>2196E50059A7DF155BD30CD4</string>
-				<string>5F3395078FFF3780060850A7</string>
-				<string>F69EBE2B5722EEBEF5B9B0A7</string>
-				<string>3445B0A9ADD7794489F23820</string>
-				<string>FD2E311FC44972331A578843</string>
-				<string>174D41F32C12A56708B05987</string>
-				<string>C983838886352C1E043DE2F7</string>
-				<string>B298E07ED940DDBA94F96CAE</string>
-				<string>3F8BDF6874EA48014D3D2619</string>
-				<string>3AD655F060E65569625DDA59</string>
-				<string>48573999134DD877698BA9F3</string>
-				<string>8390F5679DF570C890190E7C</string>
-				<string>2B212B32757D21783FE89B2C</string>
-				<string>CF8FDEBEDA76C3A34E0A02AF</string>
-				<string>E80000003E82AF829A521803</string>
-				<string>E800000003D22F33B62A98FD</string>
-				<string>685BC99DAFA493FCEB389B85</string>
-				<string>E12D0FA8EDEAC708EA387AC1</string>
-				<string>F9B2EA3A6046C331C92A991C</string>
-				<string>118BFC1BD7F8191164EC1F28</string>
-				<string>84EA260CF3F8677288CBD734</string>
-				<string>28A2D07D18A74048D374D78E</string>
-				<string>A243507A38CDA620F6EA9CFC</string>
-				<string>236D9C0C8B7D5C2BB17772D1</string>
-				<string>3CCD94BF36631D735AC50DD0</string>
-				<string>370710197E3F693AF3786C43</string>
-				<string>A1B2C3D4E5F60718293A4B5C</string>
-				<string>61802B9A9C3D59B870EFDC76</string>
-				<string>0A446418A8546A3886FD1C8C</string>
-				<string>144217C9FAD1C040EBD2F294</string>
-				<string>D078C19892C5D07129B54516</string>
-				<string>BBC1AC7A0CD90B0E7BC75223</string>
-				<string>14E0BA1614926FA5ABDBDC1A</string>
-				<string>0D4BF23384C86F7A04F21AF1</string>
-				<string>984FD73DF3F4DCFF8AB8A6BF</string>
-				<string>8C189615D8A8DC30B4B5789D</string>
-				<string>CB14CD6B60CC4F8DA016C314</string>
-				<string>C8B9433F836C41AA8E942950</string>
-				<string>E44486D30307E00936281E51</string>
-				<string>7189D665D4AB23779ACB830A</string>
-				<string>8A9B3447C705CB2A8F902152</string>
-				<string>E80000005D30E5A2A05DAB6C</string>
-				<string>E800000032E0F403F6771AC6</string>
-				<string>111C7B4BC1597B419627963B</string>
-				<string>43FFB232E616855EF7D5438E</string>
-				<string>57F069CE67A2ED299049886A</string>
-				<string>A1B8254BAD7ABE34EFF29C32</string>
-				<string>0BB1180441D5C292FDF1D87B</string>
-				<string>388033139935F97DCFECDAC1</string>
-				<string>89D16D2755C8D02FB1F5A7D8</string>
-				<string>C37D0B4D531BBB231AC8A90A</string>
-				<string>94141C2F12528E362C097D97</string>
-				<string>C4C3C8FAD6B4703ED8D28504</string>
-				<string>21388C21D48CE052BF3392DE</string>
-				<string>AF98C397F82E4D7F9517A8E4</string>
-				<string>B8EAE5AAE0A46180B2B92BC2</string>
-				<string>E8A4161080FEE103C1D2E314</string>
-				<string>8665DA9E4FE5F6175CA2AA8F</string>
-				<string>8C5FB2BC20E8B4BB996A74A6</string>
-				<string>6D72E2332D13C1ED4A00C434</string>
-				<string>0A54887C42EAF40544B47EFD</string>
-				<string>50990270ECCC792E5A17200F</string>
-				<string>033A5C6F22B5AC3CD0D490DB</string>
-				<string>F83E4FF1665636FA83213151</string>
-				<string>B3C5787F1841D0350274F90E</string>
-				<string>743170BAA00CD2471416D456</string>
-				<string>5CB96A3A7D31F2FC76679F9C</string>
-				<string>AC0A6723DBB80D2189C985C6</string>
-				<string>AECE21EC64B858B3E9302E8D</string>
-				<string>39F7DA4E369F5B9BE83ECE6D</string>
-				<string>14F00DACEF2734E0FB168738</string>
-				<string>5BB89CA48CF97ABD604521AF</string>
-				<string>24D41B3F4A893C06684C3C07</string>
-				<string>41D15C1C9F79A878ABEF7DEE</string>
-				<string>46A06406CEEB25CB293B7899</string>
-				<string>C9F55A457B8EFEC9E02BD7AA</string>
-				<string>3063A4C8D849393B67C7EA9E</string>
-				<string>63A3A48CCC399EC783EE5E76</string>
-				<string>67129ECB6F6B3907B6557698</string>
-			</array>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>isa</key>
-			<string>PBXSourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>CD73965C5395C3CFB4F69902</key>
-		<dict>
-			<key>path</key>
-			<string>face_landmarker.task</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>file</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E12D0FA8EDEAC708EA387AC1</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>454D9F210C849C41D0E8378C</string>
-		</dict>
-		<key>9C328A77ED15E907F3EE69B1</key>
-		<dict>
-			<key>path</key>
-			<string>Comparison</string>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>children</key>
-			<array>
-				<string>8904D808C7A57AB024FAEFB7</string>
-			</array>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>E80000005D30E5A2A05DAB6C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E7000000671282B495B3FED6</string>
-		</dict>
-		<key>0A446418A8546A3886FD1C8C</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>231A9D8B5701EDA4305C3266</string>
-		</dict>
-		<key>965089157E47007D209C0413</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>8904D808C7A57AB024FAEFB7</string>
-		</dict>
-		<key>118BFC1BD7F8191164EC1F28</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>A674174BCE6CB2E205B8DE7B</string>
-		</dict>
-		<key>CF9C7F6F108DEC6A46AC8A21</key>
-		<dict>
-			<key>path</key>
-			<string>EyebrowSceneRenderer.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>F40D1704AC0B3B82F035DC3C</key>
-		<dict>
-			<key>path</key>
-			<string>OnboardingView.swift</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.swift</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>174D41F32C12A56708B05987</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-			<key>fileRef</key>
-			<string>E77AFA84C187835C18DD4C98</string>
-		</dict>
-	</dict>
-</dict>
-</plist>
+// !$*UTF8*$!
+// -Nimah: Complete team project graph; native Xcode format.
+{
+	"classes" = {
+	};
+	"objectVersion" = "56";
+	"archiveVersion" = "1";
+	"objects" = {
+		"DE9F70FB20C8710887FFDCCC" = {
+			"path" = "FaceFeatureMap.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"1C3F953C55A05FCE0F8F428E" = {
+			"path" = "SavedLooksView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"7638C7BA24A4126BC5039EA5" = {
+			"path" = "ReferenceCatalogViewModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C4A5F9A43088B1E800BFECB0" = {
+			"isa" = "XCSwiftPackageProductDependency";
+			"package" = "C4A5F9A33088B1E800BFECB0";
+			"productName" = "MediaPipeTasksVision";
+		};
+		"918D048E2D5158FF62BC656E" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = (
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+		"98F393F180238C7106FB99C0" = {
+			"path" = "Localizable.xcstrings";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text.json.xcstrings";
+			"sourceTree" = "<group>";
+		};
+		"5F9B8B35ACD4D41DDB5411B9" = {
+			"path" = "Configuration";
+			"isa" = "PBXGroup";
+			"children" = (
+				"2D140CF26E79A04B1482A674",
+			);
+			"sourceTree" = "<group>";
+		};
+		"84EA260CF3F8677288CBD734" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "85190E6578A99E0FCFAD9638";
+		};
+		"D2B98367701FA4B350BAD3AB" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9DC0612A3CD82563E49C6CB2";
+		};
+		"5CB96A3A7D31F2FC76679F9C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9D7729D7358DFFF14FC0325A";
+		};
+		"9DC0612A3CD82563E49C6CB2" = {
+			"path" = "AppRootView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"0D4BF23384C86F7A04F21AF1" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C42CEFA28CA243E75B5D3DA1";
+		};
+		"F40D1704AC0B3B82F035DC3C" = {
+			"path" = "OnboardingView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"8DEEF4BC9014B9B481912D63" = {
+			"path" = "PrimaryButton.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"111C7B4BC1597B419627963B" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "7ED8B4D9166DBE43F2B1D643";
+		};
+		"22C1BB35C6F3190923BD2E6B" = {
+			"path" = "Resources";
+			"isa" = "PBXGroup";
+			"children" = (
+				"133DCD5B481F352F758A1E3F",
+				"98F393F180238C7106FB99C0",
+				"CD73965C5395C3CFB4F69902",
+			);
+			"sourceTree" = "<group>";
+		};
+		"AF8D32CBADEAE62284CB8374" = {
+			"path" = "EyelinerRegion.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"B3C5787F1841D0350274F90E" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "92EBB7356D813A77140C6444";
+		};
+		"92EBB7356D813A77140C6444" = {
+			"path" = "FaceLandmarkProjection.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"9BBFBF26B88D5A1CB066AA9D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F8CAFAEACFDE4C0B40A70B11";
+		};
+		"48338DE28C732258BB72957A" = {
+			"productType" = "com.apple.product-type.application";
+			"productReference" = "6D795F13C8C22E022040EE00";
+			"buildConfigurationList" = "3667E0A0C8FB580B1D21C114";
+			"packageProductDependencies" = (
+				"C4A5F9A43088B1E800BFECB0",
+			);
+			"productName" = "SunriseApp";
+			"isa" = "PBXNativeTarget";
+			"buildPhases" = (
+				"E4A9877846F7E14E120A0C25",
+				"624D0503EC8FAD9DEB266B14",
+				"4B8B87285CBE34CF457FD716",
+			);
+			"dependencies" = (
+			);
+			"name" = "SunriseApp";
+			"buildRules" = (
+			);
+		};
+		"2F7F9AFC01F64EED1135CF2A" = {
+			"path" = "FaceProportions.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"D9D6D606230E23D7BC356D38" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "3CAF4AC5FE94A9CCBD43461F";
+		};
+		"73EEC8668C59A63EE58717BF" = {
+			"path" = "Tutorial.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"5811410751FADBA1C66E1183" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C1810A54CE6D4BC94E7F122D";
+		};
+		"9396F6A95EDCA8291DBA3E21" = {
+			"path" = "Eyeliner";
+			"isa" = "PBXGroup";
+			"children" = (
+				"8B9309B2A6284F76F3E4AD56",
+				"231A9D8B5701EDA4305C3266",
+				"CEF01F605BF92435DC324B13",
+				"0C2A5C04A75A9061E0632676",
+				"36E763EDC56C953EA58AFBB1",
+				"43A7AA6990D68C43A68511C9",
+				"C42CEFA28CA243E75B5D3DA1",
+				"49C5565CCE7AF4F0C16F9F0A",
+				"792977CAD0396D693A58DE24",
+				"2A319A247AA300149353ECC2",
+				"29017F5C551F928297695BA1",
+				"EB847F5E015413B5B6CDA3FB",
+				"4D6FD918F6AD3EFDBC821053",
+				"0DCEA34095C8C9C53CE42CE4",
+			);
+			"sourceTree" = "<group>";
+		};
+		"880B8ADAAD4B4CCC9E778686" = {
+			"path" = "ForeheadGuideTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"89D16D2755C8D02FB1F5A7D8" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "B2B0023A348FAD79C48161E9";
+		};
+		"0EB509C6F62AD9CF0B9F3D96" = {
+			"path" = "Navigation";
+			"isa" = "PBXGroup";
+			"children" = (
+				"19A31E43DAD88366AB1ECB5C",
+				"EC5645E5A43930BFD723FED7",
+			);
+			"sourceTree" = "<group>";
+		};
+		"8C5FB2BC20E8B4BB996A74A6" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "D5689B7EB895DBD27CC6A82F";
+		};
+		"CF5B6AFD13E8B16D6706FCDA" = {
+			"path" = "ForeheadGuide.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"7ED8B4D9166DBE43F2B1D643" = {
+			"path" = "FaceFeatureLocator.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E700000020C97B84D2D8442F" = {
+			"path" = "EyeSampleGate.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"8C189615D8A8DC30B4B5789D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "792977CAD0396D693A58DE24";
+		};
+		"3AD655F060E65569625DDA59" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "4A66892916F906242E0EB942";
+		};
+		"8390F5679DF570C890190E7C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C46FF01BBC0933B3F49A571A";
+		};
+		"19A31E43DAD88366AB1ECB5C" = {
+			"path" = "AppNavigator.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"63A3A48CCC399EC783EE5E76" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9BE83A467EAAC48EF29EBFB8";
+		};
+		"E77AFA84C187835C18DD4C98" = {
+			"path" = "MockServices.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"133DCD5B481F352F758A1E3F" = {
+			"path" = "Assets.xcassets";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "folder.assetcatalog";
+			"sourceTree" = "<group>";
+		};
+		"00BBB2277B8061F71917B4DB" = {
+			"path" = "SavedLookMetadata.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"0A446418A8546A3886FD1C8C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "231A9D8B5701EDA4305C3266";
+		};
+		"534FEB0549600234AAE09DB0" = {
+			"buildActionMask" = "2147483647";
+			"isa" = "PBXSourcesBuildPhase";
+			"files" = (
+				"6C1FEB7D8D56B79BC86D794A",
+				"6BC9DD2E16CE7526E21A93B8",
+				"0BDB05D65645A9D73C294F55",
+				"D9D6D606230E23D7BC356D38",
+				"9BBFBF26B88D5A1CB066AA9D",
+				"6A5998FB4332B2D926ADD348",
+				"178C1E0195A44823A4CD0811",
+				"C96E85543600CBE3B51E79C7",
+				"66ABECA0E68ED4FBDD399A7A",
+				"4D3D248B5F57A2BCC5B92F45",
+				"CDDE58AF819DFCD6735F185F",
+				"B1B2C3D4E5F60718293A4B5C",
+				"9909AED933CB17E8692EAA5B",
+				"C9587CEBB39B613D7953399F",
+				"E80000001C043450B0C3F54A",
+				"E8000000257DD8D4770AABC1",
+				"72DD7AF42DF88A4779FE0BB5",
+				"92E3BF4E4DF3CB9F19BC11A8",
+				"A3C86C57A3B3DE9202A267CF",
+				"4FB931EDE051A5976AE56A63",
+				"256F015F65C61FE4DD9B6591",
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+		"41A32CF5459F7BA7ED67B290" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F8BC42C353CA045B4AC94AF5";
+		};
+		"92E3BF4E4DF3CB9F19BC11A8" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "B8A0C7629D5BE6A59E2A595E";
+		};
+		"8B9309B2A6284F76F3E4AD56" = {
+			"path" = "EyeGeometry.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"AECE21EC64B858B3E9302E8D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "FE3904FB0A58CD5FFD0DF623";
+		};
+		"24D41B3F4A893C06684C3C07" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "6A8BAEAF8AB95FED113534A6";
+		};
+		"0D93637BD45D15F776D9F93A" = {
+			"path" = "FaceTrackingAvailability.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"43A7AA6990D68C43A68511C9" = {
+			"path" = "LinerGuide.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"16A13571086FAC7A101835BA" = {
+			"path" = "FaceContourMeasurer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C4A5F9A53088B1E800BFECB0" = {
+			"isa" = "PBXBuildFile";
+			"productRef" = "C4A5F9A43088B1E800BFECB0";
+		};
+		"19429AD975CE1483E26A2783" = {
+			"path" = "LiveGuideView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E80000005D30E5A2A05DAB6C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E7000000671282B495B3FED6";
+		};
+		"B1B2C3D4E5F60718293A4B5D" = {
+			"path" = "LinerGeometryTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"BBBD5B695A0CBBC0FF714575" = {
+			"path" = "MakeupPreferenceTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"FE2B5E1913561C0593FD7840" = {
+			"path" = "TutorialView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"14F00DACEF2734E0FB168738" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "D79C719E5AD023220CAF0749";
+		};
+		"E70000007A577EC19F38EF9E" = {
+			"path" = "EyeScanTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"F8BC42C353CA045B4AC94AF5" = {
+			"path" = "FaceCalibrationView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"CC4E2FA16FB3D83A6DDC1EDB" = {
+			"path" = "MakeupRecommendationsView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"2C49459039CEAF042E4919F8" = {
+			"path" = "FaceShape.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"FE3904FB0A58CD5FFD0DF623" = {
+			"path" = "EyebrowRegionMapper.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"A3C86C57A3B3DE9202A267CF" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E10F58ECBC93C435DE28667D";
+		};
+		"6ACE9C80936BA0AA803627E9" = {
+			"path" = "SavedLooks";
+			"isa" = "PBXGroup";
+			"children" = (
+				"045449C4CDF0CE2EAAA00D42",
+				"1FD98450156D781E8A88FB7A",
+				"1C3F953C55A05FCE0F8F428E",
+				"C4ACC8BE3EAE74653E78A54F",
+			);
+			"sourceTree" = "<group>";
+		};
+		"9BE83A467EAAC48EF29EBFB8" = {
+			"path" = "BlushPlacementSketch.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"54BF7FC5786588B09E8F42EC" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "12A02F902EA495D3DAD7800D";
+		};
+		"5F3395078FFF3780060850A7" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "1C3F953C55A05FCE0F8F428E";
+		};
+		"E10F58ECBC93C435DE28667D" = {
+			"path" = "EyebrowTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"507F8ABB438F67B20D0A1A2C" = {
+			"path" = "MakeupRecommender.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"41D15C1C9F79A878ABEF7DEE" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "4A6545BC9255A551C688D4B1";
+		};
+		"0A54887C42EAF40544B47EFD" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "751181284B03C1E6FB6684D2";
+		};
+		"21CE064275C7C47713A1B7F0" = {
+			"path" = "FaceShapeViewModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"4D6FD918F6AD3EFDBC821053" = {
+			"path" = "MediaPipeEyeLandmarkProvider.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"8B63A0393819EF9DE7F2B473" = {
+			"name" = "Debug";
+			"buildSettings" = {
+				"LD_RUNPATH_SEARCH_PATHS" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "$(inherited) DEBUG";
+				"DEVELOPMENT_TEAM" = "WP97CT3PT7";
+				"TARGETED_DEVICE_FAMILY" = "1";
+				"INFOPLIST_FILE" = "SunriseApp/Configuration/Info.plist";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+				"SWIFT_EMIT_LOC_STRINGS" = "YES";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.sunrise.foundation";
+				"SUPPORTS_MACCATALYST" = "NO";
+			};
+			"isa" = "XCBuildConfiguration";
+		};
+		"ACDF3453576FADCFE7CD7EEE" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "8DEEF4BC9014B9B481912D63";
+		};
+		"D799BAE6088A90139B415FCC" = {
+			"isa" = "PBXContainerItemProxy";
+			"containerPortal" = "98F54143AB4E86B28C3AFEE0";
+			"remoteGlobalIDString" = "48338DE28C732258BB72957A";
+			"remoteInfo" = "SunriseApp";
+			"proxyType" = "1";
+		};
+		"EB847F5E015413B5B6CDA3FB" = {
+			"path" = "LinerTracker.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"CF8FDEBEDA76C3A34E0A02AF" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "5F6D1A9D904A10807700F875";
+		};
+		"95126388EE2677EABF3CF99B" = {
+			"isa" = "XCBuildConfiguration";
+			"buildSettings" = {
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "x86_64";
+				"CLANG_ENABLE_MODULES" = "YES";
+				"CLANG_ENABLE_OBJC_ARC" = "YES";
+				"IPHONEOS_DEPLOYMENT_TARGET" = "17.0";
+				"DEBUG_INFORMATION_FORMAT" = "dwarf-with-dsym";
+				"SWIFT_OPTIMIZATION_LEVEL" = "-O";
+				"SDKROOT" = "iphoneos";
+				"SWIFT_VERSION" = "5.0";
+				"ENABLE_TESTABILITY" = "NO";
+				"SWIFT_STRICT_CONCURRENCY" = "complete";
+			};
+			"name" = "Release";
+		};
+		"AC0A6723DBB80D2189C985C6" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "929EC20AE526B170AB21CE88";
+		};
+		"81C6BD9EDD701F40A703E2F6" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "5F3C4D0A24B6DEC94B862617";
+		};
+		"4A66892916F906242E0EB942" = {
+			"path" = "FaceMeshMeasurer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"B6C4CDC0872398FC76BC80DE" = {
+			"path" = "App";
+			"isa" = "PBXGroup";
+			"children" = (
+				"0EB509C6F62AD9CF0B9F3D96",
+				"C1810A54CE6D4BC94E7F122D",
+				"9DC0612A3CD82563E49C6CB2",
+				"4F5841E6C956B66A11234989",
+			);
+			"sourceTree" = "<group>";
+		};
+		"0DF8905476C966096CB0770C" = {
+			"path" = "MakeupARView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"6A5998FB4332B2D926ADD348" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "0E7BF5D5F430CF008106DB07";
+		};
+		"E91A2322FF10D46090575498" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "68347A4A84BC0644A4FE6F07";
+		};
+		"D86BBF720312D2F3CC3CEEAD" = {
+			"path" = "Eyebrow";
+			"isa" = "PBXGroup";
+			"children" = (
+				"9D7729D7358DFFF14FC0325A",
+				"929EC20AE526B170AB21CE88",
+				"FE3904FB0A58CD5FFD0DF623",
+				"CF9C7F6F108DEC6A46AC8A21",
+				"D79C719E5AD023220CAF0749",
+				"C5F03830273DCC9E47775164",
+				"6A8BAEAF8AB95FED113534A6",
+				"4A6545BC9255A551C688D4B1",
+			);
+			"sourceTree" = "<group>";
+		};
+		"513CE2D3B12E8EE4EB17E942" = {
+			"path" = "TutorialViewModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"A1B2C3D4E5F60718293A4B5D" = {
+			"path" = "LinerGeometry.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"4FB931EDE051A5976AE56A63" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "880B8ADAAD4B4CCC9E778686";
+		};
+		"8904D808C7A57AB024FAEFB7" = {
+			"path" = "ComparisonView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"3023F688733753EB734C8BF9" = {
+			"path" = "MakeupPreferences";
+			"isa" = "PBXGroup";
+			"children" = (
+				"3A07AB7461B6903140D1D165",
+				"9BE83A467EAAC48EF29EBFB8",
+				"528DBE5F90FFAE037040249C",
+			);
+			"sourceTree" = "<group>";
+		};
+		"FD2E311FC44972331A578843" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "513CE2D3B12E8EE4EB17E942";
+		};
+		"98F54143AB4E86B28C3AFEE0" = {
+			"buildConfigurationList" = "614471660AA131A99883C67C";
+			"packageReferences" = (
+				"C4A5F9A33088B1E800BFECB0",
+			);
+			"targets" = (
+				"48338DE28C732258BB72957A",
+				"5263EC3D7F5E85BF38460F22",
+			);
+			"developmentRegion" = "en";
+			"knownRegions" = (
+				"en",
+				"Base",
+			);
+			"compatibilityVersion" = "Xcode 14.0";
+			"isa" = "PBXProject";
+			"productRefGroup" = "FBDC4F23F93125BBEEAE800C";
+			"projectDirPath" = "";
+			"attributes" = {
+				"LastUpgradeCheck" = "2600";
+				"BuildIndependentTargetsInParallel" = "YES";
+				"TargetAttributes" = {
+					"48338DE28C732258BB72957A" = {
+						"CreatedOnToolsVersion" = "26.0";
+					};
+					"5263EC3D7F5E85BF38460F22" = {
+						"TestTargetID" = "48338DE28C732258BB72957A";
+						"CreatedOnToolsVersion" = "26.0";
+					};
+				};
+			};
+			"hasScannedForEncodings" = "0";
+			"projectRoot" = "";
+			"mainGroup" = "B28B7AF69320201D1CF206EB";
+		};
+		"DE58E2B17C19600779694943" = {
+			"isa" = "PBXTargetDependency";
+			"target" = "48338DE28C732258BB72957A";
+			"targetProxy" = "D799BAE6088A90139B415FCC";
+		};
+		"388033139935F97DCFECDAC1" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "200202B3E0189B21E1DBA4E5";
+		};
+		"5AF705A9207A9DD3364DC86F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "7638C7BA24A4126BC5039EA5";
+		};
+		"467284EDE20DBAB0C85F1F70" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "B37236A944DF5013746B587B";
+		};
+		"8F8BDBF2721E1A0E45FAA4A7" = {
+			"path" = "ReferenceCatalog";
+			"isa" = "PBXGroup";
+			"children" = (
+				"AEC597CCC28516E52ED551A2",
+				"EF346AD6D4E7E47701B1DC4C",
+				"7638C7BA24A4126BC5039EA5",
+			);
+			"sourceTree" = "<group>";
+		};
+		"AEAE4B28CDFF08F590396BA5" = {
+			"path" = "SunriseAppTests.xctest";
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.cfbundle";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
+		};
+		"118BFC1BD7F8191164EC1F28" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "A674174BCE6CB2E205B8DE7B";
+		};
+		"760FC0729A32694E12BC9FB9" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "00BBB2277B8061F71917B4DB";
+		};
+		"F9A809519AC15D1F2A75FC7E" = {
+			"path" = "MakeupTextureRenderer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"B4BCF3A0D2A9C2618147EA0C" = {
+			"path" = "MakeupTextureGeometryTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"28BE0691E5755C999C2D4014" = {
+			"path" = "Core";
+			"isa" = "PBXGroup";
+			"children" = (
+				"AA93A80688E1C6D74605DA8D",
+				"71407E93971344FFC151D513",
+				"38FF9B2420102D6F286CBF88",
+			);
+			"sourceTree" = "<group>";
+		};
+		"1AC7F6C87C6B78F0AC7DE880" = {
+			"isa" = "XCConfigurationList";
+			"defaultConfigurationIsVisible" = "0";
+			"defaultConfigurationName" = "Release";
+			"buildConfigurations" = (
+				"3325F69FD4DFE6E6674B1361",
+				"BB0D77B08ECB0D21E7974168",
+			);
+		};
+		"7BEE2E6597318E2548E93D3E" = {
+			"path" = "FaceShapeView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C42CEFA28CA243E75B5D3DA1" = {
+			"path" = "LinerOverlayModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"9909AED933CB17E8692EAA5B" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "87BF2D2EF9709D53B6DC6D0E";
+		};
+		"06E4E253B30DEDB244405B20" = {
+			"path" = "EyelinerGeometryTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"F1601274318B8DCA422ED931" = {
+			"path" = "DeviceFaceTrackingChecker.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"38FF9B2420102D6F286CBF88" = {
+			"path" = "AR";
+			"isa" = "PBXGroup";
+			"children" = (
+				"CF45679699AC7CB5E530CA1C",
+				"92EBB7356D813A77140C6444",
+				"EA63C523723545C9DAFDF3BC",
+			);
+			"sourceTree" = "<group>";
+		};
+		"A674174BCE6CB2E205B8DE7B" = {
+			"path" = "FaceShapeResultView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"3445B0A9ADD7794489F23820" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "FE2B5E1913561C0593FD7840";
+		};
+		"C983838886352C1E043DE2F7" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F41BF1094B4CE58A41E950AA";
+		};
+		"314DC6D186608E3225706A28" = {
+			"path" = "PhotoFaceMeasurer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"F83E4FF1665636FA83213151" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "CF45679699AC7CB5E530CA1C";
+		};
+		"6D72E2332D13C1ED4A00C434" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "DAD3B579ADBE7A6A3409A9D8";
+		};
+		"045449C4CDF0CE2EAAA00D42" = {
+			"path" = "LocalSavedLooksStore.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"4D3D248B5F57A2BCC5B92F45" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "7A55B196215C21A4854D69BF";
+		};
+		"A243507A38CDA620F6EA9CFC" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "507F8ABB438F67B20D0A1A2C";
+		};
+		"12A02F902EA495D3DAD7800D" = {
+			"path" = "SavedLooksStoring.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"87BF2D2EF9709D53B6DC6D0E" = {
+			"path" = "EyelinerMappingTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"36E763EDC56C953EA58AFBB1" = {
+			"path" = "LandmarkSpace.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"119AD822ABE98DE2B5B45183" = {
+			"path" = "MakeupTryOnViewModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"86692327C6B7D587C8265F12" = {
+			"path" = "TrackingReadiness.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"9C328A77ED15E907F3EE69B1" = {
+			"path" = "Comparison";
+			"isa" = "PBXGroup";
+			"children" = (
+				"8904D808C7A57AB024FAEFB7",
+			);
+			"sourceTree" = "<group>";
+		};
+		"E700000003AA57EB8DEC364F" = {
+			"path" = "EyelinerPlanner.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"2E1D4D1717EDA3997289816D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "98F393F180238C7106FB99C0";
+		};
+		"7C0E5C02D823502F262C2E96" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "133DCD5B481F352F758A1E3F";
+		};
+		"00C25255FB0A55CD254DAB5C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "EC6DBACE90DF9F4964DBD3ED";
+		};
+		"14E0BA1614926FA5ABDBDC1A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "43A7AA6990D68C43A68511C9";
+		};
+		"D7970414B769573601655292" = {
+			"path" = "Contracts";
+			"isa" = "PBXGroup";
+			"children" = (
+				"EC6DBACE90DF9F4964DBD3ED",
+				"B37236A944DF5013746B587B",
+				"12A02F902EA495D3DAD7800D",
+			);
+			"sourceTree" = "<group>";
+		};
+		"30ACDA4CE4F7397B938416B4" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "26456AF703170C7814098A8E";
+		};
+		"0DCEA34095C8C9C53CE42CE4" = {
+			"path" = "OneEuroFilter.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"CAD7754F69D7C7822BCC4CB4" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "CD73965C5395C3CFB4F69902";
+		};
+		"DAD9D2CF91F6E55477A880CE" = {
+			"path" = "LiveGuide";
+			"isa" = "PBXGroup";
+			"children" = (
+				"BC38DE15F5318E7DBE6A6A6A",
+				"9342DC399ECDC1D13247975B",
+				"19429AD975CE1483E26A2783",
+				"D5689B7EB895DBD27CC6A82F",
+				"DAD3B579ADBE7A6A3409A9D8",
+				"751181284B03C1E6FB6684D2",
+				"AF8D32CBADEAE62284CB8374",
+				"541EF3DA9C3035E1029E3BF3",
+			);
+			"sourceTree" = "<group>";
+		};
+		"AA93A80688E1C6D74605DA8D" = {
+			"path" = "Models";
+			"isa" = "PBXGroup";
+			"children" = (
+				"0D93637BD45D15F776D9F93A",
+				"5F3C4D0A24B6DEC94B862617",
+				"00BBB2277B8061F71917B4DB",
+				"73EEC8668C59A63EE58717BF",
+			);
+			"sourceTree" = "<group>";
+		};
+		"462B790ABA6A17A67726AAFD" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = (
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+		"6C1FEB7D8D56B79BC86D794A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "D7E30CC8B590F5ADA8D7A700";
+		};
+		"B7BB6F6B68833C5517A0E3C2" = {
+			"path" = "PreviewSupport";
+			"isa" = "PBXGroup";
+			"children" = (
+				"E77AFA84C187835C18DD4C98",
+				"F41BF1094B4CE58A41E950AA",
+			);
+			"sourceTree" = "<group>";
+		};
+		"DB800B2849D00487C7191B04" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "4F5841E6C956B66A11234989";
+		};
+		"5EF702E8CB338F9CCD0196D3" = {
+			"path" = "AppTypography.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"66ABECA0E68ED4FBDD399A7A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F0CCC055355A1EC0AF155313";
+		};
+		"792977CAD0396D693A58DE24" = {
+			"path" = "LinerPathBuilder.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E122CD75A643278D498BA4DE" = {
+			"path" = "Navigation";
+			"isa" = "PBXGroup";
+			"children" = (
+				"D529D8EB6F4607AD5BC97B1D",
+			);
+			"sourceTree" = "<group>";
+		};
+		"8665DA9E4FE5F6175CA2AA8F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C4AE33974D71FD4A86072E97";
+		};
+		"4B8B87285CBE34CF457FD716" = {
+			"isa" = "PBXResourcesBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = (
+				"7C0E5C02D823502F262C2E96",
+				"2E1D4D1717EDA3997289816D",
+				"CAD7754F69D7C7822BCC4CB4",
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+		"E28CA8BC201771E861AFEA21" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "19A31E43DAD88366AB1ECB5C";
+		};
+		"E800000032E0F403F6771AC6" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E700000003AA57EB8DEC364F";
+		};
+		"50990270ECCC792E5A17200F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "AF8D32CBADEAE62284CB8374";
+		};
+		"D529D8EB6F4607AD5BC97B1D" = {
+			"path" = "AppNavigatorTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C46FF01BBC0933B3F49A571A" = {
+			"path" = "FaceContourDetector.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"3063A4C8D849393B67C7EA9E" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "3A07AB7461B6903140D1D165";
+		};
+		"DC644578E897C547704A6C5E" = {
+			"path" = "Theme";
+			"isa" = "PBXGroup";
+			"children" = (
+				"C7EC61DDA286A934C9E046A3",
+				"26456AF703170C7814098A8E",
+				"5EF702E8CB338F9CCD0196D3",
+			);
+			"sourceTree" = "<group>";
+		};
+		"D5689B7EB895DBD27CC6A82F" = {
+			"path" = "FaceSurfaceProfile.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C1810A54CE6D4BC94E7F122D" = {
+			"path" = "AppContainer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"174D41F32C12A56708B05987" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E77AFA84C187835C18DD4C98";
+		};
+		"5F3C4D0A24B6DEC94B862617" = {
+			"path" = "MakeupReference.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"3CAF4AC5FE94A9CCBD43461F" = {
+			"path" = "ServiceStubs.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"D078C19892C5D07129B54516" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "0C2A5C04A75A9061E0632676";
+		};
+		"85190E6578A99E0FCFAD9638" = {
+			"path" = "FaceShapeStore.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"44D504415A68844C6C1101A8" = {
+			"path" = "TestSupport";
+			"isa" = "PBXGroup";
+			"children" = (
+				"3CAF4AC5FE94A9CCBD43461F",
+			);
+			"sourceTree" = "<group>";
+		};
+		"E4A9877846F7E14E120A0C25" = {
+			"buildActionMask" = "2147483647";
+			"isa" = "PBXSourcesBuildPhase";
+			"files" = (
+				"E28CA8BC201771E861AFEA21",
+				"7115E09FBA46C990F2D232A2",
+				"5811410751FADBA1C66E1183",
+				"D2B98367701FA4B350BAD3AB",
+				"DB800B2849D00487C7191B04",
+				"D4923AA4BE3BEDAB38682145",
+				"81C6BD9EDD701F40A703E2F6",
+				"760FC0729A32694E12BC9FB9",
+				"E4CAF00BBAA64D3952EDDB1A",
+				"00C25255FB0A55CD254DAB5C",
+				"467284EDE20DBAB0C85F1F70",
+				"54BF7FC5786588B09E8F42EC",
+				"E91A2322FF10D46090575498",
+				"75CDF97E33C22DE197A5DF55",
+				"ACDF3453576FADCFE7CD7EEE",
+				"6C1CB277BF06946BD753FABB",
+				"30ACDA4CE4F7397B938416B4",
+				"F88C4B1A73633332F0DE36C2",
+				"965089157E47007D209C0413",
+				"41A32CF5459F7BA7ED67B290",
+				"4EF7EF1EF1E32DE1D3B45E7A",
+				"513BAB4E537BC7E6398BE794",
+				"91D0BE9D95201FF3451E8D68",
+				"2C53F0CCE66A98AF04B7B2D4",
+				"5AF705A9207A9DD3364DC86F",
+				"97282C821FE1244E279E7756",
+				"7B2C5442D94A8D5854261CCB",
+				"2196E50059A7DF155BD30CD4",
+				"5F3395078FFF3780060850A7",
+				"F69EBE2B5722EEBEF5B9B0A7",
+				"3445B0A9ADD7794489F23820",
+				"FD2E311FC44972331A578843",
+				"174D41F32C12A56708B05987",
+				"C983838886352C1E043DE2F7",
+				"B298E07ED940DDBA94F96CAE",
+				"3F8BDF6874EA48014D3D2619",
+				"3AD655F060E65569625DDA59",
+				"48573999134DD877698BA9F3",
+				"8390F5679DF570C890190E7C",
+				"2B212B32757D21783FE89B2C",
+				"CF8FDEBEDA76C3A34E0A02AF",
+				"E80000003E82AF829A521803",
+				"E800000003D22F33B62A98FD",
+				"685BC99DAFA493FCEB389B85",
+				"E12D0FA8EDEAC708EA387AC1",
+				"F9B2EA3A6046C331C92A991C",
+				"118BFC1BD7F8191164EC1F28",
+				"84EA260CF3F8677288CBD734",
+				"28A2D07D18A74048D374D78E",
+				"A243507A38CDA620F6EA9CFC",
+				"236D9C0C8B7D5C2BB17772D1",
+				"3CCD94BF36631D735AC50DD0",
+				"370710197E3F693AF3786C43",
+				"A1B2C3D4E5F60718293A4B5C",
+				"61802B9A9C3D59B870EFDC76",
+				"0A446418A8546A3886FD1C8C",
+				"144217C9FAD1C040EBD2F294",
+				"D078C19892C5D07129B54516",
+				"BBC1AC7A0CD90B0E7BC75223",
+				"14E0BA1614926FA5ABDBDC1A",
+				"0D4BF23384C86F7A04F21AF1",
+				"984FD73DF3F4DCFF8AB8A6BF",
+				"8C189615D8A8DC30B4B5789D",
+				"CB14CD6B60CC4F8DA016C314",
+				"C8B9433F836C41AA8E942950",
+				"E44486D30307E00936281E51",
+				"7189D665D4AB23779ACB830A",
+				"8A9B3447C705CB2A8F902152",
+				"E80000005D30E5A2A05DAB6C",
+				"E800000032E0F403F6771AC6",
+				"111C7B4BC1597B419627963B",
+				"43FFB232E616855EF7D5438E",
+				"57F069CE67A2ED299049886A",
+				"A1B8254BAD7ABE34EFF29C32",
+				"0BB1180441D5C292FDF1D87B",
+				"388033139935F97DCFECDAC1",
+				"89D16D2755C8D02FB1F5A7D8",
+				"C37D0B4D531BBB231AC8A90A",
+				"94141C2F12528E362C097D97",
+				"C4C3C8FAD6B4703ED8D28504",
+				"21388C21D48CE052BF3392DE",
+				"AF98C397F82E4D7F9517A8E4",
+				"B8EAE5AAE0A46180B2B92BC2",
+				"E8A4161080FEE103C1D2E314",
+				"8665DA9E4FE5F6175CA2AA8F",
+				"8C5FB2BC20E8B4BB996A74A6",
+				"6D72E2332D13C1ED4A00C434",
+				"0A54887C42EAF40544B47EFD",
+				"50990270ECCC792E5A17200F",
+				"033A5C6F22B5AC3CD0D490DB",
+				"F83E4FF1665636FA83213151",
+				"B3C5787F1841D0350274F90E",
+				"743170BAA00CD2471416D456",
+				"5CB96A3A7D31F2FC76679F9C",
+				"AC0A6723DBB80D2189C985C6",
+				"AECE21EC64B858B3E9302E8D",
+				"39F7DA4E369F5B9BE83ECE6D",
+				"14F00DACEF2734E0FB168738",
+				"5BB89CA48CF97ABD604521AF",
+				"24D41B3F4A893C06684C3C07",
+				"41D15C1C9F79A878ABEF7DEE",
+				"46A06406CEEB25CB293B7899",
+				"C9F55A457B8EFEC9E02BD7AA",
+				"3063A4C8D849393B67C7EA9E",
+				"63A3A48CCC399EC783EE5E76",
+				"67129ECB6F6B3907B6557698",
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+		"68347A4A84BC0644A4FE6F07" = {
+			"path" = "EmptyStateView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"EA63C523723545C9DAFDF3BC" = {
+			"path" = "FaceLandmarkProvider.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C8B9433F836C41AA8E942950" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "29017F5C551F928297695BA1";
+		};
+		"D7E30CC8B590F5ADA8D7A700" = {
+			"path" = "ServiceStateTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C5F03830273DCC9E47775164" = {
+			"path" = "EyebrowTrackingPipeline.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"454D9F210C849C41D0E8378C" = {
+			"path" = "FaceMeshARView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"144217C9FAD1C040EBD2F294" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "CEF01F605BF92435DC324B13";
+		};
+		"6BC9DD2E16CE7526E21A93B8" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "57783D5A5FD3B135956ABDC4";
+		};
+		"CD73965C5395C3CFB4F69902" = {
+			"path" = "face_landmarker.task";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "file";
+			"sourceTree" = "<group>";
+		};
+		"3667E0A0C8FB580B1D21C114" = {
+			"isa" = "XCConfigurationList";
+			"defaultConfigurationIsVisible" = "0";
+			"defaultConfigurationName" = "Release";
+			"buildConfigurations" = (
+				"8B63A0393819EF9DE7F2B473",
+				"281FF16EF2B60E76A20BAD7F",
+			);
+		};
+		"2A319A247AA300149353ECC2" = {
+			"path" = "LinerSpec.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"2523D2C8273DE4252AB9D467" = {
+			"path" = "Onboarding";
+			"isa" = "PBXGroup";
+			"children" = (
+				"F40D1704AC0B3B82F035DC3C",
+			);
+			"sourceTree" = "<group>";
+		};
+		"E70000000C39BF83BDEA70CC" = {
+			"path" = "EyeScan.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"4EF7EF1EF1E32DE1D3B45E7A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "79305ED9810D6D771F5FD4DA";
+		};
+		"F8CAFAEACFDE4C0B40A70B11" = {
+			"path" = "FaceShapeClassifierTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"7A55B196215C21A4854D69BF" = {
+			"path" = "MakeupPersonalizationTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"3325F69FD4DFE6E6674B1361" = {
+			"name" = "Debug";
+			"buildSettings" = {
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "$(inherited) DEBUG";
+				"GENERATE_INFOPLIST_FILE" = "YES";
+				"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+				"TEST_HOST" = "$(BUILT_PRODUCTS_DIR)/SunriseApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SunriseApp";
+				"LD_RUNPATH_SEARCH_PATHS" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.sunrise.foundation.tests";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"SUPPORTS_MACCATALYST" = "NO";
+				"BUNDLE_LOADER" = "$(TEST_HOST)";
+				"TARGETED_DEVICE_FAMILY" = "1";
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+			};
+			"isa" = "XCBuildConfiguration";
+		};
+		"F0CCC055355A1EC0AF155313" = {
+			"path" = "MakeupRecommenderTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E404C04285978FF9C7DE242E" = {
+			"path" = "DesignSystem";
+			"isa" = "PBXGroup";
+			"children" = (
+				"9A7281ADAA9F5DD9A22629E5",
+				"DC644578E897C547704A6C5E",
+			);
+			"sourceTree" = "<group>";
+		};
+		"F62FFB0088DC3F46B57C2CA3" = {
+			"path" = "MakeupTryOn";
+			"isa" = "PBXGroup";
+			"children" = (
+				"087F06F4A4D4BC010EF4C720",
+				"507F8ABB438F67B20D0A1A2C",
+				"F4C68DD9443BC3C23BD1DD3F",
+				"DE9F70FB20C8710887FFDCCC",
+				"5CDF09D2EC207E4F4D908C7C",
+				"A1B2C3D4E5F60718293A4B5D",
+				"9396F6A95EDCA8291DBA3E21",
+				"E7000000671282B495B3FED6",
+				"E700000003AA57EB8DEC364F",
+				"7ED8B4D9166DBE43F2B1D643",
+				"F9A809519AC15D1F2A75FC7E",
+				"119AD822ABE98DE2B5B45183",
+				"0DF8905476C966096CB0770C",
+				"CC4E2FA16FB3D83A6DDC1EDB",
+				"200202B3E0189B21E1DBA4E5",
+			);
+			"sourceTree" = "<group>";
+		};
+		"C4ACC8BE3EAE74653E78A54F" = {
+			"path" = "SavedLooksViewModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"B298E07ED940DDBA94F96CAE" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "2C49459039CEAF042E4919F8";
+		};
+		"78BC181F4289544F053C7765" = {
+			"path" = "FaceShape";
+			"isa" = "PBXGroup";
+			"children" = (
+				"2C49459039CEAF042E4919F8",
+				"2F7F9AFC01F64EED1135CF2A",
+				"4A66892916F906242E0EB942",
+				"16A13571086FAC7A101835BA",
+				"C46FF01BBC0933B3F49A571A",
+				"314DC6D186608E3225706A28",
+				"5F6D1A9D904A10807700F875",
+				"E700000020C97B84D2D8442F",
+				"E70000000C39BF83BDEA70CC",
+				"21CE064275C7C47713A1B7F0",
+				"454D9F210C849C41D0E8378C",
+				"7BEE2E6597318E2548E93D3E",
+				"A674174BCE6CB2E205B8DE7B",
+				"85190E6578A99E0FCFAD9638",
+			);
+			"sourceTree" = "<group>";
+		};
+		"3CCD94BF36631D735AC50DD0" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "DE9F70FB20C8710887FFDCCC";
+		};
+		"087F06F4A4D4BC010EF4C720" = {
+			"path" = "MakeupRecommendation.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"F41BF1094B4CE58A41E950AA" = {
+			"path" = "SampleData.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"719471221F004F211C0E7FF8" = {
+			"path" = "FaceShapeDatasetEvalTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"94141C2F12528E362C097D97" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "86692327C6B7D587C8265F12";
+		};
+		"370710197E3F693AF3786C43" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "5CDF09D2EC207E4F4D908C7C";
+		};
+		"6018AF2785A5C14223064FCC" = {
+			"path" = "SunriseAppTests";
+			"isa" = "PBXGroup";
+			"children" = (
+				"A868936FDC1A8D26B1893C4D",
+				"E122CD75A643278D498BA4DE",
+				"44D504415A68844C6C1101A8",
+			);
+			"sourceTree" = "<group>";
+		};
+		"F69EBE2B5722EEBEF5B9B0A7" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C4ACC8BE3EAE74653E78A54F";
+		};
+		"CF9C7F6F108DEC6A46AC8A21" = {
+			"path" = "EyebrowSceneRenderer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"5CDF09D2EC207E4F4D908C7C" = {
+			"path" = "FaceFit.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"28A2D07D18A74048D374D78E" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "087F06F4A4D4BC010EF4C720";
+		};
+		"C37D0B4D531BBB231AC8A90A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F1601274318B8DCA422ED931";
+		};
+		"B2B0023A348FAD79C48161E9" = {
+			"path" = "LookArtwork.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E70000003EEB62383567027B" = {
+			"path" = "EyelinerPlannerTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"71407E93971344FFC151D513" = {
+			"path" = "Services";
+			"isa" = "PBXGroup";
+			"children" = (
+				"D7970414B769573601655292",
+			);
+			"sourceTree" = "<group>";
+		};
+		"BC38DE15F5318E7DBE6A6A6A" = {
+			"path" = "BlushMask.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"7A1EF99F369FF90802A9EE53" = {
+			"path" = "SunriseApp";
+			"isa" = "PBXGroup";
+			"children" = (
+				"B6C4CDC0872398FC76BC80DE",
+				"5F9B8B35ACD4D41DDB5411B9",
+				"28BE0691E5755C999C2D4014",
+				"E404C04285978FF9C7DE242E",
+				"AA362B7C903A0815DDE30B52",
+				"B7BB6F6B68833C5517A0E3C2",
+				"22C1BB35C6F3190923BD2E6B",
+			);
+			"sourceTree" = "<group>";
+		};
+		"F2CC9653DA95040834114EE5" = {
+			"path" = "ReferenceDetailView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"DD56B76AB67D06161485E52A" = {
+			"path" = "ReferenceDetail";
+			"isa" = "PBXGroup";
+			"children" = (
+				"F2CC9653DA95040834114EE5",
+			);
+			"sourceTree" = "<group>";
+		};
+		"57F069CE67A2ED299049886A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "119AD822ABE98DE2B5B45183";
+		};
+		"97282C821FE1244E279E7756" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F2CC9653DA95040834114EE5";
+		};
+		"AF98C397F82E4D7F9517A8E4" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "AEC597CCC28516E52ED551A2";
+		};
+		"C4C3C8FAD6B4703ED8D28504" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "BC38DE15F5318E7DBE6A6A6A";
+		};
+		"AEC597CCC28516E52ED551A2" = {
+			"path" = "BundledReferenceCatalog.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"B37236A944DF5013746B587B" = {
+			"path" = "ReferenceCatalogProviding.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C9F55A457B8EFEC9E02BD7AA" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "57A1B7BFE8B58BFECBF5F3E3";
+		};
+		"39F7DA4E369F5B9BE83ECE6D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "CF9C7F6F108DEC6A46AC8A21";
+		};
+		"178C1E0195A44823A4CD0811" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "719471221F004F211C0E7FF8";
+		};
+		"984FD73DF3F4DCFF8AB8A6BF" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "49C5565CCE7AF4F0C16F9F0A";
+		};
+		"CF45679699AC7CB5E530CA1C" = {
+			"path" = "ARFaceTrackingManager.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E80000003E82AF829A521803" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E700000020C97B84D2D8442F";
+		};
+		"FBDC4F23F93125BBEEAE800C" = {
+			"isa" = "PBXGroup";
+			"name" = "Products";
+			"children" = (
+				"6D795F13C8C22E022040EE00",
+				"AEAE4B28CDFF08F590396BA5",
+			);
+			"sourceTree" = "<group>";
+		};
+		"E800000003D22F33B62A98FD" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E70000000C39BF83BDEA70CC";
+		};
+		"C4208C4BC220C4C631815466" = {
+			"path" = "Tutorial";
+			"isa" = "PBXGroup";
+			"children" = (
+				"13D8455EFF6A75DF7B4631CC",
+				"C4AE33974D71FD4A86072E97",
+				"FE2B5E1913561C0593FD7840",
+				"513CE2D3B12E8EE4EB17E942",
+			);
+			"sourceTree" = "<group>";
+		};
+		"0E7BF5D5F430CF008106DB07" = {
+			"path" = "PhotoFaceMeasurerTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"624D0503EC8FAD9DEB266B14" = {
+			"isa" = "PBXFrameworksBuildPhase";
+			"buildActionMask" = "2147483647";
+			"files" = (
+				"C4A5F9A53088B1E800BFECB0",
+			);
+			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+		"C96E85543600CBE3B51E79C7" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "09018C00875BE2006F222659";
+		};
+		"DAD3B579ADBE7A6A3409A9D8" = {
+			"path" = "MakeupTextureBaker.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"5BB89CA48CF97ABD604521AF" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C5F03830273DCC9E47775164";
+		};
+		"91D0BE9D95201FF3451E8D68" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F40D1704AC0B3B82F035DC3C";
+		};
+		"7189D665D4AB23779ACB830A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "4D6FD918F6AD3EFDBC821053";
+		};
+		"F9B2EA3A6046C331C92A991C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "7BEE2E6597318E2548E93D3E";
+		};
+		"9E2CC9392658B0606CBF7775" = {
+			"path" = "FeaturePlaceholderView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"6C1CB277BF06946BD753FABB" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "C7EC61DDA286A934C9E046A3";
+		};
+		"30D720248C1BB5F42984E722" = {
+			"path" = "ReferenceImport";
+			"isa" = "PBXGroup";
+			"children" = (
+				"787FC7E50E3814ED5F8E71BF",
+			);
+			"sourceTree" = "<group>";
+		};
+		"EC6DBACE90DF9F4964DBD3ED" = {
+			"path" = "FaceTrackingAvailabilityChecking.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"0BB1180441D5C292FDF1D87B" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "CC4E2FA16FB3D83A6DDC1EDB";
+		};
+		"43FFB232E616855EF7D5438E" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F9A809519AC15D1F2A75FC7E";
+		};
+		"EF346AD6D4E7E47701B1DC4C" = {
+			"path" = "ReferenceCatalogView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E4CAF00BBAA64D3952EDDB1A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "73EEC8668C59A63EE58717BF";
+		};
+		"C4A5F9A33088B1E800BFECB0" = {
+			"isa" = "XCRemoteSwiftPackageReference";
+			"repositoryURL" = "https://github.com/google-ai-edge/mediapipe";
+			"requirement" = {
+				"kind" = "branch";
+				"branch" = "master";
+			};
+		};
+		"9E232BE73FECBBF8659C79E7" = {
+			"name" = "Debug";
+			"buildSettings" = {
+				"SWIFT_ACTIVE_COMPILATION_CONDITIONS" = "$(inherited) DEBUG";
+				"CLANG_ENABLE_MODULES" = "YES";
+				"CLANG_ENABLE_OBJC_ARC" = "YES";
+				"DEBUG_INFORMATION_FORMAT" = "dwarf";
+				"IPHONEOS_DEPLOYMENT_TARGET" = "17.0";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "x86_64";
+				"SWIFT_OPTIMIZATION_LEVEL" = "-Onone";
+				"SDKROOT" = "iphoneos";
+				"SWIFT_VERSION" = "5.0";
+				"ENABLE_TESTABILITY" = "YES";
+				"SWIFT_STRICT_CONCURRENCY" = "complete";
+			};
+			"isa" = "XCBuildConfiguration";
+		};
+		"D087DAE48C0672211810B9AA" = {
+			"path" = "Forehead";
+			"isa" = "PBXGroup";
+			"children" = (
+				"CF5B6AFD13E8B16D6706FCDA",
+				"57A1B7BFE8B58BFECBF5F3E3",
+			);
+			"sourceTree" = "<group>";
+		};
+		"61802B9A9C3D59B870EFDC76" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "8B9309B2A6284F76F3E4AD56";
+		};
+		"E8A4161080FEE103C1D2E314" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "13D8455EFF6A75DF7B4631CC";
+		};
+		"D79C719E5AD023220CAF0749" = {
+			"path" = "EyebrowStyle.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"57A1B7BFE8B58BFECBF5F3E3" = {
+			"path" = "ForeheadSceneRenderer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"CEF01F605BF92435DC324B13" = {
+			"path" = "GeometryHelpers.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"2C53F0CCE66A98AF04B7B2D4" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "EF346AD6D4E7E47701B1DC4C";
+		};
+		"AA362B7C903A0815DDE30B52" = {
+			"path" = "Features";
+			"isa" = "PBXGroup";
+			"sourceTree" = "<group>";
+			"children" = (
+				"9C328A77ED15E907F3EE69B1",
+				"B6C90B86F0C4B1D69A248C31",
+				"DAD9D2CF91F6E55477A880CE",
+				"2523D2C8273DE4252AB9D467",
+				"8F8BDBF2721E1A0E45FAA4A7",
+				"DD56B76AB67D06161485E52A",
+				"30D720248C1BB5F42984E722",
+				"6ACE9C80936BA0AA803627E9",
+				"C4208C4BC220C4C631815466",
+				"78BC181F4289544F053C7765",
+				"F62FFB0088DC3F46B57C2CA3",
+				"D86BBF720312D2F3CC3CEEAD",
+				"D087DAE48C0672211810B9AA",
+				"3023F688733753EB734C8BF9",
+			);
+		};
+		"D4923AA4BE3BEDAB38682145" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "0D93637BD45D15F776D9F93A";
+		};
+		"E12D0FA8EDEAC708EA387AC1" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "454D9F210C849C41D0E8378C";
+		};
+		"6D795F13C8C22E022040EE00" = {
+			"path" = "SunriseApp.app";
+			"isa" = "PBXFileReference";
+			"explicitFileType" = "wrapper.application";
+			"sourceTree" = "BUILT_PRODUCTS_DIR";
+		};
+		"C9587CEBB39B613D7953399F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "06E4E253B30DEDB244405B20";
+		};
+		"46A06406CEEB25CB293B7899" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "CF5B6AFD13E8B16D6706FCDA";
+		};
+		"4F5841E6C956B66A11234989" = {
+			"path" = "SunriseApp.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"4A6545BC9255A551C688D4B1" = {
+			"path" = "FaceGuideFlow.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"2B212B32757D21783FE89B2C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "314DC6D186608E3225706A28";
+		};
+		"26456AF703170C7814098A8E" = {
+			"path" = "AppSpacing.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E7000000671282B495B3FED6" = {
+			"path" = "EyeDebugView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"49C5565CCE7AF4F0C16F9F0A" = {
+			"path" = "LinerOverlayRenderer.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"A868936FDC1A8D26B1893C4D" = {
+			"path" = "Features";
+			"isa" = "PBXGroup";
+			"sourceTree" = "<group>";
+			"children" = (
+				"D7E30CC8B590F5ADA8D7A700",
+				"57783D5A5FD3B135956ABDC4",
+				"F8CAFAEACFDE4C0B40A70B11",
+				"0E7BF5D5F430CF008106DB07",
+				"719471221F004F211C0E7FF8",
+				"09018C00875BE2006F222659",
+				"F0CCC055355A1EC0AF155313",
+				"7A55B196215C21A4854D69BF",
+				"B4BCF3A0D2A9C2618147EA0C",
+				"B1B2C3D4E5F60718293A4B5D",
+				"87BF2D2EF9709D53B6DC6D0E",
+				"06E4E253B30DEDB244405B20",
+				"E70000003EEB62383567027B",
+				"E70000007A577EC19F38EF9E",
+				"14857EF32C7DC6CC4325CFA5",
+				"B8A0C7629D5BE6A59E2A595E",
+				"E10F58ECBC93C435DE28667D",
+				"880B8ADAAD4B4CCC9E778686",
+				"BBBD5B695A0CBBC0FF714575",
+			);
+		};
+		"9A7281ADAA9F5DD9A22629E5" = {
+			"path" = "Components";
+			"isa" = "PBXGroup";
+			"children" = (
+				"68347A4A84BC0644A4FE6F07",
+				"9E2CC9392658B0606CBF7775",
+				"B2B0023A348FAD79C48161E9",
+				"8DEEF4BC9014B9B481912D63",
+			);
+			"sourceTree" = "<group>";
+		};
+		"2196E50059A7DF155BD30CD4" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "1FD98450156D781E8A88FB7A";
+		};
+		"787FC7E50E3814ED5F8E71BF" = {
+			"path" = "ReferenceImportView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"21388C21D48CE052BF3392DE" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9342DC399ECDC1D13247975B";
+		};
+		"CDDE58AF819DFCD6735F185F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "B4BCF3A0D2A9C2618147EA0C";
+		};
+		"7115E09FBA46C990F2D232A2" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "EC5645E5A43930BFD723FED7";
+		};
+		"E80000001C043450B0C3F54A" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E70000003EEB62383567027B";
+		};
+		"200202B3E0189B21E1DBA4E5" = {
+			"path" = "MakeupTryOnView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"A1B8254BAD7ABE34EFF29C32" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "0DF8905476C966096CB0770C";
+		};
+		"B8EAE5AAE0A46180B2B92BC2" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "045449C4CDF0CE2EAAA00D42";
+		};
+		"48573999134DD877698BA9F3" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "16A13571086FAC7A101835BA";
+		};
+		"236D9C0C8B7D5C2BB17772D1" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "F4C68DD9443BC3C23BD1DD3F";
+		};
+		"B1B2C3D4E5F60718293A4B5C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "B1B2C3D4E5F60718293A4B5D";
+		};
+		"3A07AB7461B6903140D1D165" = {
+			"path" = "BlushPlacementGuide.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"29017F5C551F928297695BA1" = {
+			"path" = "LinerSolution.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C7EC61DDA286A934C9E046A3" = {
+			"path" = "AppColors.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"614471660AA131A99883C67C" = {
+			"isa" = "XCConfigurationList";
+			"defaultConfigurationIsVisible" = "0";
+			"defaultConfigurationName" = "Release";
+			"buildConfigurations" = (
+				"9E232BE73FECBBF8659C79E7",
+				"95126388EE2677EABF3CF99B",
+			);
+		};
+		"13D8455EFF6A75DF7B4631CC" = {
+			"path" = "MakeupSessionView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"C4AE33974D71FD4A86072E97" = {
+			"path" = "TutorialInstructions.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"9D7729D7358DFFF14FC0325A" = {
+			"path" = "EyebrowGuideGenerator.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"541EF3DA9C3035E1029E3BF3" = {
+			"path" = "LiveGuideDiagnostics.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"72DD7AF42DF88A4779FE0BB5" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "14857EF32C7DC6CC4325CFA5";
+		};
+		"B28B7AF69320201D1CF206EB" = {
+			"isa" = "PBXGroup";
+			"sourceTree" = "<group>";
+			"children" = (
+				"7A1EF99F369FF90802A9EE53",
+				"6018AF2785A5C14223064FCC",
+				"FBDC4F23F93125BBEEAE800C",
+			);
+		};
+		"528DBE5F90FFAE037040249C" = {
+			"path" = "MakeupPreferences.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"57783D5A5FD3B135956ABDC4" = {
+			"path" = "TutorialViewModelTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"75CDF97E33C22DE197A5DF55" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9E2CC9392658B0606CBF7775";
+		};
+		"281FF16EF2B60E76A20BAD7F" = {
+			"name" = "Release";
+			"buildSettings" = {
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+				"GENERATE_INFOPLIST_FILE" = "NO";
+				"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+				"LD_RUNPATH_SEARCH_PATHS" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"INFOPLIST_FILE" = "SunriseApp/Configuration/Info.plist";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.sunrise.foundation";
+				"SUPPORTS_MACCATALYST" = "NO";
+				"SWIFT_EMIT_LOC_STRINGS" = "YES";
+				"DEVELOPMENT_TEAM" = "WP97CT3PT7";
+				"TARGETED_DEVICE_FAMILY" = "1";
+			};
+			"isa" = "XCBuildConfiguration";
+		};
+		"67129ECB6F6B3907B6557698" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "528DBE5F90FFAE037040249C";
+		};
+		"929EC20AE526B170AB21CE88" = {
+			"path" = "EyebrowOverlayView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"5263EC3D7F5E85BF38460F22" = {
+			"productType" = "com.apple.product-type.bundle.unit-test";
+			"productReference" = "AEAE4B28CDFF08F590396BA5";
+			"buildConfigurationList" = "1AC7F6C87C6B78F0AC7DE880";
+			"productName" = "SunriseAppTests";
+			"isa" = "PBXNativeTarget";
+			"buildPhases" = (
+				"534FEB0549600234AAE09DB0",
+				"462B790ABA6A17A67726AAFD",
+				"918D048E2D5158FF62BC656E",
+			);
+			"dependencies" = (
+				"DE58E2B17C19600779694943",
+			);
+			"name" = "SunriseAppTests";
+			"buildRules" = (
+			);
+		};
+		"743170BAA00CD2471416D456" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "EA63C523723545C9DAFDF3BC";
+		};
+		"685BC99DAFA493FCEB389B85" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "21CE064275C7C47713A1B7F0";
+		};
+		"256F015F65C61FE4DD9B6591" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "BBBD5B695A0CBBC0FF714575";
+		};
+		"B6C90B86F0C4B1D69A248C31" = {
+			"path" = "FaceCalibration";
+			"isa" = "PBXGroup";
+			"children" = (
+				"F1601274318B8DCA422ED931",
+				"F8BC42C353CA045B4AC94AF5",
+				"79305ED9810D6D771F5FD4DA",
+				"86692327C6B7D587C8265F12",
+			);
+			"sourceTree" = "<group>";
+		};
+		"5F6D1A9D904A10807700F875" = {
+			"path" = "FaceShapeClassifier.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"231A9D8B5701EDA4305C3266" = {
+			"path" = "EyeLandmarks.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"BBC1AC7A0CD90B0E7BC75223" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "36E763EDC56C953EA58AFBB1";
+		};
+		"0C2A5C04A75A9061E0632676" = {
+			"path" = "ImageToViewMapping.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"CB14CD6B60CC4F8DA016C314" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "2A319A247AA300149353ECC2";
+		};
+		"B8A0C7629D5BE6A59E2A595E" = {
+			"path" = "TrackingReadinessTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"E44486D30307E00936281E51" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "EB847F5E015413B5B6CDA3FB";
+		};
+		"14857EF32C7DC6CC4325CFA5" = {
+			"path" = "LocalSavedLooksStoreTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"9342DC399ECDC1D13247975B" = {
+			"path" = "FaceCameraState.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"1FD98450156D781E8A88FB7A" = {
+			"path" = "SavedLookDetailView.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"033A5C6F22B5AC3CD0D490DB" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "541EF3DA9C3035E1029E3BF3";
+		};
+		"EC5645E5A43930BFD723FED7" = {
+			"path" = "AppRoute.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"3F8BDF6874EA48014D3D2619" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "2F7F9AFC01F64EED1135CF2A";
+		};
+		"513BAB4E537BC7E6398BE794" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "19429AD975CE1483E26A2783";
+		};
+		"751181284B03C1E6FB6684D2" = {
+			"path" = "SurfaceAttachment.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"79305ED9810D6D771F5FD4DA" = {
+			"path" = "FaceCalibrationViewModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"BB0D77B08ECB0D21E7974168" = {
+			"isa" = "XCBuildConfiguration";
+			"buildSettings" = {
+				"GENERATE_INFOPLIST_FILE" = "YES";
+				"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+				"TEST_HOST" = "$(BUILT_PRODUCTS_DIR)/SunriseApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/SunriseApp";
+				"LD_RUNPATH_SEARCH_PATHS" = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"PRODUCT_BUNDLE_IDENTIFIER" = "com.sunrise.foundation.tests";
+				"CODE_SIGN_STYLE" = "Automatic";
+				"SUPPORTS_MACCATALYST" = "NO";
+				"BUNDLE_LOADER" = "$(TEST_HOST)";
+				"PRODUCT_NAME" = "$(TARGET_NAME)";
+				"TARGETED_DEVICE_FAMILY" = "1";
+			};
+			"name" = "Release";
+		};
+		"965089157E47007D209C0413" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "8904D808C7A57AB024FAEFB7";
+		};
+		"F4C68DD9443BC3C23BD1DD3F" = {
+			"path" = "MakeupPlan.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"09018C00875BE2006F222659" = {
+			"path" = "HeadPoseTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"A1B2C3D4E5F60718293A4B5C" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "A1B2C3D4E5F60718293A4B5D";
+		};
+		"0BDB05D65645A9D73C294F55" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "D529D8EB6F4607AD5BC97B1D";
+		};
+		"6A8BAEAF8AB95FED113534A6" = {
+			"path" = "EyebrowViewModel.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"8A9B3447C705CB2A8F902152" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "0DCEA34095C8C9C53CE42CE4";
+		};
+		"F88C4B1A73633332F0DE36C2" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "5EF702E8CB338F9CCD0196D3";
+		};
+		"2D140CF26E79A04B1482A674" = {
+			"path" = "Info.plist";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text.plist.xml";
+			"sourceTree" = "<group>";
+		};
+		"E8000000257DD8D4770AABC1" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "E70000007A577EC19F38EF9E";
+		};
+		"7B2C5442D94A8D5854261CCB" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "787FC7E50E3814ED5F8E71BF";
+		};
+	};
+	"rootObject" = "98F54143AB4E86B28C3AFEE0";
+}
