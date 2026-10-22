@@ -163,6 +163,17 @@ final class EyelinerMappingTests: XCTestCase {
                                  receivedAt: receivedAt)
     }
 
+    func testInkIsCharcoalNotFlatBlack() {
+        let black = LinerOverlayRenderer.ink(MakeupPalette.black)
+        XCTAssertGreaterThan(black.red, 0.1, "Multiplied over skin, the liner keeps a little of the light and the skin's tint")
+        XCTAssertLessThan(black.red, 0.3)
+        for shade in MakeupPalette.shades(for: .eyeliner) {
+            let ink = LinerOverlayRenderer.ink(shade)
+            XCTAssertGreaterThanOrEqual(ink.red, shade.red)
+            XCTAssertLessThan(ink.red, 1)
+        }
+    }
+
     func testFillsFollowShadeIntensityAndAge() throws {
         let frame = try overlayFrame()
         let black = MakeupPalette.black
@@ -171,6 +182,8 @@ final class EyelinerMappingTests: XCTestCase {
         XCTAssertEqual(full[0].alpha, min(MakeupTextureRenderer.drawnOpacity(black), LinerOverlayRenderer.maxOpacity), accuracy: 1e-9)
         XCTAssertLessThan(full[0].alpha, 1, "Some skin always shows through")
         XCTAssertTrue(LinerOverlayRenderer.blurRange.contains(full[0].blur), "The edge is softened to match the video")
+        XCTAssertLessThan(full[0].haloAlpha, full[0].alpha / 2, "The bleed under the liner is faint")
+        XCTAssertGreaterThan(full[0].haloBlur, full[0].blur * 2, "and wider than the liner's own edge")
         let half = LinerOverlayRenderer.fills(frame, shade: black, intensity: 0.5, now: 100.1)
         XCTAssertEqual(half[0].alpha, full[0].alpha / 2, accuracy: 1e-9)
         XCTAssertTrue(LinerOverlayRenderer.fills(frame, shade: black, intensity: 0, now: 100.1).isEmpty)

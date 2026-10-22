@@ -204,9 +204,15 @@ struct LinerOverlayView: View {
         GeometryReader { proxy in
             Canvas { context, _ in
                 guard isVisible, let frame = model.frame, let shade = model.shade else { return }
-                let color = Color(red: shade.red, green: shade.green, blue: shade.blue)
+                let ink = LinerOverlayRenderer.ink(shade)
+                let color = Color(red: ink.red, green: ink.green, blue: ink.blue)
                 context.drawLayer { layer in
                     for fill in LinerOverlayRenderer.fills(frame, shade: shade, intensity: model.intensity) {
+                        // The faint bleed first, then the liner on top of it.
+                        layer.drawLayer { bleed in
+                            bleed.addFilter(.blur(radius: fill.haloBlur))
+                            bleed.fill(Path(fill.path), with: .color(color.opacity(fill.haloAlpha)), style: FillStyle(eoFill: false))
+                        }
                         layer.drawLayer { liner in
                             liner.addFilter(.blur(radius: fill.blur))
                             liner.fill(Path(fill.path), with: .color(color.opacity(fill.alpha)), style: FillStyle(eoFill: false))
@@ -231,6 +237,9 @@ struct LinerOverlayView: View {
                     }
                 }
             }
+            // Multiply over the camera picture, like ink: the skin's texture, shading and light show through the liner
+            // instead of a flat colour sitting on top of it.
+            .blendMode(.multiply)
             .overlay { landmarkDots }
             .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }
         }
