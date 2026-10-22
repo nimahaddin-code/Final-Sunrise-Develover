@@ -2,7 +2,7 @@ import XCTest
 @testable import SunriseApp
 
 /// Eyes drawn as ellipses so every expected number is known exactly. Coordinates: x to the right, y up, face upright.
-private struct SyntheticEyes {
+struct SyntheticEyes {
     var width: Float = 30
     var openness: Float = 0.3
     /// Degrees; positive lifts the outer corners.
@@ -114,24 +114,25 @@ final class EyeMeasurerTests: XCTestCase {
     // MARK: MediaPipe mesh mapping
 
     /// Puts the synthetic eyes where MediaPipe's topology expects them, in normalized image coordinates.
-    private func mesh(of landmarks: EyeLandmarks, imageSize: SIMD2<Float>) -> [SIMD2<Float>] {
+    private func mesh(of landmarks: EyeLandmarks, imageSize: SIMD2<Float>, irisRingsSwapped: Bool = false) -> [SIMD2<Float>] {
         var points = [SIMD2<Float>](repeating: SIMD2(0.5, 0.5), count: EyeLandmarks.MeshIndex.pointCount)
-        func place(_ eye: EyeLandmarks.Eye, at index: EyeLandmarks.MeshIndex.Eye) {
+        func place(_ eye: EyeLandmarks.Eye, at index: EyeLandmarks.MeshIndex.Eye, irisRing: [Int]) {
             points[index.inner] = eye.innerCorner / imageSize
             points[index.outer] = eye.outerCorner / imageSize
             for (i, point) in zip(index.lid, eye.lid) { points[i] = point / imageSize }
-            for (i, point) in zip(index.iris, eye.iris) { points[i] = point / imageSize }
+            for (i, point) in zip(irisRing, eye.iris) { points[i] = point / imageSize }
             for (i, point) in zip(index.brow, eye.brow) { points[i] = point / imageSize }
         }
-        place(landmarks.first, at: EyeLandmarks.MeshIndex.personRight)
-        place(landmarks.second, at: EyeLandmarks.MeshIndex.personLeft)
+        let rings = EyeLandmarks.MeshIndex.irisRings
+        place(landmarks.first, at: EyeLandmarks.MeshIndex.personRight, irisRing: irisRingsSwapped ? rings[1] : rings[0])
+        place(landmarks.second, at: EyeLandmarks.MeshIndex.personLeft, irisRing: irisRingsSwapped ? rings[0] : rings[1])
         return points
     }
 
     func testMeshIndicesAreDistinctAndInRange() {
         let all = [EyeLandmarks.MeshIndex.personRight, EyeLandmarks.MeshIndex.personLeft].flatMap {
-            [$0.inner, $0.outer] + $0.lid + $0.iris + $0.brow
-        }
+            [$0.inner, $0.outer] + $0.lid + $0.brow
+        } + EyeLandmarks.MeshIndex.irisRings.flatMap { $0 }
         XCTAssertEqual(Set(all).count, all.count, "no index is used twice")
         XCTAssertTrue(all.allSatisfy { (0..<EyeLandmarks.MeshIndex.pointCount).contains($0) })
     }
@@ -150,12 +151,40 @@ final class EyeMeasurerTests: XCTestCase {
         XCTAssertEqual(viaMesh.lidSpace, direct.lidSpace, accuracy: 1e-3)
     }
 
+    func testIrisRingsGoToTheNearestEyeWhicheverRingIsWhichSide() throws {
+        let eyes = SyntheticEyes(lidPointCount: 14, browPointCount: 5).landmarks()
+        let size = SIMD2<Float>(720, 1280)
+        let direct = try XCTUnwrap(EyeMeasurer.measure(eyes))
+        for swapped in [false, true] {
+            let fromMesh = try XCTUnwrap(EyeLandmarks(normalizedMesh: mesh(of: eyes, imageSize: size, irisRingsSwapped: swapped),
+                                                      imageSize: size))
+            XCTAssertEqual(try XCTUnwrap(EyeMeasurer.measure(fromMesh)).lidSpace, direct.lidSpace, accuracy: 1e-3,
+                           "iris diameter, and so lidSpace, is only right if each eye got its own ring (swapped: \(swapped))")
+        }
+    }
+
     func testMeshWithoutIrisPointsIsRejected() {
         let eyes = SyntheticEyes(lidPointCount: 14, browPointCount: 5).landmarks()
         let size = SIMD2<Float>(720, 1280)
         let faceOnly = Array(mesh(of: eyes, imageSize: size).prefix(468))
         XCTAssertNil(EyeLandmarks(normalizedMesh: faceOnly, imageSize: size))
         XCTAssertNil(EyeLandmarks(normalizedMesh: mesh(of: eyes, imageSize: size), imageSize: .zero))
+    }
+
+    func testHeadTurnIsZeroWhenFacingTheCameraAndGrowsAsTheNoseShifts() throws {
+        let eyes = SyntheticEyes(lidPointCount: 14, browPointCount: 5).landmarks()
+        let size = SIMD2<Float>(720, 1280)
+        var points = mesh(of: eyes, imageSize: size)
+        XCTAssertNil(try XCTUnwrap(EyeLandmarks(normalizedMesh: points, imageSize: size)).headTurn, "no nose or face edges yet")
+
+        points[EyeLandmarks.MeshIndex.faceEdgeRight] = SIMD2(0.3, 0.5)
+        points[EyeLandmarks.MeshIndex.faceEdgeLeft] = SIMD2(0.7, 0.5)
+        points[EyeLandmarks.MeshIndex.noseTip] = SIMD2(0.5, 0.55)
+        XCTAssertEqual(try XCTUnwrap(EyeLandmarks(normalizedMesh: points, imageSize: size)).headTurn ?? 1, 0, accuracy: 1e-4)
+
+        points[EyeLandmarks.MeshIndex.noseTip] = SIMD2(0.56, 0.55)
+        let turned = try XCTUnwrap(EyeLandmarks(normalizedMesh: points, imageSize: size)).headTurn
+        XCTAssertEqual(try XCTUnwrap(turned), 0.3, accuracy: 1e-3, "nose 65% of the way across, so 30% toward the left edge")
     }
 
     // MARK: Sampler

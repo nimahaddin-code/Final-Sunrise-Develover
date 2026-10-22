@@ -85,6 +85,17 @@
 		44431B838956C0B3B1E95ABB /* EyeShapeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */; };
 		1ABF13B48BB7A217862917C2 /* EyeMeasurerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */; };
 		1A5307ED011AADB5879ED95C /* EyeShapeClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */; };
+		CDF83FD989E60F210402362D /* MediaPipeEyeDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A67639F74080F56C5AA328F /* MediaPipeEyeDetector.swift */; };
+		53C9EFC6D892AA68BFCC8C92 /* EyeCameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676226E236A23E238E3B1C77 /* EyeCameraSession.swift */; };
+		8344B16103485A1C292BE01E /* MediaPipeEyeDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */; };
+		4FC2D031C41885221C25F6AA /* face_landmarker.task in Resources */ = {isa = PBXBuildFile; fileRef = 01F40072E3CF347862554017 /* face_landmarker.task */; };
+		55C8DD2C95B58EFD9E5AFE38 /* EyeScanGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A37DFE702393E0FA6C8BBC2 /* EyeScanGuide.swift */; };
+		36702EAD50B5B6386984383D /* EyeScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A299E490BBED2CF3DFC8DF07 /* EyeScanViewModel.swift */; };
+		531B53A829A58820D8D01370 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413DF4F73EF8C9FCD698014E /* CameraPreviewView.swift */; };
+		933BAE1CA6ED3B8C9B1D09A9 /* EyeScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */; };
+		39DA0A61353314B90D4BDCC7 /* EyeShapeResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */; };
+		D7450C847008FD8A42518AA1 /* EyeAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */; };
+		07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -178,6 +189,17 @@
 		544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeClassifier.swift; sourceTree = "<group>"; };
 		CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeMeasurerTests.swift; sourceTree = "<group>"; };
 		CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeClassifierTests.swift; sourceTree = "<group>"; };
+		8A67639F74080F56C5AA328F /* MediaPipeEyeDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeDetector.swift; sourceTree = "<group>"; };
+		676226E236A23E238E3B1C77 /* EyeCameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeCameraSession.swift; sourceTree = "<group>"; };
+		FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeDetectorTests.swift; sourceTree = "<group>"; };
+		01F40072E3CF347862554017 /* face_landmarker.task */ = {isa = PBXFileReference; lastKnownFileType = file; path = face_landmarker.task; sourceTree = "<group>"; };
+		3A37DFE702393E0FA6C8BBC2 /* EyeScanGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanGuide.swift; sourceTree = "<group>"; };
+		A299E490BBED2CF3DFC8DF07 /* EyeScanViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanViewModel.swift; sourceTree = "<group>"; };
+		413DF4F73EF8C9FCD698014E /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanView.swift; sourceTree = "<group>"; };
+		6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeResultView.swift; sourceTree = "<group>"; };
+		2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeAnalysis.swift; sourceTree = "<group>"; };
+		3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +235,7 @@
 			children = (
 				133DCD5B481F352F758A1E3F /* Assets.xcassets */,
 				98F393F180238C7106FB99C0 /* Localizable.xcstrings */,
+				01F40072E3CF347862554017 /* face_landmarker.task */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -355,6 +378,8 @@
 				F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */,
 				CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */,
 				CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */,
+				FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */,
+				3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */,
 				0E7BF5D5F430CF008106DB07 /* PhotoFaceMeasurerTests.swift */,
 				719471221F004F211C0E7FF8 /* FaceShapeDatasetEvalTests.swift */,
 				09018C00875BE2006F222659 /* HeadPoseTests.swift */,
@@ -529,6 +554,14 @@
 				396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */,
 				9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */,
 				544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */,
+				8A67639F74080F56C5AA328F /* MediaPipeEyeDetector.swift */,
+				676226E236A23E238E3B1C77 /* EyeCameraSession.swift */,
+				3A37DFE702393E0FA6C8BBC2 /* EyeScanGuide.swift */,
+				A299E490BBED2CF3DFC8DF07 /* EyeScanViewModel.swift */,
+				413DF4F73EF8C9FCD698014E /* CameraPreviewView.swift */,
+				FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */,
+				6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */,
+				2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */,
 			);
 			path = EyeShape;
 			sourceTree = "<group>";
@@ -621,6 +654,7 @@
 			files = (
 				7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */,
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
+				4FC2D031C41885221C25F6AA /* face_landmarker.task in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -645,6 +679,8 @@
 				9BBFBF26B88D5A1CB066AA9D /* FaceShapeClassifierTests.swift in Sources */,
 				1ABF13B48BB7A217862917C2 /* EyeMeasurerTests.swift in Sources */,
 				1A5307ED011AADB5879ED95C /* EyeShapeClassifierTests.swift in Sources */,
+				8344B16103485A1C292BE01E /* MediaPipeEyeDetectorTests.swift in Sources */,
+				07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */,
 				6A5998FB4332B2D926ADD348 /* PhotoFaceMeasurerTests.swift in Sources */,
 				178C1E0195A44823A4CD0811 /* FaceShapeDatasetEvalTests.swift in Sources */,
 				C96E85543600CBE3B51E79C7 /* HeadPoseTests.swift in Sources */,
@@ -703,6 +739,14 @@
 				7949BB244D59EAC66163BCBF /* EyeMeasurer.swift in Sources */,
 				B4A68F2B3FF0993A80DC8193 /* EyeShapeResult.swift in Sources */,
 				44431B838956C0B3B1E95ABB /* EyeShapeClassifier.swift in Sources */,
+				CDF83FD989E60F210402362D /* MediaPipeEyeDetector.swift in Sources */,
+				53C9EFC6D892AA68BFCC8C92 /* EyeCameraSession.swift in Sources */,
+				55C8DD2C95B58EFD9E5AFE38 /* EyeScanGuide.swift in Sources */,
+				36702EAD50B5B6386984383D /* EyeScanViewModel.swift in Sources */,
+				531B53A829A58820D8D01370 /* CameraPreviewView.swift in Sources */,
+				933BAE1CA6ED3B8C9B1D09A9 /* EyeScanView.swift in Sources */,
+				39DA0A61353314B90D4BDCC7 /* EyeShapeResultView.swift in Sources */,
+				D7450C847008FD8A42518AA1 /* EyeAnalysis.swift in Sources */,
 				685BC99DAFA493FCEB389B85 /* FaceShapeViewModel.swift in Sources */,
 				E12D0FA8EDEAC708EA387AC1 /* FaceMeshARView.swift in Sources */,
 				F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */,
@@ -804,6 +848,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_TESTABILITY = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -819,6 +864,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_TESTABILITY = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_STRICT_CONCURRENCY = complete;

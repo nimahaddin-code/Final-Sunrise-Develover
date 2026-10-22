@@ -4,6 +4,7 @@ import SwiftUI
 struct MakeupRecommendationsView: View {
     @ObservedObject var store: FaceShapeStore
     var onScanFace: () -> Void
+    var onScanEyes: () -> Void = {}
     /// A shape the user picked instead of the scanned one; cleared by a new scan.
     @State private var chosenShape: FaceShape?
 
@@ -49,6 +50,8 @@ struct MakeupRecommendationsView: View {
                 }
             }
             .listRowBackground(AppColors.card)
+            Section { eyeCard }
+                .listRowBackground(AppColors.card)
             ForEach(MakeupCategory.allCases) { category in
                 Section {
                     let items = plan.recommendations(in: category)
@@ -68,6 +71,33 @@ struct MakeupRecommendationsView: View {
             }
         }
         .scrollContentBackground(.hidden)
+    }
+
+    /// The eye scan result, or an invitation to scan. The eye shape is shown but does not change the styles yet.
+    @ViewBuilder private var eyeCard: some View {
+        if let eyes = store.eyes {
+            VStack(alignment: .leading, spacing: AppSpacing.small) {
+                HStack(spacing: AppSpacing.medium) {
+                    Image(systemName: "eye").font(.title).foregroundStyle(AppColors.rose).accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: AppSpacing.small / 2) {
+                        Text("Your eye shape").font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                        Text("\(Text(eyes.openness.title)) · \(Text(eyes.tilt.title)) · \(Text(eyes.spacing.title))")
+                            .font(AppTypography.heading)
+                        if let lid = eyes.lid {
+                            Text(lid.title).font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                        }
+                    }
+                }
+                .accessibilityElement(children: .combine)
+                Button("Scan eyes again", action: onScanEyes)
+                    .font(AppTypography.caption).foregroundStyle(AppColors.rose).buttonStyle(.plain)
+            }
+            .padding(.vertical, AppSpacing.small)
+        } else {
+            Button(action: onScanEyes) {
+                Label("Scan your eye shape", systemImage: "eye").font(.headline).foregroundStyle(AppColors.rose)
+            }
+        }
     }
 
     private func badge(for recommendation: MakeupRecommendation,

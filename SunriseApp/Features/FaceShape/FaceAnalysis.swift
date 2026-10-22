@@ -2,6 +2,7 @@ import ARKit
 import CoreGraphics
 import Foundation
 import ImageIO
+import SwiftUI
 
 /// Entry point for face shape analysis. Other features should use only what is here, plus the result types
 /// `FaceShape` and `FaceShapeResult`, instead of calling the measurers or the classifier directly.
@@ -21,9 +22,10 @@ enum FaceAnalysis {
     static var isLiveScanSupported: Bool { ARFaceTrackingConfiguration.isSupported }
 
     /// The live scan screen. It handles camera permission, guidance and the result sheet, and writes the result
-    /// to `store`. `onFinish` runs when the person taps through to their makeup recommendations.
-    @MainActor static func scanScreen(store: FaceShapeStore, onFinish: @escaping () -> Void = {}) -> FaceShapeView {
-        FaceShapeView(store: store, onShowMakeup: onFinish)
+    /// to `store`. `onFinish` runs when the person taps the result's main button, labelled `continueTitle`.
+    @MainActor static func scanScreen(store: FaceShapeStore, continueTitle: LocalizedStringKey = "Try on recommended makeup",
+                                      onFinish: @escaping () -> Void = {}) -> FaceShapeView {
+        FaceShapeView(store: store, onShowMakeup: onFinish, continueTitle: continueTitle)
     }
 
     /// The live scan without UI. Show `session` in an AR view, call `start()`, and read `phase` for progress,

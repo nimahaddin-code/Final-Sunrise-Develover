@@ -58,7 +58,7 @@ SunriseApp/
     MakeupTryOn/          makeup recommendations and live AR try-on
     Onboarding/           welcome screen, then the face scan
     EyeShape/             eye shape (openness, tilt, spacing) from MediaPipe landmarks. In progress: measuring and classifying are done and tested,
-                          the camera, MediaPipe detector and UI are not built yet
+                          the scan screen, onboarding step, home card and Try On route exist; not yet checked on a real face
     ReferenceCatalog/ ReferenceDetail/ ReferenceImport/ FaceCalibration/ Tutorial/ LiveGuide/ Comparison/ SavedLooks/
                           scaffold features: mostly placeholder UI on mock data
   PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
@@ -125,11 +125,30 @@ FaceShapeStore(latest: result)                      // in-memory store for previ
 
 ### Eye shape — `Features/EyeShape` (in progress)
 
-Pure logic so far, tested without a camera or MediaPipe. The detector, camera session, scan screen and onboarding step come next
-(plan: `Docs/Decisions/0002-mediapipe-eye-scan.md`).
+Everything is built; nothing has been run on a real face yet (the Simulator has no camera, so the scan screen shows "unavailable" there).
+Plan and decisions: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
 
-- `EyeLandmarks`: plain 2D eye points. `EyeLandmarks(normalizedMesh:imageSize:)` maps MediaPipe's 478-point mesh using its published
-  indices (`MeshIndex`); **those indices still have to be checked against a real scan on a device**.
+- Entry point: `EyeAnalysis.scanScreen(store:continueTitle:onFinish:)` returns `EyeScanView`. It writes `FaceShapeStore.eyes`
+  (kept in `UserDefaults` under its own key, separate from the face shape) and leaves the ARKit session alone; `FaceShapeView` stops it
+  before its `onShowMakeup` runs.
+- Flow: onboarding is welcome, face scan (its result button reads "Next: scan your eyes"), eye scan, then home. Skip leaves only the
+  current step. The Try On home shows an eye card ("Scan your eye shape" or the result, with "Scan eyes again") through `AppRoute.eyeScan`.
+- `EyeScanViewModel`: phases idle / unavailable / cameraDenied / failed / scanning / finished. It takes 30 good frames (`EyeScanGuide`
+  rejects too far or close, turned head, closed eyes), classifies their median and stops the camera. The result sheet asks which eyelid
+  the person has (`EyeLid`, optional).
+- The eye shape is shown on the home screen but does **not** change the makeup recommendations yet.
+- On devices without TrueDepth the face scan is unavailable, and the home screen still needs a face shape before it shows anything, so
+  those users only reach the eye scan from onboarding.
+
+- `EyeLandmarks`: plain 2D eye points. `EyeLandmarks(normalizedMesh:imageSize:)` maps MediaPipe's 478-point mesh (`MeshIndex`). The eye
+  outlines are checked against MediaPipe's own tables in `MediaPipeEyeDetectorTests`; the brow rows and the iris-to-eye assignment (done
+  by distance, because MediaPipe's iOS right-iris table returns the left ring) are not, so **check them on a real scan on a device**.
+  `headTurn` (0 facing the camera, 1 nose over a face edge) is for gating frames; its limit is still to be chosen on a device.
+- `MediaPipeEyeDetector`: the only file that imports MediaPipe. Wraps Face Landmarker in video mode; `detect(pixelBuffer:timestampMs:)`
+  wants upright BGRA frames in increasing time order from one serial queue. The model is `Resources/face_landmarker.task`, bundled, never downloaded.
+- `EyeCameraSession`: front `AVCaptureSession` delivering upright BGRA frames off the main thread. Stop the ARKit face session
+  (`FaceShapeViewModel.stop()`) before `start()`; the two must not run together. It only checks camera permission, the mesh scan asks for it.
+- The Simulator build is arm64 only (`EXCLUDED_ARCHS[sdk=iphonesimulator*] = x86_64`): MediaPipe has no Intel-Simulator slice.
 - `EyeMeasurer.measure(_:)` gives `EyeMeasurements` (openness, tilt, spacing, lidSpace in iris diameters). It derives the face's own axes
   from the points, so roll, scale, mirroring and y-down images do not matter. `EyeMeasurementsSampler` takes the per-field median and skips blinks.
 - `EyeShapeClassifier` turns measurements into `EyeShapeResult` (`EyeOpenness`, `EyeTilt`, `EyeSpacing`, `mayBeHooded`, `confidence`). The eyelid

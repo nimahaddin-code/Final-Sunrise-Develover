@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FaceShapeResultView: View {
     let result: FaceShapeResult
+    var continueTitle: LocalizedStringKey = "Try on recommended makeup"
     var onScanAgain: () -> Void
     var onShowMakeup: (() -> Void)?
 
@@ -26,7 +27,7 @@ struct FaceShapeResultView: View {
                 Text("An estimate from ARKit's face mesh, not a professional assessment. Only the face shape result is kept on this device; no photos are saved or uploaded.")
                     .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
                 if let onShowMakeup {
-                    PrimaryButton(title: "Try on recommended makeup", action: onShowMakeup)
+                    PrimaryButton(title: continueTitle, action: onShowMakeup)
                     Button("Scan again", action: onScanAgain)
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 44)
                 } else {

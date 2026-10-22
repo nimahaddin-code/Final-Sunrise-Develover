@@ -21,7 +21,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
-	<string>The front camera is used to track your face and estimate your face shape. Only the resulting face shape is kept on this device; no images are saved or uploaded.</string>
+	<string>The front camera is used to track your face and estimate your face and eye shape. Only the resulting shapes are kept on this device; no images are saved or uploaded.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Lets you save photos of your makeup try-on to your library.</string>
 	<key>UIApplicationSceneManifest</key>

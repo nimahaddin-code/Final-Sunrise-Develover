@@ -10,7 +10,8 @@ struct AppRootView: View {
             if navigator.onboardingComplete {
                 TabView(selection: $navigator.selectedTab) {
                     NavigationStack(path: $navigator.tryOnPath) {
-                        MakeupRecommendationsView(store: faceShapeStore) { navigator.open(.faceScan, in: .tryOn) }
+                        MakeupRecommendationsView(store: faceShapeStore, onScanFace: { navigator.open(.faceScan, in: .tryOn) },
+                                                  onScanEyes: { navigator.open(.eyeScan, in: .tryOn) })
                             .navigationDestination(for: AppRoute.self, destination: destination)
                     }
                     .tabItem { Label("Try On", systemImage: "wand.and.stars") }
@@ -47,6 +48,8 @@ struct AppRootView: View {
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
             FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
+        case .eyeScan:
+            EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }
         }
     }
 }
