@@ -167,6 +167,43 @@ final class MakeupPreferenceTests:XCTestCase {
         }
         XCTAssertGreaterThan(coloured,40,"Actual SceneKit output must contain visible blush pigment")
     }
+    // -Nimah: Fit at launch once; try-on, tutorial and new anchors reuse it without calling Vision.
+    func testLaunchFitSurvivesTryOnSessionRecreationWithoutAnotherScan() async throws {
+        struct InitialProvider:FaceLandmarkProviding {
+            let result:DetectedEyebrows
+            func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] { [result] }
+        }
+        struct ForbiddenProvider:FaceLandmarkProviding {
+            func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] {
+                XCTFail("Try-on must not start a new landmark scan");return []
+            }
+        }
+        let f=BrowFixture(),input=try f.input(),cache=LaunchMakeupFit()
+        XCTAssertTrue(cache.prepare(input,provider:InitialProvider(result:f.detection())))
+        let pipeline=EyebrowTrackingPipeline(provider:ForbiddenProvider())
+        for anchor in [f.anchor,UUID()] {
+            pipeline.reset(anchorID:anchor)
+            pipeline.followLaunchFit(anchorID:anchor,vertices:input.vertices,triangles:input.triangles,
+                timestamp:input.timestamp,style:.softArch,blushStyle:.apple,cache:cache)
+            for _ in 0..<100 {
+                if pipeline.snapshot(style:.softArch,includeBrow:true,blushStyle:.apple).guide != nil { break }
+                try await Task.sleep(for:.milliseconds(25))
+            }
+            let snapshot=pipeline.snapshot(style:.softArch,includeBrow:true,blushStyle:.apple)
+            XCTAssertNotNil(snapshot.guide);XCTAssertNotNil(snapshot.blushGuide)
+        }
+        XCTAssertNil(cache.fittedRegion(anchorID:f.anchor,vertices:[],triangles:[],timestamp:0))
+        cache.clear()
+        XCTAssertNil(cache.fittedRegion(anchorID:f.anchor,vertices:input.vertices,triangles:input.triangles,timestamp:0))
+    }
+    @MainActor func testTryOnEnablesAllAssignedToolsAndUsesLaunchFitting() {
+        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        XCTAssertEqual(home.enabled,Set(TryOnTool.allCases))
+        XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
+        XCTAssertTrue(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on)
+        home.deactivate()
+    }
     func testBlushRendererBeforeAndNoGuideClearStaleLayers() throws {
         let f=BrowFixture(),region=try f.region()
         let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.apple))

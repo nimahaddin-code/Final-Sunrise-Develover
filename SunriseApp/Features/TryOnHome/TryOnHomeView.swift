@@ -96,6 +96,7 @@ struct TryOnHomeView: View {
                         .foregroundStyle(AppColors.snow)
                 }
                 .accessibilityLabel("Open tutorial")
+                .disabled(!home.canTry(home.tool))
             }
         }
         .buttonStyle(.plain)

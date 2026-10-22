@@ -417,7 +417,14 @@ struct LiveGuideView: UIViewRepresentable {
             let options=snapshot().0
             if let configuration=options.eyebrows {
                 if isTracked,let face {
+                    if configuration.usesLaunchFit {
+                        // -Nimah: Reattach the launch fit to this live mesh; never run a second scan in try-on.
+                        eyebrowPipeline.followLaunchFit(anchorID:face.identifier,vertices:Array(face.geometry.vertices),
+                            triangles:Array(face.geometry.triangleIndices),timestamp:frame.timestamp,style:configuration.style,
+                            blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
+                    } else {
                     eyebrowPipeline.observe(frame:frame,anchor:face,canCalibrate:self.fitStable && relaxed && abs(relative.columns.2.z)>0.85,style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
+                    }
                 } else { eyebrowPipeline.trackingLost() }
             }
             guard frame.timestamp-lastReport>=0.1 else { return }; lastReport=frame.timestamp

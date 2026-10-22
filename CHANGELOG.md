@@ -5,6 +5,15 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Fixed — scan only at launch -Nimah
+- Require fresh face/eye analysis on every cold launch; keep only the welcome-completed preference across launches.
+- Build transient brow/cheek fitting from the initial face scan and transfer it into try-on and tutorials, including
+  recreated AR sessions. No per-feature Vision scan, hold-still gate, or scan instructions in that path.
+- Enable all assigned makeup layers on entry. Disable launch Skip and keep unusable preparation at startup.
+- Remove try-on rescan controls/profile rescan actions and skip the legacy eyeliner Vision placement phase.
+- Core face/eye classification and Hanum liner mathematics are unchanged; live camera tracking remains necessary.
+
+
 ### Fixed — visible brow and blush pigment -Nimah
 - Keep the brow input in the layered snapshot when blush is enabled; a ready status could previously coexist with no brow rendering.
 - Increase pigment core alpha/default strength, narrow the feather and raise patches above the depth mesh to reduce clipping.

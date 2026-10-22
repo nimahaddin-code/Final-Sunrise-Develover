@@ -23,6 +23,7 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertFalse(navigator.onboardingComplete)
         navigator.completeOnboarding()
         XCTAssertTrue(navigator.onboardingComplete)
+        XCTAssertTrue(navigator.launchScanComplete)
         XCTAssertEqual(navigator.selectedTab, .tryOn)
         XCTAssertTrue(navigator.tryOnPath.isEmpty)
         XCTAssertTrue(navigator.discoverPath.isEmpty)
@@ -32,6 +33,8 @@ final class AppNavigatorTests: XCTestCase {
         AppNavigator(defaults: defaults).completeOnboarding()
         let relaunched = AppNavigator(defaults: defaults)
         XCTAssertTrue(relaunched.onboardingComplete)
+        // -Nimah: Remember welcome, but require a new launch scan before try-on.
+        XCTAssertFalse(relaunched.launchScanComplete)
         XCTAssertEqual(relaunched.selectedTab, .tryOn)
     }
     @MainActor func testFinishingDiscoverFlowPreservesSavedTabHistory() {

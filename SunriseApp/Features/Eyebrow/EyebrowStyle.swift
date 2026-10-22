@@ -53,6 +53,8 @@ struct EyebrowConfiguration: Equatable, Sendable {
     // Optional shade (RGB 0...1) for the brow/blush preview; nil keeps the built-in tint.
     var shadeTint:SIMD3<Float>? = nil
     // Layered preview: brow and blush are drawn together from these layers, and `region` is ignored.
+    // -Nimah: Saved launch fitting replaces the old per-feature calibration flow.
+    var usesLaunchFit=false
     var layered = false
     var browLayer = PreviewLayer()
     var blushLayer = PreviewLayer()

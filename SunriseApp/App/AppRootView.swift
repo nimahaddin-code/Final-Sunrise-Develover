@@ -7,25 +7,25 @@ struct AppRootView: View {
 
     var body: some View {
         Group {
-            if navigator.onboardingComplete {
+            if navigator.launchScanComplete {
                 // Try On is the only screen: no tab bar.
                 NavigationStack(path: $navigator.tryOnPath) {
                     TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
                                   onProfile: { navigator.open(.profile, in: .tryOn) },
                                   onTutorial: { tool,shade,intensity in
-                                      // -Nimah: Open the assigned tutorial directly; request a scan only when missing.
+                                      // -Nimah: Launch already prepared the result; tutorial navigation never opens a scanner.
                                       switch tool {
                                       case .eyebrow,.blush:
-                                          navigator.open(faceShapeStore.latest == nil ? .faceScan : .recommendedTutorial(tool == .eyebrow ? .eyebrows : .blush,shade,intensity),in:.tryOn)
+                                          navigator.open(.recommendedTutorial(tool == .eyebrow ? .eyebrows : .blush,shade,intensity),in:.tryOn)
                                       case .eyeliner:
                                           let plan=faceShapeStore.latest.map { MakeupPlan(scan:$0,eyeScan:faceShapeStore.eyes) } ?? MakeupPlan(shape:.oval,eyeScan:faceShapeStore.eyes)
-                                          navigator.open(plan.eyeliner.isNeutral ? .eyeScan : .makeupTryOn(plan:plan,applied:plan.madeForYou),in:.tryOn)
+                                          if !plan.eyeliner.isNeutral { navigator.open(.makeupTryOn(plan:plan,applied:plan.madeForYou),in:.tryOn) }
                                       }
                                   })
                         .navigationDestination(for: AppRoute.self, destination: destination)
                 }
             } else {
-                OnboardingView(store: faceShapeStore, onFinish: navigator.completeOnboarding)
+                OnboardingView(store: faceShapeStore, showWelcome:!navigator.onboardingComplete, onFinish: navigator.completeOnboarding)
             }
         }
     }
@@ -54,8 +54,8 @@ struct AppRootView: View {
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
             FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
-        // -Nimah: Keep scan results and rescan actions reachable after the single-camera redesign.
-        case .profile: MakeupRecommendationsView(store:faceShapeStore,
+        // -Nimah: Profile shows launch results, without starting another scan.
+        case .profile: MakeupRecommendationsView(store:faceShapeStore,allowsRescan:false,
             onScanFace:{ navigator.open(.faceScan,in:.tryOn) },onScanEyes:{ navigator.open(.eyeScan,in:.tryOn) })
         case .tutorial: BlankPageView(title: "Tutorial")
         case .eyeScan:

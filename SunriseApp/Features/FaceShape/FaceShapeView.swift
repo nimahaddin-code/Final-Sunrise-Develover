@@ -1,10 +1,13 @@
 import SwiftUI
 import UIKit
+import ARKit
 
 struct FaceShapeView: View {
     @ObservedObject var store: FaceShapeStore
     /// Opens the makeup recommendations for the scanned face shape.
     var onShowMakeup: () -> Void = {}
+    // -Nimah: Supply the completed launch scan frame for transient makeup fitting.
+    var onScanFrame: ((ARFrame,ARFaceAnchor)->Void)?
     /// Label of the result popup's main button.
     var continueTitle: LocalizedStringKey = "Try on recommended makeup"
     @StateObject private var model = FaceShapeViewModel()
@@ -33,7 +36,12 @@ struct FaceShapeView: View {
                 }
             }
             .onChange(of: model.result) { _, result in
-                if let result { store.latest = result }
+                if let result {
+                    store.latest = result
+                    if let frame=model.session.currentFrame,let face=frame.anchors.compactMap({ $0 as? ARFaceAnchor }).first,face.isTracked {
+                        onScanFrame?(frame,face)
+                    }
+                }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 // Re-check camera access after returning from Settings.

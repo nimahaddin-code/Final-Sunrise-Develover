@@ -79,12 +79,8 @@ struct TryOnLiveCard: View {
 
     /// Tells the person what the face scan is waiting for, for the selected tool only. Eyeliner follows the eyes on its own,
     /// so it never shows the blush/eyebrow scan messages, even while those looks are on.
-    private var status: String? {
-        if !camera.tracked { return String(localized: "Position your face in the frame") }
-        let needsScan = home.tool != .eyeliner && home.enabled.contains(home.tool)
-        guard needsScan, !camera.eyebrowGuideReady else { return nil }
-        return camera.eyebrowMessage
-    }
+    // -Nimah: Launch already handles scanning. Live tracking has no calibration prompts or scan controls.
+    private var status: String? { nil }
 
     private func openSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
