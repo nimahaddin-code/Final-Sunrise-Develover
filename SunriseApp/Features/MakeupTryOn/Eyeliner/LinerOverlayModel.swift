@@ -83,11 +83,16 @@ import SwiftUI
                                                    viewportSize: viewport)
             return MappingReference(image: point(image), view: view)
         }
+        // Points at the depth of the eyes (the eyeballs' centres, 2 cm above and below), so they follow head turns the
+        // way the eyelids do; the face origin sits behind the head's middle and would not.
+        let eyePositions = [face.leftEyeTransform, face.rightEyeTransform].map { SIMD3($0.columns.3.x, $0.columns.3.y, $0.columns.3.z) }
+        let headAnchors = contour.project(eyePositions.flatMap { [$0 + SIMD3(0, 0.02, 0), $0 - SIMD3(0, 0.02, 0)] })?
+            .map(point) ?? []
         let buffer = arFrame.capturedImage
         let context = FrameContext(
             displayTransform: arFrame.displayTransform(for: .portrait, viewportSize: viewport),
             imageSize: CGSize(width: CVPixelBufferGetWidth(buffer), height: CVPixelBufferGetHeight(buffer)),
-            viewportSize: viewport, references: references)
+            viewportSize: viewport, references: references, headAnchors: headAnchors)
         if !provider.isBusy {
             provider.submit(LandmarkInput(pixelBuffer: contour.pixelBuffer, timestamp: arFrame.timestamp,
                                           headUp: point(raw[2]) - point(raw[0]),
@@ -99,7 +104,8 @@ import SwiftUI
     /// Draws the newest measurement, moved with the head, with this frame's screen mapping.
     private func publish(_ context: FrameContext) {
         let now = CACurrentMediaTime()
-        guard let solution, let moved = solution.moved(to: context.references.map(\.image), now: now) else {
+        let head = context.headAnchors.count >= 3 ? context.headAnchors : context.references.map(\.image)
+        guard let solution, let moved = solution.moved(to: head, now: now) else {
             if frame != nil { frame = nil }
             return
         }
@@ -118,7 +124,8 @@ import SwiftUI
         }
         let eyes = tracker.render(landmarks, spec: spec)
         solution = LinerSolution(eyes: eyes, raw: tracker.lastRaw, smoothed: tracker.lastSmoothed,
-                                 references: context.references.map(\.image), time: CACurrentMediaTime())
+                                 references: context.headAnchors.count >= 3 ? context.headAnchors : context.references.map(\.image),
+                                 time: CACurrentMediaTime())
         noteStatus(String(format: "MediaPipe: face, %.0f ms, %d eye(s) drawn", landmarks.providerLatencyMs, eyes.count))
     }
 

@@ -3,19 +3,19 @@ import CoreGraphics
 
 struct OneEuroConfig: Equatable {
     /// Lower = smoother when still (more lag). Units: Hz.
-    var minCutoff: Double = 0.6
-    /// Higher = less lag when moving fast. Landmarks are in pixels, so beta is small.
+    var minCutoff: Double = 0.4
+    /// Higher = less lag when moving fast. Landmarks are in pixels, so beta is small. Only fast motion (a blink, a
+    /// pulled lid) raises the cutoff, so a high beta does not cost steadiness when the eye is still.
     var beta: Double = 0.04
     var dCutoff: Double = 1.0
-    /// Stillness dead-band as a fraction of the face-anchor spread (~0.004 = about half a pixel on a normal face).
-    /// A point only moves once its filtered position drifts further than this from where it was last drawn,
-    /// so a still face gives a still guide. 0 = off.
-    var deadband: Double = 0.004
+    /// Stillness dead-band as a fraction of the anchor spread. A point only moves once its filtered position drifts
+    /// further than this from where it was last drawn, so a still face gives a perfectly still liner. 0 = off.
+    var deadband: Double = 0.008
 
-    /// The spike's steady setting (beta doubled): minCutoff and deadband alone decide how still a still face is, while
-    /// beta only matters during fast motion such as pulling the lid, so a higher beta follows a stretch with little jitter.
+    /// Filter-like steadiness: head motion is taken from ARKit (see `FrameContext.headAnchors`), so these only have to
+    /// calm the eye's own landmarks. The spike used 0.6 / 0.02 / 0.004.
     static let steady = OneEuroConfig()
-    /// Quicker to follow a pulled or squeezed lid, at the cost of visible jitter (tried and rejected as the default).
+    /// Quicker to follow a pulled or squeezed lid, at the cost of visible jitter.
     static let responsive = OneEuroConfig(minCutoff: 1.2, beta: 0.06, dCutoff: 1.0, deadband: 0.002)
 }
 

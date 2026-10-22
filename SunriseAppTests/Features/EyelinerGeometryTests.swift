@@ -20,13 +20,26 @@ enum SyntheticEye {
     }
 
     /// Both eyes of a face looking at the camera; rigid anchors between them.
-    static func frame(t: TimeInterval, open: CGFloat = 0.32, shift: CGPoint = .zero) -> EyeLandmarkFrame {
+    static func frame(t: TimeInterval, open: CGFloat = 0.32, shift: CGPoint = .zero, headShift: CGPoint? = nil,
+                      noise: CGPoint = .zero) -> EyeLandmarkFrame {
+        // `headShift`: the head's motion as ARKit reports it (steady); `noise`: the detector's own error on the eyes.
+        let shift = (headShift ?? shift)
         let right = landmarks(side: .subjectRight, center: CGPoint(x: 220, y: 400) + shift, open: open)
         let left = landmarks(side: .subjectLeft, center: CGPoint(x: 380, y: 400) + shift, mirrored: true, open: open)
         let anchors = [CGPoint(x: 300, y: 380), CGPoint(x: 300, y: 430), CGPoint(x: 300, y: 480),
                        CGPoint(x: 250, y: 520), CGPoint(x: 350, y: 520)].map { $0 + shift }
-        return EyeLandmarkFrame(imageSize: CGSize(width: 640, height: 480), timestamp: t, subjectLeft: left,
-                                subjectRight: right, providerLatencyMs: 10, faceAnchors: anchors)
+        var frame = EyeLandmarkFrame(imageSize: CGSize(width: 640, height: 480), timestamp: t, subjectLeft: left,
+                                     subjectRight: right, providerLatencyMs: 10, faceAnchors: anchors)
+        if headShift != nil {
+            let head = [CGPoint(x: 220, y: 380), CGPoint(x: 220, y: 420), CGPoint(x: 380, y: 380), CGPoint(x: 380, y: 420)]
+                .map { $0 + shift }
+            frame.context = FrameContext(displayTransform: .identity, imageSize: frame.imageSize,
+                                         viewportSize: frame.imageSize, headAnchors: head)
+            // The detector's own error on the eyes (its face anchors are no better).
+            frame.subjectLeft = frame.subjectLeft?.replacingPoints(with: frame.subjectLeft!.flattened.map { $0 + noise })
+            frame.subjectRight = frame.subjectRight?.replacingPoints(with: frame.subjectRight!.flattened.map { $0 + noise })
+        }
+        return frame
     }
 }
 
@@ -227,6 +240,35 @@ final class EyelinerGeometryTests: XCTestCase {
         let now = last.first?.guide.anchors.outerCorner
         XCTAssertNotNil(previous)
         XCTAssertLessThan(((now ?? .zero) - (previous ?? .zero)).length, 0.5, "Jitter is filtered out")
+    }
+
+    func testHeadMotionComesFromARKitSoItNeitherLagsNorJitters() {
+        let tracker = LinerTracker()
+        var errors: [CGFloat] = []
+        var corner = CGPoint.zero
+        for i in 0..<90 {
+            // The head moves 2 px per frame (ARKit knows exactly); the detector's eye points jitter by about a pixel.
+            let head = CGPoint(x: CGFloat(i) * 2, y: 0)
+            let noise = CGPoint(x: i.isMultiple(of: 2) ? 1.0 : -1.0, y: i.isMultiple(of: 3) ? 0.8 : -0.8)
+            corner = tracker.render(SyntheticEye.frame(t: Double(i) / 30, headShift: head, noise: noise), spec: spec(.almond))
+                .first { $0.side == .subjectRight }?.guide.anchors.outerCorner ?? corner
+            let truth = SyntheticEye.frame(t: 0, shift: head).subjectRight!.outerCorner
+            if i >= 30 { errors.append((corner - truth).length) }
+        }
+        XCTAssertLessThan(errors.max() ?? 99, 2.5, "No lag behind the head, and the detector's jitter is filtered out")
+        // Frame to frame the liner moves by the head's 2 px, not by the jitter on top of it.
+        var steps: [CGFloat] = []
+        var last: CGPoint?
+        let tracker2 = LinerTracker()
+        for i in 0..<60 {
+            let head = CGPoint(x: CGFloat(i) * 2, y: 0)
+            let noise = CGPoint(x: i.isMultiple(of: 2) ? 1.0 : -1.0, y: i.isMultiple(of: 3) ? 0.8 : -0.8)
+            let c = tracker2.render(SyntheticEye.frame(t: Double(i) / 30, headShift: head, noise: noise), spec: spec(.almond))
+                .first { $0.side == .subjectRight }?.guide.anchors.outerCorner
+            if i >= 20, let c, let last { steps.append(abs((c - last).length - 2)) }
+            last = c
+        }
+        XCTAssertLessThan(steps.max() ?? 99, 0.8)
     }
 
     func testTrackerFollowsRealMotion() {

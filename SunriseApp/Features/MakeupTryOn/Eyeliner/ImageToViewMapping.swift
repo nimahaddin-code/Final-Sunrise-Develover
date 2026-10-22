@@ -17,6 +17,9 @@ struct FrameContext: Equatable, Sendable {
     var viewportSize: CGSize
     /// Face points projected both ways (see `LinerOverlayModel`); used to check the mapping, and to repair it.
     var references: [MappingReference] = []
+    /// Rigid points around the eyes from ARKit's head tracking (image pixels): they move exactly with the head, so
+    /// the liner is steadied against them instead of against the detector's own, noisier face points.
+    var headAnchors: [CGPoint] = []
 }
 
 /// Maps points of the captured camera image (pixels) to the view that shows it (points): the display transform

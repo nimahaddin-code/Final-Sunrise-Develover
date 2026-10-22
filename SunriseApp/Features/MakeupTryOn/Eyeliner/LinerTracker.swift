@@ -12,7 +12,7 @@ struct RenderedEye {
 /// Landmarks in, liner geometry out: One Euro smoothing (with head motion removed through the rigid face anchors),
 /// the per-user open-eye baseline and `LinerPathBuilder`. No camera, no UI, so it runs on synthetic landmarks in tests.
 final class LinerTracker {
-    var filterConfig = OneEuroConfig()
+    var filterConfig = OneEuroConfig.steady
     var buildOptions = LinerBuildOptions()
     /// Fraction of THIS user's normal eye opening below which the liner starts to fade (relative, so hooded and
     /// monolid eyes with a small absolute opening still count as open).
@@ -31,7 +31,11 @@ final class LinerTracker {
     }
 
     func render(_ frame: EyeLandmarkFrame, spec: LinerSpec) -> [RenderedEye] {
-        let anchors = smoother.smoothAnchors(frame.faceAnchors, t: frame.timestamp, config: filterConfig)
+        // ARKit's head anchors are steadier than MediaPipe's face points (and need no smoothing of their own), so head
+        // motion is removed exactly and only real eye motion (blink, squint, a pulled lid) goes through the filter.
+        let headAnchors = frame.context?.headAnchors ?? []
+        let anchors = headAnchors.count >= 3
+            ? headAnchors : smoother.smoothAnchors(frame.faceAnchors, t: frame.timestamp, config: filterConfig)
         var eyes: [EyeLandmarks] = []
         for (side, eye) in [(EyeSide.subjectLeft, frame.subjectLeft), (.subjectRight, frame.subjectRight)] {
             if let eye {
