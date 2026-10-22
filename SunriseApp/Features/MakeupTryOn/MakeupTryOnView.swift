@@ -28,6 +28,12 @@ struct MakeupTryOnView: View {
             .toolbar {
                 if model.phase == .ready {
                     ToolbarItemGroup(placement: .topBarTrailing) {
+                        #if DEBUG
+                        // Developer mode: landmark dots, hand mask, lid tracking switch and the eye readout.
+                        Button("Developer mode", systemImage: developerTools ? "ladybug.fill" : "ladybug") {
+                            developerTools.toggle()
+                        }
+                        #endif
                         Button("Place again", systemImage: "arrow.triangle.2.circlepath", action: model.relocate)
                         Button("Take photo", systemImage: "camera") {
                             if let image = snapshotter.snapshot() {
@@ -199,7 +205,7 @@ struct MakeupTryOnView: View {
             }
             .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
             .fixedSize(horizontal: false, vertical: true)
-            // Long press: developer tools (landmark dots, hand mask, readout) in any build.
+            // Long press: developer mode in builds without the toolbar button (Release, TestFlight).
             .onLongPressGesture(minimumDuration: 1.2) { developerTools.toggle() }
             .sensoryFeedback(.impact, trigger: developerTools)
             if category == .eyeliner, DeveloperTools.isOn(developerTools) {

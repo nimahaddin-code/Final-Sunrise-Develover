@@ -27,9 +27,13 @@ enum LinerInk {
 
     /// The pigment as it looks on this skin. Without a skin reading it is the shade itself.
     static func color(shade: MakeupShade, skin: InkColor?) -> InkColor {
-        let base = InkColor(red: shade.red, green: shade.green, blue: shade.blue)
-        guard let skin else { return base }
-        return base.mixed(toward: skin, by: skinBleed)
+        tint(InkColor(red: shade.red, green: shade.green, blue: shade.blue), skin: skin)
+    }
+
+    /// `ink` with the skin's tone mixed in; `ink` itself without a skin reading.
+    static func tint(_ ink: InkColor, skin: InkColor?) -> InkColor {
+        guard let skin else { return ink }
+        return ink.mixed(toward: skin, by: skinBleed)
     }
 
     // MARK: Skin from camera samples

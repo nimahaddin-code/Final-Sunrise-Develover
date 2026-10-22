@@ -1,21 +1,19 @@
 import SwiftUI
 
-/// Developer-tools readout (always in Debug builds; in any other build after a long press, see `DeveloperTools`) of the measured eye values and how they became the eyeliner, for calibrating the thresholds.
+/// Developer-tools readout (hidden until switched on with a long press, see `DeveloperTools`) of the measured eye values and how they became the eyeliner, for calibrating the thresholds.
 struct EyeDebugView: View {
     let eyes: EyeScan?
     var overlay: LinerOverlayModel?
     @AppStorage("debugEyeLandmarks") private var showsLandmarks = false
     @AppStorage("debugOcclusionMask") private var showsMask = false
-    @AppStorage("disableOcclusion") private var disablesOcclusion = false
     @AppStorage("enableLidTracking") private var tracksLid = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("DEVELOPER eye measurements").font(.caption.weight(.bold))
             Toggle("Show eyeliner landmark dots (red raw, green smoothed)", isOn: $showsLandmarks)
-            Toggle("Turn off hand cut-out (needs re-opening the try-on)", isOn: $disablesOcclusion)
             Toggle("Lid tracking (experimental, for a pulled lid; re-open the try-on)", isOn: $tracksLid)
-            Toggle("Show hand mask (red: liner is hidden there)", isOn: $showsMask)
+            Toggle("Show hand mask (red: hand seen, lid tracking follows the skin)", isOn: $showsMask)
             if let overlay { OverlayStatusLine(model: overlay) }
             if let eyes {
                 let plan = EyelinerPlanner.plan(for: eyes)
@@ -52,15 +50,10 @@ private struct OverlayStatusLine: View {
     var body: some View { Text(model.debugStatus.isEmpty ? "MediaPipe: waiting" : model.debugStatus) }
 }
 
-/// Developer tools (the readout above, landmark dots, hand mask) are always on in Debug builds and can be switched on in
-/// any other build by long-pressing the explanation text under the eyeliner shades.
+/// Developer mode (the readout above, landmark dots, hand mask, lid tracking switch): nothing of it shows until it is
+/// switched on, with the ladybug button in the try-on toolbar (Debug builds) or by long-pressing the explanation text
+/// under the eyeliner shades (any build).
 enum DeveloperTools {
     static let key = "developerTools"
-    static func isOn(_ stored: Bool) -> Bool {
-        #if DEBUG
-        true
-        #else
-        stored
-        #endif
-    }
+    static func isOn(_ stored: Bool) -> Bool { stored }
 }

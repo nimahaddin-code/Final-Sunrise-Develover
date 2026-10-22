@@ -187,17 +187,18 @@ enum EyeGeometry {
 // MARK: - EyeLandmarks utilities
 
 extension EyeLandmarks {
-    var flattened: [CGPoint] { [innerCorner, outerCorner] + upperLid + lowerLid + browPoints }
+    var flattened: [CGPoint] { [innerCorner, outerCorner] + upperLid + lowerLid + browPoints + (wingAnchor.map { [$0] } ?? []) }
 
     func replacingPoints(with pts: [CGPoint]) -> EyeLandmarks? {
-        guard pts.count == 2 + upperLid.count + lowerLid.count + browPoints.count else { return nil }
+        guard pts.count == 2 + upperLid.count + lowerLid.count + browPoints.count + (wingAnchor == nil ? 0 : 1) else { return nil }
         var out = self
         var i = 0
         out.innerCorner = pts[i]; i += 1
         out.outerCorner = pts[i]; i += 1
         out.upperLid = Array(pts[i..<(i + upperLid.count)]); i += upperLid.count
         out.lowerLid = Array(pts[i..<(i + lowerLid.count)]); i += lowerLid.count
-        out.browPoints = Array(pts[i..<(i + browPoints.count)])
+        out.browPoints = Array(pts[i..<(i + browPoints.count)]); i += browPoints.count
+        if wingAnchor != nil { out.wingAnchor = pts[i] }
         return out
     }
 

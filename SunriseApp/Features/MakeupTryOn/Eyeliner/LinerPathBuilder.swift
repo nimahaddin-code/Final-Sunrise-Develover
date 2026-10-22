@@ -34,7 +34,7 @@ enum LinerPathBuilder {
             let t = start + (1 - start) * u
             var k: CGFloat = 1
             if start > 0.001 { k = 0.15 + 0.85 * smoothstep(0, 0.12, t - start) }  // soft start
-            upperOffsets.append(thick(t) * k)
+            upperOffsets.append(thick(t) * k * options.thicknessScale)
         }
         let upper = strip(base: upperBase, offsets: upperOffsets, side: .up, inset: -options.lashOffset)
 
@@ -101,7 +101,13 @@ enum LinerPathBuilder {
                 topTangent = dir
             }
 
-            let tip = bottomRoot + dir * CGFloat(spec.wingLength)
+            var tip = bottomRoot + dir * CGFloat(spec.wingLength)
+            // The wing is attached to a skin point beside the eye: when that skin is stretched the tip goes with it.
+            if let anchor = eye.wingAnchor {
+                var pull = frame.toLocal(anchor) - LinerBuildOptions.wingAnchorLocal
+                if pull.length > LinerBuildOptions.wingAnchorReach { pull = pull.normalized() * LinerBuildOptions.wingAnchorReach }
+                tip = tip + pull
+            }
             let dist = (tip - topRoot).length
             let ctrl = topRoot + topTangent * (dist * 0.5)
 
@@ -133,7 +139,7 @@ enum LinerPathBuilder {
             var off: [CGFloat] = []
             for i in 0..<m {
                 let u = CGFloat(i) / CGFloat(m - 1)
-                off.append(CGFloat(spec.lowerLine.thickness) * (0.1 + 0.9 * smoothstep(0, 0.6, u)))
+                off.append(CGFloat(spec.lowerLine.thickness) * options.thicknessScale * (0.1 + 0.9 * smoothstep(0, 0.6, u)))
             }
             lowerPoly = strip(base: base, offsets: off, side: .down, inset: -options.lashOffset).polygon
         }

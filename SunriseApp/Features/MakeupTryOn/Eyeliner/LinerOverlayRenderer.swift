@@ -9,7 +9,7 @@ struct LinerOverlayFrame {
     /// DEBUG dots: MediaPipe's eye points as reported, and after smoothing.
     var debugRaw: [EyeLandmarks] = []
     var debugSmoothed: [EyeLandmarks] = []
-    /// Hands in front of the face: the liner is erased where this is set.
+    /// Where hands are (developer view only; the liner is drawn over them).
     var occlusion: Occlusion?
     /// The skin tone around the eyes, read from the camera; the pigment picks a little of it up.
     var skin: InkColor?
@@ -22,51 +22,65 @@ enum LinerOverlayRenderer {
     static let maxAge: CFTimeInterval = 0.4
 
     /// Even at full intensity the ink lets a little skin show through, so it does not read as a sticker.
-    static let maxOpacity = 0.88
+    static let maxOpacity = 0.9
+    /// Real ink still reflects some light: the liner is multiplied over the skin with this much of the light left
+    /// (the shade lifted toward white by this share), so it is charcoal on skin, lighter in bright light, darker in dim
+    /// light, and tinted by the skin under it, instead of a flat black.
+    static let inkReflectance: Double = 0.16
+
+    /// The colour the liner is multiplied with: the shade, lifted by `inkReflectance`.
+    /// With a skin reading, the pigment also picks up a little of the skin's tone (`LinerInk.skinBleed`).
+    static func ink(_ shade: MakeupShade, skin: InkColor? = nil) -> (red: Double, green: Double, blue: Double) {
+        func lift(_ c: Double) -> Double { inkReflectance + (1 - inkReflectance) * c }
+        let tinted = LinerInk.tint(InkColor(red: lift(shade.red), green: lift(shade.green), blue: lift(shade.blue)), skin: skin)
+        return (tinted.red, tinted.green, tinted.blue)
+    }
     /// Edge softness as a fraction of the eye's width on screen. The camera image is soft (upscaled video), so a crisp
     /// vector edge looks pasted on; this matches the liner's edge to the picture. Clamped to `blurRange` points.
-    static let blurFraction: CGFloat = 0.015
-    static let blurRange: ClosedRange<CGFloat> = 0.6...2.0
-
-    /// The pigment bleeds a little into the skin around it: a wider, fainter copy under the liner.
-    static let haloAlpha = 0.22
-    static let haloBlurScale: CGFloat = 2.6
+    static let blurFraction: CGFloat = 0.008
+    static let blurRange: ClosedRange<CGFloat> = 0.4...1.2
+    /// Ink on skin bleeds a little: under the crisp liner a faint, wider-blurred copy (`haloShare` of its opacity,
+    /// `haloBlurScale` times its blur) melts its edge into the lid, the way try-on filters draw makeup.
+    static let haloShare = 0.35
+    static let haloBlurScale: CGFloat = 4
 
     /// One filled shape per eye, in view points, with the opacity to fill it with and how much to soften its edge.
-    /// Each eye gives a faint wide `halo` first, then the liner's body.
     struct Fill {
         let path: CGPath
-        let color: InkColor
         let alpha: Double
         let blur: CGFloat
-        let isHalo: Bool
-        /// Where the skin texture (grain) is anchored: the eye's inner corner on screen.
+        var haloAlpha: Double { alpha * LinerOverlayRenderer.haloShare }
+        var haloBlur: CGFloat { blur * LinerOverlayRenderer.haloBlurScale }
+        /// Where the skin grain is anchored: the eye's inner corner on screen.
         let anchor: CGPoint
+        /// Area the grain has to cover (the liner and its soft edge).
+        var grainBox: CGRect { path.boundingBoxOfPath.insetBy(dx: -haloBlur, dy: -haloBlur) }
     }
 
     static func fills(_ frame: LinerOverlayFrame, shade: MakeupShade, intensity: Double,
                       now: CFTimeInterval = CACurrentMediaTime()) -> [Fill] {
         guard now - frame.receivedAt <= maxAge, intensity > 0.01 else { return [] }
         let opacity = min(MakeupTextureRenderer.drawnOpacity(shade), maxOpacity) * intensity
-        let color = LinerInk.color(shade: shade, skin: frame.skin)
-        return frame.eyes.flatMap { eye -> [Fill] in
+        return frame.eyes.compactMap { eye in
             let alpha = opacity * eye.alpha
-            guard alpha > 0.005 else { return [] }
+            guard alpha > 0.005 else { return nil }
             let path = CGMutablePath()
             for outline in eye.guide.outlines { add(outline, to: path, mapping: frame.mapping) }
             if !eye.guide.tightline.isEmpty { add(eye.guide.tightline, to: path, mapping: frame.mapping) }
             let inner = frame.mapping.map(eye.guide.anchors.innerCorner)
             let width = (frame.mapping.map(eye.guide.anchors.outerCorner) - inner).length
-            let blur = min(max(width * blurFraction, blurRange.lowerBound), blurRange.upperBound)
-            return [Fill(path: path, color: color, alpha: alpha * haloAlpha, blur: blur * haloBlurScale, isHalo: true, anchor: inner),
-                    Fill(path: path, color: color, alpha: alpha, blur: blur, isHalo: false, anchor: inner)]
+            return Fill(path: path, alpha: alpha, blur: min(max(width * blurFraction, blurRange.lowerBound), blurRange.upperBound),
+                        anchor: inner)
         }
     }
 
-    /// Fills the shapes into a UIKit-style context (origin top left, units of view points), edges unsoftened.
-    static func draw(_ fills: [Fill], in cg: CGContext) {
-        for fill in fills {
-            cg.setFillColor(red: fill.color.red, green: fill.color.green, blue: fill.color.blue, alpha: fill.alpha)
+    /// Fills the liner into a UIKit-style context (origin top left, units of view points), edges unsoftened.
+    /// `halo` fills the faint bleed layer instead of the liner itself.
+    static func draw(_ frame: LinerOverlayFrame, shade: MakeupShade, intensity: Double, in cg: CGContext,
+                     halo: Bool = false, now: CFTimeInterval = CACurrentMediaTime()) {
+        for fill in fills(frame, shade: shade, intensity: intensity, now: now) {
+            let ink = ink(shade, skin: frame.skin)
+            cg.setFillColor(red: ink.red, green: ink.green, blue: ink.blue, alpha: halo ? fill.haloAlpha : fill.alpha)
             // The outlines share one winding, so a single nonzero fill is their union.
             cg.addPath(fill.path)
             cg.fillPath(using: .winding)
@@ -76,58 +90,43 @@ enum LinerOverlayRenderer {
     /// Lifts the ink off in faint speckles (a UIKit context is current), so skin texture shows through the liner.
     static func eraseGrain(for fills: [Fill], in cg: CGContext) {
         guard let tile = LinerInk.grainTile else { return }
-        for fill in fills where !fill.isHalo {
-            // It only removes ink that is there, so no clip is needed; the box covers the soft fringe too.
-            let box = fill.path.boundingBoxOfPath.insetBy(dx: -fill.blur * 3, dy: -fill.blur * 3)
-            for rect in LinerInk.grainTiles(covering: box, anchoredAt: fill.anchor) {
+        for fill in fills {
+            for rect in LinerInk.grainTiles(covering: fill.grainBox, anchoredAt: fill.anchor) {
                 UIImage(cgImage: tile).draw(in: rect, blendMode: .destinationOut, alpha: 1)
             }
         }
     }
 
-    /// Erases what is already drawn wherever the occlusion mask is set (a UIKit context is current).
-    static func erase(_ occlusion: Occlusion, in cg: CGContext) {
-        cg.saveGState()
-        cg.concatenate(occlusion.transform)
-        UIImage(cgImage: occlusion.image).draw(in: CGRect(origin: .zero, size: occlusion.size), blendMode: .destinationOut,
-                                               alpha: 1)
-        cg.restoreGState()
-    }
-
-    /// `snapshot` (the camera view with the other makeup) with the liner on it. The liner is multiplied into the
-    /// picture like the live overlay, so the skin's shading and texture show through it.
+    /// `snapshot` (the camera view with the other makeup) with the liner drawn over it.
     static func compose(_ snapshot: UIImage, overlay frame: LinerOverlayFrame, shade: MakeupShade,
                         intensity: Double) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.scale = snapshot.scale
         let renderer = UIGraphicsImageRenderer(size: snapshot.size, format: format)
         let fills = fills(frame, shade: shade, intensity: intensity)
-        // Halo and body each softened by their own radius, laid together, then speckled and cut out behind hands.
-        func layer(isHalo: Bool) -> UIImage {
-            let part = fills.filter { $0.isHalo == isHalo }
-            let image = renderer.image { draw(part, in: $0.cgContext) }
-            return blurred(image, radius: (part.map(\.blur).max() ?? 0) * snapshot.scale, scale: snapshot.scale)
+        // The bleed and the liner each alone on a transparent layer, softened like the live overlay, then multiplied
+        // over the photo: the ink darkens the skin under it and keeps its texture and shading.
+        func layer(halo: Bool, blur: CGFloat?) -> UIImage {
+            let image = renderer.image { context in
+                draw(frame, shade: shade, intensity: intensity, in: context.cgContext, halo: halo)
+            }
+            guard let blur, let input = CIImage(image: image), let filter = CIFilter(name: "CIGaussianBlur") else { return image }
+            filter.setValue(input.clampedToExtent(), forKey: kCIInputImageKey)
+            filter.setValue(blur * snapshot.scale, forKey: kCIInputRadiusKey)
+            guard let output = filter.outputImage?.cropped(to: input.extent),
+                  let cg = CIContext().createCGImage(output, from: output.extent) else { return image }
+            return UIImage(cgImage: cg, scale: snapshot.scale, orientation: .up)
         }
-        let halo = layer(isHalo: true), body = layer(isHalo: false)
-        let liner = renderer.image { context in
-            halo.draw(at: .zero)
-            body.draw(at: .zero)
+        let bleed = layer(halo: true, blur: fills.map(\.haloBlur).max())
+        let liner = UIGraphicsImageRenderer(size: snapshot.size, format: format).image { context in
+            layer(halo: false, blur: fills.map(\.blur).max()).draw(at: .zero)
             eraseGrain(for: fills, in: context.cgContext)
-            if let occlusion = frame.occlusion { erase(occlusion, in: context.cgContext) }
         }
         return renderer.image { _ in
             snapshot.draw(at: .zero)
+            bleed.draw(at: .zero, blendMode: .multiply, alpha: 1)
             liner.draw(at: .zero, blendMode: .multiply, alpha: 1)
         }
-    }
-
-    private static func blurred(_ image: UIImage, radius: CGFloat, scale: CGFloat) -> UIImage {
-        guard radius > 0, let input = CIImage(image: image), let filter = CIFilter(name: "CIGaussianBlur") else { return image }
-        filter.setValue(input.clampedToExtent(), forKey: kCIInputImageKey)
-        filter.setValue(radius, forKey: kCIInputRadiusKey)
-        guard let output = filter.outputImage?.cropped(to: input.extent),
-              let cg = CIContext().createCGImage(output, from: output.extent) else { return image }
-        return UIImage(cgImage: cg, scale: scale, orientation: .up)
     }
 
     private static func add(_ polygon: [CGPoint], to path: CGMutablePath, mapping: ImageToViewMapping) {

@@ -94,8 +94,28 @@ final class EyelinerGeometryTests: XCTestCase {
         XCTAssertEqual(far.min() ?? 0, 0.05, accuracy: 0.006)
         XCTAssertEqual((far.max() ?? 0) - (far.min() ?? 0), (near.max() ?? 0) - (near.min() ?? 0), accuracy: 0.01,
                        "Moving the liner off the lash line does not thin it")
-        XCTAssertGreaterThan(LinerBuildOptions.defaultLashOffset, LinerBuildOptions.spikeLashOffset)
+        XCTAssertLessThanOrEqual(LinerBuildOptions.defaultLashOffset, LinerBuildOptions.spikeLashOffset,
+                                 "The liner sits on the lash roots, with no strip of skin under it")
         XCTAssertEqual(LinerBuildOptions().lashOffset, LinerBuildOptions.defaultLashOffset)
+    }
+
+    func testWingTipFollowsItsSkinAnchor() throws {
+        let eye = SyntheticEye.landmarks()
+        let frame = try XCTUnwrap(EyeCoordinateFrame(inner: eye.innerCorner, outer: eye.outerCorner, upper: eye.upperLid,
+                                                     lower: eye.lowerLid, brow: eye.browPoints))
+        func tip(anchorLocal: CGPoint?) throws -> CGPoint {
+            var e = eye
+            e.wingAnchor = anchorLocal.map(frame.toWorld)
+            return try XCTUnwrap(try build(e, spec(.upturned)).anchors.wingTip)
+        }
+        let rigid = try tip(anchorLocal: nil)
+        let atRest = try tip(anchorLocal: LinerBuildOptions.wingAnchorLocal)
+        XCTAssertEqual((atRest - rigid).length, 0, accuracy: 1e-6, "An anchor that has not moved changes nothing")
+        let stretched = try tip(anchorLocal: LinerBuildOptions.wingAnchorLocal + CGPoint(x: 0.2, y: -0.15))
+        // The tip moves by the anchor's stretch, in the eye's own frame (100 px wide here).
+        let moved = frame.toLocal(stretched) - frame.toLocal(rigid)
+        XCTAssertEqual(moved.x, 0.2, accuracy: 1e-6)
+        XCTAssertEqual(moved.y, -0.15, accuracy: 1e-6)
     }
 
     func testGeometryDoesNotDependOnHeadRollOrScale() throws {
@@ -195,8 +215,44 @@ final class EyelinerGeometryTests: XCTestCase {
 
     // MARK: Tracker: smoothing and the open-eye baseline
 
+    func testLinerStaysOnAClosedEye() {
+        let tracker = LinerTracker()
+        var t = 0.0
+        for _ in 0..<30 {
+            t += 1.0 / 30
+            _ = tracker.render(SyntheticEye.frame(t: t), spec: spec(.almond))
+        }
+        var closed: [RenderedEye] = []
+        for _ in 0..<15 {
+            t += 1.0 / 30
+            closed = tracker.render(SyntheticEye.frame(t: t, open: 0.02), spec: spec(.almond))
+        }
+        XCTAssertEqual(closed.count, 2, "A closed eye keeps its liner on the closed lash line")
+        XCTAssertEqual(closed.first?.alpha ?? 0, 1, accuracy: 1e-9)
+    }
+
+    func testLinerGetsThickerAsTheEyeCloses() throws {
+        func area(_ guide: LinerGuide) -> CGFloat { abs(signedArea(guide.upperLiner)) }
+        let tracker = LinerTracker()
+        var t = 0.0
+        var open: [RenderedEye] = []
+        for _ in 0..<30 {
+            t += 1.0 / 30
+            open = tracker.render(SyntheticEye.frame(t: t), spec: spec(.almond))
+        }
+        var closed: [RenderedEye] = []
+        for _ in 0..<15 {
+            t += 1.0 / 30
+            closed = tracker.render(SyntheticEye.frame(t: t, open: 0.02), spec: spec(.almond))
+        }
+        let ratio = area(try XCTUnwrap(closed.first?.guide)) / area(try XCTUnwrap(open.first?.guide))
+        XCTAssertGreaterThan(ratio, 1.5, "A closed eye shows a clearly thicker liner")
+        XCTAssertLessThan(ratio, 2.6)
+    }
+
     func testLinerFadesWhenTheEyeClosesAndReturnsWhenItReopens() {
         let tracker = LinerTracker()
+        tracker.keepsLinerWhenClosed = false
         let almond = spec(.almond)
         var t = 0.0
         for _ in 0..<30 {
@@ -225,6 +281,25 @@ final class EyelinerGeometryTests: XCTestCase {
         for i in 0..<30 { shown = tracker.render(SyntheticEye.frame(t: Double(i) / 30, open: 0.12), spec: spec(.hooded)) }
         XCTAssertEqual(shown.count, 2)
         XCTAssertEqual(shown.first?.alpha ?? 0, 1, accuracy: 1e-6)
+    }
+
+    func testLinerKeepsUpWithABlink() throws {
+        // The lid closes in 3 frames (100 ms at 30 fps), as a real blink does.
+        let tracker = LinerTracker()
+        var t = 0.0
+        for _ in 0..<30 {
+            t += 1.0 / 30
+            _ = tracker.render(SyntheticEye.frame(t: t), spec: spec(.almond))
+        }
+        func lidMiddle(_ eyes: [EyeLandmarks]) -> CGFloat { eyes.first { $0.side == .subjectRight }!.upperLid[3].y }
+        let openY = lidMiddle(tracker.lastSmoothed)
+        let closedY = lidMiddle(SyntheticEye.frame(t: 0, open: 0.02).eyes)
+        for open in [0.22, 0.12, 0.02] as [CGFloat] {
+            t += 1.0 / 30
+            _ = tracker.render(SyntheticEye.frame(t: t, open: open), spec: spec(.almond))
+        }
+        let covered = (lidMiddle(tracker.lastSmoothed) - openY) / (closedY - openY)
+        XCTAssertGreaterThan(covered, 0.8, "Right after the lid closes, the liner has gone most of the way with it (the steady config alone: 67%)")
     }
 
     func testSmoothingKeepsAStillFaceStill() {
