@@ -12,12 +12,19 @@ measurement mathematics is unchanged. Both sets of eye tests are retained.
 Catalog/import/save and Nimah studio are implemented MVP features, not placeholder-only services.
 See `Docs/CodeOwnership.md`, `Docs/Performance.md`, and `Docs/Validation.md`; historical notes below may predate integration.
 
+Home screen: after onboarding the app opens on `Features/TryOnHome/TryOnHomeView` (no tab bar). `TryOnHomeModel` swaps the camera
+card between Nimah's blush/eyebrow engine and Hanum's eyeliner engine; profile and tutorial are blank placeholder routes for now.
+
 Saved-analysis flow: onboarding runs Khalish face scan then eye scan. `FaceShapeStore.latest` supplies Nimah
 eyebrow/blush presets; `FaceShapeStore.eyes` supplies Hanum eyeliner via the `MakeupPlan` adapter. Saved analysis
 opens eyebrow/blush preview directly, with tutorial immediately available. Live geometric alignment is automatic,
 not another classification step. Eye-scan measurements are converted using matching units; the lid is never
 guessed from `mayBeHooded`. Missing/unclear measurements use the neutral liner. Older scans can still use the
 eye measurements embedded in the face result when no separate eye result exists. Eyeshadow is outside this scope.
+
+Eyeliner look (Hanum's overlay): `LinerOverlayRenderer` yields a halo fill plus a body fill per eye; the live canvas and photo
+`compose` multiply them into the camera picture, erase a skin-texture grain (`LinerInk`, anchored to the eye) and hand
+regions, and tint the pigment with skin sampled from the ARKit frame. Shared tuning constants live in `LinerInk` and `LinerOverlayRenderer`.
 
 Shared brief for anyone working on this repo with an AI coding assistant (Claude Code, Codex, Cursor, Copilot, …).
 It covers the project structure, what each feature does and how to use it, and the rules to follow.

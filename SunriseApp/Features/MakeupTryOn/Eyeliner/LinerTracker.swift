@@ -17,6 +17,11 @@ final class LinerTracker {
     /// Fraction of THIS user's normal eye opening below which the liner starts to fade (relative, so hooded and
     /// monolid eyes with a small absolute opening still count as open).
     var openFractionThreshold: Double = 0.55
+    /// A closed eye keeps its liner, on the closed lash line, like real liner. `false` fades it out as the eye closes.
+    var keepsLinerWhenClosed = true
+    /// A closing eye leaves less lid to show the liner on, so the liner gets thicker as the eye closes: a closed eye
+    /// shows it `1 + closedThicknessBoost` times as thick.
+    var closedThicknessBoost: CGFloat = 0.8
 
     /// The last frame's landmarks before and after smoothing, for the DEBUG dots.
     private(set) var lastRaw: [EyeLandmarks] = []
@@ -48,9 +53,12 @@ final class LinerTracker {
         lastRaw = frame.eyes
         lastSmoothed = eyes
         return eyes.compactMap { eye in
-            let alpha = openness(of: eye)
+            let relative = openness(of: eye)
+            let alpha = keepsLinerWhenClosed ? 1 : relative
+            var options = buildOptions
+            options.thicknessScale *= 1 + closedThicknessBoost * CGFloat(1 - relative)
             guard alpha > 0.01,
-                  let guide = LinerPathBuilder.build(landmarks: eye, spec: spec, options: buildOptions) else { return nil }
+                  let guide = LinerPathBuilder.build(landmarks: eye, spec: spec, options: options) else { return nil }
             return RenderedEye(side: eye.side, guide: guide, alpha: alpha)
         }
     }

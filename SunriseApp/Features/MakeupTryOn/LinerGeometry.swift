@@ -105,7 +105,7 @@ enum LinerGeometry {
             let lifted = atan2(-direction.y, direction.x) + style.wingAngle * .pi / 180
             let elevation = min(max(lifted, range.lowerBound * .pi / 180), range.upperBound * .pi / 180)
             direction = SIMD2(cos(elevation), -sin(elevation))
-
+            
             let bottomRoot: SIMD2<Float>, topRoot: SIMD2<Float>, topTangent: SIMD2<Float>
             switch style.wingOrigin {
             case .outerCorner:

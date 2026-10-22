@@ -24,6 +24,9 @@ import SwiftUI
     private let lidQueue = DispatchQueue(label: "sunrise.lidflow", qos: .userInitiated)
     private var lidBusy = false
     private var lastHand = 0.0
+    /// Skin tone near the eyes, smoothed; re-read every few frames.
+    private var skin: InkColor?
+    private var skinCountdown = 0
     private var spec: LinerSpec?
     private var solution: LinerSolution?
     private var isStarted = false
@@ -38,8 +41,6 @@ import SwiftUI
 
     var hasLiner: Bool { spec != nil }
 
-    /// Developer tools can switch the hand cut-out off, to tell whether it is what hides the liner.
-    private static var handOcclusionDisabled: Bool { UserDefaults.standard.bool(forKey: "disableOcclusion") }
     /// Off unless a developer switches it on: the upper lid follows the skin between detector results (a pulled lid).
     private static var lidTrackingEnabled: Bool { UserDefaults.standard.bool(forKey: "enableLidTracking") }
 
@@ -69,6 +70,7 @@ import SwiftUI
         occlusionMask = nil
         solution = nil
         frame = nil
+        skin = nil
         isStarted = false
     }
 
@@ -81,7 +83,7 @@ import SwiftUI
                 self.receive(landmarks)
             }
         }
-        // Without the segmentation model the liner simply is not hidden behind hands.
+        // Hands near the eye tell lid tracking that a lid may be pulled. Without the model it simply never follows.
         occluder.onMask = { [weak self] mask in
             Task { @MainActor in
                 guard let self,self.runID==token,self.isStarted else { return }
@@ -94,7 +96,7 @@ import SwiftUI
                 try await self.provider.start()
                 guard !Task.isCancelled,self.runID==token,self.spec != nil else { return }
                 self.isStarted=true; self.unavailableReason=nil
-                if !Self.handOcclusionDisabled { try? await self.occluder.start() }
+                try? await self.occluder.start()
                 guard !Task.isCancelled,self.runID==token else { return }
                 self.startupTask=nil
             } catch {
@@ -154,7 +156,20 @@ import SwiftUI
                                            headUp: point(raw[2]) - point(raw[0]),
                                            headAnchors: headAnchors.count >= 3 ? headAnchors : references.map(\.image)))
         }
+        refreshSkin(from: buffer)
         publish(context)
+    }
+
+    /// Re-reads the skin around the eyes every few frames, from a few camera pixels, and smooths it.
+    private func refreshSkin(from buffer: CVPixelBuffer) {
+        skinCountdown -= 1
+        guard skinCountdown <= 0, let eyes = frame?.eyes, !eyes.isEmpty else { return }
+        skinCountdown = 8
+        let readings = eyes.compactMap {
+            LinerInk.sampleSkin(in: buffer, aroundEyeFrom: $0.guide.anchors.innerCorner, to: $0.guide.anchors.outerCorner)
+        }
+        guard let reading = LinerInk.skinTone(of: readings) else { return }
+        skin = skin.map { $0.mixed(toward: reading, by: 0.3) } ?? reading
     }
 
     /// Draws the newest measurement, moved with the head, with this frame's screen mapping.
@@ -168,8 +183,8 @@ import SwiftUI
         let mapping = ImageToViewMapping.resolve(context)
         frame = LinerOverlayFrame(eyes: moved.eyes, mapping: mapping, receivedAt: now, debugRaw: moved.raw,
                                   debugSmoothed: moved.smoothed,
-                                  occlusion: Self.handOcclusionDisabled ? nil
-                                      : occlusionMask?.placement(headAnchors: head, mapping: mapping, at: now))
+                                  occlusion: occlusionMask?.placement(headAnchors: head, mapping: mapping, at: now),
+                                  skin: skin)
     }
 
     private func receive(_ landmarks: EyeLandmarkFrame?) {
@@ -215,6 +230,7 @@ struct LinerOverlayView: View {
     @ObservedObject var model: LinerOverlayModel
     @AppStorage("debugEyeLandmarks") private var showsLandmarks = false
     @AppStorage("debugOcclusionMask") private var showsMask = false
+    @AppStorage(DeveloperTools.key) private var developerMode = false
     /// `false` hides the liner, for comparing with the bare face.
     let isVisible: Bool
 
@@ -222,23 +238,33 @@ struct LinerOverlayView: View {
         GeometryReader { proxy in
             Canvas { context, _ in
                 guard isVisible, let frame = model.frame, let shade = model.shade else { return }
-                let color = Color(red: shade.red, green: shade.green, blue: shade.blue)
+                let ink = LinerOverlayRenderer.ink(shade, skin: frame.skin)
+                let color = Color(red: ink.red, green: ink.green, blue: ink.blue)
                 context.drawLayer { layer in
-                    for fill in LinerOverlayRenderer.fills(frame, shade: shade, intensity: model.intensity) {
+                    let fills = LinerOverlayRenderer.fills(frame, shade: shade, intensity: model.intensity)
+                    for fill in fills {
+                        // The faint bleed first, then the liner on top of it.
+                        layer.drawLayer { bleed in
+                            bleed.addFilter(.blur(radius: fill.haloBlur))
+                            bleed.fill(Path(fill.path), with: .color(color.opacity(fill.haloAlpha)), style: FillStyle(eoFill: false))
+                        }
                         layer.drawLayer { liner in
                             liner.addFilter(.blur(radius: fill.blur))
                             liner.fill(Path(fill.path), with: .color(color.opacity(fill.alpha)), style: FillStyle(eoFill: false))
                         }
                     }
-                    // A hand in front of the eye: erase the liner where the segmenter found body skin.
-                    if let occlusion = frame.occlusion {
+                    // Skin texture shows through the ink in faint speckles that stay with the eye.
+                    if let tile = LinerInk.grainTile {
+                        let grain = Image(decorative: tile, scale: 1)
                         layer.blendMode = .destinationOut
-                        layer.concatenate(occlusion.transform)
-                        layer.draw(Image(decorative: occlusion.image, scale: 1),
-                                   in: CGRect(origin: .zero, size: occlusion.size))
+                        for fill in fills {
+                            for rect in LinerInk.grainTiles(covering: fill.grainBox, anchoredAt: fill.anchor) {
+                                layer.draw(grain, in: rect)
+                            }
+                        }
                     }
                 }
-                if showsMask, let occlusion = frame.occlusion {
+                if developerMode, showsMask, let occlusion = frame.occlusion {
                     context.drawLayer { layer in
                         layer.clipToLayer { mask in
                             mask.concatenate(occlusion.transform)
@@ -249,6 +275,9 @@ struct LinerOverlayView: View {
                     }
                 }
             }
+            // Multiply over the camera picture, like ink: the skin's texture, shading and light show through the liner
+            // instead of a flat colour sitting on top of it.
+            .blendMode(.multiply)
             .overlay { landmarkDots }
             .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }
         }
@@ -258,7 +287,7 @@ struct LinerOverlayView: View {
 
     /// Developer tools: red = MediaPipe's points as reported, green = smoothed (what the liner is built from).
     @ViewBuilder private var landmarkDots: some View {
-        if showsLandmarks, isVisible, let frame = model.frame {
+        if developerMode, showsLandmarks, isVisible, let frame = model.frame {
             Canvas { context, _ in
                 func dots(_ eyes: [EyeLandmarks], _ color: Color, _ radius: CGFloat) {
                     for eye in eyes {

@@ -5,6 +5,27 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Changed — eyeliner realism (grain and skin tint)
+- On top of the multiply blend and bleed halo: the pigment picks up 12% of the skin tone read from a few camera pixels around
+  the eyes every 8 frames, and a fixed speckle (`LinerInk`) lifts the ink unevenly so skin texture shows through; the speckle
+  is anchored to the eye's inner corner so it moves with the face. Live canvas and photos match. Not yet checked on a real face.
+
+### Changed — Try On home redesign
+- New single home screen `Features/TryOnHome/TryOnHomeView`: header (profile, wordmark, arrow), rounded live camera card, three
+  tool tiles (blush, eyeliner, eyebrow), a shade row (none, swatches, "+" disabled for now) and an intensity bar. Palette tokens
+  `AppColors.wine/cocoa/flamingo/snow` (#660033, #5F2C30, #F5477D, #FFFFFF).
+- The tab bar is gone: after onboarding the app opens on this screen. `AppRoute.profile` and `.tutorial` open blank placeholder pages
+  (`BlankPageView`) until the design team's screens exist. Discover and My Looks are no longer reachable.
+- Each tool swaps the engine inside the card (blush/eyebrow: `EyebrowViewModel` + `LiveGuideView`; eyeliner: `MakeupTryOnViewModel`);
+  only the selected engine runs. `TryOnHomeModel` owns them.
+- `EyebrowConfiguration.shadeTint` lets the blush/eyebrow preview use the chosen shade (`FaceRegionPreviewRenderer`).
+- One shared camera: the home screen runs a single ARKit session (`LiveGuideView`) and the eyeliner overlay (`LinerOverlayModel`) is fed
+  the same frames (`LiveGuideView.onFrame`, `LinerFrameRelay`). Switching tools no longer swaps cameras; each tool has its own on/off,
+  shade and intensity, and blush, eyebrow and eyeliner can show together (`EyebrowConfiguration.layered`, `PreviewLayer`, a second
+  preview renderer for blush). `MakeupTryOnViewModel` is no longer used by the home screen.
+- Logo asset `logo-burgundy` replaces the text wordmark; the intensity bar has a draggable thumb.
+- Face/eye rescan cards and the eyeliner "Take photo" / "Place again" buttons are not on the new screen yet. Not checked on a TrueDepth iPhone.
+
 ### Integrated — -Nimah
 - Saved face/eye results now drive recommendations: Nimah eyebrow/blush open preview and tutorial without a repeat
   scan step; Hanum eyeliner consumes the newer separate eye result. Live alignment remains automatic.

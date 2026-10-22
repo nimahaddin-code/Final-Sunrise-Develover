@@ -99,12 +99,14 @@ final class FaceRegionPreviewRenderer {
     private var patches:[Patch]=[]
     func update(brow:EyebrowGuide?,forehead:ForeheadGuide?,blush:BlushPlacementGuide? = nil,vertices:[SIMD3<Float>],triangles:[Int16],configuration:EyebrowConfiguration) {
         guard configuration.showMakeupPreview && configuration.previewAfter else { root.isHidden=true; return }
-        let newKey:String?
+        let regionKey:String?
         switch configuration.region {
-        case .eyebrows:newKey=brow?.id.uuidString
-        case .blush:newKey=blush?.id.uuidString
-        case .forehead:newKey=forehead?.id.uuidString
+        case .eyebrows:regionKey=brow?.id.uuidString
+        case .blush:regionKey=blush?.id.uuidString
+        case .forehead:regionKey=forehead?.id.uuidString
         }
+        // A new shade rebuilds the patches, because the tint is baked into their vertex colours.
+        let newKey=regionKey.map { $0+"|"+(configuration.shadeTint.map { "\($0)" } ?? "default") }
         guard let newKey else { root.isHidden=true; return }
         if key != newKey {
             key=newKey; root.childNodes.forEach { $0.removeFromParentNode() }; patches=[]
@@ -113,12 +115,12 @@ final class FaceRegionPreviewRenderer {
                     // -Nimah: Do not bridge missing outline attachments across unmapped skin.
                     guard curve.outline.allSatisfy({ $0 != nil }) else { continue }
                     let polygon=curve.outline.compactMap { $0?.position(in:vertices) }
-                    add(polygon:polygon,vertices:vertices,triangles:triangles,tint:SIMD3(0.16,0.085,0.055),opacity:0.85)
+                    add(polygon:polygon,vertices:vertices,triangles:triangles,tint:configuration.shadeTint ?? SIMD3(0.16,0.085,0.055),opacity:0.85)
                 }
             } else if configuration.region == .blush,let blush {
                 for area in blush.areas {
                     add(polygon:area.boundary.compactMap { $0.position(in:vertices) },vertices:vertices,triangles:triangles,
-                        tint:SIMD3(0.87,0.25,0.37),opacity:0.65)
+                        tint:configuration.shadeTint ?? SIMD3(0.87,0.25,0.37),opacity:0.65)
                 }
             } else if let forehead {
                 let highlight=forehead.style.category == .highlight

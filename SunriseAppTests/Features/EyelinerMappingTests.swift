@@ -163,6 +163,17 @@ final class EyelinerMappingTests: XCTestCase {
                                  receivedAt: receivedAt)
     }
 
+    func testInkIsCharcoalNotFlatBlack() {
+        let black = LinerOverlayRenderer.ink(MakeupPalette.black)
+        XCTAssertGreaterThan(black.red, 0.1, "Multiplied over skin, the liner keeps a little of the light and the skin's tint")
+        XCTAssertLessThan(black.red, 0.3)
+        for shade in MakeupPalette.shades(for: .eyeliner) {
+            let ink = LinerOverlayRenderer.ink(shade)
+            XCTAssertGreaterThanOrEqual(ink.red, shade.red)
+            XCTAssertLessThan(ink.red, 1)
+        }
+    }
+
     func testFillsFollowShadeIntensityAndAge() throws {
         let frame = try overlayFrame()
         let black = MakeupPalette.black
@@ -171,6 +182,8 @@ final class EyelinerMappingTests: XCTestCase {
         XCTAssertEqual(full[0].alpha, min(MakeupTextureRenderer.drawnOpacity(black), LinerOverlayRenderer.maxOpacity), accuracy: 1e-9)
         XCTAssertLessThan(full[0].alpha, 1, "Some skin always shows through")
         XCTAssertTrue(LinerOverlayRenderer.blurRange.contains(full[0].blur), "The edge is softened to match the video")
+        XCTAssertLessThan(full[0].haloAlpha, full[0].alpha / 2, "The bleed under the liner is faint")
+        XCTAssertGreaterThan(full[0].haloBlur, full[0].blur * 2, "and wider than the liner's own edge")
         let half = LinerOverlayRenderer.fills(frame, shade: black, intensity: 0.5, now: 100.1)
         XCTAssertEqual(half[0].alpha, full[0].alpha / 2, accuracy: 1e-9)
         XCTAssertTrue(LinerOverlayRenderer.fills(frame, shade: black, intensity: 0, now: 100.1).isEmpty)
@@ -285,7 +298,7 @@ final class HandOcclusionTests: XCTestCase {
         XCTAssertNil(mask.placement(headAnchors: mask.headAnchors, mapping: identity, at: 10 + OcclusionMask.maxAge + 0.1))
     }
 
-    func testTheLinerIsErasedBehindAHandInThePhoto() throws {
+    func testAHandDoesNotEraseTheLinerInThePhoto() throws {
         let tracker = LinerTracker()
         var eyes: [RenderedEye] = []
         for i in 0..<5 {
@@ -320,12 +333,8 @@ final class HandOcclusionTests: XCTestCase {
         }
         let aroundTheEye = CGRect(x: 160, y: 340, width: 120, height: 80)
         XCTAssertLessThan(try darkest(photo(occlusion: nil), in: aroundTheEye), 0.6, "Without a hand the liner is in the photo")
-        XCTAssertGreaterThan(try darkest(photo(occlusion: hand), in: aroundTheEye), 0.97,
-                             "A hand over the eye hides the liner there")
-        // A hand over only the far side of the picture leaves the liner alone.
-        let farHand = Occlusion(image: hand.image, size: hand.size,
-                                transform: CGAffineTransform(scaleX: 100, y: 100).translatedBy(x: 5, y: 0))
-        XCTAssertLessThan(try darkest(photo(occlusion: farHand), in: aroundTheEye), 0.6)
+        XCTAssertLessThan(try darkest(photo(occlusion: hand), in: aroundTheEye), 0.6,
+                          "The hand mask only steers lid tracking; the liner stays drawn")
     }
 }
 
