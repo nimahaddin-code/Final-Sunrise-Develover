@@ -63,7 +63,8 @@ final class LinerFrameRelay: @unchecked Sendable {
 /// eyebrow on the face mesh, and the same frames feed Hanum's eyeliner overlay (`LinerOverlayModel`) drawn on top.
 /// Each tool has its own on/off state, shade and intensity, so the looks can be switched on and off together.
 @MainActor final class TryOnHomeModel: ObservableObject {
-    static let defaultIntensity = 0.65
+    // -Nimah: Start with a clearly visible simulation; the slider can soften it.
+    static let defaultIntensity = 0.85
 
     /// The tool the shade row and intensity bar currently control.
     @Published private(set) var tool: TryOnTool = .blush

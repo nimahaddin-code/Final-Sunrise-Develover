@@ -115,12 +115,12 @@ final class FaceRegionPreviewRenderer {
                     // -Nimah: Do not bridge missing outline attachments across unmapped skin.
                     guard curve.outline.allSatisfy({ $0 != nil }) else { continue }
                     let polygon=curve.outline.compactMap { $0?.position(in:vertices) }
-                    add(polygon:polygon,vertices:vertices,triangles:triangles,tint:configuration.shadeTint ?? SIMD3(0.16,0.085,0.055),opacity:0.85)
+                    add(polygon:polygon,vertices:vertices,triangles:triangles,tint:configuration.shadeTint ?? SIMD3(0.16,0.085,0.055),opacity:0.95)
                 }
             } else if configuration.region == .blush,let blush {
                 for area in blush.areas {
                     add(polygon:area.boundary.compactMap { $0.position(in:vertices) },vertices:vertices,triangles:triangles,
-                        tint:configuration.shadeTint ?? SIMD3(0.87,0.25,0.37),opacity:0.65)
+                        tint:configuration.shadeTint ?? SIMD3(0.87,0.25,0.37),opacity:0.90)
                 }
             } else if let forehead {
                 let highlight=forehead.style.category == .highlight
@@ -133,7 +133,7 @@ final class FaceRegionPreviewRenderer {
         root.isHidden=patches.isEmpty
         let strength=max(0,min(1,configuration.previewIntensity))
         for patch in patches {
-            let positions=patch.attachments.compactMap { $0.position(in:vertices,lift:0.0004) }
+            let positions=patch.attachments.compactMap { $0.position(in:vertices,lift:0.001) }
             guard positions.count==patch.attachments.count else { patch.node.isHidden=true; continue }
             patch.node.isHidden=false
             let source=SCNGeometrySource(vertices:positions.map { SCNVector3($0.x,$0.y,$0.z) })
@@ -156,7 +156,7 @@ final class FaceRegionPreviewRenderer {
                 if let attachment=SurfaceAttachment.bind(p,vertices:vertices,triangles:triangles,minimumZ:minZ-0.003) {
                     mapping[y*(columns+1)+x]=attachments.count
                     attachments.append(attachment)
-                    let feather=max(0.0005,min(maxX-minX,maxY-minY)*0.28)
+                    let feather=max(0.0005,min(maxX-minX,maxY-minY)*0.14)
                     alphas.append(Self.coverage(p,polygon:outline,feather:feather)*opacity)
                 }
             }
@@ -177,6 +177,8 @@ final class FaceRegionPreviewRenderer {
         let colorSource=SCNGeometrySource(data:colors.withUnsafeBytes { Data($0) },semantic:.color,vectorCount:colors.count,
             usesFloatComponents:true,componentsPerVector:4,bytesPerComponent:4,dataOffset:0,dataStride:MemoryLayout<SIMD4<Float>>.stride)
         let element=SCNGeometryElement(indices:indices,primitiveType:.triangles)
+        // -Nimah: Keep a strong pigment core with a soft edge; lift above the face depth mesh to avoid clipping.
+        node.renderingOrder=1
         let material=EyelinerRenderer.material(tint:.white)
         patches.append(Patch(node:node,attachments:attachments,colors:colorSource,element:element,material:material))
     }

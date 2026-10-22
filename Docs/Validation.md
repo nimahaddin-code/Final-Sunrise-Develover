@@ -168,3 +168,13 @@ Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. R
 - Photos stay in memory, processing is off the UI thread, maximum raster dimension 1024 pixels. The existing
   camera usage description now covers rear-camera palette capture. System PhotosPicker requires no full-library read grant.
 - Preset colours are approximate sRGB interpretations of the supplied product images; no calibrated match is claimed.
+
+## Visible pigment fix — -Nimah
+
+- Fixed layered render snapshot dropping the eyebrow input whenever blush was requested.
+- Stronger brow/blush alpha and 0.85 initial intensity, narrower feather and 1 mm surface lift reduce fading/clipping.
+- Simulator: **261 tests, 257 pass, 4 skips, 0 failures**. Includes combined brow/blush inputs and actual
+  offscreen SceneKit rendering with an assertion that the image contains visible coloured blush pixels.
+- Signed generic iPhone build: **BUILD SUCCEEDED**. No live iPhone visual acceptance was performed.
+- On device: rebuild/run staging, select After, try Pink/Muted Mauve and Brown/Soft black, then turn both tools on;
+  check that both stay visible and intensity/Before still remove or soften them as expected.

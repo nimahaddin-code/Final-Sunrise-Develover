@@ -2,6 +2,12 @@
 
 ## Current merged scope — -Nimah
 
+Visible pigment fix — -Nimah: layered render snapshots must request `includeBrow: configuration.needsBrow`,
+otherwise turning on blush strips the brow input from the renderer. Brow/blush pigment cores use stronger alpha,
+14% feather width, 1 mm surface lift, and default intensity 0.85. Before/After and intensity still control visibility.
+These are preview rendering parameters, not measured real-world colour accuracy.
+
+
 Palette try-on — -Nimah: `Features/TryOnHome/PaletteColorPicker.swift` provides a native ColorPicker,
 PhotosPicker import and rear-camera capture, followed by tap-to-sample from bounded upright sRGB pixels.
 Photos are memory-only and never uploaded/saved. Home dismantles the face camera while picking a palette,
