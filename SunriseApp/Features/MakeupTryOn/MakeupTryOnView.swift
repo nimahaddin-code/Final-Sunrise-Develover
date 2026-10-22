@@ -171,27 +171,12 @@ struct MakeupTryOnView: View {
         let items = model.recommendations(in: category)
         let selected = model.selection[category]
         return VStack(alignment: .leading, spacing: AppSpacing.medium) {
-            Picker("Makeup", selection: $category) {
-                ForEach([MakeupCategory.eyeliner]) { Text($0.title).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AppSpacing.small) {
-                    chip(isSelected: selected == nil) { model.select(nil, in: category) } label: {
-                        Label("None", systemImage: "nosign")
-                    }
-                    ForEach(items) { item in
-                        chip(isSelected: selected == item) { model.select(item, in: category) } label: {
-                            HStack(spacing: AppSpacing.small) {
-                                if MakeupPlan.isMadeForYou(item) {
-                                    Image(systemName: "sparkles").font(.caption).accessibilityHidden(true)
-                                }
-                                Text(item.name)
-                            }
-                        }
-                    }
-                }
-            }
+            // -Nimah: A result with an on/off control, not a catalog of style choices.
+            Text("Eyeliner fitted to your eye scan").font(AppTypography.heading)
+            Toggle("Show recommended eyeliner",isOn:Binding(
+                get:{ selected != nil },
+                set:{ model.select($0 ? items.first : nil,in:.eyeliner) }
+            ))
             if selected != nil {
                 shadePicker
                 intensitySlider

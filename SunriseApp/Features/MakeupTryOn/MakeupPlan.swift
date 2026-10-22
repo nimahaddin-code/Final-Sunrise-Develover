@@ -49,7 +49,8 @@ struct MakeupPlan: Hashable, Sendable {
         self.blend = blend
         self.eyes = eyes
         // -Nimah: This plan is eyeliner-only. Nimah's studio owns eyebrow/blush preferences.
-        recommendations = [MakeupPersonalizer.eyeliner(eyes)] + EyelinerPlanner.catalog
+        // -Nimah: One eye-scan assignment only; catalog variants stay internal to Hanum’s planner.
+        recommendations = [MakeupPersonalizer.eyeliner(eyes)]
     }
 
     func recommendations(in category: MakeupCategory) -> [MakeupRecommendation] {

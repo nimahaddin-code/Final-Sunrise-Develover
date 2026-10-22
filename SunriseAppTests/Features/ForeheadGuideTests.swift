@@ -61,6 +61,8 @@ final class ForeheadGuideTests:XCTestCase {
         let model=EyebrowViewModel(checker:Supported())
         XCTAssertEqual(model.phase,.positionFace)
         model.phase = .tracking; XCTAssertTrue(model.liveConfiguration.showTrackingPoints)
+        // -Nimah: Region/tutorial tests use a saved scan; missing scans no longer show makeup.
+        model.applyAssessment(.init(shape:.oval,origin:.analysis))
         model.phase = .chooseRegion; XCTAssertTrue(model.liveConfiguration.showAllRegions)
         model.select(.forehead); XCTAssertEqual(model.phase,.chooseStyle)
         model.beginTutorial(); XCTAssertEqual(model.lessons.count,3); XCTAssertNil(model.liveConfiguration.tutorialStep)

@@ -25,27 +25,27 @@ struct MakeupRecommendationsView:View {
                 Button("View eye result / scan again",action:onScanEyes)
             }
             Section("Eyebrow & Blush") {
-                NavigationLink(value:AppRoute.browBlush(.eyebrows)) { Label("Eyebrow",systemImage:"eyebrow") }
-                NavigationLink(value:AppRoute.browBlush(.blush)) { Label("Blush",systemImage:"paintbrush.pointed") }
+                NavigationLink(value:store.latest == nil ? AppRoute.faceScan : AppRoute.browBlush(.eyebrows)) { Label("Eyebrow",systemImage:"eyebrow") }
+                NavigationLink(value:store.latest == nil ? AppRoute.faceScan : AppRoute.browBlush(.blush)) { Label("Blush",systemImage:"paintbrush.pointed") }
                 if let shape=store.latest?.shape {
                     let mapped=shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:shape.rawValue) ?? .unknown
-                    if let brow=MakeupPreferenceCatalog.browOptions(for:mapped).first { Text("Eyebrow starting style: \(brow.title)").font(.caption) }
-                    if let blush=MakeupPreferenceCatalog.blushOptions(for:mapped).first { Text("Blush starting placement: \(blush.title)").font(.caption) }
+                    if let brow=MakeupPreferenceCatalog.assignedBrow(for:mapped) { Text("Eyebrow starting style: \(brow.title)").font(.caption) }
+                    if let blush=MakeupPreferenceCatalog.assignedBlush(for:mapped) { Text("Blush starting placement: \(blush.title)").font(.caption) }
                     Text("Based on your saved face shape. Try on directly, then follow the tutorial.").font(.caption).foregroundStyle(AppColors.subtle)
                 } else {
-                    Text("Choose a face shape manually if no scan result is available.").font(.caption).foregroundStyle(AppColors.subtle)
+                    Text("Complete your face scan first. If this shape has no reference yet, makeup stays off.").font(.caption).foregroundStyle(AppColors.subtle)
                 }
             }
             Section("Eyeliner") {
                 let plan=store.latest.map { MakeupPlan(scan:$0,eyeScan:store.eyes) } ?? MakeupPlan(shape:.oval,eyeScan:store.eyes)
                 Text(plan.eyeliner.isNeutral ? "No clear eye result · neutral starting style" : "Recommended from your eye scan").font(.caption).foregroundStyle(AppColors.subtle)
                 Text(plan.eyeliner.reason).font(.caption).foregroundStyle(AppColors.subtle)
-                ForEach(plan.madeForYou) { item in
+                ForEach(plan.eyeliner.isNeutral ? [] : plan.madeForYou) { item in
                     NavigationLink(value:AppRoute.makeupTryOn(plan:plan,applied:[item])) {
                         VStack(alignment:.leading) { Text(item.name);Text(item.detail).font(.caption).foregroundStyle(AppColors.subtle) }
                     }
                 }
-                Text("Other eyeliner styles remain available inside try-on. Rescan only when you want to update the saved result.").font(.caption).foregroundStyle(AppColors.subtle)
+                Text("Your saved scan chooses the style. Colour and intensity remain adjustable.").font(.caption).foregroundStyle(AppColors.subtle)
             }
         }.scrollContentBackground(.hidden).background(AppColors.background).navigationTitle("Try On")
     }

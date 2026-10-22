@@ -1,19 +1,24 @@
 import SwiftUI
+import Combine
+// -Nimah: Saved scan outputs select the single assigned style on the shared camera.
 
 /// The app's first screen once onboarding is done: header, live camera card, the three tools, a shade row and an
 /// intensity bar. The arrow opens the tutorial, the profile button the profile page.
 struct TryOnHomeView: View {
     @StateObject private var home: TryOnHomeModel
     var onProfile: () -> Void
-    var onTutorial: () -> Void
+    var onTutorial: (TryOnTool) -> Void
+    @ObservedObject private var store: FaceShapeStore
     @AppStorage(DeveloperTools.key) private var developerTools = false
     @Environment(\.scenePhase) private var scenePhase
+    @State private var isVisible=false
 
     init(store: FaceShapeStore, assessment: FaceShapeAssessment?, checker: any FaceTrackingAvailabilityChecking,
-         onProfile: @escaping () -> Void, onTutorial: @escaping () -> Void) {
+         onProfile: @escaping () -> Void, onTutorial: @escaping (TryOnTool) -> Void) {
         let plan = store.latest.map { MakeupPlan(scan: $0, eyeScan: store.eyes) } ?? MakeupPlan(shape: .oval, eyeScan: store.eyes)
         _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment ?? FaceShapeAssessment(shape: .unknown),
                                                          checker: checker))
+        self.store = store
         self.onProfile = onProfile
         self.onTutorial = onTutorial
     }
@@ -24,9 +29,11 @@ struct TryOnHomeView: View {
             TryOnLiveCard(home: home)
                 .frame(maxHeight: .infinity)
             toolStrip
-            shadeRow
+            Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
+            shadeRow.disabled(!home.canTry(home.tool))
             IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
                          tint: home.currentShade?.color ?? AppColors.flamingo)
+                .disabled(!home.canTry(home.tool))
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
@@ -35,11 +42,14 @@ struct TryOnHomeView: View {
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: home.tool)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
-        .onAppear { home.activate() }
-        .onDisappear { home.deactivate() }
+        .onReceive(store.$latest.combineLatest(store.$eyes)) { face,eyes in
+            home.updateRecommendations(face:face,eyes:eyes)
+        }
+        .onAppear { isVisible=true; home.activate() }
+        .onDisappear { isVisible=false; home.deactivate() }
         .onChange(of: scenePhase) { _, phase in
             // Pause the camera off-screen; resume through the same guarded path.
-            if phase == .active { home.activate() } else { home.deactivate() }
+            if phase == .active && isVisible { home.activate() } else { home.deactivate() }
         }
     }
 
@@ -65,7 +75,7 @@ struct TryOnHomeView: View {
                 }
                 .accessibilityLabel("Profile")
                 Spacer()
-                Button(action: onTutorial) {
+                Button { onTutorial(home.tool) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)

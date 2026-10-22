@@ -98,7 +98,7 @@ final class EyelinerPlannerTests: XCTestCase {
         let liner = plan.recommendations(in: .eyeliner)
         XCTAssertTrue(MakeupPlan.isMadeForYou(liner[0]))
         XCTAssertEqual(liner[0].style, .eyeliner(EyelinerPlanner.plan(for: scan.eyes).style))
-        XCTAssertEqual(liner.count, 1 + 9, "Made for you plus one liner per eye shape and the natural line")
+        XCTAssertEqual(liner.count, 1, "Only the eye-scan assignment is exposed; catalog variants stay internal") // -Nimah
     }
 
     func testFaceShapeDoesNotChangeTheEyeliner() {

@@ -12,7 +12,16 @@ struct AppRootView: View {
                 NavigationStack(path: $navigator.tryOnPath) {
                     TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
                                   onProfile: { navigator.open(.profile, in: .tryOn) },
-                                  onTutorial: { navigator.open(.tutorial, in: .tryOn) })
+                                  onTutorial: { tool in
+                                      // -Nimah: Open the assigned tutorial directly; request a scan only when missing.
+                                      switch tool {
+                                      case .eyebrow,.blush:
+                                          navigator.open(faceShapeStore.latest == nil ? .faceScan : .browBlush(tool == .eyebrow ? .eyebrows : .blush),in:.tryOn)
+                                      case .eyeliner:
+                                          let plan=faceShapeStore.latest.map { MakeupPlan(scan:$0,eyeScan:faceShapeStore.eyes) } ?? MakeupPlan(shape:.oval,eyeScan:faceShapeStore.eyes)
+                                          navigator.open(plan.eyeliner.isNeutral ? .eyeScan : .makeupTryOn(plan:plan,applied:plan.madeForYou),in:.tryOn)
+                                      }
+                                  })
                         .navigationDestination(for: AppRoute.self, destination: destination)
                 }
             } else {
@@ -42,7 +51,9 @@ struct AppRootView: View {
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
             FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
-        case .profile: BlankPageView(title: "Profile")
+        // -Nimah: Keep scan results and rescan actions reachable after the single-camera redesign.
+        case .profile: MakeupRecommendationsView(store:faceShapeStore,
+            onScanFace:{ navigator.open(.faceScan,in:.tryOn) },onScanEyes:{ navigator.open(.eyeScan,in:.tryOn) })
         case .tutorial: BlankPageView(title: "Tutorial")
         case .eyeScan:
             EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }

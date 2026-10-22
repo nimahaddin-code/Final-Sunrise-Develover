@@ -27,24 +27,26 @@ final class MakeupPreferenceTests:XCTestCase {
             if let b=options.first(where:{ $0.source=="B" }),let c=options.first(where:{ $0.source=="C" }) { XCTAssertEqual(b.style,c.style) }
         }
     }
-    @MainActor func testHollyInputManualOverrideAndSourceSelectionStayExplicit() throws {
-        let model=EyebrowViewModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.round,origin:.analysis,confidence:0.8))
-        XCTAssertEqual(model.assessment.origin,.analysis)
-        XCTAssertEqual(model.configuration.style,.angular)
-        let d=try XCTUnwrap(model.blushOptions.first(where:{ $0.source=="D" }))
-        model.choose(d); model.select(.blush)
-        XCTAssertEqual(model.liveConfiguration.blushStyle,.highLift)
-        XCTAssertEqual(model.lessons.count,3)
-        XCTAssertNotNil(model.selectedBlush)
-        model.applyAssessment(.init(shape:.pear))
-        XCTAssertEqual(model.assessment.origin,.manual); XCTAssertNil(model.selectedBlush)
-        XCTAssertNil(model.selectedBrow)
-        model.explore(BlushPlacementStyle.templeSweep)
-        XCTAssertEqual(model.configuration.blushStyle,.templeSweep)
-        XCTAssertTrue(model.sourceNote.contains("Manual exploration"))
-        model.configuration.previewAfter=false
-        XCTAssertFalse(model.liveConfiguration.showMakeupPreview); XCTAssertFalse(model.liveConfiguration.showGuide)
-        XCTAssertNil(FaceShapeAssessment(shape:.oval,origin:.analysis,confidence:.nan).confidence)
+    // -Nimah: Scan assignment is authoritative, including stale catalog actions and missing coverage.
+    @MainActor func testScanAssignsOneReferenceAndRejectsOtherStyles() throws {
+        for shape in [MakeupFaceShape.oval,.round,.square,.oblong,.heart,.diamond] {
+            let model=EyebrowViewModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:shape,origin:.analysis),initialRegion:.blush)
+            XCTAssertEqual(model.browOptions.count,1)
+            XCTAssertEqual(model.blushOptions.count,1)
+            XCTAssertEqual(model.selectedBrow?.shape,shape)
+            XCTAssertEqual(model.selectedBlush?.shape,shape)
+            let assigned=try XCTUnwrap(model.selectedBlush)
+            for other in MakeupPreferenceCatalog.blush where other.id != assigned.id { model.choose(other) }
+            model.explore(BlushPlacementStyle.templeSweep)
+            XCTAssertEqual(model.selectedBlush?.id,assigned.id)
+            XCTAssertEqual(model.configuration.blushStyle,assigned.style)
+        }
+        let model=EyebrowViewModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.pear,origin:.analysis),initialRegion:.blush)
+        XCTAssertNil(model.selectedBrow); XCTAssertNil(model.selectedBlush)
+        XCTAssertFalse(model.liveConfiguration.showMakeupPreview)
+        model.beginTutorial(); XCTAssertEqual(model.phase,.chooseStyle)
+        model.applyAssessment(.init(shape:.oval))
+        XCTAssertFalse(model.hasRecommendation,"Manual labels are not saved scan outputs")
     }
     func testAllBlushStylesStayOnCheeksAndClosedAreasFollowMesh() throws {
         let f=BrowFixture(),region=try f.region()
@@ -141,13 +143,13 @@ final class MakeupPreferenceTests:XCTestCase {
     // -Nimah: Reproduce a second try after the user viewed Before or hid the guide.
     @MainActor func testNewTryRestoresVisiblePreview() {
         let model=EyebrowViewModel(checker:MockFaceTrackingChecker())
-        model.chooseFaceShape(.oval)
+        model.applyAssessment(.init(shape:.oval,origin:.analysis))
         model.configuration.previewAfter=false;model.configuration.showGuide=false;model.configuration.previewIntensity=0
         model.select(.blush)
         XCTAssertTrue(model.liveConfiguration.showMakeupPreview)
         XCTAssertTrue(model.liveConfiguration.showGuide)
         model.configuration.previewAfter=false;model.configuration.showGuide=false
-        model.choose(model.blushOptions[1])
+        model.choose(model.blushOptions[0])
         XCTAssertTrue(model.liveConfiguration.showMakeupPreview)
         XCTAssertTrue(model.liveConfiguration.showGuide)
         model.configuration.previewAfter=false

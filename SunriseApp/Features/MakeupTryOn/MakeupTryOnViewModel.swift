@@ -61,7 +61,7 @@ import UIKit
 
     init(plan: MakeupPlan, applied: [MakeupRecommendation]) {
         self.plan = plan
-        selection = Dictionary(applied.filter { $0.category == .eyeliner }.map { ($0.category, $0) }, uniquingKeysWith: { _, last in last })
+        selection = Dictionary(applied.filter { plan.recommendations.contains($0) }.map { ($0.category, $0) }, uniquingKeysWith: { _, last in last })
     }
 
     func recommendations(in category: MakeupCategory) -> [MakeupRecommendation] {
@@ -70,7 +70,7 @@ import UIKit
 
     func select(_ recommendation: MakeupRecommendation?, in category: MakeupCategory) {
         // -Nimah: Reject old eyebrow/blush requests, including stale navigation payloads.
-        guard category == .eyeliner, recommendation == nil || recommendation?.category == .eyeliner else { return }
+        guard category == .eyeliner, recommendation == nil || plan.recommendations.contains(where: { $0 == recommendation }) else { return }
         guard selection[category] != recommendation else { return }
         selection[category] = recommendation
         redraw(category)

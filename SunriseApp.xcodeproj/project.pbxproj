@@ -1118,7 +1118,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1160,7 +1160,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

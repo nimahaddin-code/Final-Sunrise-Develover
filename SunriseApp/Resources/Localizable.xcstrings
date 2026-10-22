@@ -1,6 +1,27 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Your recommendation" : {
+      "extractionState" : "manual"
+    },
+    "No saved recommendation for this face shape" : {
+      "extractionState" : "manual"
+    },
+    "Complete your face scan first. If this shape has no reference yet, makeup stays off." : {
+      "extractionState" : "manual"
+    },
+    "Complete your eye scan to get a recommendation" : {
+      "extractionState" : "manual"
+    },
+    "Eyeliner fitted to your eye scan" : {
+      "extractionState" : "manual"
+    },
+    "Show recommended eyeliner" : {
+      "extractionState" : "manual"
+    },
+    "Your saved scan chooses the style. Colour and intensity remain adjustable." : {
+      "extractionState" : "manual"
+    },
     "%@ · illustrative placement sketch" : {
 
     },
