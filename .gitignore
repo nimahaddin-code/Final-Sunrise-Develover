@@ -26,3 +26,4 @@ xcuserdata/
 *.xcconfig.local
 # Swift package checkouts; keep lockfiles if packages are added later
 .swiftpm/
+

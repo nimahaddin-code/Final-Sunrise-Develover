@@ -1,0 +1,458 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "title": "Makeup placement rule base (brows, eyeliner, blush)",
+    "status": "DRAFT_needs_MUA_validation",
+    "created": "2026-10-21",
+    "scope": "Placement and shape only. No colors, products, finishes or brands.",
+    "approach": "Balance and enhance natural features; rules are anchored to face landmarks.",
+    "numeric_policy": "Every number is an ESTIMATE unless a field explicitly says 'sourced'. No source gave degrees or percentages; all were qualitative.",
+    "labels": {
+      "ESTIMATE": "Proposed value, needs calibration and MUA validation",
+      "INFERENCE": "Analyst conclusion, not stated by sources",
+      "CONFLICT": "Sources disagree; options listed, one recommended",
+      "NO CONSENSUS FOUND": "No usable support found"
+    },
+    "caveats": [
+      "About 19 searches/page reads; many pages read only via snippets. Not exhaustive.",
+      "Most cells have 2-5 sources, not 3 fully independent ones. Independence is not verifiable; many Indonesian articles are translations of L'Oreal/Byrdie content.",
+      "Spam/scraped/mirror pages excluded (see excluded_sources).",
+      "Western and Indonesian tata rias rules are contrast-based/corrective (oval treated as ideal). The app's 'enhance, not correct' is a product framing, not a source principle."
+    ],
+    "celebrity_note": "Celebrity data is for reference/UI only and is NOT ground truth."
+  },
+  "sources": {
+    "S1": {"title": "Who What Wear - brow shaping (Benefit's Autumn Estelle Reid, Kelley Baker)", "url": "https://www.whowhatwear.com/how-to-get-shape-eyebrows/slide13", "type": "named_mua"},
+    "S2": {"title": "IT Cosmetics - eyebrow mapping (Kirsten Peterson)", "url": "https://www.itcosmetics.com/how-to-shape-your-eyebrows.html", "type": "brand_education"},
+    "S3": {"title": "Maybelline India - eyebrow mapping", "url": "https://www.maybelline.co.in/makeup-tips/eye-makeup/eyebrow-mapping", "type": "brand_education"},
+    "S4": {"title": "Rimmel London - arched eyebrows", "url": "https://www.rimmellondon.com/en-gb/trends-and-looks/looks/how-to-get-arched-eyebrows", "type": "brand_education"},
+    "S5": {"title": "InStyle via Yahoo - brow shape per face shape (Joey Healy, Kristie Streicher)", "url": "https://www.yahoo.com/lifestyle/ultimate-guide-finding-brow-shape-185218348.html", "type": "named_mua"},
+    "S6": {"title": "Who What Wear - best brows per face shape (Damone Roberts, Kelley Baker)", "url": "https://www.whowhatwear.com/best-eyebrows-for-face-shape", "type": "named_mua"},
+    "S7": {"title": "Fox News - Joey Healy brow tips", "url": "https://www.foxnews.com/lifestyle/pro-secrets-celebrity-stylist-shares-tips-for-perfect-eyebrows", "type": "named_mua", "note": "Arch phrased as two-thirds from tail end; likely mis-stated"},
+    "S8": {"title": "The Zoe Report - Stevi Christine", "url": "https://www.thezoereport.com/culture/zeitgeist/a-beginners-guide-to-gorgeous-eyebrows", "type": "named_mua"},
+    "S9": {"title": "Ella Bache - brow shaping", "url": "https://www.ellabache.com.au/blogs/bold-beyond-beauty/brow-shaping", "type": "brand_education"},
+    "S10": {"title": "L'Oreal Paris - eyebrow shapes", "url": "https://lorealparisusa.com/beauty-magazine/makeup/eye-makeup/eyebrow-shapes", "type": "brand_education"},
+    "S11": {"title": "Wimpole Clinic - brows per face shape", "url": "https://wimpole.com/blog/shaping-your-eyebrows-to-suit-your-face-shape/", "type": "commercial_blog"},
+    "S12": {"title": "Headcovers - eyebrow shapes guide", "url": "https://www.headcovers.com/resources/beauty/eyebrow-shapes/", "type": "commercial_blog"},
+    "S13": {"title": "Urban Company - eyebrow shapes", "url": "https://www.urbancompany.com/blog/eyebrow-shapes", "type": "commercial_blog"},
+    "S14": {"title": "JawaPos - teknik membentuk alis sesuai wajah", "url": "https://www.jawapos.com/lifestyle/016391321/7-teknik-membentuk-alis-sesuai-wajah-agar-tampil-sempurna", "type": "editorial_id"},
+    "S15": {"title": "Open Exam Prep - esthetician brow design study guide", "url": "https://open-exam-prep.com/study-guides/ok-esthetician/makeup-lashes-and-brows/lash-brow-tinting-and-brow-design", "type": "study_guide", "note": "Authorship unverified; low weight"},
+    "S16": {"title": "Beautylish forum - eyebrow answer", "url": "https://beautylish.com/t/ixjwgw/i-wish-i-could-do-my-eyebrows", "type": "forum", "note": "Low weight"},
+    "S20": {"title": "L'Oreal Paris - blush by face shape (also face-shape definitions)", "url": "https://lorealparisusa.com/beauty-magazine/makeup/face-makeup/blush-by-face-shape", "type": "brand_education"},
+    "S21": {"title": "Trinny London - where to apply blush (Alex Phillips)", "url": "https://trinnylondon.com/uk/blog/where-to-apply-blush", "type": "named_mua"},
+    "S22": {"title": "Patrick Ta - where to apply blush", "url": "https://patrickta.com/blogs/articles/where-to-apply-blush", "type": "named_mua"},
+    "S23": {"title": "Napoleon Perdis - blush placement", "url": "https://napoleonperdis.com/blogs/beauty-talk/sculpt-your-way-to-perfection", "type": "brand_education"},
+    "S24": {"title": "Go-To Skincare - blush placement (Yen Hoang)", "url": "https://uk.gotoskincare.com/blogs/the-go-to-guide/why-your-blush-placement-matters", "type": "named_mua"},
+    "S25": {"title": "Giorgio Armani Beauty AU - blush placement by face shape", "url": "https://www.giorgioarmanibeauty.com.au/maestro-beauty-guides/makeup-guides/blush-placement-by-face-shape.html", "type": "brand_education"},
+    "S26": {"title": "mindbodygreen - blush per face shape (Alexandra Compton)", "url": "https://www.mindbodygreen.com/articles/makeup-artist-on-how-to-apply-blush-for-your-face-shape", "type": "named_mua"},
+    "S27": {"title": "Woman&Home - blusher mistakes (Caroline Barnes)", "url": "https://www.womanandhome.com/beauty/makeup/blusher-mistakes/", "type": "named_mua"},
+    "S28": {"title": "Beautygeeks - where to apply blush (Maxime Poulin, Guerlain)", "url": "https://imabeautygeek.com/2013/11/28/where-to-apply-blush/", "type": "named_mua"},
+    "S29": {"title": "Okezone - cara pakai blush (cites Byrdie / Christian Briceno)", "url": "https://www.rctiplus.com/news/detail/okezone/5491419/cara-pakai-blush-sesuai-bentuk-wajah-agar-makeup-terlihat-lebih-menawan", "type": "editorial_id", "note": "Derived from Byrdie"},
+    "S30": {"title": "Fimela - cara pakai blush on sesuai bentuk wajah", "url": "https://www.fimela.com/beauty/read/3722525/cek-di-sini-cara-pakai-blush-on-yang-benar-sesuai-bentuk-wajah", "type": "editorial_id"},
+    "S31": {"title": "Popbela - trik blush on sesuai bentuk wajah", "url": "https://www.popbela.com/beauty/make-up/tips-pakai-blush-on-00-dvchx-0js22l", "type": "editorial_id"},
+    "S32": {"title": "Zalora ID - apple cheeks dan penempatan blush", "url": "https://www.zalora.co.id/blog/kecantikan/beauty-tutorial/apa-itu-apple-cheeks-dan-cara-penempatan-blush-on-yang-tepat/", "type": "commercial_blog"},
+    "S33": {"title": "Kontan MomsMoney - blush sesuai bentuk wajah", "url": "https://momsmoney.kontan.co.id/news/5-cara-memakai-blush-on-sesuai-bentuk-wajah-wajah-bulat-gimana", "type": "editorial_id", "note": "Derived from L'Oreal / Urban Company; not independent"},
+    "S34": {"title": "ThisDay (Nigeria) via PressReader - makeup tips", "url": "https://www.pressreader.com/nigeria/thisday-style/20200517/281668257166109", "type": "editorial"},
+    "S40": {"title": "Nylon - eyeliner by eye shape (Ashleigh Ciucci)", "url": "https://www.nylon.com/articles/how-to-apply-eyeliner", "type": "named_mua"},
+    "S41": {"title": "Harper's Bazaar SG - eyeliner technique per eye shape (Romy Soleimani)", "url": "https://www.harpersbazaar.com.sg/beauty/the-best-eyeliner-technique-for-your-eye-shape", "type": "named_mua"},
+    "S42": {"title": "Net-A-Porter Beauty Memo - ideal eyeliner (Diane Kendal)", "url": "https://www.net-a-porter.com/en-us/porter/article-2573463a292ecee8/beauty/beauty-memo/eyeliner-for-your-eye-shape", "type": "named_mua"},
+    "S43": {"title": "QC Makeup Academy - eyeliner for client eye shape", "url": "https://www.qcmakeupacademy.com/2016/06/use-eyeliner-clients-eye-shape/", "type": "makeup_academy"},
+    "S44": {"title": "Watsons Malaysia - eyeliner by eye shape", "url": "https://watsons.com.my/blog/makeup-styles/draw-eyeliner-according-eye-shape", "type": "commercial_blog"},
+    "S45": {"title": "Clinique AU - makeup for every eye shape", "url": "https://www.clinique.com.au/skin-school-blog/skin-experts/makeup-for-every-eye-shape", "type": "brand_education"},
+    "S46": {"title": "Nylon - eyeliner tricks per eye shape (Natalie Malchev)", "url": "https://nylon.com/articles/how-to-apply-eyeliner-eye-shape", "type": "named_mua"},
+    "S47": {"title": "CVS - winged eyeliner (Keita Moore, Carol Park, Teomi)", "url": "https://www.cvs.com/learn/beauty/makeup/how-to-do-winged-eyeliner", "type": "named_mua"},
+    "S48": {"title": "Makeup.com - eye makeup on monolids (Gene)", "url": "https://www.makeup.com/makeup-tutorials/eyes/applying-eye-makeup-monolids", "type": "named_mua"},
+    "S49": {"title": "Sunday Riley edit - monolid tips (Mai Quynh)", "url": "https://edit.sundayriley.com/?p=23518", "type": "named_mua"},
+    "S50": {"title": "Vogue Singapore - monolid make-up (Airin Lee)", "url": "https://vogue.sg/monolid-eyes-make-up/", "type": "named_mua"},
+    "S51": {"title": "Daily Vanity SG - winged eyeliner, Asian edition", "url": "https://dailyvanity.sg/beauty-tips/winged-eyeliners-asian-beginners", "type": "editorial"},
+    "S52": {"title": "Buro 24/7 Malaysia - winged eyeliner for four eye shapes (Ling Chong)", "url": "https://www.buro247.my/?p=9749", "type": "named_mua"},
+    "S53": {"title": "Fimela - tips eyeliner sesuai bentuk mata (2025)", "url": "https://www.fimela.com/beauty/read/6000610/tips-eyeliner-sesuai-bentuk-mata-agar-tidak-salah-gaya", "type": "editorial_id"},
+    "S54": {"title": "Fimela - tips gunakan eyeliner sesuai bentuk mata", "url": "https://www.fimela.com/beauty/read/3666025/tips-gunakan-eyeliner-sesuai-bentuk-mata", "type": "editorial_id"},
+    "S55": {"title": "Shopee Inspirasi - cara mengaplikasikan eyeliner", "url": "https://shopee.co.id/inspirasi-shopee/cara-mengaplikasikan-eyeliner/amp/", "type": "commercial_blog"},
+    "S56": {"title": "Shopee Inspirasi - riasan mata untuk kelopak monolid", "url": "https://shopee.co.id/inspirasi-shopee/riasan-mata-untuk-si-kelopak-monolid/amp/", "type": "commercial_blog"},
+    "S57": {"title": "The Handbook - winged eyeliner tips (Anna Payne, Chanel)", "url": "https://www.thehandbook.com/winged-eyeliner-tips/", "type": "named_mua"},
+    "S58": {"title": "BeautyCrew - winged eyeliner tricks (Melanie Burnicle, Stephen Gaskett)", "url": "https://beautycrew.com.au/winged-eyeliner-tricks-makeup-artists-swear-by", "type": "named_mua"},
+    "S59": {"title": "Who What Wear UK - eye makeup per eye shape (Mai Quynh, Claire Mulleady)", "url": "https://www.whowhatwear.co.uk/eye-makeup-for-your-eye-shape", "type": "named_mua"},
+    "S61": {"title": "1-800 Contacts Eye Society - how to tell face shape", "url": "https://www.1800contacts.com/eyesociety/how-to-tell-the-shape-of-your-face", "type": "commercial_blog"},
+    "S62": {"title": "Lashify - what is my face shape", "url": "https://lashify.com/blogs/lash-tips/what-is-my-face-shape", "type": "commercial_blog"},
+    "S63": {"title": "Perfect Corp - face shape test", "url": "https://www.perfectcorp.com/business/blog/general/face-shape-test", "type": "vendor"},
+    "S64": {"title": "NSMen (SAFRA) - what's the shape of your face", "url": "https://nsman.safra.sg/?p=9218", "type": "editorial"},
+    "S65": {"title": "Peerlist (Adil Balti) - 7 face shapes explained", "url": "https://peerlist.io/adilbalti/articles/7-face-shapes-explained", "type": "vendor", "note": "Only source mentioning blended faces; low weight"},
+    "S66": {"title": "The Fashionisto - face shapes for men", "url": "https://thefashionisto.com/face-shapes-men", "type": "editorial"},
+    "S67": {"title": "UNESA Jurnal Tata Rias - koreksi mata sipit pada wajah bulat, persegi, lonjong", "url": "https://ejournal.unesa.ac.id/index.php/jurnal-tata-rias/article/view/10413", "type": "academic_id"},
+    "S68": {"title": "UNIPASBY repository - tata rias wajah persegi panjang", "url": "https://repository.unipasby.ac.id/1292/3/3.%20BAB%20I.pdf", "type": "academic_id"},
+    "S69": {"title": "AOL - definitive guide to face shape", "url": "https://www.aol.com/definitive-guide-face-shape-141700907.html", "type": "editorial"},
+    "S70": {"title": "Angelica's Radar (Macaroni Kid) - what's your face shape", "url": "https://leaguecity.macaronikid.com/articles/58264e2a24d8f4da3aae533a/angelicas-radar-whats-your-face-shape", "type": "blog"},
+    "S71": {"title": "Wedding Journal - celeb-inspired bridal hair by face shape", "url": "https://www.weddingjournalonline.com/which-celeb-inspired-bridal-hair-style-you-should-choose-for-your-face-shape/", "type": "blog"}
+  },
+  "excluded_sources": {
+    "reason": "AI-generated, scraped, hijacked-domain or SEO-spam pages",
+    "domains": ["dash.rtcamp.com", "m.fightcancer.org", "buildstatus.puri.sm", "dev.asburyseminary.edu", "sandbox.dss.ucdavis.edu", "tanahmiring.merauke.go.id", "overchat.ai", "n8n.kaiai.it.com", "db1.seeclickfix.com", "chinese.aawsat.com", "voices.girleffect.org", "do2.dr-chuck.com", "tools.wbez.org", "jenkins-ci.syncfusion.com", "wwwprod.nelson-atkins.org", "calendar-uk.co.uk"]
+  },
+  "universal_anchors": {
+    "brow_start": {"rule": "Vertical line from outer nose wing up to the brow", "confidence": "high", "sources": ["S1", "S2", "S3", "S4", "S5", "S9"]},
+    "brow_tail": {"rule": "Line from nose wing through outer eye corner; tail ends where it meets the brow", "confidence": "high", "sources": ["S1", "S2", "S3", "S4", "S9"]},
+    "tail_level": {"rule": "Tail should not end below the level of the brow start", "confidence": "low-medium", "sources": ["S15", "S16"], "status": "needs MUA validation"},
+    "arch_position": {
+      "status": "CONFLICT",
+      "options": {
+        "outer_edge_of_iris": ["S1", "S2", "S4"],
+        "pupil_or_eye_center": ["S8", "S1"],
+        "two_thirds_along_brow": ["S5", "S9", "S15", "S16"]
+      },
+      "recommended": {"value_pct_from_start": "65-70", "label": "ESTIMATE", "reasoning": "INFERENCE: with start at nose wing and tail at outer eye corner, outer iris edge falls near 70% of that span, so 'outer iris' and 'two-thirds' roughly coincide; pupil option (~50%) is the outlier."},
+      "needs_mua_validation": true
+    },
+    "blush_inner_limit": {
+      "status": "CONFLICT",
+      "options": {"vertical_from_pupil": ["S27", "S26"], "vertical_from_outer_iris": ["S28"], "two_finger_from_nose": ["S20"]},
+      "recommended": "Hard inner limit at pupil vertical (most conservative); color starts at outer-iris vertical",
+      "needs_mua_validation": true
+    },
+    "blush_apex": {"rule": "Start at highest cheekbone point under the outer eye corner, blend up toward hairline and in toward pupil", "confidence": "medium", "sources": ["S26"]},
+    "measurement_conditions": {"expression": "neutral", "eyes": "open", "reason": "Smiling lifts apples so blush sits lower on neutral face (S26); liner/crease visibility changes with eyes closed (S47, S48)"}
+  },
+  "face_shape": {
+    "oval": {
+      "definition": {
+        "length_over_cheekbone_width": "approx 1.5 (band 1.4-1.6, ESTIMATE)",
+        "jaw_over_forehead_width": "approx 0.9-1.0 (ESTIMATE)",
+        "jaw_angle": "NO CONSENSUS FOUND",
+        "widest_point": "CONFLICT: cheekbones (S62, S63) vs forehead slightly wider than jaw (S64, S66)",
+        "sources": ["S20", "S61", "S62", "S63", "S64", "S65"]
+      },
+      "brows": {
+        "start": "nose wing vertical",
+        "arch_position_pct": "65-70 (ESTIMATE)",
+        "arch_height": "medium",
+        "tail": "nose wing to outer eye corner line",
+        "thickness": "NO CONSENSUS FOUND",
+        "shape": "classic: gradual incline, defined soft arch, not pointed",
+        "sources": ["S5", "S6", "S10"]
+      },
+      "liner_default": "NO CONSENSUS FOUND -> use eye_shape",
+      "blush": {
+        "inner": "pupil vertical limit",
+        "upper": "cheekbone apex",
+        "lower": "above contour zone; avoid under cheekbone (S20)",
+        "outer": "toward temple/hairline",
+        "direction": "any placement works (S20, S21)",
+        "angle_vs_eye_line_deg": "0-25 (ESTIMATE)",
+        "conflict": "straight line from pupils outward (S26) vs high lifted (S21, S22)",
+        "avoid": ["below cheekbone", "close to nose"],
+        "sources": ["S20", "S21", "S22", "S26", "S34"]
+      },
+      "balancing_goal": "Preserve the existing balance",
+      "celebrities": {"primary": [], "disputed": [{"name": "Jessica Alba", "sources": ["S6", "S70"], "note": "weakly disputed oval/oblong (S65)"}, {"name": "Halle Berry", "note": "oval S69 / diamond S6 / heart S65"}]},
+      "confidence": "medium",
+      "needs_mua_validation": true
+    },
+    "round": {
+      "definition": {
+        "length_over_cheekbone_width": "approx 1.0 (ESTIMATE band 0.95-1.1)",
+        "jaw_over_forehead_width": "similar; both narrower than cheekbones (S61)",
+        "jaw_angle": "NO CONSENSUS FOUND (soft, no angles)",
+        "sources": ["S20", "S61", "S62", "S63", "S64"]
+      },
+      "brows": {
+        "start": "nose wing vertical",
+        "arch_position_pct": "65-70 (ESTIMATE)",
+        "arch_height": "high, not extreme (avoid stern look, S6)",
+        "tail": "tapered",
+        "thickness": "NO CONSENSUS FOUND",
+        "shape": "soft-angled to angled; avoid fully round brow",
+        "sources": ["S5", "S6", "S10", "S11", "S12", "S13", "S14"]
+      },
+      "liner_default": "NO CONSENSUS FOUND -> use eye_shape",
+      "blush": {
+        "inner": "pupil vertical limit",
+        "upper": "top of cheekbone, high, close to the eyes",
+        "lower": "skip apples; avoid below cheekbone",
+        "outer": "toward temple",
+        "direction": "up and back",
+        "angle_vs_eye_line_deg": "20-35 (ESTIMATE)",
+        "conflict": "outer extent: toward temple (S20, S23, S29) vs not winged out too far (S21); S30 outlier (from below cheekbone toward eye corner)",
+        "avoid": ["apples", "below cheekbone", "toward nose"],
+        "sources": ["S20", "S21", "S23", "S29", "S31", "S33"]
+      },
+      "balancing_goal": "Add structure and a slightly longer visual line",
+      "celebrities": {"primary": [{"name": "Selena Gomez", "sources": ["S6", "S70", "S71"]}, {"name": "Chrissy Teigen", "sources": ["S6", "S69"]}, {"name": "Ginnifer Goodwin", "sources": ["S69", "S70"]}], "disputed": []},
+      "confidence": "high (height), medium (outer extent)",
+      "needs_mua_validation": true
+    },
+    "square": {
+      "definition": {
+        "length_over_cheekbone_width": "approx 1.0 (ESTIMATE)",
+        "jaw_over_forehead_width": "approx 1.0 (ESTIMATE)",
+        "jaw_angle": "NO CONSENSUS FOUND (angular, flat chin)",
+        "sources": ["S20", "S61", "S62", "S63", "S64"]
+      },
+      "brows": {
+        "start": "nose wing vertical",
+        "arch_position_pct": "65-70 (ESTIMATE)",
+        "arch_height": "low-medium, soft",
+        "tail": "standard",
+        "thickness": "CONFLICT: full/thick (S12) vs just soften (S6)",
+        "shape": "soft curved, not overtly rounded; optional short 'boy brow' (S6)",
+        "sources": ["S5", "S6", "S10", "S12", "S13"]
+      },
+      "liner_default": "NO CONSENSUS FOUND -> use eye_shape",
+      "blush": {
+        "inner": "pupil vertical limit",
+        "upper": "top of apples",
+        "lower": "stay off jawline",
+        "outer": "tapered blend toward temple/hairline",
+        "direction": "soft circular start on apples, then taper outward",
+        "angle_vs_eye_line_deg": "15-30 (ESTIMATE)",
+        "conflict": "S31: diagonal upward sweep, avoid circular motion",
+        "avoid": ["close to nose", "jawline"],
+        "sources": ["S20", "S21", "S22", "S23", "S29", "S31", "S32", "S33", "S34"]
+      },
+      "balancing_goal": "Soften angles and draw focus to the center of the face",
+      "celebrities": {"primary": [{"name": "Olivia Wilde", "sources": ["S69", "S70"]}, {"name": "Cameron Diaz", "sources": ["S69", "S70"]}], "disputed": [{"name": "Angelina Jolie", "note": "square (S6, S70) vs round (S71)"}]},
+      "confidence": "high (apples), medium (sweep direction)",
+      "needs_mua_validation": true
+    },
+    "heart": {
+      "definition": {
+        "length_over_cheekbone_width": "NO CONSENSUS FOUND",
+        "widest_point": "CONFLICT: forehead (S20, S61, S65) vs cheekbones (S62)",
+        "jaw": "narrow, pointed chin",
+        "sources": ["S20", "S61", "S62", "S65"]
+      },
+      "brows": {
+        "start": "nose wing vertical",
+        "arch_position_pct": "65-70 (ESTIMATE)",
+        "arch_height": "lowest / straighter",
+        "tail": "delicate",
+        "thickness": "light, trimmed (S5)",
+        "shape": "refined, rounded low arch; avoid sharp angles",
+        "conflict": "S10 recommends a high arch; majority (S6, S5, S11, S14) lower/softer",
+        "sources": ["S5", "S6", "S10", "S11", "S14"]
+      },
+      "liner_default": "NO CONSENSUS FOUND -> use eye_shape",
+      "blush": {
+        "conflict_options": {
+          "A_high_C_shape_to_above_brow_tail_plus_forehead_touch": ["S20", "S33"],
+          "B_lower_below_cheekbone_toward_ear": ["S22", "S23", "S32"],
+          "C_outer_corner_of_cheekbone": ["S34"]
+        },
+        "recommended": "Lower-mid placement from just below cheekbone apex outward toward ear/hairline (INFERENCE: 3 vs 2 sources, plus S25 rationale of adding weight to the narrow lower half)",
+        "angle_vs_eye_line_deg": "10-25 (ESTIMATE)",
+        "sources": ["S20", "S22", "S23", "S25", "S32", "S33", "S34"]
+      },
+      "balancing_goal": "Add visual weight to the lower half and soften the dominance of the forehead",
+      "celebrities": {"primary": [{"name": "Reese Witherspoon", "sources": ["S6", "S69", "S70", "S71"]}, {"name": "Kerry Washington", "sources": ["S6", "S69"]}, {"name": "Kourtney Kardashian", "sources": ["S6", "S70"]}], "disputed": []},
+      "confidence": "low-medium",
+      "needs_mua_validation": true
+    },
+    "diamond": {
+      "definition": {
+        "widest_point": "cheekbones; forehead and jaw narrower; chin pointed",
+        "ratios": "NO CONSENSUS FOUND",
+        "outliers": "S5 describes diamond with a strong jawline; S63 text says jaw widest",
+        "sources": ["S20", "S61", "S62", "S64", "S65"]
+      },
+      "brows": {
+        "start": "nose wing vertical",
+        "arch_position_pct": "65-70 (ESTIMATE)",
+        "arch_height": "medium",
+        "tail": "standard",
+        "thickness": "CONFLICT: bigger/bold (S5) vs not too defined (S6)",
+        "shape": "curved or soft-angled",
+        "sources": ["S5", "S6", "S12"]
+      },
+      "liner_default": "NO CONSENSUS FOUND -> use eye_shape",
+      "blush": {
+        "upper": "top of cheekbone / top of apples",
+        "outer": "blend outward toward ears/temples; warmth at temples softens sharp edges (S24)",
+        "angle_vs_eye_line_deg": "15-30 (ESTIMATE)",
+        "note": "Sources are vague",
+        "sources": ["S20", "S22", "S24", "S32"]
+      },
+      "balancing_goal": "Soften cheekbone angularity and balance width",
+      "celebrities": {"primary": [], "disputed": [{"name": "Rihanna"}, {"name": "Halle Berry"}, {"name": "Scarlett Johansson"}], "note": "No celebrity has 2 clean sources for diamond"},
+      "confidence": "low-medium",
+      "needs_mua_validation": true
+    },
+    "oblong": {
+      "definition": {
+        "length_over_cheekbone_width": "approx 1.6-2.0 (ESTIMATE; single source S65)",
+        "sides": "straight; forehead, cheekbones, jaw similar width",
+        "jaw_angle": "NO CONSENSUS FOUND",
+        "sources": ["S20", "S61", "S62", "S63", "S65"]
+      },
+      "brows": {
+        "start": "nose wing vertical (S5: may sit slightly medial; single source)",
+        "arch_position_pct": "65-70 (ESTIMATE)",
+        "arch_height": "flat / straight",
+        "tail": "standard",
+        "thickness": "fuller leaning (S6 Roberts only; low confidence)",
+        "shape": "straight, soft-angled",
+        "sources": ["S5", "S6", "S11", "S12"]
+      },
+      "liner_default": "NO CONSENSUS FOUND -> use eye_shape",
+      "blush": {
+        "zone": "horizontal band across apples toward ear; short outward blend",
+        "angle_vs_eye_line_deg": "approx 0 (ESTIMATE)",
+        "conflict": "S31: focus on upper area toward temple",
+        "avoid": ["long upward sweep (INFERENCE)"],
+        "sources": ["S20", "S25", "S30", "S31", "S34"]
+      },
+      "balancing_goal": "Shorten and widen the visual impression",
+      "celebrities": {"primary": [{"name": "Sarah Jessica Parker", "sources": ["S6", "S70"]}], "disputed": []},
+      "confidence": "medium",
+      "needs_mua_validation": true
+    }
+  },
+  "eye_shape": {
+    "wing_angle_reference": "Degrees from the extension of the lower lash line. Anchor sourced: wing aims toward the end of the brow (S40, S42). All degree/length values are ESTIMATE.",
+    "almond": {
+      "definition": "Symmetric, slightly tapered outer corner; neutral tilt (qualitative, S54)",
+      "start": "Inner corner, following natural lash line",
+      "thickness": {"inner": "thin", "middle": "medium", "outer": "thicker"},
+      "wing": {"angle_deg": "0-15 (ESTIMATE)", "length_pct_eye_width": "10-20 (ESTIMATE)", "note": "small flick optional (S42)"},
+      "lower_lash_line": "yes",
+      "special_notes": ["Most styles work"],
+      "confidence": "high",
+      "conflicts": [],
+      "sources": ["S40", "S41", "S42", "S44", "S47", "S54"]
+    },
+    "round": {
+      "definition": "High height/width ratio; white visible above/below iris at neutral (S45); large lid space (S52)",
+      "start": "Slightly in from inner corner (S57)",
+      "thickness": {"inner": "thin", "middle": "thinner", "outer": "thickening toward wing"},
+      "wing": {"angle_deg": "0-10 (ESTIMATE)", "length_pct_eye_width": "medium (ESTIMATE)"},
+      "lower_lash_line": "light, outer two-thirds (S45)",
+      "special_notes": ["Goal is a more almond/oval impression (S46, S59)"],
+      "confidence": "low-medium",
+      "conflicts": ["Dramatic upward wing (S42) vs not too upward (S44) vs liner pulled down the outer edge to elongate (S58)"],
+      "sources": ["S42", "S44", "S45", "S46", "S57", "S58", "S59"]
+    },
+    "hooded": {
+      "definition": "Crease close to lash line; fold overhangs outer lid; little lid space when eyes are open (S43, S45, S52). Crease is not a MediaPipe landmark.",
+      "start": "Tightline or inner corner (S41)",
+      "thickness": {"inner": "thin", "middle": "thin-medium", "outer": "medium (INFERENCE)"},
+      "wing": {"description": "Flick up, joined to half of lower lash line (S44); square wing possible (S59)", "angle_deg": "5-15 (ESTIMATE)"},
+      "lower_lash_line": "deeper on outer third, angled upward (S45)",
+      "special_notes": ["Check with eyes open", "Set liner with powder to reduce transfer (S42)"],
+      "confidence": "low",
+      "conflicts": ["Thin/tightline (S41) vs thick (S47, S44)"],
+      "sources": ["S41", "S42", "S43", "S44", "S45", "S47", "S59"]
+    },
+    "monolid": {
+      "definition": "Little or no visible crease; flat lid; liner disappears when eyes open (S45, S54). Measure visible lid height with eyes open. Crease not detectable via MediaPipe; likely needs image classifier or user confirmation.",
+      "start": "Close to lash line, from inner corner or slightly in (S54, S55)",
+      "thickness": {"inner": "thin", "middle": "medium", "outer": "thickest", "label": "INFERENCE (graduated), measured with eyes open"},
+      "wing": {"description": "Extend outward and lift (S47, S54)", "angle_deg": "5-20 (ESTIMATE)", "length_pct_eye_width": "15-30 (ESTIMATE)"},
+      "lower_lash_line": "light, optional (weak: S44, S51)",
+      "special_notes": ["Apply with eyes open (S47, S48, S51)", "Check left/right asymmetry (S52)", "Build slowly (L'Oreal monolid article)"],
+      "confidence": "medium (thicker + eyes open); low (thickness distribution)",
+      "conflicts": [
+        "Thicker line across the eye so it does not vanish: S40, S41, S48, S49, S54, S55",
+        "Line only the ends / wing: S50, S56",
+        "Avoid thick straight line across the whole eye: S53"
+      ],
+      "gap": "No named Indonesian MUA found; Indonesian sources are editorial/commercial. Priority for MUA validation.",
+      "sources": ["S40", "S41", "S44", "S47", "S48", "S49", "S50", "S51", "S52", "S53", "S54", "S55", "S56"]
+    },
+    "upturned": {
+      "definition": "Outer corner higher than inner (S43, S45); tilt threshold ESTIMATE only",
+      "start": "Full upper lash line (S45)",
+      "thickness": {"inner": "thin", "middle": "thin-medium", "outer": "avoid too thick"},
+      "wing": {"description": "Horizontal, short, not high (S44)", "angle_deg": "0-5 (ESTIMATE)"},
+      "lower_lash_line": "yes (S45); alternative: lower line only",
+      "special_notes": [],
+      "confidence": "low",
+      "conflicts": [],
+      "sources": ["S43", "S44", "S45"]
+    },
+    "downturned": {
+      "definition": "Outer corner lower than inner (S43)",
+      "start": "Keep inner corner open and bright; thin start (S41)",
+      "thickness": {"inner": "thin", "middle": "gradual", "outer": "thicker toward wing tip (S43, S44)"},
+      "wing": {"description": "Follow extension of lower lash line toward end of brow, subtle (S40); approx 0 deg offset", "length_pct_eye_width": "10-20 (ESTIMATE)"},
+      "lower_lash_line": "optional, light",
+      "special_notes": ["Goal is lift at the outer corner (S41, S57)"],
+      "confidence": "high",
+      "conflicts": [],
+      "sources": ["S40", "S41", "S43", "S44", "S57"]
+    },
+    "close_set": {
+      "definition": "Gap between inner corners less than one eye width (S43, S44)",
+      "start": "Inner corner, super thin to the middle (S42)",
+      "thickness": {"inner": "very thin", "middle": "thin", "outer": "thicker"},
+      "wing": {"description": "Tapered, ends in line with brow tail (S42), near horizontal (S55)", "length_pct_eye_width": "25-40 (ESTIMATE)"},
+      "lower_lash_line": "outer half only, or bare (S43)",
+      "special_notes": ["Keep the inner area light/bright (S46)"],
+      "confidence": "high",
+      "conflicts": [],
+      "sources": ["S42", "S43", "S44", "S46", "S55"]
+    },
+    "wide_set": {
+      "definition": "Gap between inner corners more than one eye width (S45, S55)",
+      "start": "Inner corner, may be emphasized (S42)",
+      "thickness": {"inner": "thicker", "middle": "medium", "outer": "thin"},
+      "wing": {"description": "Do not extend past outer corner (S41); none or very short"},
+      "lower_lash_line": "optional smudge (S41)",
+      "special_notes": ["Darker emphasis on inner half (S46)"],
+      "confidence": "high",
+      "conflicts": [],
+      "sources": ["S41", "S42", "S44", "S46", "S55"]
+    }
+  },
+  "blend_rules": {
+    "status": "INFERENCE (NO CONSENSUS FOUND in sources; only S65 mentions blended faces)",
+    "steps": [
+      "Compute a continuous similarity score per face shape from landmark ratios; scores sum to 1.",
+      "If top score >= 0.6 and gap to second >= 0.2 (ESTIMATE), use the primary shape rules only.",
+      "Else continuous params (arch height level, blush angle, blush height) = score-weighted mean of the top two.",
+      "Categorical params (e.g. horizontal vs lifted blush) follow the primary shape.",
+      "Avoid-zones = union of both shapes.",
+      "For opposing pairs (e.g. round high arch vs heart low arch), choose the smallest change from the user's natural brow."
+    ],
+    "adjacent_pairs_usually_compatible": ["oval-oblong", "round-square", "heart-diamond"]
+  },
+  "combination_rules": {
+    "status": "INFERENCE (NO CONSENSUS FOUND in sources)",
+    "rules": [
+      {"id": "R1", "rule": "Local zone wins: eye shape (Table 2) controls the eye; face shape controls brow arch and blush only.", "reason": "No source ties liner to face shape."},
+      {"id": "R2", "rule": "Shared lift vector: brow tail, wing and blush sweep point the same way or stay neutral."},
+      {"id": "R3", "rule": "One emphasis: thick wing (monolid, hooded) pairs with medium brows; avoid bold brow plus bold wing.", "partial_support": "S14"},
+      {"id": "R4", "rule": "Wide-set eyes: no wing even if face shape suggests lift; lift comes from arch/blush.", "sources": ["S41"]},
+      {"id": "R5", "rule": "Oblong face + downturned eyes: wing follows lower-lash extension, blush stays horizontal."},
+      {"id": "R6", "rule": "Round face + upturned eyes: keep high arch, wing horizontal."},
+      {"id": "R7", "rule": "Low confidence or conflicting rules: choose the neutral option (soft arch, blush at apex about 15 deg, wing along lash extension)."},
+      {"id": "R8", "rule": "Measure on neutral expression with eyes open.", "sources": ["S26", "S47", "S48"]}
+    ]
+  },
+  "engineering_gaps": [
+    "Crease/fold is not a MediaPipe landmark: hooded vs monolid needs a classifier or user confirmation.",
+    "Hairline is not a landmark: face length and forehead width are unreliable for face-shape ratios.",
+    "All ratio thresholds in sources are qualitative; thresholds must be calibrated on real data.",
+    "Arch height is ordinal only (flat/soft/medium/high); numeric mapping needs calibration."
+  ],
+  "conflicts_and_gaps": [
+    {"id": "C01", "topic": "Arch position", "detail": "outer iris vs pupil vs two-thirds; recommended 65-70% ESTIMATE"},
+    {"id": "C02", "topic": "Tail level rule", "detail": "only 2 weak sources (S15, S16)"},
+    {"id": "C03", "topic": "S7 arch wording", "detail": "'two-thirds from tail end' conflicts with S5; likely mis-stated"},
+    {"id": "C04", "topic": "Brow thickness per face shape", "detail": "NO CONSENSUS FOUND; real conflicts for square and diamond"},
+    {"id": "C05", "topic": "Heart brows", "detail": "S10 high arch vs S6, S5, S11, S14 lower/softer"},
+    {"id": "C06", "topic": "Heart blush", "detail": "high C-shape vs lower toward ear vs outer cheekbone"},
+    {"id": "C07", "topic": "Round blush outer extent", "detail": "temple vs not winged out too far; S30 outlier"},
+    {"id": "C08", "topic": "Square blush", "detail": "circular on apples vs diagonal upward sweep (S31)"},
+    {"id": "C09", "topic": "Oval blush", "detail": "straight from pupil (S26) vs high lifted (S21, S22)"},
+    {"id": "C10", "topic": "Oblong blush", "detail": "horizontal vs upper area to temple (S31)"},
+    {"id": "C11", "topic": "Blush inner limit", "detail": "pupil vs outer iris vs two-finger"},
+    {"id": "C12", "topic": "Blush upper/lower boundary and angles", "detail": "NO CONSENSUS FOUND; no source gives degrees"},
+    {"id": "C13", "topic": "Face-shape definitions", "detail": "oval widest point, heart widest point, diamond outliers (S5, S63); jaw angle NO CONSENSUS FOUND"},
+    {"id": "C14", "topic": "Round eyes wing", "detail": "dramatic upward vs horizontal vs downward"},
+    {"id": "C15", "topic": "Hooded liner thickness", "detail": "thin/tightline vs thick"},
+    {"id": "C16", "topic": "Monolid liner", "detail": "thick across vs ends only vs not thick; no named Indonesian MUA; highest validation priority"},
+    {"id": "C17", "topic": "Upturned eyes", "detail": "only 2-3 sources"},
+    {"id": "C18", "topic": "Face shape -> liner", "detail": "NO CONSENSUS FOUND"},
+    {"id": "C19", "topic": "Table 3 and blended faces", "detail": "all INFERENCE"},
+    {"id": "C20", "topic": "Celebrities", "detail": "oval and diamond have no primary; none for Indonesian/SEA/East Asian; list lacks diversity; sources are lifestyle pages, not MUAs"},
+    {"id": "C21", "topic": "Corrective framing", "detail": "Indonesian tata rias academia (S67, S68) treats oval as ideal and 'corrects' other shapes, conflicting with the app's 'enhance, not correct' promise; product decision needed"}
+  ]
+}

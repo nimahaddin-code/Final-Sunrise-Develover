@@ -77,6 +77,7 @@ final class AppNavigatorTests: XCTestCase {
         let classifier = FaceShapeClassifier(reference: FaceProportions(length: 1.2, forehead: 0.85, jaw: 0.8, chin: 0.5))
         var result = classifier.classify(FaceProportions(length: 1.15, forehead: 0.85, jaw: 0.8, chin: 0.47))
         result.contourSamples = 12
+        result.eyes = EyeScan(tiltLeft: 3, tiltRight: 5, spacing: 1.05, openness: 0.31, samples: 8, lidType: .hooded)
         FaceShapeStore(defaults: defaults).latest = result
         XCTAssertEqual(FaceShapeStore(defaults: defaults).latest, result)
         FaceShapeStore(defaults: defaults).latest = nil

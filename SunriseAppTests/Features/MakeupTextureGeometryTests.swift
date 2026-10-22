@@ -32,6 +32,26 @@ final class MakeupTextureGeometryTests: XCTestCase {
         XCTAssertEqual(uv.y, 0.5, accuracy: 1e-5)
     }
 
+    /// A 3x3 grid of 30-pixel squares whose centre square is missing, like the eye opening in the face mesh.
+    func testPointInsideAHoleInterpolatesAcrossIt() throws {
+        let columns = 4
+        let points = (0..<16).map { SIMD2<Float>(Float($0 % columns) * 30, Float($0 / columns) * 30) }
+        var triangles: [Int16] = []
+        for row in 0..<3 {
+            for column in 0..<3 where !(row == 1 && column == 1) {
+                let a = Int16(row * columns + column), b = a + 1, c = a + Int16(columns), d = c + 1
+                triangles += [a, b, d, a, d, c]
+            }
+        }
+        let mesh = ProjectedFaceMesh(points: points, depths: Array(repeating: 0.3, count: 16),
+                                     textureCoordinates: points.map { $0 / 90 }, triangleIndices: triangles)
+        for probe in [SIMD2<Float>(45, 45), SIMD2(38, 52), SIMD2(52, 40)] {
+            let uv = try XCTUnwrap(mesh.textureCoordinate(at: probe))
+            XCTAssertEqual(uv.x, probe.x / 90, accuracy: 1e-3)
+            XCTAssertEqual(uv.y, probe.y / 90, accuracy: 1e-3)
+        }
+    }
+
     func testOverlappingSurfacePrefersTheOneNearestTheCamera() throws {
         let mesh = ProjectedFaceMesh(
             points: [SIMD2(0, 0), SIMD2(10, 0), SIMD2(0, 10), SIMD2(0, 0), SIMD2(10, 0), SIMD2(0, 10)],
@@ -85,7 +105,8 @@ final class MakeupTextureGeometryTests: XCTestCase {
         let shade = MakeupPalette.black
         let style = LinerStyle(innerWidth: 0.02, outerWidth: 0.06, start: 0, wingLength: 0.3, wingAngle: 20,
                                shade: shade)
-        let outline = MakeupTextureRenderer.linerOutline(style, eye: map.left.eye, frame: frame)
+        let outline = MakeupTextureRenderer.linerOutlines(style, eye: map.left.eye, brow: map.left.brow, frame: frame)
+            .flatMap { $0 }
         let outerCorner: Float = 0.69
         let tip = outline.max { $0.x < $1.x }!
         XCTAssertGreaterThan(tip.x, outerCorner)

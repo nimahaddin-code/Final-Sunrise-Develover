@@ -82,23 +82,14 @@ final class MakeupPersonalizationTests: XCTestCase {
         XCTAssertEqual(fit.eyeTilt, -3, accuracy: 0.5)
         XCTAssertEqual(fit.tilt, .down)
         XCTAssertEqual(fit.eyeSpacing, 1, accuracy: 0.01) // a tilted eye is slightly wider
+        XCTAssertEqual(fit.eyeOpenness, 0.33, accuracy: 0.03) // 0.04 high over 0.12 wide
+        XCTAssertEqual(fit.eyeScan(samples: 5).samples, 5)
         XCTAssertEqual(fit.spacing, .balanced)
         XCTAssertEqual(fit.left.noseWing, SIMD2(0.53, 0.55))
         XCTAssertEqual(fit.right.noseWing, SIMD2(0.47, 0.55))
         XCTAssertEqual(try XCTUnwrap(fit.left.noseDepth), 0.75, accuracy: 1e-4)
         XCTAssertEqual(try XCTUnwrap(FaceFit(features: features(tilt: 10))).tilt, .up)
         XCTAssertEqual(try XCTUnwrap(FaceFit(features: features(halfWidth: 0.07))).spacing, .close)
-    }
-
-    func testLinerWingCompensatesForEyeTiltAndSpacing() throws {
-        let style = LinerStyle(innerWidth: 0.02, outerWidth: 0.06, start: 0.1, wingLength: 0.2, wingAngle: 18,
-                               shade: MakeupPalette.black)
-        let down = MakeupFitter.eyeliner(style, fit: try XCTUnwrap(FaceFit(features: features(tilt: -2))))
-        let up = MakeupFitter.eyeliner(style, fit: try XCTUnwrap(FaceFit(features: features(tilt: 10))))
-        XCTAssertGreaterThan(down.wingAngle, style.wingAngle)
-        XCTAssertLessThan(up.wingAngle, style.wingAngle)
-        let closeSet = MakeupFitter.eyeliner(style, fit: try XCTUnwrap(FaceFit(features: features(halfWidth: 0.07))))
-        XCTAssertGreaterThan(closeSet.start, style.start)
     }
 
     func testBlushStaysAboveTheNoseTipAndBelowTheEye() throws {

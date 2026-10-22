@@ -19,12 +19,20 @@ import ImageIO
     enum ScanGuidance: Equatable {
         case findFace, relaxFace, holdStill
         case turnLeft, turnRight, raisePhone, lowerPhone, moveCloser, moveBack
+        /// Eye phase: face the camera, keep the eyes relaxed and open, then hold still while they are measured.
+        case lookStraight, openEyes, measuringEyes
     }
 
     /// About 3 seconds of usable frames at ARKit's 60 fps face tracking.
     static let requiredSamples = 180
     /// Run Vision on every n-th accepted frame; about 30 outlines per scan.
     static let contourInterval = 6
+    /// The face phase takes this share of the progress bar; the eye phase the rest.
+    static let faceProgressShare = 0.85
+    /// The eye phase gives up after this long and finishes without eye measurements.
+    static let eyePhaseTimeout: TimeInterval = 8
+    /// Fewest Vision readings still worth keeping when the eye phase times out.
+    static let minimumEyeSamples = 3
 
     @Published private(set) var phase: Phase = .idle
     let session = ARSession()
@@ -37,6 +45,13 @@ import ImageIO
     private var acceptedFrames = 0
     /// Bumped on every new scan so late Vision results from a previous scan are dropped.
     private var scanID = 0
+    /// The classified face while the eye phase runs; published only once the eyes are measured.
+    private var pendingFace: FaceShapeResult?
+    private var eyeMaps: [FaceFeatureMap] = []
+    private var eyeOrientation: CGImagePropertyOrientation?
+    private var eyeDeadline = Date.distantFuture
+    private var isLocatingEyes = false
+    private var eyeFrames = 0
 
     var result: FaceShapeResult? {
         if case .finished(let result) = phase { result } else { nil }
@@ -68,6 +83,14 @@ import ImageIO
         resetMeasurements()
     }
 
+    /// Records the person's answer about their lids; the made-for-you eyeliner follows it.
+    func setLidType(_ lidType: LidType) {
+        guard case .finished(var result) = phase, var eyes = result.eyes, eyes.lidType != lidType else { return }
+        eyes.lidType = lidType
+        result.eyes = eyes
+        phase = .finished(result)
+    }
+
     func stop() {
         session.pause()
         isSessionRunning = false
@@ -81,6 +104,10 @@ import ImageIO
         sampler.reset()
         contourCorrections.removeAll()
         acceptedFrames = 0
+        pendingFace = nil
+        eyeMaps.removeAll()
+        isLocatingEyes = false
+        eyeFrames = 0
         scanID += 1
         phase = .scanning(progress: 0, guidance: .findFace)
     }
@@ -94,6 +121,10 @@ import ImageIO
 
     private func handle(_ sample: FaceSample) {
         guard case .scanning = phase, let classifier else { return }
+        if pendingFace != nil {
+            handleEyes(sample)
+            return
+        }
         let guidance: ScanGuidance
         if !sample.isTracked {
             guidance = .findFace
@@ -113,11 +144,74 @@ import ImageIO
             let correction = ContourCorrection.median(of: contourCorrections)
             var result = classifier.classify(correction?.applied(to: median) ?? median)
             result.contourSamples = contourCorrections.count
-            phase = .finished(result)
+            // The face is done; the eyes are measured next, in the same session.
+            pendingFace = result
+            eyeDeadline = Date().addingTimeInterval(Self.eyePhaseTimeout)
+            phase = .scanning(progress: Self.faceProgressShare, guidance: .lookStraight)
         } else {
-            let next = Phase.scanning(progress: sampler.progress, guidance: guidance)
+            let next = Phase.scanning(progress: sampler.progress * Self.faceProgressShare, guidance: guidance)
             if next != phase { phase = next }
         }
+    }
+
+    // MARK: - Eye phase
+
+    private func handleEyes(_ sample: FaceSample) {
+        guard let face = pendingFace else { return }
+        if Date() > eyeDeadline {
+            finishEyes(face)
+            return
+        }
+        let guidance: ScanGuidance
+        switch EyeSampleGate.verdict(isTracked: sample.isTracked, headIsStraight: sample.pose.adjustment == nil,
+                                     blinkLeft: sample.blinkLeft, blinkRight: sample.blinkRight,
+                                     squintLeft: sample.squintLeft, squintRight: sample.squintRight) {
+        case .lookStraight:
+            guidance = sample.isTracked ? sample.pose.adjustment ?? .lookStraight : .findFace
+        case .openEyes:
+            guidance = .openEyes
+        case .accept:
+            guidance = .measuringEyes
+            requestEyes(sample)
+        }
+        let share = 1 - Self.faceProgressShare
+        let progress = Self.faceProgressShare + share * Double(eyeMaps.count) / Double(EyeSampleGate.requiredSamples)
+        let next = Phase.scanning(progress: min(progress, 1), guidance: guidance)
+        if next != phase { phase = next }
+    }
+
+    private func requestEyes(_ sample: FaceSample) {
+        eyeFrames += 1
+        guard !isLocatingEyes, eyeFrames.isMultiple(of: EyeSampleGate.visionInterval),
+              let input = sample.locatorInput else { return }
+        isLocatingEyes = true
+        let preferred = eyeOrientation, scanID = scanID
+        Task.detached(priority: .userInitiated) {
+            let found = FaceFeatureLocator.features(for: input, preferred: preferred)
+            await self.receiveEyes(found, scanID: scanID)
+        }
+    }
+
+    private func receiveEyes(_ found: (FaceFeatureMap, CGImagePropertyOrientation)?, scanID: Int) {
+        isLocatingEyes = false
+        guard scanID == self.scanID, let face = pendingFace, case .scanning = phase, let found else { return }
+        eyeOrientation = found.1
+        // Vision can still read a blink the blend shapes missed; a barely open eye measures nothing useful.
+        guard let fit = FaceFit(features: found.0), fit.eyeOpenness >= EyeScan.minimumOpenness else { return }
+        eyeMaps.append(found.0)
+        if eyeMaps.count >= EyeSampleGate.requiredSamples { finishEyes(face) }
+    }
+
+    /// Publishes the face result with the averaged eye measurements, or without them when too few readings came in.
+    private func finishEyes(_ face: FaceShapeResult) {
+        var result = face
+        if eyeMaps.count >= Self.minimumEyeSamples, let average = FaceFeatureMap.average(eyeMaps),
+           let fit = FaceFit(features: average) {
+            result.eyes = fit.eyeScan(samples: eyeMaps.count)
+        }
+        pendingFace = nil
+        eyeMaps.removeAll()
+        phase = .finished(result)
     }
 
     private func requestContour(for sample: FaceSample) {
@@ -155,20 +249,38 @@ private struct FaceSample: Sendable {
     let isNeutral: Bool
     let vertices: [SIMD3<Float>]
     let contourInput: ContourInput
+    let blinkLeft: Float
+    let blinkRight: Float
+    let squintLeft: Float
+    let squintRight: Float
+    /// Camera frame and mesh for Vision's eye landmarks; only copied out during the eye phase.
+    let locatorInput: FeatureLocatorInput?
 
-    init(face: ARFaceAnchor, frame: ARFrame) {
+    init(face: ARFaceAnchor, frame: ARFrame, includesLocatorInput: Bool) {
         isTracked = face.isTracked
         vertices = face.geometry.vertices
 
         let cameraTransform = frame.camera.transform
         pose = HeadPose(face: face.transform, camera: cameraTransform)
-        contourInput = ContourInput(pixelBuffer: SendablePixelBuffer(buffer: frame.capturedImage),
-                                    cameraTransform: cameraTransform, intrinsics: frame.camera.intrinsics,
-                                    faceTransform: face.transform)
+        let contour = ContourInput(pixelBuffer: SendablePixelBuffer(buffer: frame.capturedImage),
+                                   cameraTransform: cameraTransform, intrinsics: frame.camera.intrinsics,
+                                   faceTransform: face.transform)
+        contourInput = contour
 
         func weight(_ location: ARFaceAnchor.BlendShapeLocation) -> Float {
             face.blendShapes[location]?.floatValue ?? 0
         }
+        blinkLeft = weight(.eyeBlinkLeft)
+        blinkRight = weight(.eyeBlinkRight)
+        squintLeft = weight(.eyeSquintLeft)
+        squintRight = weight(.eyeSquintRight)
+        locatorInput = includesLocatorInput
+            ? FeatureLocatorInput(contour: contour, vertices: face.geometry.vertices,
+                                  textureCoordinates: face.geometry.textureCoordinates,
+                                  triangleIndices: FilledFaceMesh.triangleIndices(
+                                      vertexCount: face.geometry.vertices.count,
+                                      fallback: face.geometry.triangleIndices))
+            : nil
         isNeutral = weight(.jawOpen) < 0.2
             && max(weight(.mouthSmileLeft), weight(.mouthSmileRight)) < 0.4
             && max(weight(.cheekPuff), weight(.mouthPucker)) < 0.4
@@ -213,7 +325,8 @@ extension FaceShapeViewModel: ARSessionDelegate {
     // ARSession calls its delegate on the main queue unless a delegateQueue is set.
     nonisolated func session(_ session: ARSession, didUpdate frame: ARFrame) {
         guard let face = frame.anchors.lazy.compactMap({ $0 as? ARFaceAnchor }).first else { return }
-        let sample = FaceSample(face: face, frame: frame)
+        let measuringEyes = MainActor.assumeIsolated { pendingFace != nil }
+        let sample = FaceSample(face: face, frame: frame, includesLocatorInput: measuringEyes)
         MainActor.assumeIsolated { handle(sample) }
     }
 

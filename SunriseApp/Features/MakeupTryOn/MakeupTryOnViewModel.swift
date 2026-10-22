@@ -25,6 +25,11 @@ import UIKit
     /// Run Vision on every n-th front-facing frame.
     static let sampleInterval = 8
 
+    /// While the liner is on, run Vision on every n-th front-facing frame to keep it on the moving eyes.
+    static let liveEyeInterval = 2
+    /// How far each new eye reading moves the liner's eye points (1 follows instantly, lower is steadier).
+    static let liveEyeWeight: Float = 0.85
+
     let plan: MakeupPlan
     @Published private(set) var phase: Phase = .idle
     @Published private(set) var selection: [MakeupCategory: MakeupRecommendation]
@@ -32,11 +37,17 @@ import UIKit
     @Published private(set) var shadeChoices: [MakeupCategory: MakeupShade] = [:]
     @Published private(set) var intensities: [MakeupCategory: Double] = [:]
     @Published private(set) var textures: [MakeupCategory: UIImage] = [:]
-    /// The person's measured features once makeup is placed; every style is fitted to them.
+    /// The person's measured features once makeup is placed; brows and blush are fitted to them. The eyeliner follows
+    /// the eye shape measured in the face scan instead.
     @Published private(set) var fit: FaceFit?
     let session = ARSession()
+    /// The eyeliner is a 2D overlay driven by MediaPipe landmarks, not part of the face-mesh texture.
+    let linerOverlay = LinerOverlayModel()
 
     private var features: FaceFeatureMap?
+    /// `features` with the eyes following the person's current eyes; only the liner is drawn from it.
+    private var liveFeatures: FaceFeatureMap?
+    private var isLocatingLive = false
     private var samples: [FaceFeatureMap] = []
     private var orientation: CGImagePropertyOrientation?
     private var isLocating = false
@@ -72,11 +83,12 @@ import UIKit
     }
 
     func intensity(for category: MakeupCategory) -> Double {
-        intensities[category] ?? MakeupTextureRenderer.defaultIntensity
+        intensities[category] ?? MakeupTextureRenderer.startingIntensity(for: category)
     }
 
     func setIntensity(_ intensity: Double, for category: MakeupCategory) {
         intensities[category] = min(max(intensity, 0), 1)
+        if category == .eyeliner { syncLiner() }
     }
 
     /// What the AR view draws: only categories with a finished texture.
@@ -86,7 +98,16 @@ import UIKit
         }
     }
 
-    var hasMakeup: Bool { !textures.isEmpty }
+    var hasMakeup: Bool { !textures.isEmpty || selection[.eyeliner] != nil }
+
+    /// Passes the selected liner, shade and intensity to the overlay (switched off when the mesh liner is being compared).
+    private func syncLiner() {
+        guard !MakeupTextureRenderer.legacyMeshEyeliner, case .eyeliner(let liner)? = selection[.eyeliner]?.style else {
+            linerOverlay.setStyle(nil, shade: nil, intensity: 1)
+            return
+        }
+        linerOverlay.setStyle(liner, shade: shade(for: .eyeliner), intensity: intensity(for: .eyeliner))
+    }
 
     func start() async {
         guard ARFaceTrackingConfiguration.isSupported else { phase = .unsupported; return }
@@ -94,6 +115,7 @@ import UIKit
         session.delegate = self
         session.run(ARFaceTrackingConfiguration(), options: [.resetTracking, .removeExistingAnchors])
         isSessionRunning = true
+        syncLiner()
         // Placement is kept across pauses; the same person is most likely still in front of the camera.
         if features == nil { resetPlacement() } else { phase = .ready }
     }
@@ -107,6 +129,7 @@ import UIKit
 
     func stop() {
         session.pause()
+        linerOverlay.stop()
         isSessionRunning = false
         switch phase {
         case .locating, .ready, .interrupted: phase = .idle
@@ -122,6 +145,8 @@ import UIKit
 
     private func resetPlacement() {
         features = nil
+        liveFeatures = nil
+        isLocatingLive = false
         samples.removeAll()
         facingFrames = 0
         locateID += 1
@@ -139,7 +164,17 @@ import UIKit
     /// Draws one category's texture in the background; a newer request for the same category replaces it.
     private func redraw(_ category: MakeupCategory) {
         renderTasks[category]?.cancel()
-        guard let features, let recommendation = selection[category] else {
+        if category == .eyeliner {
+            syncLiner()
+            // The mesh texture only draws the liner for the DEBUG side-by-side comparison.
+            if !MakeupTextureRenderer.legacyMeshEyeliner {
+                renderTasks[category] = nil
+                textures[category] = nil
+                return
+            }
+        }
+        let drawn = category == .eyeliner ? liveFeatures ?? features : features
+        guard let features = drawn, let recommendation = selection[category] else {
             renderTasks[category] = nil
             textures[category] = nil
             return
@@ -156,6 +191,7 @@ import UIKit
     }
 
     private func handle(_ sample: TryOnSample?) {
+        if phase == .ready, let sample, sample.isTracked, sample.isFacingCamera { followEyes(with: sample.input) }
         guard case .locating = phase else { return }
         let guidance: Guidance
         if let sample, sample.isTracked {
@@ -165,6 +201,28 @@ import UIKit
             guidance = .findFace
         }
         if phase != .locating(guidance) { phase = .locating(guidance) }
+    }
+
+    /// Keeps the liner on the person's actual eyes, so it follows when they squint, stretch the lid or blink.
+    private func followEyes(with input: FeatureLocatorInput) {
+        facingFrames += 1
+        guard MakeupTextureRenderer.legacyMeshEyeliner, selection[.eyeliner] != nil, features != nil, !isLocatingLive, renderTasks[.eyeliner] == nil,
+              facingFrames.isMultiple(of: Self.liveEyeInterval) else { return }
+        isLocatingLive = true
+        let preferred = orientation, locateID = locateID
+        Task.detached(priority: .userInitiated) {
+            let found = FaceFeatureLocator.features(for: input, preferred: preferred)
+            await self.receiveLive(found?.0, locateID: locateID)
+        }
+    }
+
+    private func receiveLive(_ found: FaceFeatureMap?, locateID: Int) {
+        isLocatingLive = false
+        guard locateID == self.locateID, phase == .ready, let found, let base = liveFeatures ?? features,
+              let blended = base.replacingEyes(blending: found, weight: Self.liveEyeWeight),
+              blended.isPlausible else { return }
+        liveFeatures = blended
+        redraw(.eyeliner)
     }
 
     private func requestFeatures(for input: FeatureLocatorInput) {
@@ -224,7 +282,9 @@ private struct TryOnSample: Sendable {
                                    faceTransform: face.transform)
         input = FeatureLocatorInput(contour: contour, vertices: face.geometry.vertices,
                                     textureCoordinates: face.geometry.textureCoordinates,
-                                    triangleIndices: face.geometry.triangleIndices)
+                                    triangleIndices: FilledFaceMesh.triangleIndices(
+                                        vertexCount: face.geometry.vertices.count,
+                                        fallback: face.geometry.triangleIndices))
     }
 }
 
@@ -233,7 +293,10 @@ extension MakeupTryOnViewModel: ARSessionDelegate {
     nonisolated func session(_ session: ARSession, didUpdate frame: ARFrame) {
         let face = frame.anchors.lazy.compactMap { $0 as? ARFaceAnchor }.first
         let sample = face.map { TryOnSample(face: $0, frame: frame) }
-        MainActor.assumeIsolated { handle(sample) }
+        MainActor.assumeIsolated {
+            handle(sample)
+            if let face, face.isTracked { linerOverlay.submit(frame, face: face) }
+        }
     }
 
     nonisolated func session(_ session: ARSession, didFailWithError error: any Error) {

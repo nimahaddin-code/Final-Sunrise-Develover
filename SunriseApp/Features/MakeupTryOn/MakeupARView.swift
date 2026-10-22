@@ -51,8 +51,10 @@ struct MakeupARView: UIViewRepresentable {
 /// depth (they would hide each other); instead an invisible, slightly shrunken mesh writes depth first, so parts of
 /// the face hidden behind the nose stay hidden.
 final class MakeupFaceRenderer: NSObject, ARSCNViewDelegate {
-    /// Blush first, liner on top.
-    static let drawOrder: [MakeupCategory] = [.blush, .eyebrow, .eyeliner]
+    /// Blush first. The liner is a 2D overlay (`LinerOverlayView`); the mesh only carries it in the DEBUG comparison mode.
+    static var drawOrder: [MakeupCategory] {
+        MakeupTextureRenderer.legacyMeshEyeliner ? [.blush, .eyebrow, .eyeliner] : [.blush, .eyebrow]
+    }
 
     let materials: [MakeupCategory: SCNMaterial] = Dictionary(uniqueKeysWithValues: MakeupCategory.allCases.map {
         let material = SCNMaterial()

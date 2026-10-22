@@ -9,6 +9,8 @@ struct SideFit: Equatable, Sendable {
     let eyeWidth: Float
     /// Degrees; positive when the outer corner sits higher than the inner corner.
     let eyeTilt: Float
+    /// Height of the eye opening along the face's vertical, divided by the eye width. Small when the eye is closed.
+    let eyeOpenness: Float
     /// Widest point of the nose on this side, the start of the classic brow and liner guide lines.
     let noseWing: SIMD2<Float>?
     /// How far the bottom of the nose sits below the eye centre, in eye-distance units.
@@ -26,6 +28,8 @@ struct SideFit: Equatable, Sendable {
         outerCorner = outer
         eyeWidth = width
         eyeTilt = atan2(simd_dot(axis, frame.up), simd_dot(axis, frame.outward)) * 180 / .pi
+        let heights = side.eye.map { simd_dot($0, frame.up) }
+        eyeOpenness = ((heights.max() ?? 0) - (heights.min() ?? 0)) / width
         noseWing = map.nose.max { frame.across($0) < frame.across($1) }
         noseDepth = map.nose.map { -simd_dot($0 - frame.origin, frame.up) / frame.unit }.max()
     }
@@ -68,6 +72,15 @@ struct FaceFit: Equatable, Sendable {
         if eyeSpacing < 0.9 { .close } else if eyeSpacing > 1.15 { .wide } else { .balanced }
     }
 
+    /// Eye opening height divided by eye width, averaged over both eyes.
+    var eyeOpenness: Float { (left.eyeOpenness + right.eyeOpenness) / 2 }
+
+    /// The eye measurements the face scan keeps. `samples` is the number of Vision readings averaged into them.
+    func eyeScan(samples: Int) -> EyeScan {
+        EyeScan(tiltLeft: left.eyeTilt, tiltRight: right.eyeTilt, spacing: eyeSpacing, openness: eyeOpenness,
+                samples: samples)
+    }
+
     var hasNose: Bool { left.noseWing != nil && right.noseWing != nil }
 
     /// Why the category looks the way it does on this face.
@@ -78,27 +91,12 @@ struct FaceFit: Equatable, Sendable {
                 ? ["Starts above your inner eye corner, arches over the outer edge of your iris and ends on the line from your nose to your outer eye corner."]
                 : ["Starts above your inner eye corner and arches over the outer edge of your iris."]
         case .eyeliner:
-            [tiltNote, spacingNote].compactMap { $0 }
+            // Chosen from the eye shape measured in the face scan; see `EyelinerPlan.notes`.
+            []
         case .blush:
             left.noseDepth != nil
                 ? ["Kept above the tip of your nose and outside your pupils, scaled to your cheeks."]
                 : ["Kept outside your pupils."]
-        }
-    }
-
-    private var tiltNote: LocalizedStringResource? {
-        switch tilt {
-        case .down: "Your outer eye corners sit a little low, so the wing lifts higher to open up your eyes."
-        case .up: "Your eyes already lift at the outer corners, so the wing stays lower to keep it balanced."
-        case .balanced: "Your eye tilt is balanced, so the wing follows the classic angle."
-        }
-    }
-
-    private var spacingNote: LocalizedStringResource? {
-        switch spacing {
-        case .close: "Your eyes are close-set, so the liner focuses on the outer half."
-        case .wide: "Your eyes are wide-set, so the liner starts right at the inner corner."
-        case .balanced: nil
         }
     }
 }
@@ -107,19 +105,6 @@ struct FaceFit: Equatable, Sendable {
 enum MakeupFitter {
     /// The iris edge sits about this far from the eye centre, in eye widths.
     static let irisEdge: Float = 0.2
-
-    static func eyeliner(_ style: LinerStyle, fit: FaceFit) -> LinerStyle {
-        var fitted = style
-        if style.wingLength > 0 {
-            // Compensate for the eye's own tilt, so every wing ends up lifting about the same amount visually.
-            fitted.wingAngle = min(max(style.wingAngle + (FaceFit.typicalEyeTilt - fit.eyeTilt) * 0.8, 0), 40)
-        }
-        let spacing = fit.eyeSpacing - FaceFit.typicalEyeSpacing
-        // Close-set eyes look wider with liner on the outer half; wide-set eyes with liner from the inner corner.
-        fitted.start = min(max(style.start - spacing * 0.6, 0), 0.6)
-        if spacing > 0.15 { fitted.innerWidth = style.innerWidth * 1.3 }
-        return fitted
-    }
 
     static func blush(_ style: BlushStyle, side: SideFit) -> BlushStyle {
         var fitted = style

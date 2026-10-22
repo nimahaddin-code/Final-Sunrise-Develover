@@ -1,4 +1,7 @@
+import ARKit
 import CoreGraphics
+import Metal
+import SceneKit
 import ImageIO
 import Vision
 import simd
@@ -64,5 +67,32 @@ enum FaceFeatureLocator {
         let map = FaceFeatureMap(left: .init(brow: leftBrow, eye: leftEye), right: .init(brow: rightBrow, eye: rightEye),
                                  nose: textureCoordinates(landmarks.nose) ?? [])
         return map.isPlausible ? map : nil
+    }
+}
+
+/// The triangles of the mesh that is actually drawn: ARKit's face geometry has holes at the eyes and mouth, and
+/// `ARSCNFaceGeometry(fillMesh: true)` fills them. Looking up texture coordinates in the same filled triangles
+/// puts points inside the eye openings exactly where the renderer draws them.
+enum FilledFaceMesh {
+    private static let triangles: [Int16]? = {
+        guard let device = MTLCreateSystemDefaultDevice(),
+              let geometry = ARSCNFaceGeometry(device: device, fillMesh: true),
+              let element = geometry.elements.first, element.primitiveType == .triangles,
+              element.bytesPerIndex == 2 || element.bytesPerIndex == 4 else { return nil }
+        let count = element.primitiveCount * 3
+        let indices: [Int16] = element.data.withUnsafeBytes { raw in
+            (0..<count).map { index in
+                element.bytesPerIndex == 2 ? Int16(truncatingIfNeeded: raw.loadUnaligned(fromByteOffset: index * 2, as: UInt16.self))
+                    : Int16(truncatingIfNeeded: raw.loadUnaligned(fromByteOffset: index * 4, as: UInt32.self))
+            }
+        }
+        return indices
+    }()
+
+    /// The filled triangles when they index into `vertexCount` vertices, else `fallback` (the unfilled mesh).
+    static func triangleIndices(vertexCount: Int, fallback: [Int16]) -> [Int16] {
+        guard let triangles, triangles.count >= fallback.count,
+              triangles.allSatisfy({ $0 >= 0 && Int($0) < vertexCount }) else { return fallback }
+        return triangles
     }
 }

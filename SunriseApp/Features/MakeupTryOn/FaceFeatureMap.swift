@@ -25,6 +25,19 @@ struct FaceFeatureMap: Equatable, Sendable {
         sides.allSatisfy { $0.brow.count >= 2 && $0.eye.count >= 3 } && eyeDistance > 0.01
     }
 
+    /// This map with both eyes moved toward `live`'s by `weight` (0...1). `nil` if the eye point counts differ.
+    /// Used to follow the eyes frame by frame while the brows and nose keep their averaged positions.
+    func replacingEyes(blending live: FaceFeatureMap, weight: Float) -> FaceFeatureMap? {
+        guard left.eye.count == live.left.eye.count, right.eye.count == live.right.eye.count else { return nil }
+        func blend(_ old: [SIMD2<Float>], _ new: [SIMD2<Float>]) -> [SIMD2<Float>] {
+            zip(old, new).map { $0 + ($1 - $0) * weight }
+        }
+        var result = self
+        result.left.eye = blend(left.eye, live.left.eye)
+        result.right.eye = blend(right.eye, live.right.eye)
+        return result
+    }
+
     /// Point-wise mean of several maps; `nil` if they are empty or have different point counts.
     static func average(_ maps: [FaceFeatureMap]) -> FaceFeatureMap? {
         guard let first = maps.first else { return nil }
@@ -53,27 +66,51 @@ struct ProjectedFaceMesh: Sendable {
     /// Three vertex indices per triangle.
     let triangleIndices: [Int16]
 
-    /// Texture coordinate under `point`. Points just outside the mesh, such as inside the eye openings,
-    /// are extrapolated from the nearest triangle. `nil` only for an empty mesh.
+    /// Texture coordinate under `point`. Points outside every triangle, such as inside the eye openings (the mesh
+    /// has a hole there, but the rendered face mesh fills it), come from a local fit through the nearest mesh points
+    /// instead of one stretched triangle. `nil` only for an empty mesh.
     func textureCoordinate(at point: SIMD2<Float>) -> SIMD2<Float>? {
         var inside: (uv: SIMD2<Float>, depth: Float)?
-        var nearest: (uv: SIMD2<Float>, outside: Float)?
         var index = 0
         while index + 2 < triangleIndices.count {
             let a = Int(triangleIndices[index]), b = Int(triangleIndices[index + 1]), c = Int(triangleIndices[index + 2])
             index += 3
             guard let weights = Self.barycentric(point, points[a], points[b], points[c]) else { continue }
+            guard -min(weights.x, weights.y, weights.z) <= 1e-4 else { continue }
             let uv = weights.x * textureCoordinates[a] + weights.y * textureCoordinates[b]
                 + weights.z * textureCoordinates[c]
-            let outside = -min(weights.x, weights.y, weights.z)
-            if outside <= 1e-4 {
-                let depth = weights.x * depths[a] + weights.y * depths[b] + weights.z * depths[c]
-                if depth < inside?.depth ?? .infinity { inside = (uv, depth) }
-            } else if outside < nearest?.outside ?? .infinity {
-                nearest = (uv, outside)
-            }
+            let depth = weights.x * depths[a] + weights.y * depths[b] + weights.z * depths[c]
+            if depth < inside?.depth ?? .infinity { inside = (uv, depth) }
         }
-        return inside?.uv ?? nearest?.uv
+        return inside?.uv ?? localFit(at: point)
+    }
+
+    /// Number of nearest mesh points the local fit uses; enough to surround an eye opening.
+    private static let fitPointCount = 16
+
+    /// Texture coordinate at `point` from a distance-weighted affine fit (image to texture) through the nearest
+    /// mesh points. Around an eye opening those points surround `point`, so this interpolates the texture
+    /// across the hole the way the filled face mesh does.
+    private func localFit(at point: SIMD2<Float>) -> SIMD2<Float>? {
+        guard !points.isEmpty else { return nil }
+        let nearest = points.indices.sorted { simd_distance_squared(points[$0], point) < simd_distance_squared(points[$1], point) }
+            .prefix(Self.fitPointCount)
+        guard nearest.count >= 3 else { return textureCoordinates[nearest[nearest.startIndex]] }
+        // Weighted least squares on coordinates relative to `point`, so the fit's constant term is the answer.
+        // Softened by the ring's size so the nearest points do not dominate when `point` is close to one of them.
+        let softening = Double(simd_length_squared(points[nearest[nearest.index(before: nearest.endIndex)]] - point)) * 0.25
+        var normal = simd_double3x3(0), rightU = SIMD3<Double>(0), rightV = SIMD3<Double>(0)
+        for vertex in nearest {
+            let d = points[vertex] - point
+            let weight = 1 / (Double(simd_length_squared(d)) + softening + 1e-9)
+            let row = SIMD3<Double>(1, Double(d.x), Double(d.y))
+            normal += simd_double3x3(rows: [row * row.x, row * row.y, row * row.z]) * weight
+            rightU += row * (Double(textureCoordinates[vertex].x) * weight)
+            rightV += row * (Double(textureCoordinates[vertex].y) * weight)
+        }
+        guard abs(normal.determinant) > 1e-12 else { return textureCoordinates[nearest[nearest.startIndex]] }
+        let inverse = normal.inverse
+        return SIMD2(Float((inverse * rightU).x), Float((inverse * rightV).x))
     }
 
     /// Barycentric weights of `p` in triangle (a, b, c); `nil` for a degenerate triangle.
