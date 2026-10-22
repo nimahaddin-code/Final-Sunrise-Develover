@@ -189,6 +189,7 @@
 				"43A7AA6990D68C43A68511C9",
 				"C42CEFA28CA243E75B5D3DA1",
 				"49C5565CCE7AF4F0C16F9F0A",
+				"5DB216DC7486D35D79004C59",
 				"792977CAD0396D693A58DE24",
 				"2A319A247AA300149353ECC2",
 				"792C45EC0F1AB54F3358E303",
@@ -313,6 +314,7 @@
 				"CDDE58AF819DFCD6735F185F",
 				"B1B2C3D4E5F60718293A4B5C",
 				"9909AED933CB17E8692EAA5B",
+				"06E1C2BC394CE47584C11AEE",
 				"C9587CEBB39B613D7953399F",
 				"E80000001C043450B0C3F54A",
 				"E8000000257DD8D4770AABC1",
@@ -867,6 +869,16 @@
 			"isa" = "PBXBuildFile";
 			"fileRef" = "CF45679699AC7CB5E530CA1C";
 		};
+		"5123E36F58975C5C2CA54E05" = {
+			"path" = "LinerInkTests.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"06E1C2BC394CE47584C11AEE" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "5123E36F58975C5C2CA54E05";
+		};
 		"87BF2D2EF9709D53B6DC6D0E" = {
 			"path" = "EyelinerMappingTests.swift";
 			"isa" = "PBXFileReference";
@@ -1238,6 +1250,7 @@
 				"14E0BA1614926FA5ABDBDC1A",
 				"0D4BF23384C86F7A04F21AF1",
 				"984FD73DF3F4DCFF8AB8A6BF",
+				"2BDA3A6B1D463E6EEED33D8D",
 				"8C189615D8A8DC30B4B5789D",
 				"CB14CD6B60CC4F8DA016C314",
 				"C8B9433F836C41AA8E942950",
@@ -2006,6 +2019,16 @@
 			"lastKnownFileType" = "sourcecode.swift";
 			"sourceTree" = "<group>";
 		};
+		"5DB216DC7486D35D79004C59" = {
+			"path" = "LinerInk.swift";
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"sourceTree" = "<group>";
+		};
+		"2BDA3A6B1D463E6EEED33D8D" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "5DB216DC7486D35D79004C59";
+		};
 		"49C5565CCE7AF4F0C16F9F0A" = {
 			"path" = "LinerOverlayRenderer.swift";
 			"isa" = "PBXFileReference";
@@ -2034,6 +2057,7 @@
 				"B4BCF3A0D2A9C2618147EA0C",
 				"B1B2C3D4E5F60718293A4B5D",
 				"87BF2D2EF9709D53B6DC6D0E",
+				"5123E36F58975C5C2CA54E05",
 				"06E4E253B30DEDB244405B20",
 				"E70000003EEB62383567027B",
 				"E70000007A577EC19F38EF9E",

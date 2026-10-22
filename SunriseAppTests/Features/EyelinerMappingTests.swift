@@ -166,12 +166,18 @@ final class EyelinerMappingTests: XCTestCase {
     func testFillsFollowShadeIntensityAndAge() throws {
         let frame = try overlayFrame()
         let black = MakeupPalette.black
-        let full = LinerOverlayRenderer.fills(frame, shade: black, intensity: 1, now: 100.1)
+        let all = LinerOverlayRenderer.fills(frame, shade: black, intensity: 1, now: 100.1)
+        // Each eye: a faint wide halo under the liner's body.
+        XCTAssertEqual(all.count, 4)
+        let halos = all.filter(\.isHalo), full = all.filter { !$0.isHalo }
         XCTAssertEqual(full.count, 2)
+        XCTAssertEqual(halos.count, 2)
+        XCTAssertLessThan(halos[0].alpha, full[0].alpha / 2)
+        XCTAssertGreaterThan(halos[0].blur, full[0].blur)
         XCTAssertEqual(full[0].alpha, min(MakeupTextureRenderer.drawnOpacity(black), LinerOverlayRenderer.maxOpacity), accuracy: 1e-9)
         XCTAssertLessThan(full[0].alpha, 1, "Some skin always shows through")
         XCTAssertTrue(LinerOverlayRenderer.blurRange.contains(full[0].blur), "The edge is softened to match the video")
-        let half = LinerOverlayRenderer.fills(frame, shade: black, intensity: 0.5, now: 100.1)
+        let half = LinerOverlayRenderer.fills(frame, shade: black, intensity: 0.5, now: 100.1).filter { !$0.isHalo }
         XCTAssertEqual(half[0].alpha, full[0].alpha / 2, accuracy: 1e-9)
         XCTAssertTrue(LinerOverlayRenderer.fills(frame, shade: black, intensity: 0, now: 100.1).isEmpty)
         XCTAssertTrue(LinerOverlayRenderer.fills(frame, shade: black, intensity: 1, now: 100 + LinerOverlayRenderer.maxAge + 0.1).isEmpty,
@@ -180,7 +186,7 @@ final class EyelinerMappingTests: XCTestCase {
 
     func testFillsLandOnTheMappedEyes() throws {
         let frame = try overlayFrame()
-        let fills = LinerOverlayRenderer.fills(frame, shade: MakeupPalette.black, intensity: 1, now: 100.1)
+        let fills = LinerOverlayRenderer.fills(frame, shade: MakeupPalette.black, intensity: 1, now: 100.1).filter { !$0.isHalo }
         let eyeFrame = SyntheticEye.frame(t: 0)
         for (fill, eye) in zip(fills, [eyeFrame.subjectLeft!, eyeFrame.subjectRight!]) {
             let corner = frame.mapping.map(eye.outerCorner)

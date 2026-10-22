@@ -5,6 +5,13 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Changed — eyeliner realism
+- The live eyeliner overlay is multiplied into the camera picture (`.blendMode(.multiply)`) instead of laid over it, so skin
+  shading and texture show through; photos use the same blend. Pigment picks up 12% of the skin tone read from a few camera
+  pixels around the eyes (`LinerInk`), has a faint wider halo under it (pigment bleeding into skin), and a speckled grain that
+  lifts ink unevenly and stays anchored to the eye. Hand occlusion unchanged. New `LinerInk.swift`, `LinerInkTests`.
+  Not yet seen on a real face: check the multiply blend over the AR view, grain strength and skin tint on a Face ID iPhone.
+
 ### Integrated — -Nimah
 - Saved face/eye results now drive recommendations: Nimah eyebrow/blush open preview and tutorial without a repeat
   scan step; Hanum eyeliner consumes the newer separate eye result. Live alignment remains automatic.

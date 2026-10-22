@@ -19,6 +19,10 @@ not another classification step. Eye-scan measurements are converted using match
 guessed from `mayBeHooded`. Missing/unclear measurements use the neutral liner. Older scans can still use the
 eye measurements embedded in the face result when no separate eye result exists. Eyeshadow is outside this scope.
 
+Eyeliner look (Hanum's overlay): `LinerOverlayRenderer` yields a halo fill plus a body fill per eye; the live canvas and photo
+`compose` multiply them into the camera picture, erase a skin-texture grain (`LinerInk`, anchored to the eye) and hand
+regions, and tint the pigment with skin sampled from the ARKit frame. Shared tuning constants live in `LinerInk` and `LinerOverlayRenderer`.
+
 Shared brief for anyone working on this repo with an AI coding assistant (Claude Code, Codex, Cursor, Copilot, …).
 It covers the project structure, what each feature does and how to use it, and the rules to follow.
 `CHANGELOG.md` records what changed. Team docs in `Docs/` are written in Indonesian and give more detail.
