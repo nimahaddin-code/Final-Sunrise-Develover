@@ -1,3 +1,30 @@
+## Rekomendasi otomatis dari hasil scan — -Nimah
+
+Alur pengguna menampilkan satu hasil per kategori, bukan pilihan semua referensi.
+Data saat ini adalah katalog lokal `MakeupPreferenceCatalog`, bukan database server.
+`assignedBrowIDs` dan `assignedBlushIDs` menetapkan ID stabil; varian penelitian tetap disimpan
+untuk provenance, tanpa picker A/B/C. Aturan MVP ini mempertahankan default sebelumnya secara eksplisit,
+bukan klaim satu style yang paling benar untuk setiap orang.
+
+| Hasil wajah | Eyebrow | Blush |
+| --- | --- | --- |
+| Oval | A · upward brow | A · outer sweep |
+| Round | A · defined angle | A · apple |
+| Square | A · rounded curve | A · placement dots |
+| Oblong | B · straight | B · wide horizontal |
+| Heart | B · low arch | A · upper inner |
+| Diamond | A · soft arch | A · temple sweep |
+| Triangle / pear, rectangle | Belum ada data | Belum ada data |
+
+Data kosong atau tanpa scan: overlay kategori tersebut mati dan tidak diganti style generik.
+Scan ulang memperbarui assignment di home; warna, intensitas, Before/After, dan on/off tetap tersedia.
+Eyeliner menggunakan `EyelinerPlanner` Hanum dan output mata Khalish, bukan label bentuk wajah.
+Hanya hasil personal yang diekspos; hasil mata yang tidak jelas meminta eye scan, bukan katalog liner.
+Profile membuka ringkasan hasil dan akses scan ulang. Panah home membuka tutorial kategori aktif.
+Akurasi posisi dan kenyamanan kamera harus diuji pada iPhone; tes simulator tidak memvalidasi hasil visual.
+
+---
+
 # Eyebrow & Blush Preferences
 
 > -Nimah · 22 October 2026, scan recovery: reset/loss now invalidates old worker ownership, failed area generation retries after a cooldown, and scan UI explains positioning (near/far, movement, eyes and pose) with Scan ulang. Distance 25–60 cm is a starting suggestion, not an enforced hardware limit. Signed iPhone build succeeded and installed on Nimah New at 06:27. Simulator: 80 tests, 77 passed, 3 hardware skipped, 0 failures. Real-face repeat-use acceptance remains pending. Previous installation/test notes below are historical.

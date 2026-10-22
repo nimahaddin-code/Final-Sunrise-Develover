@@ -78,17 +78,47 @@ final class LinerFrameRelay: @unchecked Sendable {
     let camera = FaceCameraState()
     let liner = LinerOverlayModel()
     let relay: LinerFrameRelay
-    private let linerStyle: LinerStyle?
+    // -Nimah: Refresh assignments after a rescan; no camera/model recreation is needed.
+    private var linerStyle: LinerStyle?
+    @Published private(set) var linerRecommendation: MakeupRecommendation?
+    private var activation: Task<Void,Never>?
+    private var active = false
 
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
-        if case .eyeliner(let style)? = recommendation?.style { linerStyle = style } else { linerStyle = nil }
+        if !plan.eyeliner.isNeutral, case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: .blush)
         relay = LinerFrameRelay(model: liner)
         shades = [.blush: MakeupPalette.rose, .eyebrow: MakeupPalette.darkBrown,
                   .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
         intensities = [.blush: Self.defaultIntensity, .eyebrow: Self.defaultIntensity,
                        .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
+    }
+
+    // -Nimah: Database/catalog selection is automatic; tools only switch category, never placement style.
+    func canTry(_ tool: TryOnTool)->Bool {
+        switch tool {
+        case .eyebrow:return brow.selectedBrow != nil
+        case .blush:return brow.selectedBlush != nil
+        case .eyeliner:return linerStyle != nil
+        }
+    }
+    var recommendationTitle: String {
+        switch tool {
+        case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"No saved recommendation for this face shape")
+        case .blush:return brow.selectedBlush?.title ?? String(localized:"No saved recommendation for this face shape")
+        case .eyeliner:return linerRecommendation == nil ? String(localized:"Complete your eye scan to get a recommendation") : String(localized:"Eyeliner fitted to your eye scan")
+        }
+    }
+    func updateRecommendations(face: FaceShapeResult?, eyes: EyeShapeResult?) {
+        let shape=face.map { $0.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:$0.shape.rawValue) ?? .unknown } ?? .unknown
+        brow.applyAssessment(FaceShapeAssessment(shape:shape,origin:.analysis,confidence:face.map { Float($0.confidence) }))
+        let plan=face.map { MakeupPlan(scan:$0,eyeScan:eyes) } ?? MakeupPlan(shape:.oval,eyeScan:eyes)
+        linerRecommendation=plan.eyeliner.isNeutral ? nil : plan.madeForYou.first
+        if case .eyeliner(let style)? = linerRecommendation?.style { linerStyle=style } else { linerStyle=nil }
+        enabled=Set(enabled.filter { canTry($0) })
+        if canTry(tool) { enabled.insert(tool) }
+        syncLiner()
     }
 
     var isOff: Bool { !enabled.contains(tool) }
@@ -118,11 +148,12 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// Selecting a tool also switches its makeup on.
     func choose(_ newTool: TryOnTool) {
         tool = newTool
-        enabled.insert(newTool)
+        if canTry(newTool) { enabled.insert(newTool) }
         syncLiner()
     }
 
     func choose(shade: MakeupShade) {
+        guard canTry(tool) else { return }
         shades[tool] = shade
         enabled.insert(tool)
         syncLiner()
@@ -134,6 +165,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     }
 
     func setIntensity(_ value: Double) {
+        guard canTry(tool) else { return }
         intensities[tool] = min(max(value, 0.1), 1)
         enabled.insert(tool)
         syncLiner()
@@ -142,22 +174,28 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// Starts the one camera. Blush and eyebrow are placed as soon as it runs, whichever tools are on, so switching a
     /// look on later is immediate.
     func activate() {
+        // -Nimah: A late permission response must not revive the home camera behind a scan/tutorial.
+        guard !active else { return }
+        active=true
         syncLiner()
-        Task {
+        activation=Task {
             await brow.prepare()
+            guard !Task.isCancelled else { return }
             await camera.requestPermission()
+            guard !Task.isCancelled,active else { return }
             camera.overlay = true
         }
     }
 
     func deactivate() {
+        active=false; activation?.cancel(); activation=nil
         liner.stop()
         camera.stopSession?()
         camera.suspend()
     }
 
     private func layer(_ tool: TryOnTool) -> PreviewLayer {
-        PreviewLayer(on: enabled.contains(tool), intensity: Float(intensities[tool] ?? Self.defaultIntensity),
+        PreviewLayer(on: canTry(tool) && enabled.contains(tool), intensity: Float(intensities[tool] ?? Self.defaultIntensity),
                      tint: shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) })
     }
 

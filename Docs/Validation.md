@@ -145,3 +145,16 @@ Tech lead requested Khalish eyebrow/blush takeout. Scan/result remain Khalish; e
 Merged Eyeliner-Hanum through 9c8aaf4 (hand occlusion/lid flow) and chore/mediapipe through efdd168 (separate Khalish eye scan and onboarding). Preserved Nimah-only eyebrow/blush. Resolved two independent EyeLandmarks types and duplicate output filenames using EyeScanLandmarks for the scan model; mathematics retained. MediaPipe pinned to revision 50505c8312c7eacb1bd411cecdc4cc9fd08d53cb.
 
 Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. Regressions cover immediate preview/tutorial from saved face shape, eye measurement/lid handoff, eye-plan independence from face shape and neutral fallback for unclear eyes. Live alignment and actual makeup accuracy still need physical acceptance. Saved classification does not remove the camera's need to track current pose; no repeat classification or Continue-scan action is required.
+
+## Staging: one scan-assigned result — -Nimah
+
+- Merge latest published Eyeliner-Hanum 431a9e5. Remote chore/mediapipe efdd168, feat/face-shape aee8264,
+  feature/nimah-mvp 3c963e5 and main 7cb99c4 are ancestors of the integrated staging history.
+- Simulator iPhone 17: **257 tests, 253 pass, 4 skipped, 0 failures**. Includes scan assignment enforcement,
+  missing coverage, clearing stale makeup and updating home after rescan, plus latest Hanum geometry/ink tests.
+- Signed generic iPhone Debug build: **BUILD SUCCEEDED**, restoring Nimah's existing WP97CT3PT7 team after merge.
+- No live device accuracy/performance acceptance was performed in this change.
+- Manual iPhone check: scan face/eyes once; tap each tool; confirm its single assigned reference (see
+  BrowBlushPreferences.md), adjust shade/intensity, compare Before/After, open tutorial; rescan with a different
+  result and confirm labels and overlays refresh. Missing scan/unsupported catalog shape must leave that layer off.
+- References are an on-device catalog. Pear/rectangle lack an assignment and are explicitly unavailable.

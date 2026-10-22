@@ -5,6 +5,15 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Fixed — scan-assigned makeup results -Nimah
+- Eyebrow/blush now expose one stable local-catalog assignment from the saved face scan, with provenance; remove
+  style/source exploration and block unsupported defaults. Eyeliner exposes only the personal eye-scan result.
+- Refresh home assignments after a rescan and clear stale layers for absent data. Keep shades/intensity/comparison.
+- Connect the home tutorial arrow and profile scan/results routes; cancel late camera startup off-screen.
+- Integrate latest remote Eyeliner-Hanum (431a9e5). Other available team branch heads are already ancestors.
+- Reference coverage is incomplete for pear/rectangle; no recommendation is invented. Real-device validation pending.
+
+
 ### Changed — eyeliner realism (grain and skin tint)
 - On top of the multiply blend and bleed halo: the pigment picks up 12% of the skin tone read from a few camera pixels around
   the eyes every 8 frames, and a fixed speckle (`LinerInk`) lifts the ink unevenly so skin texture shows through; the speckle

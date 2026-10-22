@@ -1,4 +1,4 @@
-// -Nimah: Shared face-shape input and source choices; no automatic classifier is claimed here.
+// -Nimah: Reuse saved face classification and its one assigned reference per category.
 import SwiftUI
 
 @MainActor final class EyebrowViewModel:ObservableObject {
@@ -8,14 +8,22 @@ import SwiftUI
     @Published private(set) var assessment=FaceShapeAssessment(shape:.unknown)
     @Published private(set) var browPreferenceID:String?
     @Published private(set) var blushPreferenceID:String?
-    var browOptions:[BrowPreference] { MakeupPreferenceCatalog.browOptions(for:assessment.shape) }
-    var blushOptions:[BlushPreference] { MakeupPreferenceCatalog.blushOptions(for:assessment.shape) }
+    var browOptions:[BrowPreference] { assessment.origin == .analysis ? MakeupPreferenceCatalog.assignedBrow(for:assessment.shape).map { [$0] } ?? [] : [] }
+    var blushOptions:[BlushPreference] { assessment.origin == .analysis ? MakeupPreferenceCatalog.assignedBlush(for:assessment.shape).map { [$0] } ?? [] : [] }
     var selectedBrow:BrowPreference? { browOptions.first { $0.id==browPreferenceID } }
     var selectedBlush:BlushPreference? { blushOptions.first { $0.id==blushPreferenceID } }
+    // -Nimah: Missing scan/catalog coverage must not silently render the default configuration.
+    var hasRecommendation:Bool {
+        switch configuration.region {
+        case .eyebrows:return selectedBrow != nil
+        case .blush:return selectedBlush != nil
+        case .forehead:return true
+        }
+    }
     var sourceNote:String {
         switch configuration.region {
-        case .eyebrows:return selectedBrow.map { "Reference \($0.source) · \($0.evidence.title)" } ?? "Manual exploration · not a face-shape recommendation"
-        case .blush:return selectedBlush.map { "Reference \($0.source) · \($0.evidence.title)" } ?? "Manual exploration · not a face-shape recommendation"
+        case .eyebrows:return selectedBrow.map { "Reference \($0.source) · \($0.evidence.title)" } ?? "No saved recommendation for this face shape"
+        case .blush:return selectedBlush.map { "Reference \($0.source) · \($0.evidence.title)" } ?? "No saved recommendation for this face shape"
         case .forehead:return "Forehead placement estimate"
         }
     }
@@ -42,9 +50,10 @@ import SwiftUI
         value.tutorialStep=phase == .tutorial && value.region == .eyebrows ? stepIndex : nil
         value.showMakeupPreview=(phase == .chooseStyle || phase == .tutorial) && value.previewAfter
         if !value.previewAfter && (phase == .chooseStyle || phase == .tutorial) { value.showGuide=false; value.debugMesh=false; value.showTrackingPoints=false }
+        if !hasRecommendation { value.showMakeupPreview=false; value.showGuide=false; value.showAllRegions=false }
         return value
     }
-    // -Nimah: Holly can call this with .analysis; manual overrides remain available and are labelled.
+    // -Nimah: Consume Holly/Khalish analysis; manual labels never create scan recommendations.
     func applyAssessment(_ value:FaceShapeAssessment) {
         assessment=value; browPreferenceID=nil; blushPreferenceID=nil
         if let first=browOptions.first { choose(first) } else { configuration.style = .natural }
@@ -65,10 +74,11 @@ import SwiftUI
         guard blushOptions.contains(where:{ $0.id==preference.id }) else { return }
         restorePreview(); blushPreferenceID=preference.id; configuration.blushStyle=preference.style
     }
-    func explore(_ style:EyebrowStyle) { restorePreview(); browPreferenceID=nil; configuration.style=style }
-    func explore(_ style:BlushPlacementStyle) { restorePreview(); blushPreferenceID=nil; configuration.blushStyle=style }
+    // -Nimah: Stale exploration actions cannot override the scan assignment.
+    func explore(_ style:EyebrowStyle) {}
+    func explore(_ style:BlushPlacementStyle) {}
     func select(_ region:FaceGuideRegion) { restorePreview(); configuration.region=region; phase = .chooseStyle; stepIndex=0 }
-    func beginTutorial() { stepIndex=0; phase = .tutorial }
+    func beginTutorial() { guard hasRecommendation else { return }; stepIndex=0; phase = .tutorial }
     func nextStep() { if stepIndex+1<lessons.count { stepIndex += 1 } else { phase = .chooseStyle; stepIndex=0 } }
     func previousStep() { if stepIndex>0 { stepIndex -= 1 } else { phase = .chooseStyle } }
     func back() {

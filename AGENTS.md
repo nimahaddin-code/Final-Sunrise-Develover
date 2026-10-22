@@ -2,6 +2,14 @@
 
 ## Current merged scope — -Nimah
 
+Scan-assigned results — -Nimah: user-facing eyebrow/blush use exactly one stable assigned catalog ID for the saved
+face shape (`MakeupPreferenceCatalog.assignedBrow/assignedBlush`); no source/style picker or manual face override.
+Uncovered shapes and absent scans leave those layers off. Eyeliner exposes only Hanum's personal eye-scan result,
+not the catalog. TryOnHome refreshes saved output changes without rebuilding the camera, and its profile route
+opens scan results/rescan actions; the tutorial arrow opens the active assigned category. Data is an on-device
+catalog, not a server database. See Docs/BrowBlushPreferences.md for assignments and uncovered shapes.
+
+
 This section supersedes older status descriptions below. Khalish owns face/eye scanning and saved outputs;
 Nimah owns eyebrow/blush placement and tutorials; Hanum owns the eyeliner planner/live overlay. The duplicate
 Khalish eyebrow/blush catalog, personalizer and renderer were removed. Shared measurement/data helpers remain.

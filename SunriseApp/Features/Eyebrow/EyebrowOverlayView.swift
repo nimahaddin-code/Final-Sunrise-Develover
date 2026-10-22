@@ -6,7 +6,6 @@ struct EyebrowOverlayView:View {
     @StateObject private var camera=FaceCameraState()
     @State private var visible=false
     @State private var showOptions=false
-    @State private var showFaceShapes=false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil) { _model=StateObject(wrappedValue:EyebrowViewModel(checker:checker,assessment:assessment,initialRegion:initialRegion)) }
@@ -46,12 +45,6 @@ struct EyebrowOverlayView:View {
             await model.prepare()
             if supported { await camera.requestPermission() }
             else if case .unsupported=model.availability { model.nextAfterScan() }
-        }
-        .sheet(isPresented:$showFaceShapes) {
-            NavigationStack {
-                ScrollView { faceShapeChoices.padding() }.navigationTitle("Face shape")
-                    .toolbar { ToolbarItem(placement:.confirmationAction) { Button("Done") { showFaceShapes=false } } }
-            }.preferredColorScheme(.light).presentationDetents([.medium,.large])
         }
         .onAppear { visible=true; camera.overlay=true }
         .onDisappear { visible=false; camera.stopSession?(); camera.suspend() }
@@ -115,7 +108,7 @@ struct EyebrowOverlayView:View {
             }
         case .chooseStyle:
             panel {
-                HStack { Text("Choose style").font(.headline); Spacer(); Button("Region") { model.phase = .chooseRegion }.font(.caption) }
+                HStack { Text("Your recommendation").font(.headline); Spacer(); Button("Region") { model.phase = .chooseRegion }.font(.caption) }
                 faceShapeChip
                 if model.configuration.region == .eyebrows || model.configuration.region == .blush {
                     referenceChoices
@@ -193,7 +186,7 @@ struct EyebrowOverlayView:View {
             }
             if model.phase == .chooseStyle {
                 // -Nimah: Tutorial text is available immediately while live placement aligns automatically.
-                action(supported ? "Start tutorial" : "Preview steps",disabled:false) { model.beginTutorial() }
+                action(supported ? "Start tutorial" : "Preview steps",disabled:!model.hasRecommendation) { model.beginTutorial() }
                     .padding(.horizontal,18).padding(.bottom,14)
             }
         }.frame(height:panelHeight)
@@ -215,66 +208,30 @@ struct EyebrowOverlayView:View {
             Text(model.assessment.shape.title).font(.caption.weight(.semibold))
             Text(model.assessment.origin == .manual ? "Selected manually" : "Analysis result").font(.caption2).foregroundStyle(.secondary)
             Spacer()
-            Button("Change") { showFaceShapes=true }.font(.caption)
+            // -Nimah: The saved scan determines the shape; no manual replacement in try-on.
         }
     }
+    // -Nimah: Missing scan data asks for the existing face-scan flow, not a manual shape picker.
     private var faceShapeChoices:some View {
-        VStack(alignment:.leading,spacing:12) {
-            Text("Choose your face shape").font(.headline)
-            Text("Choose the closest match or explore without a recommendation. You can change this later.").font(.caption).foregroundStyle(.secondary)
-            LazyVGrid(columns:[GridItem(.flexible()),GridItem(.flexible())],spacing:8) {
-                ForEach(MakeupFaceShape.allCases) { shape in
-                    Button {
-                        if showFaceShapes { model.applyAssessment(.init(shape:shape)); showFaceShapes=false }
-                        else { model.chooseFaceShape(shape) }
-                    } label: {
-                        Text(shape.title).font(.subheadline).frame(maxWidth:.infinity,minHeight:44)
-                            .background(model.assessment.shape==shape ? AppColors.rose.opacity(0.16) : Color.gray.opacity(0.08),in:RoundedRectangle(cornerRadius:12))
-                    }.buttonStyle(.plain).foregroundStyle(AppColors.rose)
-                }
-            }
-        }.foregroundStyle(.black)
+        Text("Complete your face scan first. If this shape has no reference yet, makeup stays off.")
+            .font(.subheadline)
     }
+    // -Nimah: Display the assigned result, not a picker of all research references.
     private var referenceChoices:some View {
         VStack(alignment:.leading,spacing:10) {
-            Text(MakeupPreferenceCatalog.coverageNote(for:model.assessment.shape)).font(.caption).foregroundStyle(.secondary)
-            ScrollView(.horizontal,showsIndicators:false) {
-                HStack(spacing:10) {
-                    if model.configuration.region == .eyebrows {
-                        if model.browOptions.isEmpty {
-                            ForEach(EyebrowStyle.allCases) { style in
-                                styleCard(title:style.title,selected:model.configuration.style==style,brow:style,forehead:nil) { model.explore(style) }
-                            }
-                        } else {
-                            ForEach(model.browOptions) { option in
-                                styleCard(title:option.title,selected:model.browPreferenceID==option.id,brow:option.style,forehead:nil) { model.choose(option) }
-                            }
-                        }
-                    } else if model.blushOptions.isEmpty {
-                        ForEach(BlushPlacementStyle.allCases) { style in
-                            blushCard(title:style.title,style:style,selected:model.configuration.blushStyle==style) { model.explore(style) }
-                        }
-                    } else {
-                        ForEach(model.blushOptions) { option in
-                            blushCard(title:option.title,style:option.style,selected:model.blushPreferenceID==option.id) { model.choose(option) }
-                        }
-                    }
-                }
+            if model.configuration.region == .eyebrows,let option=model.selectedBrow {
+                FaceGuideStylePreview(brow:option.style,forehead:nil).frame(width:108,height:62)
+                Text(option.title).font(.headline)
+                Text(model.sourceNote).font(.caption).foregroundStyle(AppColors.rose)
+            } else if model.configuration.region == .blush,let option=model.selectedBlush {
+                BlushPlacementSketch(style:option.style).frame(width:108,height:82)
+                Text(option.title).font(.headline)
+                Text(option.style.instruction).font(.caption)
+                Text(model.sourceNote).font(.caption).foregroundStyle(AppColors.rose)
+            } else {
+                Text("No saved recommendation for this face shape").font(.headline)
+                Text("Complete your face scan first. If this shape has no reference yet, makeup stays off.").font(.caption)
             }
-            Text(model.sourceNote).font(.caption2).foregroundStyle(AppColors.rose)
-            if model.configuration.region == .blush {
-                Text(model.configuration.blushStyle.instruction).font(.caption).foregroundStyle(.secondary)
-                if model.selectedBlush?.evidence == .cheekOnlyInterpretation {
-                    Text("E has no color legend. This optional interpretation uses cheeks only; nose and chin annotations are excluded.").font(.caption2)
-                }
-            }
-            Menu("Explore other styles") {
-                if model.configuration.region == .eyebrows {
-                    ForEach(EyebrowStyle.allCases) { style in Button(style.title) { model.explore(style) } }
-                } else {
-                    ForEach(BlushPlacementStyle.allCases) { style in Button(style.title) { model.explore(style) } }
-                }
-            }.font(.caption)
         }
     }
     private func blushCard(title:String,style:BlushPlacementStyle,selected:Bool,action:@escaping () -> Void) -> some View {
