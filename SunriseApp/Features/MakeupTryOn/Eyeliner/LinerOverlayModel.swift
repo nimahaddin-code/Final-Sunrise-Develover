@@ -97,7 +97,8 @@ import SwiftUI
         }
         let eyes = tracker.render(landmarks, spec: spec)
         frame = LinerOverlayFrame(eyes: eyes, mapping: ImageToViewMapping.resolve(context),
-                                  receivedAt: CACurrentMediaTime())
+                                  receivedAt: CACurrentMediaTime(), debugRaw: tracker.lastRaw,
+                                  debugSmoothed: tracker.lastSmoothed)
     }
 
     /// `snapshot` with the liner on it, for photos.
@@ -111,6 +112,9 @@ import SwiftUI
 /// The 2D layer above `MakeupARView`. Pixel-for-pixel the same size as the AR view (both ignore the safe area).
 struct LinerOverlayView: View {
     @ObservedObject var model: LinerOverlayModel
+    #if DEBUG
+    @AppStorage("debugEyeLandmarks") private var showsLandmarks = false
+    #endif
     /// `false` hides the liner, for comparing with the bare face.
     let isVisible: Bool
 
@@ -126,9 +130,31 @@ struct LinerOverlayView: View {
                     }
                 }
             }
+            .overlay { landmarkDots }
             .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+
+    /// DEBUG only: red = MediaPipe's points as reported, green = smoothed (what the liner is built from).
+    @ViewBuilder private var landmarkDots: some View {
+        #if DEBUG
+        if showsLandmarks, isVisible, let frame = model.frame {
+            Canvas { context, _ in
+                func dots(_ eyes: [EyeLandmarks], _ color: Color, _ radius: CGFloat) {
+                    for eye in eyes {
+                        for point in eye.flattened {
+                            let p = frame.mapping.map(point)
+                            context.fill(Path(ellipseIn: CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2,
+                                                                height: radius * 2)), with: .color(color))
+                        }
+                    }
+                }
+                dots(frame.debugRaw, .red, 2)
+                dots(frame.debugSmoothed, .green, 2.5)
+            }
+        }
+        #endif
     }
 }

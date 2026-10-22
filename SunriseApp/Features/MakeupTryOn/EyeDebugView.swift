@@ -4,10 +4,12 @@ import SwiftUI
 /// Debug-only readout of the measured eye values and how they became the eyeliner, for calibrating the thresholds.
 struct EyeDebugView: View {
     let eyes: EyeScan?
+    @AppStorage("debugEyeLandmarks") private var showsLandmarks = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("DEBUG eye measurements").font(.caption.weight(.bold))
+            Toggle("Show eyeliner landmark dots (red raw, green smoothed)", isOn: $showsLandmarks)
             if let eyes {
                 let plan = EyelinerPlanner.plan(for: eyes)
                 line("tilt L/R", String(format: "%.1f° / %.1f° (mean %.1f°)", eyes.tiltLeft, eyes.tiltRight, eyes.tilt))

@@ -18,6 +18,10 @@ final class LinerTracker {
     /// monolid eyes with a small absolute opening still count as open).
     var openFractionThreshold: Double = 0.55
 
+    /// The last frame's landmarks before and after smoothing, for the DEBUG dots.
+    private(set) var lastRaw: [EyeLandmarks] = []
+    private(set) var lastSmoothed: [EyeLandmarks] = []
+
     private let smoother = EyeLandmarksSmoother()
     private var baselines: [EyeSide: Double] = [:]
 
@@ -37,6 +41,8 @@ final class LinerTracker {
                 baselines[side] = nil
             }
         }
+        lastRaw = frame.eyes
+        lastSmoothed = eyes
         return eyes.compactMap { eye in
             let alpha = openness(of: eye)
             guard alpha > 0.01,

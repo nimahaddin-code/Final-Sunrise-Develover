@@ -6,6 +6,9 @@ struct LinerOverlayFrame {
     var eyes: [RenderedEye]
     var mapping: ImageToViewMapping
     var receivedAt: CFTimeInterval
+    /// DEBUG dots: MediaPipe's eye points as reported, and after smoothing.
+    var debugRaw: [EyeLandmarks] = []
+    var debugSmoothed: [EyeLandmarks] = []
 }
 
 /// Draws the liner into a Core Graphics context in view points. Used by the live SwiftUI canvas and, with the same
