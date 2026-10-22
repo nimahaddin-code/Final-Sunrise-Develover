@@ -34,7 +34,7 @@ struct MakeupTryOnView: View {
                             developerTools.toggle()
                         }
                         #endif
-                        Button("Place again", systemImage: "arrow.triangle.2.circlepath", action: model.relocate)
+                        if MakeupTextureRenderer.legacyMeshEyeliner { Button("Place again", systemImage: "arrow.triangle.2.circlepath", action: model.relocate) }
                         Button("Take photo", systemImage: "camera") {
                             if let image = snapshotter.snapshot() {
                                 photo = TryOnPhoto(image: model.linerOverlay.composed(image))

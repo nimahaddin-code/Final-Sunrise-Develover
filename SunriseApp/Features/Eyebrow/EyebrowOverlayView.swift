@@ -27,7 +27,7 @@ struct EyebrowOverlayView:View {
                     faceFrame.frame(maxWidth:300,maxHeight:320).allowsHitTesting(false)
                     Spacer(minLength:8)
                 }
-                if supported {
+                if supported && !model.configuration.usesLaunchFit {
                     HStack(spacing:8) {
                         Circle().fill(camera.tracked ? Color.green : Color.orange).frame(width:8,height:8)
                         Text(camera.tracked ? (camera.eyebrowGuideReady ? "Check placement alignment" : "Face detected · mapping") : model.trackingState(camera:camera).rawValue)
@@ -129,13 +129,13 @@ struct EyebrowOverlayView:View {
                     Text("Keep the outline within visible skin. Hairline is not detected automatically.").font(.caption).foregroundStyle(.secondary)
                 }
                 previewControls
-                if supported { Button("Refresh placement") { model.restorePreview(); camera.refitFace() }.font(.caption) }
-                if supported && !camera.eyebrowGuideReady { Text("Aligning makeup automatically · keep your face visible").font(.caption).foregroundStyle(.secondary) }
+                if supported && !model.configuration.usesLaunchFit { Button("Refresh placement") { model.restorePreview(); camera.refitFace() }.font(.caption) }
+                if supported && !model.configuration.usesLaunchFit && !camera.eyebrowGuideReady { Text("Aligning makeup automatically · keep your face visible").font(.caption).foregroundStyle(.secondary) }
             }
         case .tutorial:
             panel {
                 previewControls
-                if supported { Button("Refresh placement") { model.restorePreview(); camera.refitFace() }.font(.caption) }
+                if supported && !model.configuration.usesLaunchFit { Button("Refresh placement") { model.restorePreview(); camera.refitFace() }.font(.caption) }
                 HStack(alignment:.top,spacing:16) {
                     VStack(alignment:.leading,spacing:6) {
                         Text("Step \(model.stepIndex+1) · \(lessons[model.stepIndex].title)").font(.headline)
@@ -260,7 +260,7 @@ struct EyebrowOverlayView:View {
             Form {
                 Toggle("Show guide",isOn:$model.configuration.showGuide)
                 Picker("Appearance",selection:$model.configuration.mode) { ForEach(EyebrowGuideMode.allCases) { Text($0.title).tag($0) } }
-                Button("Refresh placement") { camera.refitFace(); showOptions=false }
+                if !model.configuration.usesLaunchFit { Button("Refresh placement") { camera.refitFace(); showOptions=false } }
                 if let distance=camera.distanceHint { Text(distance).font(.caption) }
                 #if DEBUG
                 Toggle("Debug face mesh + landmarks",isOn:$model.configuration.debugMesh)

@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Preparing your recommended makeup" : {
+      "extractionState" : "manual"
+    },
+    "Makeup preparation unavailable" : {
+      "extractionState" : "manual"
+    },
+    "Repeat initial scan" : {
+      "extractionState" : "manual"
+    },
+    "The initial scan did not provide a usable face fit and eye result. Complete it before opening try-on." : {
+      "extractionState" : "manual"
+    },
     "01 Pink" : {
       "extractionState" : "manual"
     },

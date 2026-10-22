@@ -24,8 +24,9 @@ enum FaceAnalysis {
     /// The live scan screen. It handles camera permission, guidance and the result sheet, and writes the result
     /// to `store`. `onFinish` runs when the person taps the result's main button, labelled `continueTitle`.
     @MainActor static func scanScreen(store: FaceShapeStore, continueTitle: LocalizedStringKey = "Try on recommended makeup",
+                                      onScanFrame: ((ARFrame,ARFaceAnchor)->Void)? = nil,
                                       onFinish: @escaping () -> Void = {}) -> FaceShapeView {
-        FaceShapeView(store: store, onShowMakeup: onFinish, continueTitle: continueTitle)
+        FaceShapeView(store: store, onShowMakeup: onFinish, onScanFrame:onScanFrame, continueTitle: continueTitle)
     }
 
     /// The live scan without UI. Show `session` in an AR view, call `start()`, and read `phase` for progress,

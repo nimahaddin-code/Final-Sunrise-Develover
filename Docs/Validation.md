@@ -178,3 +178,15 @@ Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. R
 - Signed generic iPhone build: **BUILD SUCCEEDED**. No live iPhone visual acceptance was performed.
 - On device: rebuild/run staging, select After, try Pink/Muted Mauve and Brown/Soft black, then turn both tools on;
   check that both stay visible and intensity/Before still remove or soften them as expected.
+
+## Launch-only analysis and fitting — -Nimah
+
+- Simulator: **263 tests, 259 passed, 4 skipped, 0 failures**. Signed generic iPhone build: **BUILD SUCCEEDED**.
+- Regression test prepares fitting once from initial-scan input, then reuses it after AR session/anchor recreation.
+  Its live pipeline has a provider that fails the test if Vision scanning is invoked; brow and blush remain available.
+- Additional checks: all assigned tools are enabled on home entry, launch fitting is selected, welcome persistence
+  does not bypass the new-launch scan gate, and cache reset/topology mismatch cannot reuse stale fitting.
+- Cold-launch scan/eye flow and live transfer have not been validated on a physical face in this change.
+- Device checklist: complete launch scan once, confirm all supported overlays; switch tools/tutorial/palette picker
+  and return, with no scan/hold-still prompts; briefly lose tracking and return; terminate/reopen and verify the
+  startup scan is required again. Unsupported devices/denied permissions remain in startup with clear fallback.

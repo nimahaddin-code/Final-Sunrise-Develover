@@ -2,6 +2,16 @@
 
 ## Current merged scope — -Nimah
 
+Launch-only scan — -Nimah: `AppNavigator.launchScanComplete` is memory-only and starts false on every cold launch.
+Welcome is remembered, analysis is not skipped. Launch runs face scan, eye scan, and transient makeup fitting before
+try-on. `FaceAnalysis.scanScreen(onScanFrame:)` exposes the completed AR frame to the launch integrator without
+changing classification formulas. `LaunchMakeupFit` keeps only in-memory fitting geometry for the current run;
+no image/mesh is written to disk. Try-on/tutorial use `usesLaunchFit` and `followLaunchFit`, which reattach the
+initial fit on matching ARKit topology without Vision scanning, sample accumulation or hold-still gates. No scan
+prompts or rescan controls appear in try-on. All supported assigned layers start on. Liner live tracking remains
+automatic; it skips the legacy Vision fitting phase. Initial preparation failures stay in the launch flow.
+
+
 Visible pigment fix — -Nimah: layered render snapshots must request `includeBrow: configuration.needsBrow`,
 otherwise turning on blush strips the brow input from the renderer. Brow/blush pigment cores use stronger alpha,
 14% feather width, 1 mm surface lift, and default intensity 0.85. Before/After and intensity still control visibility.

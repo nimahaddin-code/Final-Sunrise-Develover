@@ -68,7 +68,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     /// The tool the shade row and intensity bar currently control.
     @Published private(set) var tool: TryOnTool = .blush
-    @Published private(set) var enabled: Set<TryOnTool> = [.blush]
+    @Published private(set) var enabled: Set<TryOnTool> = Set(TryOnTool.allCases)
     @Published private(set) var shades: [TryOnTool: MakeupShade]
     @Published private(set) var intensities: [TryOnTool: Double]
     /// Held down on the camera card to see the bare face.
