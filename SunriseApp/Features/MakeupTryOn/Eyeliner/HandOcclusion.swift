@@ -1,8 +1,8 @@
 import CoreGraphics
 import Foundation
 
-/// Where hands (and anything else that is "body skin" rather than the face) are in the camera image, so the liner can
-/// be hidden there and stay on the eye behind a finger. Pure data and geometry; the detector is `HandOcclusionSegmenter`.
+/// Where hands (and anything else that is "body skin" rather than the face) are in the camera image. Lid tracking uses it
+/// to know when a finger may be pulling a lid; the liner itself is not hidden behind hands. Pure data and geometry; the detector is `HandOcclusionSegmenter`.
 struct OcclusionMask {
     /// Alpha is 255 where the person's body skin (a hand, a finger) was found, 0 elsewhere. `size` pixels.
     let image: CGImage
@@ -60,7 +60,7 @@ struct OcclusionMask {
     }
 
     /// The category mask of a segmenter (one class id per pixel) as an alpha image: 255 where the class is one of
-    /// `occluders`. Premultiplied black, so drawing it with `destinationOut` erases what is under it.
+    /// `occluders`. Premultiplied black, so it can be drawn as a tint (developer hand-mask view).
     static func alphaImage(categories: [UInt8], width: Int, height: Int, occluders: Set<UInt8>) -> CGImage? {
         guard width > 0, height > 0, categories.count >= width * height else { return nil }
         var pixels = [UInt8](repeating: 0, count: width * height * 4)

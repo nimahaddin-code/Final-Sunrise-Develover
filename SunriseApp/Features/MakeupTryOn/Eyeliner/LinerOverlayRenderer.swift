@@ -9,7 +9,7 @@ struct LinerOverlayFrame {
     /// DEBUG dots: MediaPipe's eye points as reported, and after smoothing.
     var debugRaw: [EyeLandmarks] = []
     var debugSmoothed: [EyeLandmarks] = []
-    /// Hands in front of the face: the liner is erased where this is set.
+    /// Where hands are (developer view only; the liner is drawn over them).
     var occlusion: Occlusion?
 }
 
@@ -75,16 +75,6 @@ enum LinerOverlayRenderer {
             cg.addPath(fill.path)
             cg.fillPath(using: .winding)
         }
-        if let occlusion = frame.occlusion { erase(occlusion, in: cg) }
-    }
-
-    /// Erases what is already drawn wherever the occlusion mask is set (a UIKit context is current).
-    static func erase(_ occlusion: Occlusion, in cg: CGContext) {
-        cg.saveGState()
-        cg.concatenate(occlusion.transform)
-        UIImage(cgImage: occlusion.image).draw(in: CGRect(origin: .zero, size: occlusion.size), blendMode: .destinationOut,
-                                               alpha: 1)
-        cg.restoreGState()
     }
 
     /// `snapshot` (the camera view with the other makeup) with the liner drawn over it.

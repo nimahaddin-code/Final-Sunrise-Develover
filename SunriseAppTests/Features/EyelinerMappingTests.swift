@@ -298,7 +298,7 @@ final class HandOcclusionTests: XCTestCase {
         XCTAssertNil(mask.placement(headAnchors: mask.headAnchors, mapping: identity, at: 10 + OcclusionMask.maxAge + 0.1))
     }
 
-    func testTheLinerIsErasedBehindAHandInThePhoto() throws {
+    func testAHandDoesNotEraseTheLinerInThePhoto() throws {
         let tracker = LinerTracker()
         var eyes: [RenderedEye] = []
         for i in 0..<5 {
@@ -333,12 +333,8 @@ final class HandOcclusionTests: XCTestCase {
         }
         let aroundTheEye = CGRect(x: 160, y: 340, width: 120, height: 80)
         XCTAssertLessThan(try darkest(photo(occlusion: nil), in: aroundTheEye), 0.6, "Without a hand the liner is in the photo")
-        XCTAssertGreaterThan(try darkest(photo(occlusion: hand), in: aroundTheEye), 0.97,
-                             "A hand over the eye hides the liner there")
-        // A hand over only the far side of the picture leaves the liner alone.
-        let farHand = Occlusion(image: hand.image, size: hand.size,
-                                transform: CGAffineTransform(scaleX: 100, y: 100).translatedBy(x: 5, y: 0))
-        XCTAssertLessThan(try darkest(photo(occlusion: farHand), in: aroundTheEye), 0.6)
+        XCTAssertLessThan(try darkest(photo(occlusion: hand), in: aroundTheEye), 0.6,
+                          "The hand mask only steers lid tracking; the liner stays drawn")
     }
 }
 

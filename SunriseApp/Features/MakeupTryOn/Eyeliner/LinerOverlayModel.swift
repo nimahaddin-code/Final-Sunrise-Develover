@@ -38,8 +38,6 @@ import SwiftUI
 
     var hasLiner: Bool { spec != nil }
 
-    /// Developer tools can switch the hand cut-out off, to tell whether it is what hides the liner.
-    private static var handOcclusionDisabled: Bool { UserDefaults.standard.bool(forKey: "disableOcclusion") }
     /// Off unless a developer switches it on: the upper lid follows the skin between detector results (a pulled lid).
     private static var lidTrackingEnabled: Bool { UserDefaults.standard.bool(forKey: "enableLidTracking") }
 
@@ -81,7 +79,7 @@ import SwiftUI
                 self.receive(landmarks)
             }
         }
-        // Without the segmentation model the liner simply is not hidden behind hands.
+        // Hands near the eye tell lid tracking that a lid may be pulled. Without the model it simply never follows.
         occluder.onMask = { [weak self] mask in
             Task { @MainActor in
                 guard let self,self.runID==token,self.isStarted else { return }
@@ -94,7 +92,7 @@ import SwiftUI
                 try await self.provider.start()
                 guard !Task.isCancelled,self.runID==token,self.spec != nil else { return }
                 self.isStarted=true; self.unavailableReason=nil
-                if !Self.handOcclusionDisabled { try? await self.occluder.start() }
+                try? await self.occluder.start()
                 guard !Task.isCancelled,self.runID==token else { return }
                 self.startupTask=nil
             } catch {
@@ -168,8 +166,7 @@ import SwiftUI
         let mapping = ImageToViewMapping.resolve(context)
         frame = LinerOverlayFrame(eyes: moved.eyes, mapping: mapping, receivedAt: now, debugRaw: moved.raw,
                                   debugSmoothed: moved.smoothed,
-                                  occlusion: Self.handOcclusionDisabled ? nil
-                                      : occlusionMask?.placement(headAnchors: head, mapping: mapping, at: now))
+                                  occlusion: occlusionMask?.placement(headAnchors: head, mapping: mapping, at: now))
     }
 
     private func receive(_ landmarks: EyeLandmarkFrame?) {
@@ -215,6 +212,7 @@ struct LinerOverlayView: View {
     @ObservedObject var model: LinerOverlayModel
     @AppStorage("debugEyeLandmarks") private var showsLandmarks = false
     @AppStorage("debugOcclusionMask") private var showsMask = false
+    @AppStorage(DeveloperTools.key) private var developerMode = false
     /// `false` hides the liner, for comparing with the bare face.
     let isVisible: Bool
 
@@ -236,15 +234,8 @@ struct LinerOverlayView: View {
                             liner.fill(Path(fill.path), with: .color(color.opacity(fill.alpha)), style: FillStyle(eoFill: false))
                         }
                     }
-                    // A hand in front of the eye: erase the liner where the segmenter found body skin.
-                    if let occlusion = frame.occlusion {
-                        layer.blendMode = .destinationOut
-                        layer.concatenate(occlusion.transform)
-                        layer.draw(Image(decorative: occlusion.image, scale: 1),
-                                   in: CGRect(origin: .zero, size: occlusion.size))
-                    }
                 }
-                if showsMask, let occlusion = frame.occlusion {
+                if developerMode, showsMask, let occlusion = frame.occlusion {
                     context.drawLayer { layer in
                         layer.clipToLayer { mask in
                             mask.concatenate(occlusion.transform)
@@ -267,7 +258,7 @@ struct LinerOverlayView: View {
 
     /// Developer tools: red = MediaPipe's points as reported, green = smoothed (what the liner is built from).
     @ViewBuilder private var landmarkDots: some View {
-        if showsLandmarks, isVisible, let frame = model.frame {
+        if developerMode, showsLandmarks, isVisible, let frame = model.frame {
             Canvas { context, _ in
                 func dots(_ eyes: [EyeLandmarks], _ color: Color, _ radius: CGFloat) {
                     for eye in eyes {
