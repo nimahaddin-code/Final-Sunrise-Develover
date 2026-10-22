@@ -2,7 +2,7 @@
 
 ## Pilihan utama
 
-SwiftUI, iOS 17+, MVVM ringan, satu app target dan satu unit test target. Tidak ada dependency eksternal atau package internal. Observasi konsisten menggunakan `ObservableObject` + `@Published`; semua ViewModel dan navigator adalah `@MainActor`.
+SwiftUI, iOS 17+, MVVM ringan, satu app target dan satu unit test target. Satu-satunya dependency eksternal adalah MediaPipe Tasks Vision (Swift Package) untuk scan mata ([ADR 0002](Decisions/0002-mediapipe-eye-scan.md)); `import MediaPipeTasksVision` hanya boleh ada di satu file, `Features/EyeShape/MediaPipeEyeDetector.swift`. Tidak ada package internal. Observasi konsisten menggunakan `ObservableObject` + `@Published`; semua ViewModel dan navigator adalah `@MainActor`.
 
 Organisasi berdasarkan fitur. Model yang dibagi katalog/detail/tutorial/saved berada di Core. Rendering dan media belum memiliki model karena belum ada kebutuhan implementasi yang terbukti. Tidak ada UIImage atau ARFaceAnchor di domain bersama.
 

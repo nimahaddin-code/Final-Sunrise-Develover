@@ -3,7 +3,7 @@ import SwiftUI
 struct AppRootView: View {
     let container: AppContainer
     @StateObject private var navigator = AppNavigator()
-    @StateObject private var faceShapeStore = FaceShapeStore(defaults: .standard)
+    @StateObject private var faceShapeStore = FaceAnalysis.savedResults()
 
     var body: some View {
         Group {
@@ -46,7 +46,7 @@ struct AppRootView: View {
         case .savedLookDetail(let look): SavedLookDetailView(look: look)
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
-            FaceShapeView(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
+            FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
         }
     }
 }

@@ -4,6 +4,7 @@
 
 ## Mulai di sini
 
+- Coding dengan AI (Claude Code, Codex, Cursor, Copilot): baca [AGENTS.md](AGENTS.md) dulu; riwayat perubahan di [CHANGELOG.md](CHANGELOG.md).
 - Tech lead: [pembagian workstream](Docs/TeamWorkstreams.md).
 - Engineer: [arsitektur](Docs/Architecture.md), [kontrak integrasi](Docs/IntegrationContracts.md), [kontribusi](CONTRIBUTING.md).
 - QA: [test dan checklist](Docs/Testing.md), [hasil validasi](Docs/Validation.md).
@@ -12,8 +13,8 @@
 ## Requirement dan setup
 
 - Mac dengan Xcode 15+ lengkap dan iOS Simulator runtime yang terpasang. Build environment yang benar-benar diperiksa tercantum di Validation.md.
-- Minimum iOS 17, iPhone portrait. Tidak ada dependency eksternal atau langkah package installation.
-- Buka `SunriseApp.xcodeproj`, pilih scheme **SunriseApp**, pilih iPhone Simulator, lalu Run (Cmd+R).
+- Minimum iOS 17, iPhone portrait. Satu-satunya dependency eksternal adalah MediaPipe Tasks Vision (Swift Package, revisi tag v1.1.1) untuk scan bentuk mata; lihat [ADR 0002](Docs/Decisions/0002-mediapipe-eye-scan.md).
+- Buka `SunriseApp.xcodeproj`, pilih scheme **SunriseApp**, pilih iPhone Simulator, lalu Run (Cmd+R). Pada build pertama Xcode mengunduh package MediaPipe (butuh internet); versi terkunci di `Package.resolved`.
 - Untuk iPhone fisik: pilih target → Signing & Capabilities → development Team milikmu, gunakan bundle identifier unik bila diperlukan, trust perangkat dan aktifkan Developer Mode, lalu Run. Team ID pribadi tidak disimpan di repository.
 - Untuk test: Product → Test (Cmd+U) atau ikuti CLI di Docs/Testing.md.
 

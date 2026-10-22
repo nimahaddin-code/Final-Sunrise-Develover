@@ -9,7 +9,7 @@ struct OnboardingView: View {
     var body: some View {
         NavigationStack {
             if isScanning {
-                FaceShapeView(store: store, onShowMakeup: onFinish)
+                FaceAnalysis.scanScreen(store: store, onFinish: onFinish)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
                             Button("Back") { isScanning = false }

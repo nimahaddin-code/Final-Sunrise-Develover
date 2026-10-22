@@ -18,6 +18,20 @@ Kontrak berada di `Core/Services/Contracts`. Semua Sendable; fungsi async dapat 
 
 Error katalog/saved saat ini dipetakan ke pesan UI generik; detail logging tanpa data pribadi bisa ditambahkan saat ada layanan nyata. Error unsupported bukan exception; tampilkan fallback. Mock error lebih lanjut dapat dibuat dalam test support.
 
+## Analisis bentuk wajah
+
+Pintu masuk tunggal: `Features/FaceShape/FaceAnalysis.swift`. Fitur lain cukup memakai `FaceAnalysis` serta tipe hasil `FaceShape` dan `FaceShapeResult`; jangan memanggil measurer atau classifier langsung, dan jangan mengubah file internal FaceShape dari fitur lain.
+
+| API | Input → output | Catatan |
+| --- | --- | --- |
+| `isLiveScanSupported` | Tidak ada → Bool | Scan live butuh TrueDepth; foto jalan di semua device |
+| `scanScreen(store:onFinish:)` | FaceShapeStore → layar scan siap pakai | Menangani izin kamera, panduan pose, sheet hasil; hasil ditulis ke store |
+| `makeLiveScanner()` | Tidak ada → FaceShapeViewModel | Untuk UI custom: tampilkan `session`, panggil `start()`/`stop()`, baca `phase` |
+| `faceShape(in:orientation:)` | CGImage → Result<FaceShapeResult, PhotoFailure> | async, Vision di luar main actor; gagal `.noFace`, `.turnedAway`, `.unmeasurable`, `.visionFailed` |
+| `savedResults(defaults:)` | UserDefaults → FaceShapeStore | Hanya hasil klasifikasi yang disimpan; tidak ada foto/mesh |
+
+Rekomendasi makeup dari hasil scan: `MakeupPlan(scan:)` di `Features/MakeupTryOn`.
+
 ## Batas AR yang sengaja belum dikunci
 
 Belum ada protocol rendering atau FaceSessionManager. Tim AR terlebih dahulu membuktikan tracking blush pada iPhone. Pisahkan lifecycle session, permission, tracking status, dan rendering. Tetapkan kontrak session setelah spike menemukan kebutuhan nyata; hindari mendesain semua overlay dari awal.
