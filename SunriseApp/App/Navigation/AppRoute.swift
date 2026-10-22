@@ -1,4 +1,4 @@
-enum AppTab: Hashable { case discover, myLooks }
+enum AppTab: Hashable { case tryOn, discover, myLooks }
 
 enum AppRoute: Hashable {
     case referenceDetail(MakeupReference)
@@ -8,4 +8,6 @@ enum AppRoute: Hashable {
     case liveGuide(referenceID: String)
     case comparison(referenceID: String)
     case savedLookDetail(SavedLookMetadata)
+    case makeupTryOn(plan: MakeupPlan, applied: [MakeupRecommendation])
+    case faceScan
 }

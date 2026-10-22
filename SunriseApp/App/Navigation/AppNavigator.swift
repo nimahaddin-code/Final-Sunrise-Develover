@@ -1,18 +1,35 @@
 import Combine
+import Foundation
 
 @MainActor final class AppNavigator: ObservableObject {
-    @Published private(set) var onboardingComplete = false
-    @Published var selectedTab: AppTab = .discover
+    static let onboardingCompleteKey = "onboardingComplete"
+
+    @Published private(set) var onboardingComplete: Bool
+    /// Try On is the home tab once onboarding is done.
+    @Published var selectedTab: AppTab = .tryOn
     @Published var discoverPath: [AppRoute] = []
     @Published var savedPath: [AppRoute] = []
+    @Published var tryOnPath: [AppRoute] = []
+    private let defaults: UserDefaults
 
-    func completeOnboarding() { onboardingComplete = true }
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        onboardingComplete = defaults.bool(forKey: Self.onboardingCompleteKey)
+    }
+
+    /// Ends onboarding for good and lands on the Try On home screen.
+    func completeOnboarding() {
+        defaults.set(true, forKey: Self.onboardingCompleteKey)
+        selectedTab = .tryOn
+        onboardingComplete = true
+    }
 
     func open(_ route: AppRoute, in tab: AppTab) {
         selectedTab = tab
         switch tab {
         case .discover: discoverPath.append(route)
         case .myLooks: savedPath.append(route)
+        case .tryOn: tryOnPath.append(route)
         }
     }
 
@@ -21,6 +38,7 @@ import Combine
         switch tab {
         case .discover: discoverPath.removeAll()
         case .myLooks: savedPath.removeAll()
+        case .tryOn: tryOnPath.removeAll()
         }
     }
 }
