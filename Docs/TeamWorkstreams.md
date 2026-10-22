@@ -1,6 +1,36 @@
-# Usulan pembagian pekerjaan tim
+# Pembagian iterasi MVP — Nimah, Khalish, Hanum
+
+> -Nimah: Current tech-lead instruction: **Khalish owns face scan and scan output; Nimah owns eyebrow/blush; Hanum owns eyeliner**. Khalish eyebrow/blush implementations removed from the active product. See [CodeOwnership](CodeOwnership.md); older assignments below are history.
+
+> -Nimah · 22 October 2026: Pembagian dari tech lead saat ini: **Holly: deteksi/analisis bentuk wajah; Nimah: eyebrow + blush; Hanum: eyeliner**. Katalog preferensi dan preview eyebrow/blush sudah tersedia, analisis Holly belum tersambung. [Kontrak, referensi dan acceptance](BrowBlushPreferences.md). Pembagian lama di bawah merupakan riwayat/usulan sebelumnya.
+
+> -Nimah, 19 October 2026: scope terbaru mencakup closed eyebrow outline, lima forehead style dan tutorial manual. Baca [BrowForeheadGuide](BrowForeheadGuide.md) untuk status terbaru, batas hairline dan testing; catatan sebelumnya di bawah adalah riwayat.
+
+> -Nimah: Instruksi terbaru menetapkan tech lead mengerjakan Eyes & Eyebrows. Kontrak modul dan handoff region lain ada di [EyebrowModule](EyebrowModule.md). Nama PIC Lips/Nose dan Cheeks/Forehead/Jaw/Chin belum ditetapkan di instruksi baru; tabel lama di bawah tetap usulan historis.
 
 Ini daftar area kerja, bukan asumsi jumlah anggota. Satu PIC dapat memegang beberapa area; tech lead menetapkan nama melalui issue. Area bisa mulai paralel menggunakan mock setelah kontrak minimum disepakati.
+
+## Prioritas placement eyeliner — -Nimah
+
+Pembagian berikut adalah **usulan tugas berikutnya**, bukan atribusi penulis kode atau delegasi otomatis. Tech lead dapat menyesuaikan PIC. Kode iterasi ini ditandai -Nimah.
+
+| PIC usulan | Deliverable | Dependensi | Acceptance |
+| --- | --- | --- | --- |
+| Nimah | Integrasi build, pengujian iPhone 17, review anatomy bersama makeup artist/tester | Source eyeliner + perangkat + persetujuan tester | Original vs eyeliner only diuji pada wajah; anotasi lokasi; hasil PASS/FAIL jujur dan keputusan toleransi dicatat |
+| Khalish | Audit upper-rim attachment dan opsi landmark untuk eyelid sulit | Debug region + sampel yang diizinkan | Tidak ada pigmen hidung/pipi; dokumentasikan batas mesh; detektor tambahan hanya jika error/latency terukur membaik |
+| Hanum | QA scope tutorial, kontrol style, debug UI dan regresi lifecycle | Kontrak state di MakeupAccuracyPlan.md | Previous/next kembali satu layer; full look eksplisit; refit/background/anchor replacement tidak memunculkan hasil lama |
+
+Urutan wajib: audit/debug → eyeliner → **gate wajah nyata** → baru perluas attachment/fine adjustment shadow/lips/blush/contour → integrasi full look tervalidasi. Buat satu PR kecil per area, koordinasikan project.pbxproj dan file kontrak. Panduan acceptance ada di EyelinerDeviceTesting.md; usulan metrik belum disepakati dan belum diukur.
+
+## Tim dan handoff saat ini
+
+| Nama | Usulan area iterasi berikut | Pekerjaan berikutnya |
+| --- | --- | --- |
+| Nimah (tech lead) | Integrasi, camera/calibration/AR | Uji iPhone, tuning pipi, lifecycle dan capture orientation |
+| Khalish | Katalog/detail/import dan tutorial | Review konten look, import memory, UI/accessibility |
+| Hanum | Comparison, local persistence, My Looks | End-to-end save/relaunch/delete, thumbnail dan storage quota |
+
+Implementasi MVP pada paket ini diberi komentar `// -Nimah:` sesuai permintaan. Ini tidak mengklaim Khalish atau Hanum menulis kode yang dibuat pada fase ini. Status fitur dan batas pengujian terbaru ada di ProductScope.md dan Validation.md. Rincian delapan area di bawah menjadi backlog/handoff; beberapa deliverable awal sudah diimplementasikan dan perlu divalidasi lebih lanjut.
 
 ## 1. Foundation dan integrasi
 
@@ -26,7 +56,7 @@ Ini daftar area kerja, bukan asumsi jumlah anggota. Satu PIC dapat memegang bebe
 
 - Tujuan: memilih foto inspirasi pribadi tanpa janji analisis otomatis.
 - Area: Features/ReferenceImport.
-- Kontrak: belum ada media contract; sepakati owned reference ID/lifecycle dengan tutorial dan persistence sebelum wiring.
+- Kontrak: media import session-only; koordinasikan perubahan ownership jika reference kelak ikut disimpan.
 - Dependensi: API media milestone berikut; UI dapat dimulai dari placeholder dan fixture berlabel.
 - Deliverable: PhotosPicker, preview/removal, cancellation/error, pengelolaan ukuran gambar.
 - Acceptance: cancel tidak dianggap error; iCloud/unreadable asset ditangani; tidak ada klaim makeup extraction; foto tidak terkirim ke server.
@@ -56,7 +86,7 @@ Ini daftar area kerja, bukan asumsi jumlah anggota. Satu PIC dapat memegang bebe
 
 - Tujuan: membandingkan capture nyata dan menyimpan koleksi lokal.
 - Area: Features/Comparison, Features/SavedLooks; kontrak SavedLooksStoring melalui koordinasi.
-- Kontrak: SavedLookMetadata, SavedLooksStoring; proposal transaksi media diperlukan sebelum save aktif.
+- Kontrak: SavedLookMetadata, SavedLooksStoring; save dua JPEG memakai staging folder; pertahankan kontrak transaksi saat mengembangkannya.
 - Dependensi: capture dari AR/camera dan media ownership dari import bila reference ikut disimpan. UI boleh menggunakan metadata sample tanpa foto palsu.
 - Deliverable: comparison, file storage, metadata, reload/delete, error/cleanup policy.
 - Acceptance: capture asalnya jelas; tanpa overlay jika dipilih produk; simpan/relaunch/hapus konsisten; gagal I/O tidak menampilkan sukses; media dan metadata tidak orphan.

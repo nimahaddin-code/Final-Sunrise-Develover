@@ -89,16 +89,7 @@ final class MakeupTextureGeometryTests: XCTestCase {
         XCTAssertNil(FaceFeatureMap.average([map, missing]))
     }
 
-    func testHigherArchLiftsTheBrowPeak() {
-        let frame = FeatureFrame(side: map.left, in: map)
-        let shade = MakeupPalette.black
-        func highestPoint(_ archHeight: Float) -> Float {
-            let style = BrowStyle(archPosition: 0.6, archHeight: archHeight, thickness: 0.15, tailExtension: 0,
-                                  angularity: 0.5, shade: shade)
-            return MakeupTextureRenderer.browOutline(style, brow: map.left.brow, frame: frame).map(\.y).min()!
-        }
-        XCTAssertLessThan(highestPoint(0.2), highestPoint(0.05))
-    }
+
 
     func testLinerWingReachesPastTheOuterCorner() {
         let frame = FeatureFrame(side: map.left, in: map)

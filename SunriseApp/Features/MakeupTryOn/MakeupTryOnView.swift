@@ -1,7 +1,7 @@
 import SwiftUI
 import UIKit
 
-/// Live camera try-on: the selected eyebrow, blush and eyeliner are drawn on the tracked face.
+// -Nimah: This live screen is eyeliner-only; eyebrow/blush use Nimah studio.
 struct MakeupTryOnView: View {
     @StateObject private var model: MakeupTryOnViewModel
     @State private var category: MakeupCategory
@@ -15,7 +15,7 @@ struct MakeupTryOnView: View {
 
     init(plan: MakeupPlan, applied: [MakeupRecommendation]) {
         _model = StateObject(wrappedValue: MakeupTryOnViewModel(plan: plan, applied: applied))
-        _category = State(initialValue: applied.first?.category ?? .eyebrow)
+        _category = State(initialValue: .eyeliner)
     }
 
     var body: some View {
@@ -47,8 +47,9 @@ struct MakeupTryOnView: View {
             .task { await model.startIfNeeded() }
             .onDisappear { model.stop() }
             .onChange(of: scenePhase) { _, newPhase in
-                // Re-check camera access after returning from Settings.
-                if newPhase == .active, model.phase == .cameraDenied { Task { await model.start() } }
+                // -Nimah: Pause all camera/model work off-screen; resume through one guarded lifecycle.
+                if newPhase == .active { Task { await model.startIfNeeded() } }
+                else { model.stop() }
             }
     }
 
@@ -165,7 +166,7 @@ struct MakeupTryOnView: View {
         let selected = model.selection[category]
         return VStack(alignment: .leading, spacing: AppSpacing.medium) {
             Picker("Makeup", selection: $category) {
-                ForEach(MakeupCategory.allCases) { Text($0.title).tag($0) }
+                ForEach([MakeupCategory.eyeliner]) { Text($0.title).tag($0) }
             }
             .pickerStyle(.segmented)
             ScrollView(.horizontal, showsIndicators: false) {

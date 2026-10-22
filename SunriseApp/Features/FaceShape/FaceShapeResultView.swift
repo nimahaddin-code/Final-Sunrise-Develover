@@ -3,6 +3,8 @@ import SwiftUI
 struct FaceShapeResultView: View {
     let result: FaceShapeResult
     @AppStorage(DeveloperTools.key) private var developerTools = false
+    var continueTitle: LocalizedStringKey = "Try on recommended makeup"
+
     var onScanAgain: () -> Void
     /// Called when the person answers the hooded / monolid question.
     var onLidTypeChange: (LidType) -> Void = { _ in }
@@ -13,7 +15,7 @@ struct FaceShapeResultView: View {
             VStack(alignment: .leading, spacing: AppSpacing.large) {
                 summaryCard
                 eyeCard
-                card(title: "Blush tip") { Text(result.shape.blushTip).font(AppTypography.body) }
+                // -Nimah: Blush guidance now belongs exclusively to Nimah studio.
                 card(title: "Closest matches") {
                     ForEach(result.rankedShapes.prefix(3), id: \.shape) { match in
                         VStack(alignment: .leading, spacing: AppSpacing.small) {
@@ -31,7 +33,7 @@ struct FaceShapeResultView: View {
                     .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
                 if DeveloperTools.isOn(developerTools) { EyeDebugView(eyes: result.eyes) }
                 if let onShowMakeup {
-                    PrimaryButton(title: "Try on recommended makeup", action: onShowMakeup)
+                    PrimaryButton(title: continueTitle, action: onShowMakeup)
                     Button("Scan again", action: onScanAgain)
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 44)
                 } else {

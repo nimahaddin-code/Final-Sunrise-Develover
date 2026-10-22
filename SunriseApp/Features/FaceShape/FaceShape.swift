@@ -1,3 +1,4 @@
+// -Nimah: Obsolete blush tip removed; face-shape labels and descriptions retained.
 import Foundation
 
 enum FaceShape: String, CaseIterable, Identifiable, Codable, Sendable {
@@ -41,15 +42,4 @@ enum FaceShape: String, CaseIterable, Identifiable, Codable, Sendable {
         }
     }
 
-    var blushTip: LocalizedStringResource {
-        switch self {
-        case .oval: "Sweep blush on the apples of the cheeks and blend lightly toward the temples."
-        case .round: "Apply blush just above the apples and blend upward toward the temples to add length."
-        case .square: "Keep blush on the apples in soft circular motions to round the angles."
-        case .oblong: "Blend blush horizontally across the cheeks to visually widen the face."
-        case .heart: "Place blush just below the cheekbones and blend toward the ears, away from the chin."
-        case .diamond: "Apply blush on the apples and blend inward to soften the cheekbones."
-        case .triangle: "Sweep blush high on the cheekbones toward the temples to balance the jaw."
-        }
-    }
 }

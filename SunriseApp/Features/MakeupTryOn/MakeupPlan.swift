@@ -5,8 +5,7 @@ struct ShapeWeight: Hashable, Sendable {
     let weight: Double
 }
 
-/// Everything the Try On tab offers one person: a "Made for you" style per category, built from their scan,
-/// followed by the face shape's catalog styles.
+// -Nimah: Hanum eyeliner plan only; brow/blush preferences live in Nimah studio.
 struct MakeupPlan: Hashable, Sendable {
     static let personalPrefix = "personal."
 
@@ -22,25 +21,35 @@ struct MakeupPlan: Hashable, Sendable {
 
     /// - Parameter chosenShape: a shape the user picked instead of the scanned one. The made-for-you styles then
     ///   use only that shape, still tuned to the scanned proportions.
-    init(scan: FaceShapeResult, chosenShape: FaceShape? = nil) {
+    init(scan: FaceShapeResult, chosenShape: FaceShape? = nil, eyeScan:EyeShapeResult? = nil) {
         let blend = chosenShape.map { [ShapeWeight(shape: $0, weight: 1)] } ?? Self.blend(of: scan)
-        self.init(shape: chosenShape ?? scan.shape, blend: blend, deviation: scan.deviation, eyes: scan.eyes)
+        self.init(shape: chosenShape ?? scan.shape, blend: blend, deviation: scan.deviation,
+                  eyes: eyeScan == nil ? scan.eyes : eyeScan.flatMap(Self.savedEyeMeasurements))
     }
 
     /// A plan for a shape alone, without scan measurements.
-    init(shape: FaceShape) {
+    init(shape: FaceShape, eyeScan:EyeShapeResult? = nil) {
         self.init(shape: shape, blend: [ShapeWeight(shape: shape, weight: 1)],
-                  deviation: FaceProportions(length: 0, forehead: 0, jaw: 0, chin: 0), eyes: nil)
+                  deviation: FaceProportions(length: 0, forehead: 0, jaw: 0, chin: 0), eyes: eyeScan.flatMap(Self.savedEyeMeasurements))
+    }
+
+    // -Nimah: Adapt saved Khalish eye measurements to Hanum's planner without changing its formulas.
+    // Units agree: opening/width, inner-corner gap/width and tilt degrees. Sample count is not
+    // stored in EyeShapeResult; zero means unknown and is not used by the planner's confidence gate.
+    static func savedEyeMeasurements(_ result:EyeShapeResult)->EyeScan? {
+        let m=result.measurements
+        guard result.confidence.isFinite,result.confidence>0.1,
+              [m.tilt,m.spacing,m.openness].allSatisfy({ $0.isFinite }),m.spacing>0,m.openness>0 else { return nil }
+        let lid:LidType = result.lid == .hooded ? .hooded : (result.lid == .monolid ? .monolid : .neither)
+        return EyeScan(tiltLeft:m.tilt,tiltRight:m.tilt,spacing:m.spacing,openness:m.openness,samples:0,lidType:lid)
     }
 
     private init(shape: FaceShape, blend: [ShapeWeight], deviation: FaceProportions, eyes: EyeScan?) {
         self.shape = shape
         self.blend = blend
         self.eyes = eyes
-        recommendations = MakeupCategory.allCases.flatMap { category in
-            [MakeupPersonalizer.recommendation(for: category, blend: blend, deviation: deviation, eyes: eyes)]
-                + MakeupRecommender.recommendations(for: shape, in: category)
-        }
+        // -Nimah: This plan is eyeliner-only. Nimah's studio owns eyebrow/blush preferences.
+        recommendations = [MakeupPersonalizer.eyeliner(eyes)] + EyelinerPlanner.catalog
     }
 
     func recommendations(in category: MakeupCategory) -> [MakeupRecommendation] {
@@ -70,42 +79,9 @@ struct MakeupPlan: Hashable, Sendable {
     }
 }
 
-/// Builds the made-for-you styles: the best-match brow and blush styles of the blended shapes, averaged by weight,
-/// then nudged by the measured proportions so two people with the same shape label still get different styles.
-/// The eyeliner comes from the eye shape instead (`EyelinerPlanner`).
+/// Builds the made-for-you eyeliner from eye shape (`EyelinerPlanner`).
+// -Nimah: Removed Khalish eyebrow/blush blending rules; retained Hanum eye-shape planning.
 enum MakeupPersonalizer {
-    /// Relative deviation from the average face that counts as a full-strength adjustment.
-    static let fullDeviation: Float = 0.06
-
-    static func recommendation(for category: MakeupCategory, blend: [ShapeWeight],
-                               deviation: FaceProportions, eyes: EyeScan?) -> MakeupRecommendation {
-        let styles = blend.compactMap { weight in
-            MakeupRecommender.recommendations(for: weight.shape, in: category).first.map { ($0.style, Float(weight.weight)) }
-        }
-        let shade = styles.first?.0.shade ?? MakeupPalette.shades(for: category)[0]
-        let id = MakeupPlan.personalPrefix + category.rawValue + "."
-            + blend.map { "\($0.shape.rawValue)\(Int(($0.weight * 100).rounded()))" }.joined(separator: "-")
-        switch category {
-        case .eyebrow:
-            let brows = styles.compactMap { style, weight -> (BrowStyle, Float)? in
-                if case .eyebrow(let brow) = style { (brow, weight) } else { nil }
-            }
-            return MakeupRecommendation(id: id, name: "Made for you",
-                detail: "Arch, thickness and length blended from your closest shapes and tuned to your proportions.",
-                style: .eyebrow(eyebrow(brows, shade: shade, deviation: deviation)))
-        case .blush:
-            let blushes = styles.compactMap { style, weight -> (BlushStyle, Float)? in
-                if case .blush(let blush) = style { (blush, weight) } else { nil }
-            }
-            return MakeupRecommendation(id: id, name: "Made for you",
-                detail: "Placement and angle blended from your closest shapes and tuned to your proportions.",
-                style: .blush(blush(blushes, shade: shade, deviation: deviation)))
-        case .eyeliner:
-            return eyeliner(eyes)
-        }
-    }
-
-    /// The made-for-you eyeliner, chosen from the eye shape alone.
     static func eyeliner(_ eyes: EyeScan?) -> MakeupRecommendation {
         let plan = EyelinerPlanner.plan(for: eyes)
         let shapes = plan.blend.map { "\($0.shape.rawValue)\(Int(($0.weight * 100).rounded()))" }
@@ -116,40 +92,4 @@ enum MakeupPersonalizer {
             style: .eyeliner(plan.style))
     }
 
-    /// Deviation scaled to -1...1.
-    static func strength(_ deviation: Float) -> Float { min(max(deviation / fullDeviation, -1), 1) }
-
-    static func eyebrow(_ styles: [(BrowStyle, Float)], shade: MakeupShade, deviation: FaceProportions) -> BrowStyle {
-        let length = strength(deviation.length), jaw = strength(deviation.jaw), forehead = strength(deviation.forehead)
-        return BrowStyle(
-            archPosition: mean(styles) { $0.archPosition },
-            // A longer face looks balanced with a flatter brow; a shorter one with more lift.
-            archHeight: mean(styles) { $0.archHeight } * (1 - 0.35 * length),
-            thickness: mean(styles) { $0.thickness } * (1 + 0.1 * max(0, jaw)),
-            // A wide jaw or narrow forehead is balanced by a longer brow.
-            tailExtension: mean(styles) { $0.tailExtension } + 0.05 * max(0, jaw) + 0.04 * max(0, -forehead),
-            angularity: clamp(mean(styles) { $0.angularity } - 0.2 * length, 0, 1),
-            shade: shade)
-    }
-
-    static func blush(_ styles: [(BlushStyle, Float)], shade: MakeupShade, deviation: FaceProportions) -> BlushStyle {
-        let length = strength(deviation.length), jaw = strength(deviation.jaw)
-        let center = SIMD2(mean(styles) { $0.center.x }, mean(styles) { $0.center.y })
-        let radii = SIMD2(mean(styles) { $0.radii.x }, mean(styles) { $0.radii.y })
-        return BlushStyle(
-            // A wide jaw is balanced by blush placed higher.
-            center: SIMD2(center.x, center.y - 0.05 * max(0, jaw)),
-            // A longer face gets a wider, flatter sweep; a shorter one a steeper lift.
-            radii: SIMD2(radii.x * (1 + 0.15 * length), radii.y),
-            tilt: clamp(mean(styles) { $0.tilt } - 12 * length, -10, 35),
-            shade: shade)
-    }
-
-    private static func mean<Style>(_ styles: [(Style, Float)], _ value: (Style) -> Float) -> Float {
-        let total = styles.reduce(0) { $0 + $1.1 }
-        guard total > 0 else { return 0 }
-        return styles.reduce(0) { $0 + value($1.0) * $1.1 } / total
-    }
-
-    private static func clamp(_ value: Float, _ low: Float, _ high: Float) -> Float { min(max(value, low), high) }
 }

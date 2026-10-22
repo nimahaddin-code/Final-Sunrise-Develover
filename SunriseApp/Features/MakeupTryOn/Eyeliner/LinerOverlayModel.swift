@@ -27,6 +27,9 @@ import SwiftUI
     private var spec: LinerSpec?
     private var solution: LinerSolution?
     private var isStarted = false
+    // -Nimah: Cancel a pending model load when the screen/style stops using it.
+    private var startupTask:Task<Void,Never>?
+    private var runID=UUID()
 
     /// The reference points whose image and screen positions are compared to check the mapping.
     private static let referencePoints: [SIMD3<Float>] = [
@@ -56,7 +59,7 @@ import SwiftUI
     }
 
     func stop() {
-        guard isStarted else { return }
+        runID=UUID(); startupTask?.cancel(); startupTask=nil
         provider.stop()
         provider.onFrame = nil
         tracker.reset()
@@ -70,21 +73,36 @@ import SwiftUI
     }
 
     private func startIfNeeded() {
-        guard !isStarted else { return }
+        guard !isStarted,startupTask==nil else { return }
+        let token=runID
         provider.onFrame = { [weak self] landmarks in
-            Task { @MainActor in self?.receive(landmarks) }
+            Task { @MainActor in
+                guard let self,self.runID==token,self.isStarted else { return }
+                self.receive(landmarks)
+            }
         }
         // Without the segmentation model the liner simply is not hidden behind hands.
         occluder.onMask = { [weak self] mask in
-            Task { @MainActor in self?.occlusionMask = mask }
+            Task { @MainActor in
+                guard let self,self.runID==token,self.isStarted else { return }
+                self.occlusionMask=mask
+            }
         }
-        if !Self.handOcclusionDisabled { try? occluder.start() }
-        do {
-            try provider.start()
-            isStarted = true
-            unavailableReason = nil
-        } catch {
-            unavailableReason = error.localizedDescription
+        startupTask=Task { [weak self] in
+            guard let self,!Task.isCancelled,self.runID==token else { return }
+            do {
+                try await self.provider.start()
+                guard !Task.isCancelled,self.runID==token,self.spec != nil else { return }
+                self.isStarted=true; self.unavailableReason=nil
+                if !Self.handOcclusionDisabled { try? await self.occluder.start() }
+                guard !Task.isCancelled,self.runID==token else { return }
+                self.startupTask=nil
+            } catch {
+                guard self.runID==token else { return }
+                self.startupTask=nil
+                if !(error is CancellationError) { self.unavailableReason=error.localizedDescription }
+            }
+
         }
     }
 

@@ -76,7 +76,29 @@ final class MediaPipeEyeLandmarkProvider: NSObject, @unchecked Sendable {
     private lazy var ciContext = CIContext()
     private var bgraPool: CVPixelBufferPool?
 
-    func start() throws {
+    // -Nimah: User-approved lifecycle optimization; model creation never blocks the UI.
+    private var lifecycleID=UUID()
+    private let detectorFactory:(@Sendable () throws -> FaceLandmarker)?
+    init(detectorFactory:(@Sendable () throws -> FaceLandmarker)? = nil) {
+        self.detectorFactory=detectorFactory; super.init()
+    }
+    func start() async throws {
+        lock.lock(); lifecycleID=UUID(); let token=lifecycleID; lock.unlock()
+        try await withCheckedThrowingContinuation { (continuation:CheckedContinuation<Void,Error>) in
+            queue.async { [self] in
+                lock.lock(); let current=lifecycleID==token; lock.unlock()
+                guard current else { continuation.resume(throwing:CancellationError()); return }
+                do {
+                    let detector=try detectorFactory?() ?? makeLandmarker()
+                    lock.lock()
+                    guard lifecycleID==token else { lock.unlock(); continuation.resume(throwing:CancellationError()); return }
+                    landmarker=detector; lock.unlock()
+                    continuation.resume()
+                } catch { continuation.resume(throwing:error) }
+            }
+        }
+    }
+    private func makeLandmarker() throws -> FaceLandmarker {
         guard let path = Bundle.main.path(forResource: "face_landmarker", ofType: "task") else {
             throw EyeProviderError.modelMissing
         }
@@ -89,17 +111,20 @@ final class MediaPipeEyeLandmarkProvider: NSObject, @unchecked Sendable {
         options.minFacePresenceConfidence = 0.3
         options.minTrackingConfidence = 0.3
         options.faceLandmarkerLiveStreamDelegate = self
-        landmarker = try FaceLandmarker(options: options)
+        return try FaceLandmarker(options: options)
     }
 
     func stop() {
         lock.lock()
+        // -Nimah: Invalidate startup immediately; release native detector on its worker queue.
+        lifecycleID=UUID()
+        let retired=landmarker
         landmarker = nil
         pending.removeAll()
         inFlightSince = nil
         space = nil
-        lastTimestampMs = -1
         lock.unlock()
+        queue.async { withExtendedLifetime(retired) {} }
     }
 
     /// `false` while the previous frame is still being processed: frames are dropped, never queued.
@@ -128,15 +153,18 @@ final class MediaPipeEyeLandmarkProvider: NSObject, @unchecked Sendable {
         pending[ms] = Pending(start: now, rawSize: raw, rotation: rotation, headAcross: input.headAcross,
                               context: input.context)
         if pending.count > 30 { pending = pending.filter { $0.key > ms - 2000 } }
+        let token=lifecycleID
+        let timestampMs=ms
         lock.unlock()
 
         queue.async { [self] in
-            guard let landmarker, let buffer = bgra(from: input.pixelBuffer.buffer) else { return finish(ms, delivered: nil) }
+            lock.lock(); let detector=lifecycleID==token ? landmarker : nil; lock.unlock()
+            guard let landmarker=detector, let buffer = bgra(from: input.pixelBuffer.buffer) else { return finish(timestampMs, delivered: nil) }
             do {
                 let image = try MPImage(pixelBuffer: buffer, orientation: rotation.uiOrientation)
-                try landmarker.detectAsync(image: image, timestampInMilliseconds: ms)
+                try landmarker.detectAsync(image: image, timestampInMilliseconds: timestampMs)
             } catch {
-                finish(ms, delivered: nil)
+                finish(timestampMs, delivered: nil)
             }
         }
         return true
@@ -145,7 +173,8 @@ final class MediaPipeEyeLandmarkProvider: NSObject, @unchecked Sendable {
     /// Clears the in-flight state for `ms` and reports `frame` (or "no face").
     private func finish(_ ms: Int, delivered frame: EyeLandmarkFrame?) {
         lock.lock()
-        pending[ms] = nil
+        // -Nimah: Late work from a stopped run must not clear a newer in-flight frame.
+        guard pending.removeValue(forKey:ms) != nil else { lock.unlock(); return }
         inFlightSince = nil
         lock.unlock()
         onFrame?(frame)

@@ -3,14 +3,15 @@ import SwiftUI
 struct AppRootView: View {
     let container: AppContainer
     @StateObject private var navigator = AppNavigator()
-    @StateObject private var faceShapeStore = FaceShapeStore(defaults: .standard)
+    @StateObject private var faceShapeStore = FaceAnalysis.savedResults()
 
     var body: some View {
         Group {
             if navigator.onboardingComplete {
                 TabView(selection: $navigator.selectedTab) {
                     NavigationStack(path: $navigator.tryOnPath) {
-                        MakeupRecommendationsView(store: faceShapeStore) { navigator.open(.faceScan, in: .tryOn) }
+                        MakeupRecommendationsView(store: faceShapeStore, onScanFace: { navigator.open(.faceScan, in: .tryOn) },
+                                                  onScanEyes: { navigator.open(.eyeScan, in: .tryOn) })
                             .navigationDestination(for: AppRoute.self, destination: destination)
                     }
                     .tabItem { Label("Try On", systemImage: "wand.and.stars") }
@@ -34,19 +35,29 @@ struct AppRootView: View {
         }
     }
 
+    // -Nimah: Adapt classifier output without changing Khalish's classifier or scan result model.
+    private var studioAssessment:FaceShapeAssessment? {
+        guard let result=faceShapeStore.latest else { return nil }
+        let shape=result.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:result.shape.rawValue) ?? .unknown
+        return FaceShapeAssessment(shape:shape,origin:.analysis,confidence:Float(result.confidence))
+    }
+
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
         case .referenceDetail(let reference): ReferenceDetailView(reference: reference)
-        case .referenceImport: ReferenceImportView()
-        case .faceCalibration(let id): FaceCalibrationView(referenceID: id, checker: container.faceTracking)
-        case .tutorial(let id): TutorialView(referenceID: id)
-        case .liveGuide(let id): LiveGuideView(referenceID: id)
-        case .comparison(let id):
-            ComparisonView(referenceID: id) { navigator.returnToRoot(of: .discover) }
-        case .savedLookDetail(let look): SavedLookDetailView(look: look)
+        // -Nimah: Integration routing; teammate feature implementations remain unchanged.
+        case .eyebrowGuide: EyebrowOverlayView(checker: container.faceTracking,assessment:studioAssessment)
+        case .browBlush(let region): EyebrowOverlayView(checker:container.faceTracking,assessment:studioAssessment,initialRegion:region)
+        case .referenceImport: ReferenceImportView(checker: container.faceTracking, store: container.savedLooks)
+        case .session:
+            // -Nimah: Old catalog/import routes cannot reopen the superseded mixed renderer.
+            EyebrowOverlayView(checker:container.faceTracking,assessment:studioAssessment)
+        case .savedLookDetail(let look): SavedLookDetailView(look: look, store: container.savedLooks)
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
-            FaceShapeView(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
+            FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
+        case .eyeScan:
+            EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }
         }
     }
 }
