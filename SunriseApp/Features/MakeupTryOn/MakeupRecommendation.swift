@@ -39,11 +39,20 @@ struct MakeupShade: Identifiable, Hashable, Sendable {
 enum MakeupPalette {
     static func shades(for category: MakeupCategory) -> [MakeupShade] {
         switch category {
-        case .eyebrow: [blonde, taupe, softBrown, darkBrown, softBlack]
-        case .blush: [peach, coral, rose, mauve, berry]
+        case .eyebrow: [bistre, referenceBrown, chocolate, tan, softBlack]
+        case .blush: [pink, peach, winterPink, mutedMauve]
         case .eyeliner: [brown, plum, navy, black]
         }
     }
+
+    // -Nimah: Approximate sRGB previews inspired by the supplied photos, not measured product colours.
+    static let pink = MakeupShade(id:"blush.pink",name:"01 Pink",red:0.91,green:0.29,blue:0.38,opacity:0.36)
+    static let winterPink = MakeupShade(id:"blush.winterPink",name:"03 Winter Pink",red:0.89,green:0.48,blue:0.57,opacity:0.36)
+    static let mutedMauve = MakeupShade(id:"blush.mutedMauve",name:"04 Muted Mauve",red:0.70,green:0.29,blue:0.40,opacity:0.36)
+    static let bistre = MakeupShade(id:"brow.bistre",name:"B201 Bistre",red:0.29,green:0.23,blue:0.19,opacity:0.5)
+    static let referenceBrown = MakeupShade(id:"brow.referenceBrown",name:"B202 Brown",red:0.38,green:0.27,blue:0.20,opacity:0.5)
+    static let chocolate = MakeupShade(id:"brow.chocolate",name:"B203 Chocolate",red:0.25,green:0.16,blue:0.13,opacity:0.5)
+    static let tan = MakeupShade(id:"brow.tan",name:"B204 Tan",red:0.49,green:0.36,blue:0.26,opacity:0.5)
 
     static let blonde = MakeupShade(id: "brow.blonde", name: "Blonde", red: 0.62, green: 0.48, blue: 0.34, opacity: 0.5)
     static let taupe = MakeupShade(id: "brow.taupe", name: "Taupe", red: 0.42, green: 0.33, blue: 0.27, opacity: 0.55)
@@ -54,7 +63,7 @@ enum MakeupPalette {
     static let softBlack = MakeupShade(id: "brow.softBlack", name: "Soft black", red: 0.12, green: 0.10, blue: 0.10,
                                        opacity: 0.45)
 
-    static let peach = MakeupShade(id: "blush.peach", name: "Peach", red: 0.96, green: 0.55, blue: 0.47, opacity: 0.38)
+    static let peach = MakeupShade(id: "blush.peach", name: "02 Peach", red: 0.96, green: 0.55, blue: 0.47, opacity: 0.38)
     static let coral = MakeupShade(id: "blush.coral", name: "Coral", red: 0.97, green: 0.47, blue: 0.40, opacity: 0.36)
     static let rose = MakeupShade(id: "blush.rose", name: "Rose", red: 0.86, green: 0.40, blue: 0.48, opacity: 0.36)
     static let mauve = MakeupShade(id: "blush.mauve", name: "Mauve", red: 0.74, green: 0.47, blue: 0.52, opacity: 0.36)

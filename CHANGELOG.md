@@ -5,6 +5,15 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Added — reference colours and palette picker -Nimah
+- Blush presets: Pink, Peach, Winter Pink, Muted Mauve. Brows: Bistre, Brown, Chocolate, Tan, Soft black.
+  RGB values approximate the supplied photos; they are not measured brand shade matches.
+- Enable the home eyedropper: manual colour picker, Photos import or rear-camera palette capture, then tap a colour.
+  Downsample and orient images off the UI thread; sample only inside the displayed photo. Cancel leaves the shade unchanged.
+- Pause/dismantle face tracking while the picker uses the camera; keep photos in memory, without uploads/library writes.
+- Add explicit Before/After and carry shade/intensity from try-on directly into the recommended eyebrow/blush tutorial.
+
+
 ### Fixed — scan-assigned makeup results -Nimah
 - Eyebrow/blush now expose one stable local-catalog assignment from the saved face scan, with provenance; remove
   style/source exploration and block unsupported defaults. Eyeliner exposes only the personal eye-scan result.

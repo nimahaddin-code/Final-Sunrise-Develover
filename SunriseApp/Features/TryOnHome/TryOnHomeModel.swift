@@ -89,7 +89,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         if !plan.eyeliner.isNeutral, case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: .blush)
         relay = LinerFrameRelay(model: liner)
-        shades = [.blush: MakeupPalette.rose, .eyebrow: MakeupPalette.darkBrown,
+        shades = [.blush: MakeupPalette.pink, .eyebrow: MakeupPalette.referenceBrown,
                   .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
         intensities = [.blush: Self.defaultIntensity, .eyebrow: Self.defaultIntensity,
                        .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
