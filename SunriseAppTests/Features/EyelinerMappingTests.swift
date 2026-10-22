@@ -252,6 +252,19 @@ final class HandOcclusionTests: XCTestCase {
                              CGPoint(x: 0, y: 100), CGPoint(x: 100, y: 100)], time: time)
     }
 
+    func testHandFractionIsAskedInImagePixels() throws {
+        // Hand only in the top half of the upright mask (rows 0..<100); upright (360, 160) is raw (160, 360).
+        var mask = try mask()
+        mask.occupied = (0..<20_000).map { $0 < 10_000 ? 1 : 0 }
+        let anchors = mask.headAnchors
+        let onHand = mask.handFraction(around: CGPoint(x: 160, y: 360), radius: 20, headAnchors: anchors, at: 10.1)
+        let offHand = mask.handFraction(around: CGPoint(x: 1000, y: 360), radius: 20, headAnchors: anchors, at: 10.1)
+        XCTAssertEqual(onHand, 1, accuracy: 0.01)
+        XCTAssertEqual(offHand, 0, accuracy: 0.01)
+        XCTAssertEqual(mask.handFraction(around: CGPoint(x: 160, y: 360), radius: 20, headAnchors: anchors, at: 12), 0,
+                       "A stale mask says nothing")
+    }
+
     func testMaskPixelsLandWhereTheHandIsOnScreen() throws {
         let mask = try mask()
         // Identity screen mapping and a head that has not moved: a mask pixel goes to the raw image, as the rotation says.

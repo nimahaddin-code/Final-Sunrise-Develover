@@ -162,6 +162,7 @@ extension HandOcclusionSegmenter: ImageSegmenterLiveStreamDelegate {
         finish(timestampInMilliseconds, mask: OcclusionMask(
             image: image, size: CGSize(width: width, height: height),
             uprightSize: info.rotation.uprightSize(raw: info.rawSize), rotation: info.rotation, rawSize: info.rawSize,
-            headAnchors: info.headAnchors, time: info.time))
+            headAnchors: info.headAnchors, time: info.time,
+            occupied: categories.map { occluders.contains($0) ? 1 : 0 }))
     }
 }

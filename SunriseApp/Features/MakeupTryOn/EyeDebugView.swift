@@ -7,12 +7,14 @@ struct EyeDebugView: View {
     @AppStorage("debugEyeLandmarks") private var showsLandmarks = false
     @AppStorage("debugOcclusionMask") private var showsMask = false
     @AppStorage("disableOcclusion") private var disablesOcclusion = false
+    @AppStorage("enableLidTracking") private var tracksLid = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             Text("DEVELOPER eye measurements").font(.caption.weight(.bold))
             Toggle("Show eyeliner landmark dots (red raw, green smoothed)", isOn: $showsLandmarks)
             Toggle("Turn off hand cut-out (needs re-opening the try-on)", isOn: $disablesOcclusion)
+            Toggle("Lid tracking (experimental, for a pulled lid; re-open the try-on)", isOn: $tracksLid)
             Toggle("Show hand mask (red: liner is hidden there)", isOn: $showsMask)
             if let overlay { OverlayStatusLine(model: overlay) }
             if let eyes {

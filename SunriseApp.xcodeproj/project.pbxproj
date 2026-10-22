@@ -11,6 +11,7 @@
 		DFE49476F0DF2E2C54A6BA8C /* HandOcclusionSegmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792C45EC0F1AB54F3358E303 /* HandOcclusionSegmenter.swift */; };
 		601CB711F407BB508AE96EDE /* HandOcclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64DA4C04FEDB41433C2EFE1 /* HandOcclusion.swift */; };
 		C8B9433F836C41AA8E942950 /* LinerSolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29017F5C551F928297695BA1 /* LinerSolution.swift */; };
+		08141B51E306391DEED79934 /* LidFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD93F3E7DA4BDAA776A4A5A /* LidFlow.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		0A446418A8546A3886FD1C8C /* EyeLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 231A9D8B5701EDA4305C3266 /* EyeLandmarks.swift */; };
 		0BB1180441D5C292FDF1D87B /* MakeupRecommendationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC4E2FA16FB3D83A6DDC1EDB /* MakeupRecommendationsView.swift */; };
@@ -80,6 +81,7 @@
 		BBC1AC7A0CD90B0E7BC75223 /* LandmarkSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E763EDC56C953EA58AFBB1 /* LandmarkSpace.swift */; };
 		C4A5F9A53088B1E800BFECB0 /* MediaPipeTasksVision in Frameworks */ = {isa = PBXBuildFile; productRef = C4A5F9A43088B1E800BFECB0 /* MediaPipeTasksVision */; };
 		C9587CEBB39B613D7953399F /* EyelinerGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */; };
+		4A61AA654852436A57B4838B /* LidFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832873944F90986F04549D21 /* LidFlowTests.swift */; };
 		C96E85543600CBE3B51E79C7 /* HeadPoseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09018C00875BE2006F222659 /* HeadPoseTests.swift */; };
 		C983838886352C1E043DE2F7 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41BF1094B4CE58A41E950AA /* SampleData.swift */; };
 		CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */ = {isa = PBXBuildFile; fileRef = CD73965C5395C3CFB4F69902 /* face_landmarker.task */; };
@@ -123,8 +125,10 @@
 		792C45EC0F1AB54F3358E303 /* HandOcclusionSegmenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandOcclusionSegmenter.swift; sourceTree = "<group>"; };
 		A64DA4C04FEDB41433C2EFE1 /* HandOcclusion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandOcclusion.swift; sourceTree = "<group>"; };
 		29017F5C551F928297695BA1 /* LinerSolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerSolution.swift; sourceTree = "<group>"; };
+		4DD93F3E7DA4BDAA776A4A5A /* LidFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidFlow.swift; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
 		06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerGeometryTests.swift; sourceTree = "<group>"; };
+		832873944F90986F04549D21 /* LidFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidFlowTests.swift; sourceTree = "<group>"; };
 		087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommendation.swift; sourceTree = "<group>"; };
 		09018C00875BE2006F222659 /* HeadPoseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadPoseTests.swift; sourceTree = "<group>"; };
 		0C2A5C04A75A9061E0632676 /* ImageToViewMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageToViewMapping.swift; sourceTree = "<group>"; };
@@ -390,6 +394,7 @@
 				792C45EC0F1AB54F3358E303 /* HandOcclusionSegmenter.swift */,
 				A64DA4C04FEDB41433C2EFE1 /* HandOcclusion.swift */,
 				29017F5C551F928297695BA1 /* LinerSolution.swift */,
+				4DD93F3E7DA4BDAA776A4A5A /* LidFlow.swift */,
 				EB847F5E015413B5B6CDA3FB /* LinerTracker.swift */,
 				4D6FD918F6AD3EFDBC821053 /* MediaPipeEyeLandmarkProvider.swift */,
 				0DCEA34095C8C9C53CE42CE4 /* OneEuroFilter.swift */,
@@ -430,6 +435,7 @@
 				B1B2C3D4E5F60718293A4B5D /* LinerGeometryTests.swift */,
 				87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */,
 				06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */,
+				832873944F90986F04549D21 /* LidFlowTests.swift */,
 				E70000003EEB62383567027B /* EyelinerPlannerTests.swift */,
 				E70000007A577EC19F38EF9E /* EyeScanTests.swift */,
 			);
@@ -717,6 +723,7 @@
 				B1B2C3D4E5F60718293A4B5C /* LinerGeometryTests.swift in Sources */,
 				9909AED933CB17E8692EAA5B /* EyelinerMappingTests.swift in Sources */,
 				C9587CEBB39B613D7953399F /* EyelinerGeometryTests.swift in Sources */,
+				4A61AA654852436A57B4838B /* LidFlowTests.swift in Sources */,
 				E80000001C043450B0C3F54A /* EyelinerPlannerTests.swift in Sources */,
 				E8000000257DD8D4770AABC1 /* EyeScanTests.swift in Sources */,
 			);
@@ -793,6 +800,7 @@
 				DFE49476F0DF2E2C54A6BA8C /* HandOcclusionSegmenter.swift in Sources */,
 				601CB711F407BB508AE96EDE /* HandOcclusion.swift in Sources */,
 				C8B9433F836C41AA8E942950 /* LinerSolution.swift in Sources */,
+				08141B51E306391DEED79934 /* LidFlow.swift in Sources */,
 				E44486D30307E00936281E51 /* LinerTracker.swift in Sources */,
 				7189D665D4AB23779ACB830A /* MediaPipeEyeLandmarkProvider.swift in Sources */,
 				8A9B3447C705CB2A8F902152 /* OneEuroFilter.swift in Sources */,

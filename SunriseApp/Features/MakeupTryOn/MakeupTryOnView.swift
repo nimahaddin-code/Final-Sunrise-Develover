@@ -6,6 +6,7 @@ struct MakeupTryOnView: View {
     @StateObject private var model: MakeupTryOnViewModel
     @State private var category: MakeupCategory
     @State private var isComparing = false
+    @State private var controlsHidden = false
     @State private var snapshotter = ARSnapshotter()
     @State private var photo: TryOnPhoto?
     @AppStorage(DeveloperTools.key) private var developerTools = false
@@ -103,10 +104,26 @@ struct MakeupTryOnView: View {
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.horizontal, AppSpacing.medium)
                 }
-                controls
+                panelToggle
+                if !controlsHidden { controls }
             }
         }
         .animation(.easeInOut(duration: 0.2), value: model.phase)
+        .animation(.easeInOut(duration: 0.2), value: controlsHidden)
+    }
+
+    /// Folds the controls away to see the whole face.
+    private var panelToggle: some View {
+        Button { controlsHidden.toggle() } label: {
+            Image(systemName: controlsHidden ? "chevron.up" : "chevron.down")
+                .font(.subheadline.weight(.semibold))
+                .frame(width: 44, height: 28)
+                .background(AppColors.card, in: Capsule())
+                .foregroundStyle(AppColors.ink)
+        }
+        .buttonStyle(.plain)
+        .padding(.bottom, controlsHidden ? AppSpacing.medium : 0)
+        .accessibilityLabel(controlsHidden ? "Show controls" : "Hide controls")
     }
 
     private var status: LocalizedStringKey? {
@@ -185,7 +202,8 @@ struct MakeupTryOnView: View {
             .onLongPressGesture(minimumDuration: 1.2) { developerTools.toggle() }
             .sensoryFeedback(.impact, trigger: developerTools)
             if category == .eyeliner, DeveloperTools.isOn(developerTools) {
-                EyeDebugView(eyes: model.plan.eyes, overlay: model.linerOverlay)
+                ScrollView { EyeDebugView(eyes: model.plan.eyes, overlay: model.linerOverlay) }
+                    .frame(maxHeight: 150)
             }
             if let selected, let notes = notes(for: category, selected: selected), !notes.isEmpty {
                 fitNotes(notes)

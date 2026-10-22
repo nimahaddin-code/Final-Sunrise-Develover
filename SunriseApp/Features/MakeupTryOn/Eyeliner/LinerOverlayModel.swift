@@ -20,6 +20,10 @@ import SwiftUI
     private let occluder = HandOcclusionSegmenter()
     private var occlusionMask: OcclusionMask?
     private let tracker = LinerTracker()
+    private let lidFollower = LidFollower()
+    private let lidQueue = DispatchQueue(label: "sunrise.lidflow", qos: .userInitiated)
+    private var lidBusy = false
+    private var lastHand = 0.0
     private var spec: LinerSpec?
     private var solution: LinerSolution?
     private var isStarted = false
@@ -33,6 +37,8 @@ import SwiftUI
 
     /// Developer tools can switch the hand cut-out off, to tell whether it is what hides the liner.
     private static var handOcclusionDisabled: Bool { UserDefaults.standard.bool(forKey: "disableOcclusion") }
+    /// Off unless a developer switches it on: the upper lid follows the skin between detector results (a pulled lid).
+    private static var lidTrackingEnabled: Bool { UserDefaults.standard.bool(forKey: "enableLidTracking") }
 
     /// `style == nil` switches the overlay off and stops the detector.
     func setStyle(_ style: LinerStyle?, shade: MakeupShade?, intensity: Double) {
@@ -54,6 +60,7 @@ import SwiftUI
         provider.stop()
         provider.onFrame = nil
         tracker.reset()
+        lidFollower.reset()
         occluder.stop()
         occluder.onMask = nil
         occlusionMask = nil
@@ -102,6 +109,19 @@ import SwiftUI
         let headAnchors = contour.project(eyePositions.flatMap { [$0 + SIMD3(0, 0.02, 0), $0 - SIMD3(0, 0.02, 0)] })?
             .map(point) ?? []
         let buffer = arFrame.capturedImage
+        if Self.lidTrackingEnabled, headAnchors.count >= 3 {
+            // Off the main thread, one frame at a time; frames that arrive meanwhile are skipped.
+            if !lidBusy {
+                lidBusy = true
+                let frame = SendablePixelBuffer(buffer: buffer), follower = lidFollower
+                lidQueue.async { [weak self] in
+                    follower.advance(frame.buffer, headAnchors: headAnchors)
+                    Task { @MainActor in self?.lidBusy = false }
+                }
+            }
+        } else if lidFollower.followingCount > 0 {
+            lidFollower.reset()
+        }
         let context = FrameContext(
             displayTransform: arFrame.displayTransform(for: .portrait, viewportSize: viewport),
             imageSize: CGSize(width: CVPixelBufferGetWidth(buffer), height: CVPixelBufferGetHeight(buffer)),
@@ -140,14 +160,28 @@ import SwiftUI
             // No face in this frame (a hand over it, for example): keep the last measurement on the head for a while,
             // and smooth afresh when the face comes back.
             tracker.reset()
+            lidFollower.reset()
             debugStatus = "MediaPipe: no face"
             return
         }
-        let eyes = tracker.render(landmarks, spec: spec)
-        solution = LinerSolution(eyes: eyes, raw: tracker.lastRaw, smoothed: tracker.lastSmoothed,
+        var hand: [EyeSide: Double] = [:]
+        if let mask = occlusionMask, let anchors = context.headAnchors.count >= 3 ? context.headAnchors : nil {
+            let now = CACurrentMediaTime()
+            for eye in landmarks.eyes {
+                let width = hypot(eye.outerCorner.x - eye.innerCorner.x, eye.outerCorner.y - eye.innerCorner.y)
+                let middle = CGPoint(x: (eye.outerCorner.x + eye.innerCorner.x) / 2, y: (eye.outerCorner.y + eye.innerCorner.y) / 2)
+                hand[eye.side] = mask.handFraction(around: middle, radius: width * 1.2, headAnchors: anchors, at: now)
+            }
+        }
+        lastHand = hand.values.max() ?? 0
+        let fused = Self.lidTrackingEnabled ? lidFollower.fuse(landmarks, now: landmarks.timestamp, hand: hand) : landmarks
+        let eyes = tracker.render(fused, spec: spec)
+        solution = LinerSolution(eyes: eyes, raw: landmarks.eyes, smoothed: tracker.lastSmoothed,
                                  references: context.headAnchors.count >= 3 ? context.headAnchors : context.references.map(\.image),
                                  time: CACurrentMediaTime())
-        debugStatus = String(format: "MediaPipe: face, %.0f ms, %d eye(s) drawn", landmarks.providerLatencyMs, eyes.count)
+        debugStatus = String(format: "MediaPipe: face, %.0f ms, %d eye(s) drawn%@", landmarks.providerLatencyMs, eyes.count,
+                             Self.lidTrackingEnabled
+                                 ? ", lid tracking \(lidFollower.followingCount)/2, hand \(Int(lastHand * 100))%" : "")
     }
 
     /// `snapshot` with the liner on it, for photos.

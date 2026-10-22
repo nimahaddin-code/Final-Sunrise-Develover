@@ -14,6 +14,8 @@ struct OcclusionMask {
     /// ARKit's head anchors in the image when this mask was measured; the mask is carried to the head's later position.
     let headAnchors: [CGPoint]
     let time: CFTimeInterval
+    /// 1 where the mask is set, row by row (`size` pixels); lets the mask be asked where a hand is.
+    var occupied: [UInt8] = []
 
     /// A mask older than this is not trusted: the hand may be gone.
     static let maxAge: CFTimeInterval = 0.5
@@ -22,6 +24,29 @@ struct OcclusionMask {
     var toImage: CGAffineTransform {
         CGAffineTransform(scaleX: uprightSize.width / max(size.width, 1), y: uprightSize.height / max(size.height, 1))
             .concatenating(rotation.uprightToRaw(raw: rawSize))
+    }
+
+    /// Share (0...1) of the points inside a circle of `radius` image pixels around `point` that are hand. `point` is in
+    /// the current frame's image pixels, `headAnchors` are the head's anchors in that same frame.
+    func handFraction(around point: CGPoint, radius: CGFloat, headAnchors now: [CGPoint], at time: CFTimeInterval) -> Double {
+        guard !occupied.isEmpty, occupied.count >= Int(size.width * size.height), time - self.time <= Self.maxAge,
+              uprightSize.width > 0 else { return 0 }
+        var imagePoint = point
+        if let head = SimilarityTransform(from: now, to: headAnchors), head.isPlausible { imagePoint = head.apply(point) }
+        let center = imagePoint.applying(toImage.inverted())
+        let r = radius * size.width / uprightSize.width
+        let width = Int(size.width), height = Int(size.height)
+        var hits = 0, total = 0
+        for i in -3...3 {
+            for j in -3...3 {
+                let dx = CGFloat(i) / 3, dy = CGFloat(j) / 3
+                guard dx * dx + dy * dy <= 1 else { continue }
+                total += 1
+                let x = Int((center.x + dx * r).rounded()), y = Int((center.y + dy * r).rounded())
+                if x >= 0, y >= 0, x < width, y < height, occupied[y * width + x] != 0 { hits += 1 }
+            }
+        }
+        return total > 0 ? Double(hits) / Double(total) : 0
     }
 
     /// Mask pixels to view points for the current frame: to the image, moved with the head, then the screen mapping.
