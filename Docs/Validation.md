@@ -135,3 +135,7 @@ User reported build errors after merge. Reproduction found the local project fil
 ## Feature transition lifecycle optimization — -Nimah
 
 User approved lifecycle-only edits in Hanum modules. Simulator: 197 tests / 193 pass / 4 skip / 0 fail; signed iPhone build succeeded. See Performance.md. No measured device FPS or transition-latency improvement is claimed. Unrelated local localization changes were left untouched.
+
+## Single implementation per feature — -Nimah
+
+Tech lead requested Khalish eyebrow/blush takeout. Scan/result remain Khalish; eyebrow/blush route to Nimah with scan handoff; eyeliner routes to Hanum only. Simulator 188 tests: 184 pass, 4 skip, 0 fail. Deleted-feature assertions were replaced with checks that the old catalogs are empty, stale requests cannot activate removed filters, and Nimah receives scan/region input. See CodeOwnership.md for the current scope.

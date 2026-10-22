@@ -9,7 +9,7 @@ struct EyebrowOverlayView:View {
     @State private var showFaceShapes=false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
-    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil) { _model=StateObject(wrappedValue:EyebrowViewModel(checker:checker,assessment:assessment)) }
+    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil) { _model=StateObject(wrappedValue:EyebrowViewModel(checker:checker,assessment:assessment,initialRegion:initialRegion)) }
     private var supported:Bool { model.availability == .supported }
     private var lessons:[FaceGuideLesson] { model.lessons }
     var body:some View {
@@ -45,7 +45,7 @@ struct EyebrowOverlayView:View {
         .task {
             await model.prepare()
             if supported { await camera.requestPermission() }
-            else if case .unsupported=model.availability { model.phase = .chooseFaceShape }
+            else if case .unsupported=model.availability { model.nextAfterScan() }
         }
         .sheet(isPresented:$showFaceShapes) {
             NavigationStack {
@@ -93,7 +93,7 @@ struct EyebrowOverlayView:View {
                 if let distance=camera.distanceHint { Text(distance).font(.caption) }
                 Text("Coba posisi awal 25–60 cm; ini panduan posisi, bukan batas pasti perangkat. Pastikan alis tidak tertutup dan cahaya cukup.").font(.caption)
                 Button("Scan ulang") { camera.refitFace() }
-                action("Continue to face shape",disabled:!camera.eyebrowGuideReady) { model.phase = .chooseFaceShape }
+                action("Continue",disabled:!camera.eyebrowGuideReady) { model.nextAfterScan() }
             }
         case .chooseFaceShape:
             panel { faceShapeChoices }

@@ -53,7 +53,7 @@ struct MakeupARView: UIViewRepresentable {
 final class MakeupFaceRenderer: NSObject, ARSCNViewDelegate {
     /// Blush first. The liner is a 2D overlay (`LinerOverlayView`); the mesh only carries it in the DEBUG comparison mode.
     static var drawOrder: [MakeupCategory] {
-        MakeupTextureRenderer.legacyMeshEyeliner ? [.blush, .eyebrow, .eyeliner] : [.blush, .eyebrow]
+        MakeupTextureRenderer.legacyMeshEyeliner ? [.eyeliner] : []
     }
 
     let materials: [MakeupCategory: SCNMaterial] = Dictionary(uniqueKeysWithValues: MakeupCategory.allCases.map {

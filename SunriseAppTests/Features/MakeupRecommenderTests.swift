@@ -1,87 +1,52 @@
+// -Nimah: Ownership routing regressions replace removed Khalish brow/blush catalog expectations.
 import XCTest
 @testable import SunriseApp
-
-final class MakeupRecommenderTests: XCTestCase {
-    func testEveryShapeGetsEyebrowBlushAndEyelinerOnly() {
+final class MakeupRecommenderTests:XCTestCase {
+    func testHanumCatalogContainsOnlyEyeliner() {
         for shape in FaceShape.allCases {
-            let recommendations = MakeupRecommender.recommendations(for: shape)
-            XCTAssertEqual(Set(recommendations.map(\.category)), Set(MakeupCategory.allCases), "\(shape)")
-            for category in MakeupCategory.allCases {
-                XCTAssertGreaterThanOrEqual(MakeupRecommender.recommendations(for: shape, in: category).count, 2)
-            }
+            let items=MakeupRecommender.recommendations(for:shape)
+            XCTAssertFalse(items.isEmpty)
+            XCTAssertTrue(items.allSatisfy { $0.category == .eyeliner })
+            XCTAssertEqual(Set(items.map(\.id)).count,items.count)
+            XCTAssertTrue(MakeupRecommender.recommendations(for:shape,in:.eyebrow).isEmpty)
+            XCTAssertTrue(MakeupRecommender.recommendations(for:shape,in:.blush).isEmpty)
+            XCTAssertTrue(MakeupPlan(shape:shape).recommendations.allSatisfy { $0.category == .eyeliner })
         }
     }
-
     func testEyelinerDoesNotDependOnFaceShape() {
-        let ids = FaceShape.allCases.map { MakeupRecommender.recommendations(for: $0, in: .eyeliner).map(\.id) }
-        XCTAssertEqual(Set(ids).count, 1)
-        // One liner per eye shape, then the neutral natural line.
-        XCTAssertEqual(ids[0], EyeShape.allCases.map { "liner.eye.\($0.rawValue)" } + ["liner.eye.neutral"])
+        let ids=FaceShape.allCases.map { MakeupRecommender.recommendations(for:$0,in:.eyeliner).map(\.id) }
+        XCTAssertEqual(Set(ids).count,1)
+        XCTAssertEqual(ids[0],EyeShape.allCases.map { "liner.eye.\($0.rawValue)" }+["liner.eye.neutral"])
     }
-
-    func testRecommendationsAreGroupedByCategoryWithoutDuplicates() {
-        for shape in FaceShape.allCases {
-            let recommendations = MakeupRecommender.recommendations(for: shape)
-            XCTAssertEqual(Set(recommendations.map(\.id)).count, recommendations.count, "\(shape)")
-            let order = recommendations.map(\.category).map { MakeupCategory.allCases.firstIndex(of: $0)! }
-            XCTAssertEqual(order, order.sorted(), "\(shape)")
-        }
+    @MainActor func testStaleLegacyRequestCannotActivateBrowBlush() {
+        let old=MakeupRecommendation(id:"old.brow",name:"Old",detail:"",style:.eyebrow(BrowStyle(archPosition:0.6,archHeight:0.1,thickness:0.2,tailExtension:0,angularity:0,shade:MakeupPalette.taupe)))
+        let model=MakeupTryOnViewModel(plan:MakeupPlan(shape:.oval),applied:[old])
+        XCTAssertTrue(model.selection.isEmpty)
+        model.select(old,in:.eyebrow)
+        XCTAssertTrue(model.selection.isEmpty)
     }
-
-    func testBestMatchFollowsFaceShapeGuidance() {
-        XCTAssertEqual(MakeupRecommender.recommendations(for: .round, in: .eyebrow).first?.id, "brow.highArch")
-        XCTAssertEqual(MakeupRecommender.recommendations(for: .oblong, in: .blush).first?.id, "blush.horizontal")
-        XCTAssertEqual(MakeupRecommender.recommendations(for: .square, in: .blush).first?.id, "blush.apples")
+    @MainActor func testNimahStudioReusesScanAndOpensRequestedRegion() {
+        let model=EyebrowViewModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.oval,origin:.analysis,confidence:0.8),initialRegion:.blush)
+        model.nextAfterScan()
+        XCTAssertEqual(model.phase,.chooseStyle)
+        XCTAssertEqual(model.configuration.region,.blush)
+        XCTAssertFalse(model.blushOptions.isEmpty)
+        XCTAssertEqual(model.assessment.origin,.analysis)
+        model.chooseFaceShape(.round)
+        XCTAssertEqual(model.phase,.chooseStyle)
+        XCTAssertEqual(model.configuration.region,.blush)
+        XCTAssertEqual(model.assessment.origin,.manual)
     }
-
-    @MainActor func testTryOnStartsWithRequestedLooksOnePerCategory() {
-        let blush = MakeupRecommender.recommendations(for: .heart, in: .blush)
-        let brow = MakeupRecommender.recommendations(for: .heart, in: .eyebrow)[0]
-        let model = MakeupTryOnViewModel(plan: MakeupPlan(shape: .heart), applied: [blush[0], brow, blush[1]])
-        XCTAssertEqual(model.selection[.blush], blush[1])
-        XCTAssertEqual(model.selection[.eyebrow], brow)
-        XCTAssertNil(model.selection[.eyeliner])
-        model.select(nil, in: .blush)
-        XCTAssertNil(model.selection[.blush])
+    @MainActor func testChosenShadeOutlivesSwitchingLinerStyles() {
+        let items=MakeupRecommender.recommendations(for:.round,in:.eyeliner)
+        let model=MakeupTryOnViewModel(plan:MakeupPlan(shape:.round),applied:[])
+        model.select(MakeupPalette.navy,in:.eyeliner)
+        model.select(items[1],in:.eyeliner)
+        XCTAssertEqual(model.shade(for:.eyeliner),MakeupPalette.navy)
+        model.stop()
     }
-
-    func testEveryRecommendedShadeIsInItsCategoryPalette() {
-        for shape in FaceShape.allCases {
-            for recommendation in MakeupRecommender.recommendations(for: shape) {
-                XCTAssertTrue(MakeupPalette.shades(for: recommendation.category).contains(recommendation.style.shade),
-                              recommendation.id)
-            }
-        }
-    }
-
-    func testChangingShadeKeepsTheStyleShape() {
-        let style = MakeupRecommender.recommendations(for: .oval, in: .eyebrow)[0].style
-        let recoloured = style.with(shade: MakeupPalette.darkBrown)
-        XCTAssertEqual(recoloured.shade, MakeupPalette.darkBrown)
-        guard case .eyebrow(let before) = style, case .eyebrow(let after) = recoloured else {
-            return XCTFail("Expected eyebrow styles")
-        }
-        XCTAssertEqual(after.archHeight, before.archHeight)
-        XCTAssertEqual(after.archPosition, before.archPosition)
-    }
-
-    @MainActor func testChosenShadeOutlivesSwitchingStyles() {
-        let liners = MakeupRecommender.recommendations(for: .round, in: .eyeliner)
-        let model = MakeupTryOnViewModel(plan: MakeupPlan(shape: .round), applied: [liners[0]])
-        XCTAssertEqual(model.shade(for: .eyeliner), liners[0].style.shade)
-        model.select(MakeupPalette.navy, in: .eyeliner)
-        model.select(liners[1], in: .eyeliner)
-        XCTAssertEqual(model.shade(for: .eyeliner), MakeupPalette.navy)
-        XCTAssertNil(model.shade(for: .blush))
-    }
-
-    @MainActor func testIntensityDefaultsAndIsClamped() {
-        let model = MakeupTryOnViewModel(plan: MakeupPlan(shape: .oval), applied: [])
-        XCTAssertEqual(model.intensity(for: .blush), MakeupTextureRenderer.defaultIntensity)
-        model.setIntensity(1.4, for: .blush)
-        XCTAssertEqual(model.intensity(for: .blush), 1)
-        model.setIntensity(-1, for: .eyebrow)
-        XCTAssertEqual(model.intensity(for: .eyebrow), 0)
-        XCTAssertFalse(model.hasMakeup, "Nothing is drawn before the face is located")
+    func testLinerRecoloringKeepsShape() {
+        let style=EyelinerPlanner.catalog[0].style
+        XCTAssertEqual(style.with(shade:MakeupPalette.navy).with(shade:style.shade),style)
     }
 }

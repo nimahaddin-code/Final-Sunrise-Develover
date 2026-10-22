@@ -5,6 +5,8 @@ enum AppRoute: Hashable {
     case referenceDetail(MakeupReference)
     // -Nimah: Eyebrow module memakai sesi AR foundation aplikasi yang sama.
     case eyebrowGuide
+    // -Nimah: Dedicated Nimah region entry, fed by Khalish scan output.
+    case browBlush(FaceGuideRegion)
     case referenceImport
     case session(MakeupReference)
     case savedLookDetail(SavedLookMetadata)

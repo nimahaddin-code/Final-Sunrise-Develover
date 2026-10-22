@@ -20,9 +20,9 @@ struct ReferenceDetailView: View {
                 Text(reference.id == "sculpted-glam" ? "Points + color preview" : step == .blush ? "Live AR guide" : "Manual guide").font(.caption).foregroundStyle(AppColors.rose)
             } }
             NavigationLink(value: AppRoute.session(reference)) {
-                Text("Start my tutorial").font(.headline).frame(maxWidth: .infinity).padding().background(AppColors.rose, in: Capsule()).foregroundStyle(.white)
+                Text("Try eyebrow & blush").font(.headline).frame(maxWidth: .infinity).padding().background(AppColors.rose, in: Capsule()).foregroundStyle(.white)
             }
-            Text("AR is available on supported iPhones. Manual tutorials work on every device. Placement is an approximate guide, not automatic face-shape analysis.").font(.caption).foregroundStyle(AppColors.subtle)
+            Text("Open the studio to choose eyebrow and blush placement. This reference is inspiration; its makeup is not automatically analyzed or transferred. Eyeliner is available in Try On.").font(.caption).foregroundStyle(AppColors.subtle)
         }.padding(AppSpacing.large) }.background(AppColors.background).foregroundStyle(AppColors.ink).navigationTitle("The look").navigationBarTitleDisplayMode(.inline)
     }
 }

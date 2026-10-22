@@ -1,5 +1,7 @@
 # Pembagian iterasi MVP — Nimah, Khalish, Hanum
 
+> -Nimah: Current tech-lead instruction: **Khalish owns face scan and scan output; Nimah owns eyebrow/blush; Hanum owns eyeliner**. Khalish eyebrow/blush implementations removed from the active product. See [CodeOwnership](CodeOwnership.md); older assignments below are history.
+
 > -Nimah · 22 October 2026: Pembagian dari tech lead saat ini: **Holly: deteksi/analisis bentuk wajah; Nimah: eyebrow + blush; Hanum: eyeliner**. Katalog preferensi dan preview eyebrow/blush sudah tersedia, analisis Holly belum tersambung. [Kontrak, referensi dan acceptance](BrowBlushPreferences.md). Pembagian lama di bawah merupakan riwayat/usulan sebelumnya.
 
 > -Nimah, 19 October 2026: scope terbaru mencakup closed eyebrow outline, lima forehead style dan tutorial manual. Baca [BrowForeheadGuide](BrowForeheadGuide.md) untuk status terbaru, batas hairline dan testing; catatan sebelumnya di bawah adalah riwayat.

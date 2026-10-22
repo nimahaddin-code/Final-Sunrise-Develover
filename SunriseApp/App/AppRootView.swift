@@ -34,14 +34,23 @@ struct AppRootView: View {
         }
     }
 
+    // -Nimah: Adapt classifier output without changing Khalish's classifier or scan result model.
+    private var studioAssessment:FaceShapeAssessment? {
+        guard let result=faceShapeStore.latest else { return nil }
+        let shape=result.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:result.shape.rawValue) ?? .unknown
+        return FaceShapeAssessment(shape:shape,origin:.analysis,confidence:Float(result.confidence))
+    }
+
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
         case .referenceDetail(let reference): ReferenceDetailView(reference: reference)
         // -Nimah: Integration routing; teammate feature implementations remain unchanged.
-        case .eyebrowGuide: EyebrowOverlayView(checker: container.faceTracking)
+        case .eyebrowGuide: EyebrowOverlayView(checker: container.faceTracking,assessment:studioAssessment)
+        case .browBlush(let region): EyebrowOverlayView(checker:container.faceTracking,assessment:studioAssessment,initialRegion:region)
         case .referenceImport: ReferenceImportView(checker: container.faceTracking, store: container.savedLooks)
-        case .session(let reference):
-            MakeupSessionView(reference: reference, checker: container.faceTracking, store: container.savedLooks) { navigator.returnToRoot(of: .discover) }
+        case .session:
+            // -Nimah: Old catalog/import routes cannot reopen the superseded mixed renderer.
+            EyebrowOverlayView(checker:container.faceTracking,assessment:studioAssessment)
         case .savedLookDetail(let look): SavedLookDetailView(look: look, store: container.savedLooks)
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:

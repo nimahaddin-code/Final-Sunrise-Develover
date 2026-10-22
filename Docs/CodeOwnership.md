@@ -21,3 +21,20 @@ Integration validation: simulator build succeeded; 196 tests executed, 192 passe
 ## Approved lifecycle optimization — -Nimah
 
 After the preservation baseline above, Nimah explicitly approved lifecycle changes in four Hanum files: LinerOverlayModel.swift, MediaPipeEyeLandmarkProvider.swift, MakeupTryOnView.swift and MakeupTryOnViewModel.swift. These changes are marked -Nimah, leave eyeliner geometry/formulas intact, and are described in Performance.md. The other 39 teammate source files remain identical to the recorded baseline. TeamSourcePreservation.json remains the original merge baseline, not a claim that the four approved files are still identical.
+
+## Current feature ownership — explicit tech-lead decision
+
+-Nimah: This supersedes the earlier side-by-side merge scope and byte-for-byte baseline claims. User explicitly requested removal of Khalish eyebrow/blush implementations.
+
+| Active feature | Owner | Entry |
+| --- | --- | --- |
+| Face-shape scan/classification/result | -Khalish | Try On → Face scan; onboarding |
+| Eyebrow placement/preview/tutorial | -Nimah | Try On → Eyebrow; Discover studio |
+| Blush placement/preview/tutorial | -Nimah | Try On → Blush; Discover studio |
+| Eyeliner preview/eye-shape planning | -Hanum | Try On → Eyeliner |
+
+Khalish eyebrow/blush catalogs, shape-blending personalizer, texture-drawing functions and MakeupFitter rules were removed. The old result-card blush tip was removed. The Hanum try-on rejects eyebrow/blush payloads, offers no category switch to them and creates no eyebrow/blush mesh layers. Its eyeliner geometry and eye-shape planner remain unchanged. Shared data types, palettes and eye/feature measurement helpers remain where needed for compatibility or eyeliner; they do not activate an alternate eyebrow/blush filter.
+
+Nimah studio receives the Khalish result as FaceShapeAssessment(origin: .analysis). Triangle maps to Pear; unavailable source recommendations still permit manual exploration. This is a classifier estimate, not identity recognition. Independent eye/brow placement calibration remains required. Before/After and manual overrides are retained. Old catalog/import session routes now open the Nimah studio rather than the superseded mixed tutorial renderer, so they cannot activate the old eyeliner path. Reference images remain inspiration, not automatic makeup transfer.
+
+Tests for deleted legacy brow/blush behavior were removed/replaced with owner-routing regressions. Simulator: 188 tests, 184 pass, 4 skip, 0 fail. Native face alignment remains unverified.

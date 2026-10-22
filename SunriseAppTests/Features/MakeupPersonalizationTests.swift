@@ -18,12 +18,12 @@ final class MakeupPersonalizationTests: XCTestCase {
         XCTAssertEqual(plan.blend.first?.shape, result.shape)
         XCTAssertEqual(plan.blend.reduce(0) { $0 + $1.weight }, 1, accuracy: 1e-9)
         XCTAssertLessThanOrEqual(plan.blend.count, 3)
-        for category in MakeupCategory.allCases {
+        for category in [MakeupCategory.eyeliner] {
             let items = plan.recommendations(in: category)
             XCTAssertTrue(MakeupPlan.isMadeForYou(items[0]))
             XCTAssertEqual(items.filter(MakeupPlan.isMadeForYou).count, 1)
         }
-        XCTAssertEqual(plan.madeForYou.map(\.category), MakeupCategory.allCases)
+        XCTAssertEqual(plan.madeForYou.map(\.category), [.eyeliner])
     }
 
     func testChosenShapeUsesOnlyThatShape() {
@@ -32,34 +32,9 @@ final class MakeupPersonalizationTests: XCTestCase {
         XCTAssertEqual(plan.blend, [ShapeWeight(shape: .diamond, weight: 1)])
     }
 
-    func testSingleShapeWithAverageProportionsMatchesItsBestStyle() {
-        let plan = MakeupPlan(shape: .round)
-        guard case .eyebrow(let personal) = plan.madeForYou[0].style,
-              case .eyebrow(let best) = MakeupRecommender.recommendations(for: .round, in: .eyebrow)[0].style else {
-            return XCTFail("Expected eyebrow styles")
-        }
-        XCTAssertEqual(personal.archHeight, best.archHeight, accuracy: 1e-6)
-        XCTAssertEqual(personal.archPosition, best.archPosition, accuracy: 1e-6)
-        XCTAssertEqual(personal.tailExtension, best.tailExtension, accuracy: 1e-6)
-    }
 
-    func testLongerFaceGetsFlatterBrowAndFlatterBlush() {
-        let base = MakeupRecommender.recommendations(for: .oval, in: .eyebrow)[0]
-        guard case .eyebrow(let brow) = base.style else { return XCTFail() }
-        let longer = MakeupPersonalizer.eyebrow([(brow, 1)], shade: brow.shade,
-                                                deviation: FaceProportions(length: 0.06, forehead: 0, jaw: 0, chin: 0))
-        let shorter = MakeupPersonalizer.eyebrow([(brow, 1)], shade: brow.shade,
-                                                 deviation: FaceProportions(length: -0.06, forehead: 0, jaw: 0, chin: 0))
-        XCTAssertLessThan(longer.archHeight, shorter.archHeight)
 
-        guard case .blush(let blush) = MakeupRecommender.recommendations(for: .oval, in: .blush)[0].style else {
-            return XCTFail()
-        }
-        let longBlush = MakeupPersonalizer.blush([(blush, 1)], shade: blush.shade,
-                                                 deviation: FaceProportions(length: 0.06, forehead: 0, jaw: 0, chin: 0))
-        XCTAssertLessThan(longBlush.tilt, blush.tilt)
-        XCTAssertGreaterThan(longBlush.radii.x, blush.radii.x)
-    }
+
 
     // MARK: Fit to measured features
 
@@ -92,32 +67,9 @@ final class MakeupPersonalizationTests: XCTestCase {
         XCTAssertEqual(try XCTUnwrap(FaceFit(features: features(halfWidth: 0.07))).spacing, .close)
     }
 
-    func testBlushStaysAboveTheNoseTipAndBelowTheEye() throws {
-        let fit = try XCTUnwrap(FaceFit(features: features()))
-        let style = BlushStyle(center: SIMD2(0.05, 0.6), radii: SIMD2(0.3, 0.2), tilt: 10, shade: MakeupPalette.rose)
-        let fitted = MakeupFitter.blush(style, side: fit.left)
-        let depth = try XCTUnwrap(fit.left.noseDepth)
-        XCTAssertLessThanOrEqual(fitted.center.y + style.radii.y * 0.6, depth + 1e-5)
-        XCTAssertGreaterThanOrEqual(fitted.center.y - style.radii.y * 0.8, 0.15 - 1e-5)
-    }
 
-    func testBrowEndsMoveTowardTheGuideLines() throws {
-        let map = features()
-        let fit = try XCTUnwrap(FaceFit(features: map))
-        let naturalHead = SIMD2<Float>(0.57, 0.33), naturalTail = SIMD2<Float>(0.70, 0.32)
-        let guides = MakeupFitter.browGuides(side: fit.left, naturalHead: naturalHead, naturalTail: naturalTail)
-        let frame = fit.left.frame
-        // The nose-to-outer-corner line reaches the brow line outside the natural tail here.
-        XCTAssertGreaterThan(guides.tail, frame.across(naturalTail))
-        XCTAssertLessThan(guides.head, frame.across(naturalHead))
-        XCTAssertGreaterThan(guides.peak, 0)
-        XCTAssertLessThan(guides.peak, guides.tail)
-    }
 
-    func testLineIntersection() throws {
-        let point = try XCTUnwrap(MakeupFitter.intersection(SIMD2(0, 0), SIMD2(1, 1), SIMD2(0, 1), SIMD2(1, 0)))
-        XCTAssertEqual(point.x, 0.5, accuracy: 1e-6)
-        XCTAssertEqual(point.y, 0.5, accuracy: 1e-6)
-        XCTAssertNil(MakeupFitter.intersection(SIMD2(0, 0), SIMD2(1, 0), SIMD2(0, 1), SIMD2(1, 1)))
-    }
+
+
+
 }

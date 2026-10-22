@@ -12,7 +12,7 @@ struct FaceShapeResultView: View {
             VStack(alignment: .leading, spacing: AppSpacing.large) {
                 summaryCard
                 eyeCard
-                card(title: "Blush tip") { Text(result.shape.blushTip).font(AppTypography.body) }
+                // -Nimah: Blush guidance now belongs exclusively to Nimah studio.
                 card(title: "Closest matches") {
                     ForEach(result.rankedShapes.prefix(3), id: \.shape) { match in
                         VStack(alignment: .leading, spacing: AppSpacing.small) {

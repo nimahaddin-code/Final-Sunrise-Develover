@@ -51,7 +51,7 @@ import SwiftUI
         if let first=blushOptions.first { choose(first) } else { configuration.blushStyle = .apple }
         stepIndex=0
     }
-    func chooseFaceShape(_ shape:MakeupFaceShape) { applyAssessment(.init(shape:shape)); phase = .chooseRegion }
+    func chooseFaceShape(_ shape:MakeupFaceShape) { applyAssessment(.init(shape:shape)); phase = entryRegion == nil ? .chooseRegion : .chooseStyle }
     // -Nimah: A new try explicitly restores visible preview; Before/Hide from the previous try must not silently carry over.
     func restorePreview() {
         configuration.previewAfter=true; configuration.showGuide=true
@@ -82,9 +82,16 @@ import SwiftUI
     }
     @Published private(set) var availability:FaceTrackingAvailability = .notChecked
     private let checker:any FaceTrackingAvailabilityChecking
-    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil) {
-        self.checker=checker
+    private let entryRegion:FaceGuideRegion?
+    init(checker:any FaceTrackingAvailabilityChecking,assessment:FaceShapeAssessment? = nil,initialRegion:FaceGuideRegion? = nil) {
+        self.checker=checker; self.entryRegion=initialRegion
         if let assessment { applyAssessment(assessment) }
+        if let initialRegion { configuration.region=initialRegion }
+    }
+    // -Nimah: Face-shape classification is reused; eye/brow fitting remains a separate live calibration.
+    func nextAfterScan() {
+        if assessment.origin == .analysis { phase=entryRegion == nil ? .chooseRegion : .chooseStyle }
+        else { phase = .chooseFaceShape }
     }
     func prepare() async { availability=await checker.availability() }
     func trackingState(camera:FaceCameraState) -> FaceTrackingState {

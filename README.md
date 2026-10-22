@@ -1,5 +1,7 @@
 # Final-Sunrise-Develover — MVP
 
+> -Nimah: Current ownership: Khalish face scan/result → Nimah eyebrow/blush studio; Hanum eyeliner only. Duplicate Khalish brow/blush filters removed. [Current scope and attribution](Docs/CodeOwnership.md). Historical merge notes below are superseded.
+
 > -Nimah: Team integration now includes Khalish face-shape/Try On and Hanum MediaPipe eyeliner alongside Nimah Brow & Blush Studio. [Source attribution and preserved modules](Docs/CodeOwnership.md). Historical scope/dependency notes below predate this merge.
 
 > -Nimah · follow-up overlay kedua: signed build berhasil dan terpasang di iPhone 17 Nimah New pada 08:32. Simulator 81 tes: 78 pass, 3 hardware skip, 0 fail. Percobaan baru mengaktifkan After/guide lagi; dropout singkat pada anchor sama melanjutkan mapping. Acceptance gejala perangkat tetap belum dikonfirmasi pengguna. Rincian: Docs/BrowBlushPreferences.md.
