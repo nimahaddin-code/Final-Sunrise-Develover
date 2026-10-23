@@ -42,13 +42,17 @@ final class LinerFrameRelay: @unchecked Sendable {
     private struct Box: @unchecked Sendable { let frame: ARFrame; let face: ARFaceAnchor }
     private let lock = NSLock()
     private var pending = false
+    private var isEnabled = false
     private weak var model: LinerOverlayModel?
 
     @MainActor init(model: LinerOverlayModel) { self.model = model }
 
+    /// Frames are only handed over while the eyeliner is on; otherwise 60 main-thread hops a second would do nothing.
+    func setEnabled(_ value: Bool) { lock.lock(); isEnabled = value; lock.unlock() }
+
     func deliver(_ frame: ARFrame, _ face: ARFaceAnchor) {
         lock.lock()
-        if pending { lock.unlock(); return }
+        if pending || !isEnabled { lock.unlock(); return }
         pending = true
         lock.unlock()
         let box = Box(frame: frame, face: face)
@@ -189,6 +193,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     func deactivate() {
         active=false; activation?.cancel(); activation=nil
+        relay.setEnabled(false)
         liner.stop()
         camera.stopSession?()
         camera.suspend()
@@ -202,9 +207,11 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// The liner is a 2D overlay fed by MediaPipe; it runs only while the eyeliner is on.
     private func syncLiner() {
         guard enabled.contains(.eyeliner), let linerStyle else {
+            relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
             return
         }
+        relay.setEnabled(true)
         liner.setStyle(linerStyle, shade: shades[.eyeliner], intensity: intensities[.eyeliner] ?? 1)
     }
 }

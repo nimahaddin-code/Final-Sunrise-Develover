@@ -65,13 +65,17 @@ import ImageIO
         }
         authorized = result; denied = !result
     }
-    func report(tracked: Bool, ready: Bool) {
-        self.tracked = tracked
-        if tracked { lastTrackedAt = Date() }
-        if !tracked { calibrated = false } else if ready && fitReady { calibrated = true }
-        message = tracked ? (calibrated ? "Tracking active · check makeup alignment" : (fitReady ? "Hold still for 2 seconds" : "Hold still · fitting your face surface")) : "Face not tracked · face the camera in good light"
+    /// Assigns only when the value changed: `@Published` publishes on every assignment, and the session reports 10 times a second.
+    func update<Value: Equatable>(_ keyPath: ReferenceWritableKeyPath<FaceCameraState, Value>, _ value: Value) {
+        if self[keyPath: keyPath] != value { self[keyPath: keyPath] = value }
     }
-    func suspend() { tracked = false; calibrated = false; lastTrackedAt = nil; distanceMeters = nil }
+    func report(tracked: Bool, ready: Bool) {
+        update(\.tracked, tracked)
+        if tracked { lastTrackedAt = Date() }
+        if !tracked { update(\.calibrated, false) } else if ready && fitReady { update(\.calibrated, true) }
+        update(\.message, tracked ? (calibrated ? "Tracking active · check makeup alignment" : (fitReady ? "Hold still for 2 seconds" : "Hold still · fitting your face surface")) : "Face not tracked · face the camera in good light")
+    }
+    func suspend() { update(\.tracked, false); update(\.calibrated, false); lastTrackedAt = nil; update(\.distanceMeters, nil) }
     // -Nimah: Capture dari buffer kamera asli, sehingga titik/mesh render tidak pernah masuk foto.
     func capture() -> UIImage? {
         guard authorized, failure == nil, tracked,

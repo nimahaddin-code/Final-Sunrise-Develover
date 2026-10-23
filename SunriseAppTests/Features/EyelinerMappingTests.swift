@@ -1,4 +1,5 @@
 import XCTest
+import Combine
 @testable import SunriseApp
 
 final class EyelinerMappingTests: XCTestCase {
@@ -350,5 +351,40 @@ extension EyelinerMappingTests {
         catch { XCTAssertTrue(error is Expected) }
         provider.stop()
         XCTAssertFalse(provider.isBusy)
+    }
+}
+
+final class FrameThrottleTests: XCTestCase {
+    func testLetsOneFramePerIntervalThrough() {
+        var throttle = FrameThrottle(interval: 0.1)
+        XCTAssertTrue(throttle.allows(10.0))
+        XCTAssertFalse(throttle.allows(10.03))
+        XCTAssertFalse(throttle.allows(10.09))
+        XCTAssertTrue(throttle.allows(10.11))
+        XCTAssertFalse(throttle.allows(10.15))
+    }
+
+    func testResetAndClockGoingBackwardsDoNotStallTheStream() {
+        var throttle = FrameThrottle(interval: 0.1)
+        XCTAssertTrue(throttle.allows(50))
+        XCTAssertTrue(throttle.allows(1), "a restarted session clock must not block frames")
+        XCTAssertFalse(throttle.allows(1.01))
+        throttle.reset()
+        XCTAssertTrue(throttle.allows(1.02))
+    }
+}
+
+@MainActor final class FaceCameraStatePublishTests: XCTestCase {
+    func testRepeatedUnchangedReportsDoNotPublish() {
+        let camera = FaceCameraState()
+        camera.report(tracked: true, ready: false)
+        var changes = 0
+        let token = camera.objectWillChange.sink { changes += 1 }
+        for _ in 0..<20 { camera.report(tracked: true, ready: false) }
+        camera.update(\.distanceMeters, nil)
+        XCTAssertEqual(changes, 0)
+        camera.report(tracked: false, ready: false)
+        XCTAssertGreaterThan(changes, 0)
+        token.cancel()
     }
 }

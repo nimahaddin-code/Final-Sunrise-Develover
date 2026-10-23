@@ -104,6 +104,8 @@ struct LiveGuideView: UIViewRepresentable {
             var drawnStep: TutorialStep?
             var colorKey: String?
             var colorSource: SCNGeometrySource?
+            // The face mesh topology never changes, so it is copied once, not on every rendered frame.
+            var triangles: [Int16]?
             init?(device: MTLDevice) {
                 guard let depth=ARSCNFaceGeometry(device:device,fillMesh:false), let diagnostic=ARSCNFaceGeometry(device:device,fillMesh:false) else { return nil }
                 self.depth=depth
@@ -281,7 +283,8 @@ struct LiveGuideView: UIViewRepresentable {
             face.eyebrowRenderer.update(guide:configuration.needsBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
             face.foreheadRenderer.update(guide:result.foreheadGuide,vertices:vertices,configuration:configuration)
             face.blushRenderer.update(blush:result.blushGuide,vertices:vertices,configuration:configuration)
-            let triangles=Array(anchor.geometry.triangleIndices)
+            if face.triangles == nil { face.triangles=Array(anchor.geometry.triangleIndices) }
+            let triangles=face.triangles ?? []
             if configuration.layered {
                 // Home screen: brow and blush previews are separate layers with their own shade and strength.
                 var brow=configuration; brow.region = .eyebrows; brow.showMakeupPreview=configuration.browLayer.on
@@ -432,16 +435,16 @@ struct LiveGuideView: UIViewRepresentable {
             Task { @MainActor in
                 guard self.isCurrent(ticket) else { return }
                 if let brow {
-                    self.camera.eyebrowWasTracked = self.camera.eyebrowWasTracked || isTracked
-                    self.camera.eyebrowGuideReady=brow.ready
-                    self.camera.fitReady=brow.ready
+                    self.camera.update(\.eyebrowWasTracked, self.camera.eyebrowWasTracked || isTracked)
+                    self.camera.update(\.eyebrowGuideReady, brow.ready)
+                    self.camera.update(\.fitReady, brow.ready)
                     // -Nimah: Explain the gate that is actually preventing a new scan.
                     let scanMessage = brow.ready ? brow.message : (!relaxed ? "Buka kedua mata, rilekskan mulut, dan lihat lurus ke kamera." : (relative.columns.2.z <= 0.94 ? "Luruskan wajah menghadap kamera; jangan menoleh atau menunduk." : (!self.fitStable ? "Tahan iPhone dan kepala tetap stabil sebentar. Scan dimulai saat gerakan berkurang." : brow.message)))
-                    self.camera.eyebrowMessage=isTracked ? scanMessage : (self.camera.eyebrowWasTracked ? "Tracking lost · guides hidden; face the camera to remap" : "Position your face in the frame")
+                    self.camera.update(\.eyebrowMessage, isTracked ? scanMessage : (self.camera.eyebrowWasTracked ? "Tracking lost · guides hidden; face the camera to remap" : "Position your face in the frame"))
                     let confidence=brow.confidence.map { String(format:"%.2f",$0) } ?? "—"
-                    self.camera.eyebrowDebug="Vision face confidence \(confidence) · mapped brows \(brow.guide?.curves.count ?? 0)/2 · style \(options.eyebrows?.style.rawValue ?? "—")"
+                    self.camera.update(\.eyebrowDebug, "Vision face confidence \(confidence) · mapped brows \(brow.guide?.curves.count ?? 0)/2 · style \(options.eyebrows?.style.rawValue ?? "—")")
                 }
-                self.camera.report(tracked:isTracked,ready:ready); self.camera.distanceMeters=distance
+                self.camera.report(tracked:isTracked,ready:ready); self.camera.update(\.distanceMeters, distance.map { ($0*100).rounded()/100 })
             }
         }
         private func invalidateSession() {

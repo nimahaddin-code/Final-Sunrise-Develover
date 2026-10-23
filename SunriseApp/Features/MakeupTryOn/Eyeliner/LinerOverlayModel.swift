@@ -24,6 +24,10 @@ import SwiftUI
     private let lidQueue = DispatchQueue(label: "sunrise.lidflow", qos: .userInitiated)
     private var lidBusy = false
     private var lastHand = 0.0
+    /// The detectors need not see every 60 Hz frame: `publish` carries the newest result with the head each frame.
+    /// Landmarks at up to 30 Hz, the hand mask (which moves slowly) at up to 15 Hz.
+    private var landmarkThrottle = FrameThrottle(interval: 1.0 / 30)
+    private var occlusionThrottle = FrameThrottle(interval: 1.0 / 15)
     /// Skin tone near the eyes, smoothed; re-read every few frames.
     private var skin: InkColor?
     private var skinCountdown = 0
@@ -71,6 +75,7 @@ import SwiftUI
         solution = nil
         frame = nil
         skin = nil
+        landmarkThrottle.reset(); occlusionThrottle.reset()
         isStarted = false
     }
 
@@ -146,12 +151,12 @@ import SwiftUI
             displayTransform: arFrame.displayTransform(for: .portrait, viewportSize: viewport),
             imageSize: CGSize(width: CVPixelBufferGetWidth(buffer), height: CVPixelBufferGetHeight(buffer)),
             viewportSize: viewport, references: references, headAnchors: headAnchors)
-        if !provider.isBusy {
+        if !provider.isBusy, landmarkThrottle.allows(arFrame.timestamp) {
             provider.submit(LandmarkInput(pixelBuffer: contour.pixelBuffer, timestamp: arFrame.timestamp,
                                           headUp: point(raw[2]) - point(raw[0]),
                                           headAcross: point(raw[1]) - point(raw[0]), context: context))
         }
-        if occluder.isAvailable, !occluder.isBusy {
+        if occluder.isAvailable, !occluder.isBusy, occlusionThrottle.allows(arFrame.timestamp) {
             occluder.submit(OcclusionInput(pixelBuffer: contour.pixelBuffer, timestamp: arFrame.timestamp,
                                            headUp: point(raw[2]) - point(raw[0]),
                                            headAnchors: headAnchors.count >= 3 ? headAnchors : references.map(\.image)))
@@ -303,4 +308,21 @@ struct LinerOverlayView: View {
             }
         }
     }
+}
+
+/// Lets a frame through at most once per `interval` seconds of camera time.
+struct FrameThrottle {
+    let interval: TimeInterval
+    private var last: TimeInterval?
+
+    init(interval: TimeInterval) { self.interval = interval }
+
+    /// `true` (and remembers `timestamp`) when enough time has passed since the last accepted frame.
+    mutating func allows(_ timestamp: TimeInterval) -> Bool {
+        if let last, timestamp >= last, timestamp - last < interval { return false }
+        last = timestamp
+        return true
+    }
+
+    mutating func reset() { last = nil }
 }
