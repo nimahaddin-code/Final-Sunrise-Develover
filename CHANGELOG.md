@@ -10,13 +10,6 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 - `ScanSnapshots` keeps one small JPEG per scan on device (not backed up, never uploaded); privacy copy and `AGENTS.md` updated.
 - `AppRoute.fullScan` / `FullScanFlow`: the retake button runs the face scan then the eye scan in one go.
 
-### Fixed — Try On camera lag after merging eyeliner with blush/brow
-- `FaceCameraState` no longer re-publishes unchanged values every 0.1 s (`update(_:_:)`), which re-rendered the camera card constantly.
-- `LinerFrameRelay` drops frames at once while eyeliner is off, instead of hopping to the main thread 60 times a second.
-- MediaPipe landmarks run at most 30 Hz and the hand-occlusion mask at most 15 Hz (`FrameThrottle`); the overlay still follows the head every frame.
-- The face-mesh triangle list is copied once per face, not on every SceneKit frame.
-- Not yet measured on a device: confirm on a Face ID iPhone, with eyeliner off and on. Tunables: `LinerOverlayModel.landmarkThrottle`/`occlusionThrottle`.
-
 ### Added — reference colours and palette picker -Nimah
 - Blush presets: Pink, Peach, Winter Pink, Muted Mauve. Brows: Bistre, Brown, Chocolate, Tan, Soft black.
   RGB values approximate the supplied photos; they are not measured brand shade matches.
