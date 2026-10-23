@@ -73,6 +73,9 @@ final class LinerFrameRelay: @unchecked Sendable {
     @Published private(set) var tool: TryOnTool = .blush
     @Published private(set) var enabled: Set<TryOnTool> = [.blush]
     @Published private(set) var shades: [TryOnTool: MakeupShade]
+    /// Colours picked from a product photo, kept per tool so they stay in the shade row after another swatch is chosen.
+    @Published private(set) var customShades: [TryOnTool: [MakeupShade]] = [:]
+    static let maxCustomShades = 3
     @Published private(set) var intensities: [TryOnTool: Double]
     /// Held down on the camera card to see the bare face.
     @Published var isComparing = false
@@ -84,13 +87,16 @@ final class LinerFrameRelay: @unchecked Sendable {
     let relay: LinerFrameRelay
     // -Nimah: Refresh assignments after a rescan; no camera/model recreation is needed.
     private var linerStyle: LinerStyle?
+    private var linerIsNeutral = true
     @Published private(set) var linerRecommendation: MakeupRecommendation?
     private var activation: Task<Void,Never>?
     private var active = false
 
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
-        if !plan.eyeliner.isNeutral, case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
+        // A thin natural line is used when the eye scan is missing or unclear, so the colour can still be tried.
+        linerIsNeutral = plan.eyeliner.isNeutral
+        if case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: .blush)
         relay = LinerFrameRelay(model: liner)
         shades = [.blush: MakeupPalette.pink, .eyebrow: MakeupPalette.referenceBrown,
@@ -111,14 +117,15 @@ final class LinerFrameRelay: @unchecked Sendable {
         switch tool {
         case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"No saved recommendation for this face shape")
         case .blush:return brow.selectedBlush?.title ?? String(localized:"No saved recommendation for this face shape")
-        case .eyeliner:return linerRecommendation == nil ? String(localized:"Complete your eye scan to get a recommendation") : String(localized:"Eyeliner fitted to your eye scan")
+        case .eyeliner:return linerIsNeutral ? String(localized:"Natural line · scan your eyes for a fitted style") : String(localized:"Eyeliner fitted to your eye scan")
         }
     }
     func updateRecommendations(face: FaceShapeResult?, eyes: EyeShapeResult?) {
         let shape=face.map { $0.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:$0.shape.rawValue) ?? .unknown } ?? .unknown
         brow.applyAssessment(FaceShapeAssessment(shape:shape,origin:.analysis,confidence:face.map { Float($0.confidence) }))
         let plan=face.map { MakeupPlan(scan:$0,eyeScan:eyes) } ?? MakeupPlan(shape:.oval,eyeScan:eyes)
-        linerRecommendation=plan.eyeliner.isNeutral ? nil : plan.madeForYou.first
+        linerIsNeutral=plan.eyeliner.isNeutral
+        linerRecommendation=plan.madeForYou.first
         if case .eyeliner(let style)? = linerRecommendation?.style { linerStyle=style } else { linerStyle=nil }
         enabled=Set(enabled.filter { canTry($0) })
         if canTry(tool) { enabled.insert(tool) }
@@ -132,7 +139,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// The highlighted swatch; nil when the tool is off or its shade is not one of the row's swatches.
     var currentShade: MakeupShade? { isOff ? nil : shades[tool] }
 
-    var swatches: [MakeupShade] { MakeupPalette.shades(for: tool.category) }
+    var swatches: [MakeupShade] { MakeupPalette.shades(for: tool.category) + (customShades[tool] ?? []) }
 
     /// The brow/blush preview configuration for the shared camera view: both layers are drawn together.
     var liveConfiguration: EyebrowConfiguration {
@@ -158,6 +165,11 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     func choose(shade: MakeupShade) {
         guard canTry(tool) else { return }
+        if shade.id.hasPrefix("custom.") {
+            var picked = customShades[tool] ?? []
+            if !picked.contains(shade) { picked.append(shade) }
+            customShades[tool] = Array(picked.suffix(Self.maxCustomShades))
+        }
         shades[tool] = shade
         enabled.insert(tool)
         syncLiner()

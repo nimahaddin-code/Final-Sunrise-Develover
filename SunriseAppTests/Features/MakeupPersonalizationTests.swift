@@ -74,7 +74,9 @@ final class MakeupPersonalizationTests: XCTestCase {
     @MainActor func testSharedHomeRefreshesAssignmentsAfterRescan() throws {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.oval),assessment:.init(shape:.unknown),checker:MockFaceTrackingChecker())
         home.updateRecommendations(face:nil,eyes:nil)
-        for tool in TryOnTool.allCases { XCTAssertFalse(home.canTry(tool)) }
+        // Brow and blush need a saved face scan; the eyeliner falls back to a natural line so its colour can be tried.
+        XCTAssertFalse(home.canTry(.eyebrow)); XCTAssertFalse(home.canTry(.blush))
+        XCTAssertTrue(home.canTry(.eyeliner))
         home.choose(.eyebrow)
         XCTAssertFalse(home.liveConfiguration.browLayer.on)
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
@@ -85,9 +87,10 @@ final class MakeupPersonalizationTests: XCTestCase {
         home.choose(.eyeliner)
         XCTAssertTrue(home.enabled.contains(.eyeliner))
         home.updateRecommendations(face:nil,eyes:nil)
-        XCTAssertFalse(home.canTry(.eyeliner))
-        XCTAssertNil(home.linerRecommendation)
-        XCTAssertTrue(home.enabled.isEmpty)
+        XCTAssertTrue(home.canTry(.eyeliner))
+        XCTAssertTrue(home.enabled.contains(.eyeliner))
+        XCTAssertFalse(home.canTry(.eyebrow)); XCTAssertFalse(home.canTry(.blush))
+        XCTAssertFalse(home.enabled.contains(.eyebrow)); XCTAssertFalse(home.enabled.contains(.blush))
         XCTAssertFalse(home.liveConfiguration.browLayer.on)
         XCTAssertFalse(home.liveConfiguration.blushLayer.on)
         home.deactivate()

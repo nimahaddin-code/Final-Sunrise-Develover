@@ -1,4 +1,4 @@
-// -Nimah: Local palette photo sampling; images stay in memory and are never uploaded or saved.
+// -Nimah: Local palette photo sampling (sampler); the sheet below follows the design's snap-then-pick flow. images stay in memory and are never uploaded or saved.
 import SwiftUI
 import PhotosUI
 import UIKit
@@ -57,123 +57,209 @@ struct PalettePhoto: @unchecked Sendable {
     }
 }
 
+/// The sheet behind the "+" button: photograph a makeup product, then drag the pin to the colour to use.
+/// Photos stay in memory and are never saved or uploaded.
 struct PaletteColorPicker: View {
     let initial: MakeupShade
-    let onApply: (MakeupShade)->Void
+    let onApply: (MakeupShade) -> Void
     @Environment(\.dismiss) private var dismiss
-    @State private var color: Color
+    @StateObject private var camera = ProductCamera()
     @State private var photo: PalettePhoto?
-    @State private var selection: PhotosPickerItem?
-    @State private var showCamera=false
-    @State private var loading=false
-    @State private var error: String?
     @State private var marker: CGPoint?
-    @State private var loadTask: Task<Void,Never>?
-    @State private var requestID=UUID()
+    @State private var color: Color
+    @State private var selection: PhotosPickerItem?
+    @State private var error: String?
 
-    init(initial:MakeupShade,onApply:@escaping (MakeupShade)->Void) {
-        self.initial=initial;self.onApply=onApply;_color=State(initialValue:initial.color)
+    private static let frameSize = CGSize(width: 280, height: 294)
+    private static let pinSize: CGFloat = 40
+
+    init(initial: MakeupShade, onApply: @escaping (MakeupShade) -> Void) {
+        self.initial = initial
+        self.onApply = onApply
+        _color = State(initialValue: initial.color)
     }
+
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment:.leading,spacing:AppSpacing.medium) {
-                    ColorPicker("Choose makeup colour",selection:$color,supportsOpacity:false)
-                    HStack {
-                        PhotosPicker(selection:$selection,matching:.images) { Label("Palette from Photos",systemImage:"photo") }
-                        Spacer()
-                        Button { Task { await takePhoto() } } label: { Label("Photograph palette",systemImage:"camera") }
-                            .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
-                    }.font(AppTypography.caption)
-                    if loading { ProgressView("Loading palette") }
-                    if let photo {
-                        Text("Tap a colour on your palette photo").font(AppTypography.body)
-                        GeometryReader { proxy in
-                            ZStack {
-                                Color.gray.opacity(0.12)
-                                Image(decorative:photo.image,scale:1).resizable().scaledToFit()
-                                if let marker {
-                                    Circle().strokeBorder(.white,lineWidth:3).background(Circle().fill(color))
-                                        .frame(width:24,height:24).shadow(radius:2).position(marker)
-                                }
-                            }.contentShape(Rectangle())
-                                .gesture(SpatialTapGesture().onEnded { tap in
-                                    if let picked=photo.sample(at:tap.location,in:proxy.size) { color=Color(uiColor:picked);marker=tap.location }
-                                })
-                                .accessibilityLabel("Palette photo. Tap a colour, or use the colour picker above.")
-                        }.frame(height:300)
-                    }
-                    if let error { Text(error).font(AppTypography.caption).foregroundStyle(.red) }
-                    HStack { Circle().fill(color).frame(width:40,height:40);Text("Selected colour") }
-                    Text("Photo colours are approximate: lighting and the camera affect the result. Photos stay on this device and are not saved by the app.")
-                        .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
-                    Button("Use this colour") {
-                        var r:CGFloat=0,g:CGFloat=0,b:CGFloat=0,a:CGFloat=0
-                        guard UIColor(color).getRed(&r,green:&g,blue:&b,alpha:&a) else { return }
-                        onApply(MakeupShade(id:"custom."+UUID().uuidString,name:"Custom colour",red:r,green:g,blue:b,opacity:initial.opacity))
-                        dismiss()
-                    }.buttonStyle(.borderedProminent).tint(AppColors.rose).disabled(loading)
-                }.padding(AppSpacing.medium)
-            }.navigationTitle("Makeup colour").navigationBarTitleDisplayMode(.inline)
-                .toolbar { ToolbarItem(placement:.cancellationAction) { Button("Cancel") { dismiss() } } }
+        VStack(spacing: AppSpacing.large) {
+            Text(photo == nil ? "Snap Your Product" : "Pick Your Colour")
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
+            viewfinder
+            if let error {
+                Text(error).font(AppTypography.caption).multilineTextAlignment(.center)
+            }
+            controls
         }
-        .sheet(isPresented:$showCamera) {
-            PaletteCamera { image in
-                showCamera=false
-                if let image { load(image) }
-            }.ignoresSafeArea()
-        }
-        .task(id:selection) {
-            guard let selection else { return }
-            requestID=UUID();let request=requestID
-            loading=true;error=nil
-            do {
-                guard let data=try await selection.loadTransferable(type:Data.self) else { throw CocoaError(.fileReadCorruptFile) }
-                let decoded=await Task.detached(priority:.userInitiated) { PalettePhoto.decode(data) }.value
-                guard !Task.isCancelled,request==requestID else { return }
-                photo=decoded;marker=nil;loading=false
-                if decoded == nil { error=String(localized:"Could not open this photo. Try another image.") }
-            } catch { if !Task.isCancelled,request==requestID { loading=false;self.error=String(localized:"Could not open this photo. Try another image.") } }
-        }
-        .onDisappear { loadTask?.cancel() }
+        .padding(.top, AppSpacing.extraLarge)
+        .padding(.horizontal, AppSpacing.medium)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .foregroundStyle(AppColors.snow)
+        .presentationBackground(AppColors.wine)
+        .presentationDetents([.height(600), .large])
+        .presentationCornerRadius(32)
+        .presentationDragIndicator(.visible)
+        .task { await camera.start() }
+        .onDisappear { camera.stop() }
+        .task(id: selection) { await loadSelection() }
     }
-    private func takePhoto() async {
-        requestID=UUID();loading=false
-        let allowed:Bool
-        switch AVCaptureDevice.authorizationStatus(for:.video) {
-        case .authorized:allowed=true
-        case .notDetermined:allowed=await AVCaptureDevice.requestAccess(for:.video)
-        default:allowed=false
+
+    // MARK: Viewfinder and photo
+
+    private var viewfinder: some View {
+        ZStack {
+            if let photo {
+                pickSurface(photo)
+            } else {
+                switch camera.state {
+                case .running: ProductCameraPreview(session: camera.session)
+                case .idle: ProgressView().tint(AppColors.snow)
+                case .denied: unavailable("Allow camera access in Settings to photograph your product.")
+                case .unavailable: unavailable("The camera is not available. You can choose a photo instead.")
+                }
+            }
         }
-        if allowed { showCamera=true } else { error=String(localized:"Allow camera access in Settings to photograph your palette.") }
+        .frame(width: Self.frameSize.width, height: Self.frameSize.height)
+        .background(Color.black.opacity(0.35))
+        .clipShape(RoundedRectangle(cornerRadius: 44, style: .continuous))
     }
-    private func load(_ image:UIImage) {
-        struct ImmutablePhoto: @unchecked Sendable { let image:UIImage }
-        let box=ImmutablePhoto(image:image)
-        requestID=UUID();let request=requestID
-        loading=true;error=nil;loadTask?.cancel()
-        loadTask=Task {
-            let decoded=await Task.detached(priority:.userInitiated) { box.image.jpegData(compressionQuality:0.9).flatMap(PalettePhoto.decode) }.value
-            guard !Task.isCancelled,request==requestID else { return }
-            photo=decoded;marker=nil;loading=false
-            if decoded == nil { error=String(localized:"Could not open this photo. Try another image.") }
+
+    private func pickSurface(_ photo: PalettePhoto) -> some View {
+        ZStack {
+            Image(decorative: photo.image, scale: 1).resizable().scaledToFit()
+            if let marker {
+                pin.position(x: marker.x, y: marker.y - (Self.pinSize + 18) / 2)
+            }
+        }
+        .contentShape(Rectangle())
+        .gesture(DragGesture(minimumDistance: 0).onChanged { drag in
+            if let picked = photo.sample(at: drag.location, in: Self.frameSize) {
+                color = Color(uiColor: picked)
+                marker = drag.location
+            }
+        })
+        .accessibilityLabel("Product photo. Drag the pin to a colour.")
+    }
+
+    /// A teardrop pin whose tip sits on the sampled point and whose head shows the colour under it.
+    private var pin: some View {
+        ZStack(alignment: .top) {
+            PinTip().fill(AppColors.snow).frame(width: 22, height: 26).offset(y: Self.pinSize - 10)
+            Circle().fill(AppColors.snow).frame(width: Self.pinSize, height: Self.pinSize)
+                .overlay(Circle().fill(color).padding(4))
+        }
+        .frame(width: Self.pinSize, height: Self.pinSize + 18, alignment: .top)
+        .shadow(color: .black.opacity(0.3), radius: 3, y: 1)
+        .allowsHitTesting(false)
+    }
+
+    private func unavailable(_ message: LocalizedStringKey) -> some View {
+        VStack(spacing: AppSpacing.medium) {
+            Image(systemName: "camera").font(.largeTitle).accessibilityHidden(true)
+            Text(message).font(AppTypography.caption).multilineTextAlignment(.center)
+            PhotosPicker(selection: $selection, matching: .images) {
+                Label("Choose from Photos", systemImage: "photo")
+            }
+            .buttonStyle(.borderedProminent).tint(AppColors.flamingo)
+        }
+        .padding(AppSpacing.medium)
+    }
+
+    // MARK: Controls
+
+    @ViewBuilder private var controls: some View {
+        if photo == nil {
+            Button(action: snap) {
+                ZStack {
+                    Circle().strokeBorder(AppColors.snow, lineWidth: 3).frame(width: 76, height: 76)
+                    Circle().fill(AppColors.flamingo.opacity(0.6)).frame(width: 60, height: 60)
+                }
+            }
+            .buttonStyle(.plain)
+            .disabled(camera.state != .running)
+            .opacity(camera.state == .running ? 1 : 0.4)
+            .accessibilityLabel("Take photo of product")
+        } else {
+            HStack(spacing: AppSpacing.large) {
+                roundButton("arrow.counterclockwise", label: "Retake", action: retake)
+                Circle().fill(color).frame(width: 60, height: 60)
+                    .overlay(Circle().strokeBorder(AppColors.snow, lineWidth: 2))
+                    .accessibilityLabel("Selected colour")
+                roundButton("checkmark", label: "Use this colour", action: apply)
+            }
+        }
+    }
+
+    private func roundButton(_ symbol: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol).font(.title2.weight(.semibold))
+                .frame(width: 60, height: 60)
+                .background(AppColors.flamingo, in: Circle())
+                .foregroundStyle(AppColors.snow)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+
+    // MARK: Actions
+
+    private func snap() {
+        guard let data = camera.snapshot(aspect: Self.frameSize.width / Self.frameSize.height) else {
+            error = String(localized: "Could not take the photo. Try again.")
+            return
+        }
+        camera.stop()
+        Task { await show(data) }
+    }
+
+    private func retake() {
+        photo = nil; marker = nil; error = nil; selection = nil
+        Task { await camera.start() }
+    }
+
+    private func apply() {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard UIColor(color).getRed(&r, green: &g, blue: &b, alpha: &a) else { return }
+        onApply(MakeupShade(id: "custom." + UUID().uuidString, name: "Custom colour", red: r, green: g, blue: b,
+                            opacity: initial.opacity))
+        dismiss()
+    }
+
+    private func loadSelection() async {
+        guard let selection else { return }
+        error = nil
+        do {
+            guard let data = try await selection.loadTransferable(type: Data.self) else { throw CocoaError(.fileReadCorruptFile) }
+            camera.stop()
+            await show(data)
+        } catch {
+            if !Task.isCancelled { self.error = String(localized: "Could not open this photo. Try another image.") }
+        }
+    }
+
+    /// Decodes the photo off the main thread and puts the pin in its middle.
+    private func show(_ data: Data) async {
+        let decoded = await Task.detached(priority: .userInitiated) { PalettePhoto.decode(data) }.value
+        guard let decoded else {
+            error = String(localized: "Could not open this photo. Try another image.")
+            return
+        }
+        photo = decoded
+        error = nil
+        let centre = CGPoint(x: Self.frameSize.width / 2, y: Self.frameSize.height / 2)
+        if let picked = decoded.sample(at: centre, in: Self.frameSize) {
+            color = Color(uiColor: picked)
+            marker = centre
         }
     }
 }
 
-// -Nimah: Rear-camera capture reuses the existing camera permission; no photo-library write occurs.
-private struct PaletteCamera:UIViewControllerRepresentable {
-    let completion:(UIImage?)->Void
-    func makeCoordinator()->Coordinator { Coordinator(completion:completion) }
-    func makeUIViewController(context:Context)->UIImagePickerController {
-        let picker=UIImagePickerController();picker.sourceType = .camera;picker.cameraDevice = .rear;picker.delegate=context.coordinator
-        return picker
-    }
-    func updateUIViewController(_ controller:UIImagePickerController,context:Context) {}
-    final class Coordinator:NSObject,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
-        let completion:(UIImage?)->Void
-        init(completion:@escaping (UIImage?)->Void) { self.completion=completion }
-        func imagePickerControllerDidCancel(_ picker:UIImagePickerController) { completion(nil) }
-        func imagePickerController(_ picker:UIImagePickerController,didFinishPickingMediaWithInfo info:[UIImagePickerController.InfoKey:Any]) { completion(info[.originalImage] as? UIImage) }
+private struct PinTip: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        path.closeSubpath()
+        return path
     }
 }

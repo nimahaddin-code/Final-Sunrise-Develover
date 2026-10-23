@@ -169,6 +169,7 @@
 		65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */; };
 		EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */; };
 		B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */; };
+		E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A92B86027ED154A52F5754 /* ProductCamera.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -345,6 +346,7 @@
 		9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeView.swift; sourceTree = "<group>"; };
 		C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnLiveCard.swift; sourceTree = "<group>"; };
 		6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPages.swift; sourceTree = "<group>"; };
+		64A92B86027ED154A52F5754 /* ProductCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCamera.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -827,6 +829,7 @@
 				9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */,
 				FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */,
 				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
+				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
 				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
 			);
 			path = TryOnHome;
@@ -1003,6 +1006,7 @@
 				65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */,
 				5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */,
 				EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */,
+				E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */,
 				B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */,
 				2C53F0CCE66A98AF04B7B2D4 /* ReferenceCatalogView.swift in Sources */,
 				5AF705A9207A9DD3364DC86F /* ReferenceCatalogViewModel.swift in Sources */,

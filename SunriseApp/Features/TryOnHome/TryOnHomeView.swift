@@ -35,11 +35,7 @@ struct TryOnHomeView: View {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
             }
             toolStrip
-            Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
             shadeRow.disabled(!home.canTry(home.tool))
-            if let shade=home.currentShade { Text(shade.name).font(AppTypography.caption) }
-            Picker("Live comparison",selection:$home.isComparing) { Text("Before").tag(true);Text("After").tag(false) }
-                .pickerStyle(.segmented)
             IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
                          tint: home.currentShade?.color ?? AppColors.flamingo)
                 .disabled(!home.canTry(home.tool))
@@ -56,7 +52,6 @@ struct TryOnHomeView: View {
         }
         .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
             PaletteColorPicker(initial:home.currentShade ?? home.swatches[0]) { home.choose(shade:$0) }
-                .presentationDetents([.large])
         }
         .onAppear { isVisible=true; if !showColours { home.activate() } }
         .onDisappear { isVisible=false; home.deactivate() }
@@ -150,13 +145,11 @@ struct TryOnHomeView: View {
                 }
                 .padding(.horizontal, 2)
             }
-            // -Nimah: Keep custom and sampled colour visible even when it is not a preset swatch.
-            circleButton(selected:home.currentShade?.id.hasPrefix("custom.") == true,label:"Custom makeup colour",action:{
-                home.deactivate();showColours=true
+            // The "+" opens the snap-a-product colour sheet.
+            circleButton(selected: false, label: "Add a colour from a product", action: {
+                home.deactivate(); showColours = true
             }) {
-                if let shade=home.currentShade,shade.id.hasPrefix("custom.") {
-                    Circle().fill(shade.color).frame(width:30,height:30).overlay(Image(systemName:"eyedropper").foregroundStyle(.white))
-                } else { Image(systemName:"eyedropper").font(.title2) }
+                Image(systemName: "plus").font(.title2)
             }
         }
         .frame(height: 56)
