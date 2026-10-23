@@ -2,6 +2,14 @@
 
 ## Current merged scope — -Nimah
 
+Startup recovery — -Nimah: initial face scanning offers tracked frames every 400 ms to a bounded background
+`LaunchFitPreparation`; retain the first valid fit, rather than relying on one final frame. Launch fitting can
+use observed brow contours without optional pupil/nose formula points; no missing landmarks are invented.
+Legacy formula-dependent fitting remains strict. Neutral eyeliner does not block startup. If contour fitting
+still fails, retain scan results and offer continuing with available makeup; home explicitly disables and labels
+unfitted brow/blush layers instead of claiming they are rendered. Try-on still never runs another Vision scan.
+
+
 Launch-only scan — -Nimah: `AppNavigator.launchScanComplete` is memory-only and starts false on every cold launch.
 Welcome is remembered, analysis is not skipped. Launch runs face scan, eye scan, and transient makeup fitting before
 try-on. `FaceAnalysis.scanScreen(onScanFrame:)` exposes the completed AR frame to the launch integrator without

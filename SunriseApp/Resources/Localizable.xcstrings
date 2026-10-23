@@ -1,6 +1,18 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Brow fitting unavailable" : {
+      "extractionState" : "manual"
+    },
+    "Continue with available makeup" : {
+      "extractionState" : "manual"
+    },
+    "Brow contours could not be fitted from the initial scan. Your face and eye results are retained. You can continue with available makeup." : {
+      "extractionState" : "manual"
+    },
+    "Brow and blush unavailable: initial contour fitting was not captured" : {
+      "extractionState" : "manual"
+    },
     "Preparing your recommended makeup" : {
       "extractionState" : "manual"
     },

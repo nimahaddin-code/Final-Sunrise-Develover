@@ -78,7 +78,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertNil(PalettePhoto.decode(Data([0,1,2])))
     }
     @MainActor func testCustomColourKeepsPlacementAndTransfersToTutorial() throws {
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
         let assigned=try XCTUnwrap(home.brow.selectedBlush).id
         let shade=MakeupShade(id:"custom.test",name:"Custom colour",red:0.8,green:0.2,blue:0.4,opacity:0.36)
         home.choose(shade:shade);home.setIntensity(0.8)
@@ -198,10 +198,53 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     @MainActor func testTryOnEnablesAllAssignedToolsAndUsesLaunchFitting() {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
         XCTAssertEqual(home.enabled,Set(TryOnTool.allCases))
         XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
         XCTAssertTrue(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on)
+        home.deactivate()
+    }
+    // -Nimah: Real brow contours can be fitted without pretending missing pupil/nose points exist.
+    func testLaunchFitAcceptsMeasuredBrowsWithoutOptionalFormulaPoints() throws {
+        struct Provider:FaceLandmarkProviding {
+            let result:DetectedEyebrows
+            func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] { [result] }
+        }
+        let fixture=BrowFixture(),input=try fixture.input(),cache=LaunchMakeupFit()
+        var detected=fixture.detection();detected.eyeScan=nil
+        XCTAssertTrue(cache.prepare(input,provider:Provider(result:detected)))
+        let region=try XCTUnwrap(cache.fittedRegion(anchorID:fixture.anchor,vertices:input.vertices,triangles:input.triangles,timestamp:0))
+        XCTAssertTrue(region.brows.allSatisfy { $0.mapping == nil })
+        XCTAssertNotNil(EyebrowGuideGenerator.make(region:region,style:.natural))
+        struct Empty:FaceLandmarkProviding { func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] { [] } }
+        XCTAssertFalse(cache.prepare(input,provider:Empty()))
+        XCTAssertTrue(cache.hasFit,"A later bad frame must not erase the successful initial fit")
+    }
+    // -Nimah: Retry a rejected early frame during the same launch scan, without queueing or erasing a valid fit.
+    @MainActor func testLaunchCollectorRetriesFramesUntilOneFits() async throws {
+        final class Provider:FaceLandmarkProviding,@unchecked Sendable {
+            private let lock=NSLock()
+            private var attempts=0
+            let result:DetectedEyebrows
+            init(_ result:DetectedEyebrows) { self.result=result }
+            func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] {
+                lock.lock();defer { lock.unlock() };attempts += 1
+                return attempts==1 ? [] : [result]
+            }
+        }
+        let fixture=BrowFixture(),input=try fixture.input(),cache=LaunchMakeupFit(),provider=Provider(fixture.detection())
+        let collector=LaunchFitPreparation(cache:cache,provider:provider)
+        collector.submit(input)
+        let first=await collector.finish();XCTAssertFalse(first)
+        collector.submit(input)
+        let second=await collector.finish();XCTAssertTrue(second)
+        XCTAssertTrue(cache.hasFit)
+    }
+    @MainActor func testMissingFitDisablesOnlyUnavailablePigment() {
+        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:false)
+        XCTAssertFalse(home.canTry(.eyebrow));XCTAssertFalse(home.canTry(.blush))
+        XCTAssertTrue(home.canTry(.eyeliner))
         home.deactivate()
     }
     func testBlushRendererBeforeAndNoGuideClearStaleLayers() throws {

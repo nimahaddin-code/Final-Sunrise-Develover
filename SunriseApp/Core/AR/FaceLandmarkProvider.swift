@@ -49,6 +49,8 @@ protocol FaceLandmarkProviding: Sendable {
     func detectEyebrows(in frame: FaceLandmarkFrame) throws -> [DetectedEyebrows]
 }
 struct VisionFaceLandmarkProvider: FaceLandmarkProviding {
+    // -Nimah: Real brow contours remain usable even when optional pupil/nose formula points are absent.
+    var requireEyeFormula=true
     func detectEyebrows(in frame: FaceLandmarkFrame) throws -> [DetectedEyebrows] {
         let request=VNDetectFaceLandmarksRequest()
         #if targetEnvironment(simulator)
@@ -68,7 +70,9 @@ struct VisionFaceLandmarkProvider: FaceLandmarkProviding {
             }
             guard let le=landmarks.leftEye,let re=landmarks.rightEye,
                   let lp=landmarks.leftPupil,let rp=landmarks.rightPupil,let nose=landmarks.nose,
-                  le.pointCount>=4,re.pointCount>=4,lp.pointCount>0,rp.pointCount>0,nose.pointCount>=3 else { return nil }
+                  le.pointCount>=4,re.pointCount>=4,lp.pointCount>0,rp.pointCount>0,nose.pointCount>=3 else {
+                return requireEyeFormula ? nil : DetectedEyebrows(first:raw(left),second:raw(right),faceObservationConfidence:observation.confidence)
+            }
             return DetectedEyebrows(first:raw(left),second:raw(right),faceObservationConfidence:observation.confidence,
                 eyeScan:DetectedEyeScan(eyes:[.init(contour:raw(le),pupil:raw(lp)[0]),.init(contour:raw(re),pupil:raw(rp)[0])],nose:raw(nose)))
         }

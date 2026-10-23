@@ -185,13 +185,14 @@ final class LaunchMakeupFit: @unchecked Sendable {
     private let lock=NSLock()
     private var epoch=UUID()
     private var region:EyebrowRegion?
+    var hasFit:Bool { lock.lock();defer { lock.unlock() };return region != nil }
     func clear() { lock.lock();epoch=UUID();region=nil;lock.unlock() }
-    func prepare(_ input:FaceLandmarkFrame,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider())->Bool {
+    func prepare(_ input:FaceLandmarkFrame,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider(requireEyeFormula:false))->Bool {
         lock.lock();let token=epoch;lock.unlock()
         guard let detected=try? provider.detectEyebrows(in:input),!Task.isCancelled else { return false }
         let mapped=detected.compactMap { detection in
             EyebrowRegionMapper.map(detection,projection:input.projection,vertices:input.vertices,triangles:input.triangles,
-                leftEye:input.leftEye,rightEye:input.rightEye,timestamp:input.timestamp,anchorID:input.anchorID)
+                leftEye:input.leftEye,rightEye:input.rightEye,timestamp:input.timestamp,anchorID:input.anchorID,requireFormula:false)
         }.max { $0.faceObservationConfidence < $1.faceObservationConfidence }
         guard let mapped,EyebrowGuideGenerator.make(region:mapped,style:.natural) != nil else { return false }
         lock.lock();defer { lock.unlock() }
@@ -204,4 +205,22 @@ final class LaunchMakeupFit: @unchecked Sendable {
         return EyebrowRegion(brows:region.brows,faceObservationConfidence:region.faceObservationConfidence,
             timestamp:timestamp,anchorID:anchorID,restVertices:region.restVertices,triangles:region.triangles)
     }
+}
+
+// -Nimah: Bounded background fitting during the initial scan, retaining the first valid observation.
+@MainActor final class LaunchFitPreparation:ObservableObject {
+    private var pending:Task<Void,Never>?
+    private let cache:LaunchMakeupFit
+    private let provider:any FaceLandmarkProviding
+    init(cache:LaunchMakeupFit = .shared,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider(requireEyeFormula:false)) {
+        self.cache=cache;self.provider=provider
+    }
+    func submit(_ input:FaceLandmarkFrame) {
+        guard pending==nil,!cache.hasFit else { return }
+        pending=Task {
+            _=await Task.detached(priority:.userInitiated) { [cache,provider] in cache.prepare(input,provider:provider) }.value
+            pending=nil
+        }
+    }
+    func finish() async -> Bool { await pending?.value;return cache.hasFit }
 }
