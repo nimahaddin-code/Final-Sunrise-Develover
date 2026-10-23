@@ -30,6 +30,7 @@ import Foundation
         case .discover: discoverPath.append(route)
         case .myLooks: savedPath.append(route)
         case .tryOn: tryOnPath.append(route)
+        case .scanDebug: break  // a single screen with no routes
         }
     }
 
@@ -39,6 +40,7 @@ import Foundation
         case .discover: discoverPath.removeAll()
         case .myLooks: savedPath.removeAll()
         case .tryOn: tryOnPath.removeAll()
+        case .scanDebug: break
         }
     }
 }

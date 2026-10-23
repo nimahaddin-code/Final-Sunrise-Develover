@@ -48,22 +48,24 @@ SunriseApp/
   App/                    SunriseApp entry, AppContainer (composition root), AppRootView (tabs + route destinations)
     Navigation/           AppRoute (all destinations), AppNavigator (tabs, per-tab paths, onboarding flag)
   Core/
-    Models/               cross-feature models: MakeupReference, Tutorial, SavedLookMetadata, FaceTrackingAvailability
+    Models/               cross-feature models: MakeupReference, Tutorial, SavedLookMetadata, FaceTrackingAvailability, ScanOverlay (+ ScanSnapshot)
     Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
-    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView
+    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView
   Features/
     FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
     MakeupTryOn/          makeup recommendations and live AR try-on
     Onboarding/           welcome screen, then the face scan
     EyeShape/             eye shape (openness, tilt, spacing) from MediaPipe landmarks. In progress: measuring and classifying are done and tested,
                           the scan screen, onboarding step, home card and Try On route exist; not yet checked on a real face
+    ScanDebug/            debug tab: correct the face and eye outline points from a live scan by hand and save raw + corrected as JSON (see below)
     ReferenceCatalog/ ReferenceDetail/ ReferenceImport/ FaceCalibration/ Tutorial/ LiveGuide/ Comparison/ SavedLooks/
                           scaffold features: mostly placeholder UI on mock data
   PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
   Configuration/          Info.plist (camera + photo-library-add usage strings)
+SunriseDebugMac/          separate Mac-only Xcode project: edits scans exported from the Scan Debug tab (see below and its README)
 SunriseAppTests/
   Features/               face shape, head pose, photo measurer, makeup recommender/personalization/texture tests
   Navigation/             AppNavigatorTests
@@ -109,6 +111,10 @@ FaceShapeStore(latest: result)                      // in-memory store for previ
   Tuning lives in `FaceShapeClassifier` (prototypes, `unit`) and `PhotoFaceMeasurer` (photo reference). Check
   accuracy changes with the dataset eval.
 - Privacy: only the classified result is stored. No photos or meshes are saved or uploaded.
+- Result picture: `FaceShapeViewModel.snapshot` is the camera picture (from the `ARSCNView`, wireframe hidden) with the face outline and the
+  forehead, cheekbone and jaw widths and the length drawn on it (`FaceMeshMeasurer.guide` → `FaceGuide.overlay` → `FaceSnapshotter`), shown
+  by `FaceShapeResultView`. The widths are scaled by the Vision correction, so the lines are the widths the classifier used. In memory only.
+  It needs a device to check: the Simulator has no TrueDepth camera, so `FaceSnapshotter.capture` has only been compiled.
 
 ### Makeup try-on — `Features/MakeupTryOn`
 
@@ -149,11 +155,31 @@ Plan and decisions: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
 - `EyeCameraSession`: front `AVCaptureSession` delivering upright BGRA frames off the main thread. Stop the ARKit face session
   (`FaceShapeViewModel.stop()`) before `start()`; the two must not run together. It only checks camera permission, the mesh scan asks for it.
 - The Simulator build is arm64 only (`EXCLUDED_ARCHS[sdk=iphonesimulator*] = x86_64`): MediaPipe has no Intel-Simulator slice.
+- Result picture: `EyeScanViewModel.snapshot` is the last good frame, mirrored like the preview and cropped around the eyes, with the lines
+  from `EyeOverlay` (outlines, corner lines, opening, iris, brow, spacing), made by `EyeFrameSnapshot` on the camera queue and shown by
+  `EyeShapeResultView`. In memory only. The eyelid split in `EyeOverlay` assumes `lid` lists the upper lid, then the lower, both from
+  the outer corner (true for `MeshIndex`); check the drawn outline on a real scan.
 - `EyeMeasurer.measure(_:)` gives `EyeMeasurements` (openness, tilt, spacing, lidSpace in iris diameters). It derives the face's own axes
   from the points, so roll, scale, mirroring and y-down images do not matter. `EyeMeasurementsSampler` takes the per-field median and skips blinks.
 - `EyeShapeClassifier` turns measurements into `EyeShapeResult` (`EyeOpenness`, `EyeTilt`, `EyeSpacing`, `mayBeHooded`, `confidence`). The eyelid
   (`EyeLid`) cannot be seen in landmarks, so the person chooses it later; it stays `nil` until then.
 - The thresholds in `EyeShapeClassifier.Thresholds` and `EyeMeasurer.minimumOpenness` are starting guesses, not tuned on real faces.
+
+### Scan Debug — `Features/ScanDebug`
+
+A fourth tab (`AppTab.scanDebug`, "Scan Debug") for correcting outlines by hand. It runs the same `FaceShapeView` / `EyeScanView` as onboarding
+(into a throwaway `FaceShapeStore`, so real results are not changed) and takes their scan picture through the new optional `onResult` callback.
+`ScanDebugSnapshotReader` turns that picture's overlay strokes into raw points (10 face, 14 eye). Corrected stage: points drag. Final: corrected vs
+raw numbers, and Confirm writes `<face|eyes>-<name>.raw.json` and `.corrected.json` via `ScanDebugStore` (Application Support/ScanDebug; a name already
+used gets `-2`). Only coordinates are stored. Measuring uses `FaceShapeClassifier.photo` and `EyeMeasurer` / `EyeShapeClassifier`. If `FaceGuide.overlay`
+or `EyeOverlay.overlay` change their stroke order, update the reader (tests cover it). Its UI strings are English-only, not in `Localizable.xcstrings`.
+
+#### Export for Mac and the Mac editor — `SunriseDebugMac/`
+
+Scan Debug has an **Export for Mac** share button (`ScanDebugExportItem`, file format `ScanDebugExportFile`, extension `.sunrisescan`, type
+`com.sunrise.scan-debug` declared in `Info.plist`). `SunriseDebugMac/SunriseDebugMac.xcodeproj` is a separate macOS app with no scanning that opens those
+files (AirDrop), corrects the points with the mouse and writes the same raw and corrected JSON files. It compiles files from `SunriseApp/` directly, so a
+shared file (listed in its project) must not import ARKit, UIKit or MediaPipe. See `SunriseDebugMac/README.md`.
 
 ### Scaffold features
 
@@ -174,7 +200,8 @@ Keep their placeholder labels until a real implementation is tested (see `Docs/P
   snapshots across actors, and `nonisolated` ARSession delegate methods with `MainActor.assumeIsolated`.
 - **UI:** use `AppColors` / `AppSpacing` / `AppTypography` and Dynamic Type text styles. User-facing strings go in
   `Localizable.xcstrings`, with English as the source language.
-- **Privacy:** no networking, analytics or uploads. Never persist photos, camera frames or face meshes. A new permission needs an Info.plist usage string.
+- **Privacy:** no networking, analytics or uploads. The one exception to "never write pictures" is Scan Debug's **Export for Mac**: only when tapped, it hands the scan picture and points to the system share sheet as a `.sunrisescan` file (`ScanDebugExportItem`); the app writes nothing itself. Never persist photos, camera frames or face meshes. The scan result pictures
+  (`ScanSnapshot`) are held in a view model for the result screen only; never write them to disk, `FaceShapeStore` or the photo library. A new permission needs an Info.plist usage string.
 - **Honesty:** don't describe mock or sample data as real user results, and don't claim AR works on the strength of a Simulator run.
 - **Git:** branch from `main` as `feature/…`, `fix/…` or `chore/…`. Use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`).
   Keep refactors separate from features.

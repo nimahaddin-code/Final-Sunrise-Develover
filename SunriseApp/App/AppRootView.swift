@@ -28,6 +28,9 @@ struct AppRootView: View {
                     }
                     .tabItem { Label("My Looks", systemImage: "heart") }
                     .tag(AppTab.myLooks)
+                    NavigationStack { ScanDebugView() }
+                        .tabItem { Label("Scan Debug", systemImage: "scope") }
+                        .tag(AppTab.scanDebug)
                 }
             } else {
                 OnboardingView(store: faceShapeStore, onFinish: navigator.completeOnboarding)

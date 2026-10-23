@@ -18,6 +18,9 @@ import Combine
     static let requiredSamples = 30
 
     @Published private(set) var phase: Phase = .idle
+    /// The last good frame, cropped around the eyes, with the measured lines. For the result screen; in memory only, never saved.
+    @Published private(set) var snapshot: ScanSnapshot?
+    private var latestSnapshot: ScanSnapshot?
     let camera = EyeCameraSession()
     private var sampler = EyeMeasurementsSampler(requiredSamples: EyeScanViewModel.requiredSamples)
     private let classifier = EyeShapeClassifier()
@@ -40,7 +43,10 @@ import Combine
                 let timestamp = Int((CMTimeGetSeconds(time) * 1000).rounded())
                 guard let outcome = detector.detect(pixelBuffer: buffer, timestampMs: timestamp) else { return }
                 let frame = EyeScanGuide.evaluate(outcome.landmarks, imageWidth: Float(CVPixelBufferGetWidth(buffer)))
-                Task { @MainActor in self?.handle(frame) }
+                let picture = frame.measurements == nil ? nil : outcome.landmarks.flatMap {
+                    EyeFrameSnapshot.make(from: buffer, landmarks: $0)
+                }
+                Task { @MainActor in self?.handle(frame, snapshot: picture) }
             }
         } catch EyeCameraSession.Failure.cameraDenied {
             phase = .cameraDenied
@@ -67,6 +73,8 @@ import Combine
 
     func stop() {
         camera.stop()
+        snapshot = nil
+        latestSnapshot = nil
         switch phase {
         case .scanning, .finished: phase = .idle
         default: break
@@ -82,14 +90,17 @@ import Combine
 
     func resetMeasurements() {
         sampler.reset()
+        snapshot = nil
+        latestSnapshot = nil
         phase = .scanning(progress: 0, guidance: .findFace)
     }
 
-    func handle(_ frame: EyeScanFrame) {
+    func handle(_ frame: EyeScanFrame, snapshot picture: ScanSnapshot? = nil) {
         guard case .scanning = phase else { return }
-        if let measurements = frame.measurements { sampler.add(measurements) }
+        if let measurements = frame.measurements, sampler.add(measurements), let picture { latestSnapshot = picture }
         if sampler.isComplete, let median = sampler.median() {
             camera.stop()
+            snapshot = latestSnapshot
             phase = .finished(classifier.classify(median))
         } else {
             let next = Phase.scanning(progress: sampler.progress, guidance: frame.guidance)

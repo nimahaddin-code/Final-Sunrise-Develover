@@ -57,6 +57,15 @@ enum EyeLid: String, CaseIterable, Identifiable, Codable, Sendable {
         case .monolid: "Monolid"
         }
     }
+
+    /// How to tell this lid from the others, in plain words, for the picker.
+    var detail: LocalizedStringResource {
+        switch self {
+        case .crease: "With your eyes open, you can see a fold line in your upper lid, with a strip of lid skin between the fold and your lashes."
+        case .hooded: "With your eyes open, a fold of skin from under your brow droops over the lid, so the crease is hidden or most of the lid is covered."
+        case .monolid: "Your upper lid is smooth with no fold line at all, from your lashes up to your brow bone."
+        }
+    }
 }
 
 struct EyeShapeResult: Equatable, Codable, Sendable {

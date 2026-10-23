@@ -1,4 +1,4 @@
-enum AppTab: Hashable { case tryOn, discover, myLooks }
+enum AppTab: Hashable { case tryOn, discover, myLooks, scanDebug }
 
 enum AppRoute: Hashable {
     case referenceDetail(MakeupReference)
