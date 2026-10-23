@@ -18,7 +18,7 @@ struct EyebrowRegion: Sendable {
 }
 enum EyebrowRegionMapper {
     static func map(_ detection: DetectedEyebrows, projection: FaceLandmarkProjection, vertices:[SIMD3<Float>], triangles:[Int16],
-                    leftEye: SIMD3<Float>, rightEye: SIMD3<Float>, timestamp: TimeInterval, anchorID: UUID) -> EyebrowRegion? {
+                    leftEye: SIMD3<Float>, rightEye: SIMD3<Float>, timestamp: TimeInterval, anchorID: UUID,requireFormula:Bool = true) -> EyebrowRegion? {
         guard detection.faceObservationConfidence>=0.5,vertices.count>=12,
               vertices.allSatisfy({ $0.x.isFinite && $0.y.isFinite && $0.z.isFinite }),
               let low=vertices.map(\.x).min(),let high=vertices.map(\.x).max() else { return nil }
@@ -41,8 +41,10 @@ enum EyebrowRegionMapper {
                   abs(center.x-eye.x)<width*0.35,browWidth>width*0.12,browWidth<width*0.9,
                   local.allSatisfy({ abs($0.x)<width*1.15 && $0.y>eye.y-width*0.03 }),
                   !brows.contains(where: { $0.side==side }) else { return nil }
-            guard let scan=detection.eyeScan,let mapping=BrowMappingFormula.scan(scan,side:side,eye:eye,otherEye:side == .left ? rightEye : leftEye,
-                brow:local,projection:projection,vertices:vertices,triangles:triangles,faceWidth:width) else { return nil }
+            // -Nimah: Pigment uses measured brow contours. Optional formula rays must not invalidate those contours.
+            let mapping=detection.eyeScan.flatMap { scan in BrowMappingFormula.scan(scan,side:side,eye:eye,otherEye:side == .left ? rightEye : leftEye,
+                brow:local,projection:projection,vertices:vertices,triangles:triangles,faceWidth:width) }
+            if requireFormula && mapping==nil { return nil }
             brows.append(.init(side:side,landmarks:attachments,mapping:mapping))
         }
         guard brows.count==2 else { return nil }

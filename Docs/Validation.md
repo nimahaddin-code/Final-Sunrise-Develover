@@ -190,3 +190,13 @@ Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. R
 - Device checklist: complete launch scan once, confirm all supported overlays; switch tools/tutorial/palette picker
   and return, with no scan/hold-still prompts; briefly lose tracking and return; terminate/reopen and verify the
   startup scan is required again. Unsupported devices/denied permissions remain in startup with clear fallback.
+
+## Startup preparation recovery — -Nimah
+
+- Simulator: **266 tests, 262 passed, 4 skipped, 0 failures**. Signed generic iPhone build: **BUILD SUCCEEDED**.
+- Regression coverage: retry early rejected frames in the same launch scan; preserve the first valid fit; use
+  measured brow contours when optional pupil/nose points are absent; disable only unfitted pigment.
+- The screenshot's combined startup guard has been split: neutral eyeliner no longer invalidates otherwise
+  successful face fitting; failed fitting can continue with available categories while retaining scan results.
+- Installation attempted but the iPhone 17 is currently unavailable to CoreDevice. This build has not been
+  installed or validated on a real face in this change. Reconnect the device and run the staging build.

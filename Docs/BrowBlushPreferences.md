@@ -1,3 +1,14 @@
+## Koreksi kegagalan persiapan awal — -Nimah
+
+Frame yang ditawarkan selama face scan dibatasi 400 ms dengan satu pekerjaan aktif; collector berhenti setelah
+fit berhasil. Frame akhir yang buruk tidak menghapus hasil valid. Pemetaan awal memakai kontur alis terdeteksi
+meski titik tambahan pupil/hidung tidak tersedia. Garis rumus tidak dibuat jika datanya tidak ada.
+Rekomendasi eyeliner netral tidak lagi memblokir pembukaan aplikasi. Jika fitting tetap gagal, hasil klasifikasi
+dipertahankan dan pengguna bisa melanjutkan dengan kategori tersedia. Brow/blush tanpa fit diberi keterangan
+dan dinonaktifkan; tidak ditampilkan sebagai sukses. Tidak ada pengukuran ulang di try-on.
+
+---
+
 ## Scan hanya di awal aplikasi — -Nimah
 
 Setiap cold launch: face scan → eye scan → persiapan fit makeup di awal → try-on. Welcome hanya muncul pertama kali.

@@ -21,6 +21,16 @@ struct FaceShapeView: View {
             .navigationTitle("Face Shape")
             .navigationBarTitleDisplayMode(.inline)
             .task { await model.startIfNeeded() }
+            // -Nimah: Offer tracked frames throughout the initial scan, not one potentially blinking final frame.
+            .task {
+                guard onScanFrame != nil else { return }
+                while !Task.isCancelled {
+                    if let frame=model.session.currentFrame,let face=frame.anchors.compactMap({ $0 as? ARFaceAnchor }).first,face.isTracked {
+                        onScanFrame?(frame,face)
+                    }
+                    do { try await Task.sleep(for:.milliseconds(400)) } catch { return }
+                }
+            }
             .onDisappear { model.stop() }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {

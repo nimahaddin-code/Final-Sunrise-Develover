@@ -5,6 +5,13 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Fixed — startup preparation failure -Nimah
+- Collect bounded fitting attempts throughout the initial scan instead of trusting one final frame; keep valid fits across later rejected frames.
+- Fit actual brow contours when optional pupil/nose formula landmarks are unavailable; retain strict legacy formula behavior.
+- Stop treating neutral eyeliner as an overall preparation failure. Preserve existing results and allow partial continuation if fitting fails.
+- Mark unfitted pigment unavailable instead of silently enabling layers that cannot render. No extra scan is added to try-on.
+
+
 ### Fixed — scan only at launch -Nimah
 - Require fresh face/eye analysis on every cold launch; keep only the welcome-completed preference across launches.
 - Build transient brow/cheek fitting from the initial face scan and transfer it into try-on and tutorials, including

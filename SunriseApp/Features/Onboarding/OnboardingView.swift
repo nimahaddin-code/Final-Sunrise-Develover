@@ -7,7 +7,7 @@ struct OnboardingView: View {
     var onFinish: () -> Void
     @State private var step:Step
     @State private var started=false
-    @State private var preparation:Task<Bool,Never>?
+    @StateObject private var preparation=LaunchFitPreparation()
     @State private var preparationFailed=false
 
     // -Nimah: Repeat analysis on launch, with welcome shown only on the first launch.
@@ -21,17 +21,15 @@ struct OnboardingView: View {
             case .faceScan:
                 FaceAnalysis.scanScreen(store:store,continueTitle:"Next: scan your eyes",onScanFrame:{ frame,face in
                     // -Nimah: Compute brow/cheek attachments here, while the launch scan is still visible.
-                    preparation?.cancel()
-                    let input=FaceLandmarkFrame(frame:frame,anchor:face)
-                    preparation=Task.detached(priority:.userInitiated) { LaunchMakeupFit.shared.prepare(input) }
+                    preparation.submit(FaceLandmarkFrame(frame:frame,anchor:face))
                 }) { step = .eyeScan }
             case .eyeScan:
                 EyeAnalysis.scanScreen(store:store,continueTitle:"See my makeup") {
                     step = .preparing
                     Task {
-                        let fitted=await preparation?.value ?? false
-                        guard fitted,store.latest != nil,let eyes=store.eyes,
-                              MakeupPlan(shape:.oval,eyeScan:eyes).eyeliner.isNeutral == false else {
+                        let fitted=await preparation.finish()
+                        // -Nimah: A neutral eye recommendation is a valid fallback, not a failed face scan.
+                        guard fitted,store.latest != nil,store.eyes != nil else {
                             preparationFailed=true;return
                         }
                         onFinish()
@@ -41,9 +39,10 @@ struct OnboardingView: View {
             }
         }
         .onAppear { if !started { started=true;LaunchMakeupFit.shared.clear() } }
-        .alert("Makeup preparation unavailable",isPresented:$preparationFailed) {
-            Button("Repeat initial scan") { preparation?.cancel();LaunchMakeupFit.shared.clear();step = .faceScan }
-        } message: { Text("The initial scan did not provide a usable face fit and eye result. Complete it before opening try-on.") }
+        .alert("Brow fitting unavailable",isPresented:$preparationFailed) {
+            Button("Continue with available makeup") { onFinish() }
+            Button("Repeat initial scan") { LaunchMakeupFit.shared.clear();step = .faceScan }
+        } message: { Text("Brow contours could not be fitted from the initial scan. Your face and eye results are retained. You can continue with available makeup.") }
     }
 
     private var welcome: some View {

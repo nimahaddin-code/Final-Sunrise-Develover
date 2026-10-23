@@ -80,12 +80,14 @@ final class LinerFrameRelay: @unchecked Sendable {
     let liner = LinerOverlayModel()
     let relay: LinerFrameRelay
     // -Nimah: Refresh assignments after a rescan; no camera/model recreation is needed.
+    @Published private(set) var hasLaunchFit:Bool
     private var linerStyle: LinerStyle?
     @Published private(set) var linerRecommendation: MakeupRecommendation?
     private var activation: Task<Void,Never>?
     private var active = false
 
-    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
+    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,hasLaunchFit:Bool? = nil) {
+        self.hasLaunchFit=hasLaunchFit ?? LaunchMakeupFit.shared.hasFit
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
         if !plan.eyeliner.isNeutral, case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: .blush)
@@ -99,12 +101,13 @@ final class LinerFrameRelay: @unchecked Sendable {
     // -Nimah: Database/catalog selection is automatic; tools only switch category, never placement style.
     func canTry(_ tool: TryOnTool)->Bool {
         switch tool {
-        case .eyebrow:return brow.selectedBrow != nil
-        case .blush:return brow.selectedBlush != nil
+        case .eyebrow:return hasLaunchFit && brow.selectedBrow != nil
+        case .blush:return hasLaunchFit && brow.selectedBlush != nil
         case .eyeliner:return linerStyle != nil
         }
     }
     var recommendationTitle: String {
+        if tool != .eyeliner && !hasLaunchFit { return String(localized:"Brow and blush unavailable: initial contour fitting was not captured") }
         switch tool {
         case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"No saved recommendation for this face shape")
         case .blush:return brow.selectedBlush?.title ?? String(localized:"No saved recommendation for this face shape")
@@ -112,6 +115,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         }
     }
     func updateRecommendations(face: FaceShapeResult?, eyes: EyeShapeResult?) {
+        hasLaunchFit=LaunchMakeupFit.shared.hasFit
         let shape=face.map { $0.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:$0.shape.rawValue) ?? .unknown } ?? .unknown
         brow.applyAssessment(FaceShapeAssessment(shape:shape,origin:.analysis,confidence:face.map { Float($0.confidence) }))
         let plan=face.map { MakeupPlan(scan:$0,eyeScan:eyes) } ?? MakeupPlan(shape:.oval,eyeScan:eyes)
