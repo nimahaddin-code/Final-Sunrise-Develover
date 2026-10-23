@@ -1,5 +1,10 @@
 # AGENTS.md — read this first
 
+## Tutorial — scan-assigned
+
+`AppRoute.recommendedTutorial(TutorialHandoff)` opens `Features/Tutorial/GuidedTutorialView` (tabs Brows / Eyeliner / Blush, no settings;
+shade and strength are carried over from Try On). Eyeliner steps come from the fitted `LinerStyle`. Not yet checked on a real device.
+
 ## Current merged scope — -Nimah
 
 Palette try-on — -Nimah: `Features/TryOnHome/PaletteColorPicker.swift` provides a native ColorPicker,

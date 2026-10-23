@@ -10,11 +10,14 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
   `ProductCamera`, shutter) then "Pick Your Colour" (drag the pin, retake, colour preview, confirm). A picked colour shows as an extra
   swatch. Photos stay in memory. When the camera is denied or missing, the sheet offers "Choose from Photos". The sampler (`PalettePhoto`)
   is unchanged. Not checked on a real device.
-
-### Added — Profile page
-- `ProfileView` (profile button): face shape, eye shape and signature look, with the face portrait and eye strip taken from the scans.
-- `ScanSnapshots` keeps one small JPEG per scan on device (not backed up, never uploaded); privacy copy and `AGENTS.md` updated.
-- `AppRoute.fullScan` / `FullScanFlow`: the retake button runs the face scan then the eye scan in one go.
+### Changed — tutorial screen follows the design
+- `AppRoute.recommendedTutorial(TutorialHandoff)` now opens `Features/Tutorial/GuidedTutorialView`: the face camera in a rounded card, back
+  and next arrows, the logo, the step wording in a card at the bottom of the camera, and Brows / Eyeliner / Blush tabs. Back/next move
+  between steps and leave the tutorial at either end. There are no settings here: shade and strength come from Try On through
+  `TutorialHandoff` (all tools), so changing them means going back. The brow mapping lines are on for Brows.
+- Eyeliner now has a tutorial (steps follow the fitted `LinerStyle`; dotted outline drawn from `LinerOverlayRenderer`). Not checked on a real device.
+- The Try On arrow passes a `TutorialHandoff`; an eyeliner without an eye scan still goes to the eye scan first.
+- Tutorial wording that mentioned the removed refit / Before / hide-guide controls was reworded.
 
 ### Changed — eyeliner without a clear eye scan
 - Home keeps the thin natural liner available (colour row and intensity enabled) when the eye scan is missing or unclear; it says "Natural line" instead of a fitted style. Brow and blush still need a saved face scan.

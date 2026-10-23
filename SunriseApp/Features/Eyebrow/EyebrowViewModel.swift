@@ -31,7 +31,7 @@ import SwiftUI
         if configuration.region == .blush {
             return [.init(title:"Check cheek placement",instruction:configuration.blushStyle.instruction),
                     .init(title:"Apply & blend",instruction:"Use a small amount. Follow the direction arrows when shown, then soften the boundary. The preview is a simulation."),
-                    .init(title:"Review",instruction:"Switch to Before to see the original camera. Hide the guide to review your actual makeup. Steps advance manually.")]
+                    .init(title:"Review",instruction:"Step back and check both cheeks look even, then blend any hard edge. Steps advance manually.")]
         }
         return FaceGuideLesson.steps(region:configuration.region,brow:configuration.style,forehead:configuration.foreheadStyle)
     }

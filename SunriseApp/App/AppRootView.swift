@@ -12,14 +12,13 @@ struct AppRootView: View {
                 NavigationStack(path: $navigator.tryOnPath) {
                     TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
                                   onProfile: { navigator.open(.profile, in: .tryOn) },
-                                  onTutorial: { tool,shade,intensity in
+                                  onTutorial: { handoff in
                                       // -Nimah: Open the assigned tutorial directly; request a scan only when missing.
-                                      switch tool {
+                                      switch handoff.tool {
                                       case .eyebrow,.blush:
-                                          navigator.open(faceShapeStore.latest == nil ? .faceScan : .recommendedTutorial(tool == .eyebrow ? .eyebrows : .blush,shade,intensity),in:.tryOn)
+                                          navigator.open(faceShapeStore.latest == nil ? .faceScan : .recommendedTutorial(handoff),in:.tryOn)
                                       case .eyeliner:
-                                          let plan=faceShapeStore.latest.map { MakeupPlan(scan:$0,eyeScan:faceShapeStore.eyes) } ?? MakeupPlan(shape:.oval,eyeScan:faceShapeStore.eyes)
-                                          navigator.open(plan.eyeliner.isNeutral ? .eyeScan : .makeupTryOn(plan:plan,applied:plan.madeForYou),in:.tryOn)
+                                          navigator.open(tutorialPlan.eyeliner.isNeutral ? .eyeScan : .recommendedTutorial(handoff),in:.tryOn)
                                       }
                                   })
                         .navigationDestination(for: AppRoute.self, destination: destination)
@@ -28,6 +27,10 @@ struct AppRootView: View {
                 OnboardingView(store: faceShapeStore, onFinish: navigator.completeOnboarding)
             }
         }
+    }
+
+    private var tutorialPlan:MakeupPlan {
+        faceShapeStore.latest.map { MakeupPlan(scan:$0,eyeScan:faceShapeStore.eyes) } ?? MakeupPlan(shape:.oval,eyeScan:faceShapeStore.eyes)
     }
 
     // -Nimah: Adapt classifier output without changing Khalish's classifier or scan result model.
@@ -43,9 +46,8 @@ struct AppRootView: View {
         // -Nimah: Integration routing; teammate feature implementations remain unchanged.
         case .eyebrowGuide: EyebrowOverlayView(checker: container.faceTracking,assessment:studioAssessment)
         case .browBlush(let region): EyebrowOverlayView(checker:container.faceTracking,assessment:studioAssessment,initialRegion:region)
-        case .recommendedTutorial(let region,let shade,let intensity):
-            EyebrowOverlayView(checker:container.faceTracking,assessment:studioAssessment,initialRegion:region,
-                               initialShade:shade,initialIntensity:intensity,startTutorial:true)
+        case .recommendedTutorial(let handoff):
+            GuidedTutorialView(checker:container.faceTracking,assessment:studioAssessment,plan:tutorialPlan,handoff:handoff)
         case .referenceImport: ReferenceImportView(checker: container.faceTracking, store: container.savedLooks)
         case .session:
             // -Nimah: Old catalog/import routes cannot reopen the superseded mixed renderer.

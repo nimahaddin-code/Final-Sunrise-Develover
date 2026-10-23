@@ -7,8 +7,8 @@ enum AppRoute: Hashable {
     case eyebrowGuide
     // -Nimah: Dedicated Nimah region entry, fed by Khalish scan output.
     case browBlush(FaceGuideRegion)
-    // -Nimah: The tutorial receives the exact shade/strength from its preceding try-on.
-    case recommendedTutorial(FaceGuideRegion,MakeupShade?,Double)
+    // -Nimah: The tutorial receives every tool's shade/strength from its preceding try-on.
+    case recommendedTutorial(TutorialHandoff)
     case referenceImport
     case session(MakeupReference)
     case savedLookDetail(SavedLookMetadata)

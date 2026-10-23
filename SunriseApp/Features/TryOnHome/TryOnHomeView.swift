@@ -7,7 +7,7 @@ import Combine
 struct TryOnHomeView: View {
     @StateObject private var home: TryOnHomeModel
     var onProfile: () -> Void
-    var onTutorial: (TryOnTool,MakeupShade?,Double) -> Void
+    var onTutorial: (TutorialHandoff) -> Void
     @ObservedObject private var store: FaceShapeStore
     @AppStorage(DeveloperTools.key) private var developerTools = false
     @Environment(\.scenePhase) private var scenePhase
@@ -15,7 +15,7 @@ struct TryOnHomeView: View {
     @State private var showColours=false
 
     init(store: FaceShapeStore, assessment: FaceShapeAssessment?, checker: any FaceTrackingAvailabilityChecking,
-         onProfile: @escaping () -> Void, onTutorial: @escaping (TryOnTool,MakeupShade?,Double) -> Void) {
+         onProfile: @escaping () -> Void, onTutorial: @escaping (TutorialHandoff) -> Void) {
         let plan = store.latest.map { MakeupPlan(scan: $0, eyeScan: store.eyes) } ?? MakeupPlan(shape: .oval, eyeScan: store.eyes)
         _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment ?? FaceShapeAssessment(shape: .unknown),
                                                          checker: checker))
@@ -83,7 +83,7 @@ struct TryOnHomeView: View {
                 }
                 .accessibilityLabel("Profile")
                 Spacer()
-                Button { onTutorial(home.tool,home.shades[home.tool],home.intensity) } label: {
+                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities)) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)

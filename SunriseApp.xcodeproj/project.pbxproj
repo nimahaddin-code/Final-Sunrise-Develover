@@ -164,6 +164,7 @@
 		F83E4FF1665636FA83213151 /* ARFaceTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF45679699AC7CB5E530CA1C /* ARFaceTrackingManager.swift */; };
 		F88C4B1A73633332F0DE36C2 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */; };
 		F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */; };
+		7F3A91C2D45E6B80A1C9E0F4 /* GuidedTutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */; };
 		FD2E311FC44972331A578843 /* TutorialViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */; };
 		AD829C69DD73C01C6DCD473D /* TryOnHomeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */; };
 		65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */; };
@@ -234,6 +235,7 @@
 		4DD93F3E7DA4BDAA776A4A5A /* LidFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidFlow.swift; sourceTree = "<group>"; };
 		4F5841E6C956B66A11234989 /* SunriseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseApp.swift; sourceTree = "<group>"; };
 		507F8ABB438F67B20D0A1A2C /* MakeupRecommender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommender.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedTutorialView.swift; sourceTree = "<group>"; };
 		513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialViewModel.swift; sourceTree = "<group>"; };
 		528DBE5F90FFAE037040249C /* MakeupPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPreferences.swift; sourceTree = "<group>"; };
 		541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGuideDiagnostics.swift; sourceTree = "<group>"; };
@@ -702,6 +704,7 @@
 				13D8455EFF6A75DF7B4631CC /* MakeupSessionView.swift */,
 				C4AE33974D71FD4A86072E97 /* TutorialInstructions.swift */,
 				FE2B5E1913561C0593FD7840 /* TutorialView.swift */,
+				7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */,
 				513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */,
 			);
 			path = Tutorial;
@@ -1016,6 +1019,7 @@
 				5F3395078FFF3780060850A7 /* SavedLooksView.swift in Sources */,
 				F69EBE2B5722EEBEF5B9B0A7 /* SavedLooksViewModel.swift in Sources */,
 				3445B0A9ADD7794489F23820 /* TutorialView.swift in Sources */,
+				7F3A91C2D45E6B80A1C9E0F4 /* GuidedTutorialView.swift in Sources */,
 				FD2E311FC44972331A578843 /* TutorialViewModel.swift in Sources */,
 				174D41F32C12A56708B05987 /* MockServices.swift in Sources */,
 				C983838886352C1E043DE2F7 /* SampleData.swift in Sources */,

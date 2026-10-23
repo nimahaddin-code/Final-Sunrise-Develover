@@ -8,7 +8,7 @@ struct FaceGuideLesson {
     static func steps(region:FaceGuideRegion,brow:EyebrowStyle,forehead:ForeheadStyle) -> [Self] {
         if region == .eyebrows {
             return [
-                .init(title:"Mark your shape",instruction:"Check the three marks on your detected brow: head, arch and tail. Formula rays are optional references and may differ from your natural hair. Refit if the outline does not follow your brow."),
+                .init(title:"Mark your shape",instruction:"Check the three marks on your detected brow: head, arch and tail. Formula rays are optional references and may differ from your natural hair. Hold still and check the light if the outline does not follow your brow."),
                 .init(title:"Define the upper edge",instruction:"Sketch lightly along the upper dashed outline. Keep the tail soft and tapered."),
                 .init(title:"Define the lower edge",instruction:"Follow the lower outline with light pressure. Keep the front of the brow soft."),
                 .init(title:brow == .feathered ? "Add feathered strokes" : "Fill & soften",instruction:brow == .feathered ? "Use short upward strokes following the small direction guides. Brush through to soften." : "Fill sparse areas inside the outline, then brush through. The guide does not check your application.")]
