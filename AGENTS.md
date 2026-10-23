@@ -1,5 +1,11 @@
 # AGENTS.md — read this first
 
+## Profile — scan stills
+
+`AppRoute.profile` opens `ProfileView` (face + eye analysis, signature look). Its retake button opens `AppRoute.fullScan`
+(`FullScanFlow`: face scan then eye scan in one flow). Portraits are the stills saved by `ScanSnapshots` at scan completion
+(face: ARKit frame, oriented via the Vision orientation; eyes: MediaPipe frame cropped around the eyes). Not yet checked on a real device.
+
 ## Current merged scope — -Nimah
 
 Palette try-on — -Nimah: `Features/TryOnHome/PaletteColorPicker.swift` provides a native ColorPicker,
@@ -217,7 +223,7 @@ Keep their placeholder labels until a real implementation is tested (see `Docs/P
   snapshots across actors, and `nonisolated` ARSession delegate methods with `MainActor.assumeIsolated`.
 - **UI:** use `AppColors` / `AppSpacing` / `AppTypography` and Dynamic Type text styles. User-facing strings go in
   `Localizable.xcstrings`, with English as the source language.
-- **Privacy:** no networking, analytics or uploads. Never persist photos, camera frames or face meshes. A new permission needs an Info.plist usage string.
+- **Privacy:** no networking, analytics or uploads. Never persist camera frames or face meshes. The one exception is `Features/FaceShape/ScanSnapshots.swift`: one small JPEG per scan (face, eyes) in Application Support, excluded from backup, shown on the profile (`TryOnHome/ProfileView`); a new scan replaces it. A new permission needs an Info.plist usage string.
 - **Honesty:** don't describe mock or sample data as real user results, and don't claim AR works on the strength of a Simulator run.
 - **Git:** branch from `main` as `feature/…`, `fix/…` or `chore/…`. Use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`).
   Keep refactors separate from features.

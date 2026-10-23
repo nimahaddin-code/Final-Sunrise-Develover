@@ -14,7 +14,7 @@ import SwiftUI
 ///
 /// Everything else in this folder (mesh/contour measuring, classifier prototypes, head pose limits) is internal
 /// tuning; change it here in the FaceShape feature, not from callers. Only the classified result is ever kept;
-/// no photos or meshes are saved or uploaded.
+/// one small still per scan stays on device (`ScanSnapshots`); no meshes are kept and nothing is uploaded.
 enum FaceAnalysis {
     typealias PhotoFailure = PhotoFaceMeasurer.Failure
 

@@ -17,7 +17,7 @@ struct EyeShapeResultView: View {
                     Text("Some measurements sat close to the line between two shapes. If this does not look right, scan again facing the camera in good light.")
                         .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
                 }
-                Text("An estimate from your front camera, not a professional assessment. Only your eye shape result is kept on this device; no photos are saved or uploaded.")
+                Text("An estimate from your front camera, not a professional assessment. Only your eye shape result and one small photo from the scan are kept on this device; nothing is uploaded.")
                     .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
                 PrimaryButton(title: continueTitle, action: onContinue)
                 Button("Scan again", action: onScanAgain)

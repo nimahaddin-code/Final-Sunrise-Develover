@@ -42,7 +42,7 @@ struct OnboardingView: View {
                 Text("Your next glow starts here").font(AppTypography.title)
                 Text("First, let's find your face shape, then your eye shape. We'll use the front camera for a few seconds each, then recommend brow, blush and eyeliner styles you can try on live.")
                     .font(AppTypography.body)
-                Label("Only your face and eye shape results are kept on this device. No photos are saved or uploaded.",
+                Label("Only your face and eye shape results and one small photo from each scan are kept on this device. Nothing is uploaded.",
                       systemImage: "lock")
                     .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
                 PrimaryButton(title: "Scan my face") { step = .faceScan }
