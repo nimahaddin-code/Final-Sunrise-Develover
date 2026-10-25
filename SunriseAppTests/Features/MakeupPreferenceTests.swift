@@ -247,6 +247,52 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertTrue(home.canTry(.eyeliner))
         home.deactivate()
     }
+    // -Nimah: Slider/colour changes must reuse bindings, topology and feather data.
+    func testShadeChangesReuseSurfaceBindings() throws {
+        let f=BrowFixture(),region=try f.region(),pigment=FaceRegionPreviewRenderer()
+        let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.apple))
+        var config=EyebrowConfiguration();config.region = .blush;config.showMakeupPreview=true
+        pigment.update(brow:nil,forehead:nil,blush:guide,vertices:region.restVertices,triangles:region.triangles,configuration:config)
+        let node=try XCTUnwrap(pigment.root.childNodes.first),geometry=try XCTUnwrap(node.geometry)
+        let positions=try XCTUnwrap(geometry.sources(for:.vertex).first).data
+        let colours=try XCTUnwrap(geometry.sources(for:.color).first)
+        let topology=try XCTUnwrap(geometry.elements.first)
+        for i in 0..<30 {
+            config.shadeTint=SIMD3(Float(i)/30,0.2,0.4);config.previewIntensity=Float(i)/30
+            pigment.update(brow:nil,forehead:nil,blush:guide,vertices:region.restVertices,triangles:region.triangles,configuration:config)
+            XCTAssertTrue(node === pigment.root.childNodes.first)
+            XCTAssertTrue(topology === node.geometry?.elements.first)
+            XCTAssertTrue(colours === node.geometry?.sources(for:.color).first)
+            XCTAssertEqual(node.geometry?.sources(for:.vertex).first?.data,positions)
+        }
+        XCTAssertEqual(pigment.bindingBuildCount,1)
+        let tint=try XCTUnwrap(node.geometry?.firstMaterial?.diffuse.contents as? UIColor)
+        var r:CGFloat=0,g:CGFloat=0,b:CGFloat=0,a:CGFloat=0
+        XCTAssertTrue(tint.getRed(&r,green:&g,blue:&b,alpha:&a))
+        XCTAssertEqual(g,0.2,accuracy:0.00001)
+    }
+    func testOverlayBudgetDropsExcessFramesAndRecoversClockReset() {
+        var budget=LiveOverlayBudget(),accepted=0
+        for frame in 0..<120 { if budget.accepts(Double(frame)/120) { accepted += 1 } }
+        XCTAssertEqual(accepted,30)
+        XCTAssertFalse(budget.accepts(.nan))
+        XCTAssertTrue(budget.accepts(0),"A new session must not be blocked by the old clock")
+        XCTAssertFalse(budget.accepts(0))
+    }
+    func testHiddenGuidesDoNotConstructSceneNodes() throws {
+        let f=BrowFixture(),region=try f.region()
+        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.natural))
+        let blush=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.apple))
+        let browRenderer=EyebrowSceneRenderer(),areaRenderer=ForeheadSceneRenderer()
+        var config=EyebrowConfiguration();config.showGuide=false
+        browRenderer.update(guide:guide,vertices:region.restVertices,configuration:config)
+        areaRenderer.update(blush:blush,vertices:region.restVertices,configuration:config)
+        XCTAssertTrue(browRenderer.root.childNodes.isEmpty);XCTAssertTrue(areaRenderer.root.childNodes.isEmpty)
+        config.showGuide=true
+        browRenderer.update(guide:guide,vertices:region.restVertices,configuration:config)
+        areaRenderer.update(blush:blush,vertices:region.restVertices,configuration:config)
+        XCTAssertFalse(browRenderer.root.isHidden);XCTAssertFalse(areaRenderer.root.isHidden)
+    }
     func testBlushRendererBeforeAndNoGuideClearStaleLayers() throws {
         let f=BrowFixture(),region=try f.region()
         let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.apple))

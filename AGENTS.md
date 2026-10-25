@@ -2,6 +2,15 @@
 
 ## Current merged scope — -Nimah
 
+Smooth try-on — -Nimah: replayed identical scan outputs are ignored before any published state changes.
+Brow/blush shade changes update material tint only: keep surface attachments, feather sources and topology.
+`FaceRegionPreviewRenderer` uses a 6 mm XY triangle index for exact barycentric binding; live vertex updates
+avoid intermediate arrays. Hidden guide renderers return before node construction/animation. Shared-camera
+`LinerFrameRelay` budgets overlay delivery to 30 Hz without changing ARKit camera tracking or Hanum formulas.
+Non-eyeliner tool/shade/intensity changes do not resynchronize eyeliner. For device performance acceptance,
+use a Release build without Xcode's debugger; no measured physical-device FPS is claimed by simulator tests.
+
+
 Startup recovery — -Nimah: initial face scanning offers tracked frames every 400 ms to a bounded background
 `LaunchFitPreparation`; retain the first valid fit, rather than relying on one final frame. Launch fitting can
 use observed brow contours without optional pupil/nose formula points; no missing landmarks are invented.

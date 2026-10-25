@@ -36,19 +36,30 @@ extension MakeupShade {
     var color: Color { Color(red: red, green: green, blue: blue) }
 }
 
+// -Nimah: Budget overlay work, not camera tracking; no backlog and recover from a new session clock.
+struct LiveOverlayBudget {
+    private var last:TimeInterval?
+    mutating func accepts(_ timestamp:TimeInterval)->Bool {
+        guard timestamp.isFinite else { return false }
+        if let last,timestamp>=last,timestamp-last<1.0/30.0-0.000001 { return false }
+        last=timestamp;return true
+    }
+}
+
 /// Hands ARKit frames from the shared camera session to the eyeliner overlay. Frames that arrive while the previous one
 /// is still being handed over are dropped, so ARKit never waits on the main thread.
 final class LinerFrameRelay: @unchecked Sendable {
     private struct Box: @unchecked Sendable { let frame: ARFrame; let face: ARFaceAnchor }
     private let lock = NSLock()
     private var pending = false
+    private var budget=LiveOverlayBudget()
     private weak var model: LinerOverlayModel?
 
     @MainActor init(model: LinerOverlayModel) { self.model = model }
 
     func deliver(_ frame: ARFrame, _ face: ARFaceAnchor) {
         lock.lock()
-        if pending { lock.unlock(); return }
+        if pending || !budget.accepts(frame.timestamp) { lock.unlock(); return }
         pending = true
         lock.unlock()
         let box = Box(frame: frame, face: face)
@@ -85,6 +96,9 @@ final class LinerFrameRelay: @unchecked Sendable {
     @Published private(set) var linerRecommendation: MakeupRecommendation?
     private var activation: Task<Void,Never>?
     private var active = false
+    private var hasAppliedAnalysis=false
+    private var appliedFace:FaceShapeResult?
+    private var appliedEyes:EyeShapeResult?
 
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,hasLaunchFit:Bool? = nil) {
         self.hasLaunchFit=hasLaunchFit ?? LaunchMakeupFit.shared.hasFit
@@ -115,7 +129,11 @@ final class LinerFrameRelay: @unchecked Sendable {
         }
     }
     func updateRecommendations(face: FaceShapeResult?, eyes: EyeShapeResult?) {
-        hasLaunchFit=LaunchMakeupFit.shared.hasFit
+        // -Nimah: SwiftUI can resubscribe to @Published outputs; identical scans must not republish/reset the entire home.
+        let prepared=LaunchMakeupFit.shared.hasFit
+        guard !hasAppliedAnalysis || appliedFace != face || appliedEyes != eyes || prepared != hasLaunchFit else { return }
+        hasAppliedAnalysis=true;appliedFace=face;appliedEyes=eyes
+        hasLaunchFit=prepared
         let shape=face.map { $0.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:$0.shape.rawValue) ?? .unknown } ?? .unknown
         brow.applyAssessment(FaceShapeAssessment(shape:shape,origin:.analysis,confidence:face.map { Float($0.confidence) }))
         let plan=face.map { MakeupPlan(scan:$0,eyeScan:eyes) } ?? MakeupPlan(shape:.oval,eyeScan:eyes)
@@ -154,26 +172,26 @@ final class LinerFrameRelay: @unchecked Sendable {
     func choose(_ newTool: TryOnTool) {
         tool = newTool
         if canTry(newTool) { enabled.insert(newTool) }
-        syncLiner()
+        if newTool == .eyeliner { syncLiner() }
     }
 
     func choose(shade: MakeupShade) {
         guard canTry(tool) else { return }
         shades[tool] = shade
         enabled.insert(tool)
-        syncLiner()
+        if tool == .eyeliner { syncLiner() }
     }
 
     func turnOff() {
         enabled.remove(tool)
-        syncLiner()
+        if tool == .eyeliner { syncLiner() }
     }
 
     func setIntensity(_ value: Double) {
         guard canTry(tool) else { return }
         intensities[tool] = min(max(value, 0.1), 1)
         enabled.insert(tool)
-        syncLiner()
+        if tool == .eyeliner { syncLiner() }
     }
 
     /// Starts the one camera. Blush and eyebrow are placed as soon as it runs, whichever tools are on, so switching a

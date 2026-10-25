@@ -5,6 +5,14 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Performance — reduce try-on stalls -Nimah
+- Ignore identical replayed analysis outputs before republishing state; preserve user on/off choices.
+- Recolour cached pigment materials without rebinding mesh attachments. Use a triangle spatial index for first binding.
+- Skip hidden guide node creation/animation and avoid intermediate per-frame position/index arrays.
+- Budget shared-camera eyeliner delivery to 30 Hz; brow/blush controls no longer republish unchanged eyeliner settings.
+- Signed Release build provided for device testing; no live FPS/transition-latency improvement measured yet.
+
+
 ### Fixed — startup preparation failure -Nimah
 - Collect bounded fitting attempts throughout the initial scan instead of trusting one final frame; keep valid fits across later rejected frames.
 - Fit actual brow contours when optional pupil/nose formula landmarks are unavailable; retain strict legacy formula behavior.

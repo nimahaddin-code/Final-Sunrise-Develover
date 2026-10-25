@@ -6,7 +6,8 @@ struct SurfaceAttachment: Sendable {
     let indices: SIMD3<Int>
     let weights: SIMD3<Float>
     func position(in vertices: [SIMD3<Float>], lift: Float = 0) -> SIMD3<Float>? {
-        guard [indices.x,indices.y,indices.z].allSatisfy(vertices.indices.contains) else { return nil }
+        // -Nimah: Avoid allocating an index array for each live vertex attachment.
+        guard vertices.indices.contains(indices.x),vertices.indices.contains(indices.y),vertices.indices.contains(indices.z) else { return nil }
         let a=vertices[indices.x], b=vertices[indices.y], c=vertices[indices.z]
         let n=simd_cross(b-a,c-a), length=simd_length(n)
         guard length > 0.00000001 else { return nil }

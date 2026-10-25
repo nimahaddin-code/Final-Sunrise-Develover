@@ -20,6 +20,8 @@ final class ForeheadSceneRenderer {
             tint:UIColor(red:1,green:0.76,blue:0.84,alpha:1))
     }
     private func updateAreas(id:UUID,areas:[FaceGuideArea],vertices:[SIMD3<Float>],configuration:EyebrowConfiguration,tint:UIColor) {
+        // -Nimah: Pigment-only try-on skips all hidden guide geometry work.
+        guard configuration.showGuide else { root.isHidden=true; return }
         if self.id != id { rebuild(id:id,areas:areas,tint:tint) }
         root.isHidden = !configuration.showGuide
         for (node,point) in dots {
@@ -88,6 +90,11 @@ final class FaceTrackingDotsRenderer {
 final class FaceRegionPreviewRenderer {
     let root=SCNNode()
     private var key:String?
+    private var previousTint:SIMD3<Float>?
+    private(set) var bindingBuildCount=0
+    private struct Cell:Hashable { let x:Int;let y:Int }
+    private var triangleCells:[Cell:[Int16]]=[:]
+    private let cellWidth:Float=0.006
     private struct Patch {
         let node:SCNNode
         let attachments:[SurfaceAttachment]
@@ -95,6 +102,7 @@ final class FaceRegionPreviewRenderer {
         let colors:SCNGeometrySource
         let element:SCNGeometryElement
         let material:SCNMaterial
+        let baseTint:SIMD3<Float>
     }
     private var patches:[Patch]=[]
     func update(brow:EyebrowGuide?,forehead:ForeheadGuide?,blush:BlushPlacementGuide? = nil,vertices:[SIMD3<Float>],triangles:[Int16],configuration:EyebrowConfiguration) {
@@ -105,22 +113,25 @@ final class FaceRegionPreviewRenderer {
         case .blush:regionKey=blush?.id.uuidString
         case .forehead:regionKey=forehead?.id.uuidString
         }
-        // A new shade rebuilds the patches, because the tint is baked into their vertex colours.
-        let newKey=regionKey.map { $0+"|"+(configuration.shadeTint.map { "\($0)" } ?? "default") }
+        // -Nimah: Shade/intensity changes never rebind skin attachments.
+        let newKey=regionKey
         guard let newKey else { root.isHidden=true; return }
-        if key != newKey {
+        let rebuilding=key != newKey
+        if rebuilding {
+            bindingBuildCount += 1
+            buildTriangleIndex(vertices:vertices,triangles:triangles)
             key=newKey; root.childNodes.forEach { $0.removeFromParentNode() }; patches=[]
             if configuration.region == .eyebrows,let brow {
                 for curve in brow.curves {
                     // -Nimah: Do not bridge missing outline attachments across unmapped skin.
                     guard curve.outline.allSatisfy({ $0 != nil }) else { continue }
                     let polygon=curve.outline.compactMap { $0?.position(in:vertices) }
-                    add(polygon:polygon,vertices:vertices,triangles:triangles,tint:configuration.shadeTint ?? SIMD3(0.16,0.085,0.055),opacity:0.95)
+                    add(polygon:polygon,vertices:vertices,triangles:triangles,tint:SIMD3(0.16,0.085,0.055),opacity:0.95)
                 }
             } else if configuration.region == .blush,let blush {
                 for area in blush.areas {
                     add(polygon:area.boundary.compactMap { $0.position(in:vertices) },vertices:vertices,triangles:triangles,
-                        tint:configuration.shadeTint ?? SIMD3(0.87,0.25,0.37),opacity:0.90)
+                        tint:SIMD3(0.87,0.25,0.37),opacity:0.90)
                 }
             } else if let forehead {
                 let highlight=forehead.style.category == .highlight
@@ -130,13 +141,25 @@ final class FaceRegionPreviewRenderer {
                 }
             }
         }
+        if rebuilding || previousTint != configuration.shadeTint {
+            previousTint=configuration.shadeTint
+            for patch in patches {
+                let tint=configuration.region == .forehead ? patch.baseTint : configuration.shadeTint ?? patch.baseTint
+                patch.material.diffuse.contents=UIColor(red:CGFloat(tint.x),green:CGFloat(tint.y),blue:CGFloat(tint.z),alpha:1)
+            }
+        }
         root.isHidden=patches.isEmpty
         let strength=max(0,min(1,configuration.previewIntensity))
         for patch in patches {
-            let positions=patch.attachments.compactMap { $0.position(in:vertices,lift:0.001) }
+            // -Nimah: One packed position array, without intermediate compactMap/map arrays per frame.
+            var positions:[SCNVector3]=[];positions.reserveCapacity(patch.attachments.count)
+            for attachment in patch.attachments {
+                guard let p=attachment.position(in:vertices,lift:0.001) else { break }
+                positions.append(SCNVector3(p.x,p.y,p.z))
+            }
             guard positions.count==patch.attachments.count else { patch.node.isHidden=true; continue }
             patch.node.isHidden=false
-            let source=SCNGeometrySource(vertices:positions.map { SCNVector3($0.x,$0.y,$0.z) })
+            let source=SCNGeometrySource(vertices:positions)
             let geometry=SCNGeometry(sources:[source,patch.colors],elements:[patch.element])
             patch.material.transparency=CGFloat(strength)
             geometry.materials=[patch.material]
@@ -153,7 +176,7 @@ final class FaceRegionPreviewRenderer {
         for y in 0...rows {
             for x in 0...columns {
                 let p=SIMD2(minX+(maxX-minX)*Float(x)/Float(columns),minY+(maxY-minY)*Float(y)/Float(rows))
-                if let attachment=SurfaceAttachment.bind(p,vertices:vertices,triangles:triangles,minimumZ:minZ-0.003) {
+                if let nearby=triangleCells[cell(p)],let attachment=SurfaceAttachment.bind(p,vertices:vertices,triangles:nearby,minimumZ:minZ-0.003) {
                     mapping[y*(columns+1)+x]=attachments.count
                     attachments.append(attachment)
                     let feather=max(0.0005,min(maxX-minX,maxY-minY)*0.14)
@@ -173,14 +196,32 @@ final class FaceRegionPreviewRenderer {
         }
         guard !indices.isEmpty else { return }
         let node=SCNNode(); root.addChildNode(node)
-        let colors=alphas.map { SIMD4(tint.x,tint.y,tint.z,$0) }
+        let colors=alphas.map { SIMD4<Float>(1,1,1,$0) }
         let colorSource=SCNGeometrySource(data:colors.withUnsafeBytes { Data($0) },semantic:.color,vectorCount:colors.count,
             usesFloatComponents:true,componentsPerVector:4,bytesPerComponent:4,dataOffset:0,dataStride:MemoryLayout<SIMD4<Float>>.stride)
         let element=SCNGeometryElement(indices:indices,primitiveType:.triangles)
         // -Nimah: Keep a strong pigment core with a soft edge; lift above the face depth mesh to avoid clipping.
         node.renderingOrder=1
         let material=EyelinerRenderer.material(tint:.white)
-        patches.append(Patch(node:node,attachments:attachments,colors:colorSource,element:element,material:material))
+        patches.append(Patch(node:node,attachments:attachments,colors:colorSource,element:element,material:material,baseTint:tint))
+    }
+    // -Nimah: Spatial lookup preserves exact barycentric binding, while skipping unrelated triangles.
+    private func cell(_ point:SIMD2<Float>)->Cell { Cell(x:Int(floor(point.x/cellWidth)),y:Int(floor(point.y/cellWidth))) }
+    private func buildTriangleIndex(vertices:[SIMD3<Float>],triangles:[Int16]) {
+        triangleCells.removeAll(keepingCapacity:true)
+        guard triangles.count % 3 == 0 else { return }
+        for i in stride(from:0,to:triangles.count,by:3) {
+            let a=Int(triangles[i]),b=Int(triangles[i+1]),c=Int(triangles[i+2])
+            guard vertices.indices.contains(a),vertices.indices.contains(b),vertices.indices.contains(c) else { continue }
+            let p=vertices[a],q=vertices[b],r=vertices[c]
+            guard [p,q,r].allSatisfy({ $0.x.isFinite && $0.y.isFinite }) else { continue }
+            let low=cell(SIMD2(min(p.x,min(q.x,r.x))-0.000001,min(p.y,min(q.y,r.y))-0.000001))
+            let high=cell(SIMD2(max(p.x,max(q.x,r.x))+0.000001,max(p.y,max(q.y,r.y))+0.000001))
+            guard high.x-low.x<100,high.y-low.y<100 else { continue }
+            for y in low.y...high.y { for x in low.x...high.x {
+                triangleCells[Cell(x:x,y:y),default:[]].append(contentsOf:[triangles[i],triangles[i+1],triangles[i+2]])
+            } }
+        }
     }
     // -Nimah: Feather stays inside the intended polygon, including concave hairline bands.
     static func coverage(_ point:SIMD2<Float>,polygon:[SIMD2<Float>],feather:Float) -> Float {
