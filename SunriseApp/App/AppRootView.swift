@@ -55,4 +55,5 @@ struct AppRootView: View {
         // -Nimah: Keep scan results and rescan actions reachable after the single-camera redesign.
         case .profile: ProfileView(store:faceShapeStore,onRetake:{ navigator.open(.fullScan,in:.tryOn) },
             onTry:{ navigator.returnToRoot(of:.tryOn) })
+            .toolbar { NavigationLink("Scan Debug",value:AppRoute.scanDebug) }
         case .fullScan: FullScanFlow(store:faceShapeStore) { navigator.returnToRoot(of:.tryOn) }

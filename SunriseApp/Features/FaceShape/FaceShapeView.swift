@@ -10,6 +10,8 @@ struct FaceShapeView: View {
     var onScanFrame: ((ARFrame,ARFaceAnchor)->Void)?
     /// Label of the result popup's main button.
     var continueTitle: LocalizedStringKey = "Try on recommended makeup"
+    /// Called with the scan picture when a scan finishes (before the result popup's button is used). Debug tools only.
+    var onResult: (ScanSnapshot?) -> Void = { _ in }
     @StateObject private var model = FaceShapeViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
@@ -34,7 +36,7 @@ struct FaceShapeView: View {
             .onDisappear { model.stop() }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {
-                    FaceShapeResultView(result: result, continueTitle:continueTitle, onScanAgain:model.scanAgain, onLidTypeChange:model.setLidType) {
+                    FaceShapeResultView(result: result, snapshot:model.snapshot, continueTitle:continueTitle, onScanAgain:model.scanAgain, onLidTypeChange:model.setLidType) {
                         // Stopping clears the result, which closes this popup before leaving the scan.
                         model.stop()
                         onShowMakeup()
@@ -48,6 +50,7 @@ struct FaceShapeView: View {
             .onChange(of: model.result) { _, result in
                 if let result {
                     store.latest = result
+                    onResult(model.snapshot)
                     if let frame=model.session.currentFrame,let face=frame.anchors.compactMap({ $0 as? ARFaceAnchor }).first,face.isTracked {
                         onScanFrame?(frame,face)
                     }
@@ -108,7 +111,7 @@ struct FaceShapeView: View {
     private var scanner: some View {
         let (progress, message) = scanStatus
         return ZStack(alignment: .bottom) {
-            FaceMeshARView(session: model.session).ignoresSafeArea()
+            FaceMeshARView(session: model.session, snapshotter: model.snapshotter).ignoresSafeArea()
             VStack(spacing: AppSpacing.medium) {
                 Text(message).font(AppTypography.body).multilineTextAlignment(.center)
                 ProgressView(value: progress).tint(AppColors.rose)

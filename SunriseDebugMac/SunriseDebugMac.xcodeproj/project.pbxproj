@@ -1,0 +1,302 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3EE84684E4D030E0816BF306 /* SunriseDebugMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100990EC010949BF862E20B3 /* SunriseDebugMacApp.swift */; };
+		348EB4A6B536D219963C3719 /* ScanLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE0D486A59A59CC8AFD2C34 /* ScanLibrary.swift */; };
+		A6B6A4C52B2C0544A1331BAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860BCFDB32F4575D91C0CAB4 /* ContentView.swift */; };
+		EC09096A882F488EBFA3E741 /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8E47EF23556E26E48A18 /* EditorView.swift */; };
+		74F560283AAEC82DB39A098E /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75218CA6D1DD043A938E2760 /* AppColors.swift */; };
+		2449CB411E60FF109F95DEE2 /* ScanOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479828A621225345427392BB /* ScanOverlay.swift */; };
+		BF977DD87EB5E09E51B671A6 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A2359792908B04201425358 /* ScanOverlayView.swift */; };
+		EEDEEB14A95231BEE4626EC2 /* FaceShapeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBAE9D42AA6DFCCB9ED792F /* FaceShapeClassifier.swift */; };
+		FDF5E794F20CACB799FA5228 /* FaceProportions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6536D06CE3A286FCF8D9C808 /* FaceProportions.swift */; };
+		503AC09F0E01BFDE3027F3FE /* FaceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CA3C4A6A00DC1D3F66308E5 /* FaceShape.swift */; };
+		361A8B890BEB418067C11B4D /* PhotoFaceMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EFCA96A2BB2792567C932E9 /* PhotoFaceMeasurer.swift */; };
+		7DF8855A66F46A68FBD3DF9E /* FaceContourMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEFBABF732E9E49E135EF654 /* FaceContourMeasurer.swift */; };
+		DE6D4666C057D30F0A29A498 /* FaceMeshMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C18C4F31DDC5F15B8139669D /* FaceMeshMeasurer.swift */; };
+		06EF38DC6AEF8AA1FD56EDAC /* EyeMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4179A72B8D153380FF3C829F /* EyeMeasurer.swift */; };
+		E3CDDAFC6FF66C617BC04C8C /* EyeShapeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C736FA2B9346116A9A3C2A6 /* EyeShapeClassifier.swift */; };
+		AD0F2F674C670333D6A20E37 /* EyeShapeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE44E100D62707AA96C9740 /* EyeShapeResult.swift */; };
+		A20049C1E2FD39AC7056D777 /* EyeLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D77BE76E8CB6E0F1643BD0B /* EyeLandmarks.swift */; };
+		A7086C4482B514E646F9CB39 /* ScanDebugModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A97AFA31A6DC5A2FEFFC9C /* ScanDebugModels.swift */; };
+		CE21856D3CC37410B34A1D07 /* ScanDebugStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CBB0765E60286BDA8D5AFD /* ScanDebugStore.swift */; };
+		5AECAA172FFE5AB9ED92F870 /* ScanDebugViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58857FA0813C8A49820EF381 /* ScanDebugViewModel.swift */; };
+		1066F3D183E651CCDFFA6846 /* ScanDebugExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17B300C7207345A99F062DE7 /* ScanDebugExport.swift */; };
+		2134154EDBE2656F2FFECB12 /* ScanDebugExportItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32388CBBEDAB2179FC77F15 /* ScanDebugExportItem.swift */; };
+		8CD9F834CAD6A01D1327BF9D /* ScanDebugSnapshotReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E935914DC3F167E04EAA2 /* ScanDebugSnapshotReader.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		100990EC010949BF862E20B3 /* SunriseDebugMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SunriseDebugMacApp.swift; path = "SunriseDebugMac/SunriseDebugMacApp.swift"; sourceTree = SOURCE_ROOT; };
+		2EE0D486A59A59CC8AFD2C34 /* ScanLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanLibrary.swift; path = "SunriseDebugMac/ScanLibrary.swift"; sourceTree = SOURCE_ROOT; };
+		860BCFDB32F4575D91C0CAB4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = "SunriseDebugMac/ContentView.swift"; sourceTree = SOURCE_ROOT; };
+		798F8E47EF23556E26E48A18 /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EditorView.swift; path = "SunriseDebugMac/EditorView.swift"; sourceTree = SOURCE_ROOT; };
+		75218CA6D1DD043A938E2760 /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppColors.swift; path = "SunriseDebugMac/Stubs/AppColors.swift"; sourceTree = SOURCE_ROOT; };
+		479828A621225345427392BB /* ScanOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanOverlay.swift; path = "../SunriseApp/Core/Models/ScanOverlay.swift"; sourceTree = SOURCE_ROOT; };
+		4A2359792908B04201425358 /* ScanOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanOverlayView.swift; path = "../SunriseApp/DesignSystem/Components/ScanOverlayView.swift"; sourceTree = SOURCE_ROOT; };
+		4EBAE9D42AA6DFCCB9ED792F /* FaceShapeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FaceShapeClassifier.swift; path = "../SunriseApp/Features/FaceShape/FaceShapeClassifier.swift"; sourceTree = SOURCE_ROOT; };
+		6536D06CE3A286FCF8D9C808 /* FaceProportions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FaceProportions.swift; path = "../SunriseApp/Features/FaceShape/FaceProportions.swift"; sourceTree = SOURCE_ROOT; };
+		6CA3C4A6A00DC1D3F66308E5 /* FaceShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FaceShape.swift; path = "../SunriseApp/Features/FaceShape/FaceShape.swift"; sourceTree = SOURCE_ROOT; };
+		2EFCA96A2BB2792567C932E9 /* PhotoFaceMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PhotoFaceMeasurer.swift; path = "../SunriseApp/Features/FaceShape/PhotoFaceMeasurer.swift"; sourceTree = SOURCE_ROOT; };
+		AEFBABF732E9E49E135EF654 /* FaceContourMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FaceContourMeasurer.swift; path = "../SunriseApp/Features/FaceShape/FaceContourMeasurer.swift"; sourceTree = SOURCE_ROOT; };
+		C18C4F31DDC5F15B8139669D /* FaceMeshMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FaceMeshMeasurer.swift; path = "../SunriseApp/Features/FaceShape/FaceMeshMeasurer.swift"; sourceTree = SOURCE_ROOT; };
+		4179A72B8D153380FF3C829F /* EyeMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeMeasurer.swift; path = "../SunriseApp/Features/EyeShape/EyeMeasurer.swift"; sourceTree = SOURCE_ROOT; };
+		0C736FA2B9346116A9A3C2A6 /* EyeShapeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeShapeClassifier.swift; path = "../SunriseApp/Features/EyeShape/EyeShapeClassifier.swift"; sourceTree = SOURCE_ROOT; };
+		BCE44E100D62707AA96C9740 /* EyeShapeResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeShapeResult.swift; path = "../SunriseApp/Features/EyeShape/EyeShapeResult.swift"; sourceTree = SOURCE_ROOT; };
+		5D77BE76E8CB6E0F1643BD0B /* EyeLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeLandmarks.swift; path = "../SunriseApp/Features/EyeShape/EyeLandmarks.swift"; sourceTree = SOURCE_ROOT; };
+		81A97AFA31A6DC5A2FEFFC9C /* ScanDebugModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugModels.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugModels.swift"; sourceTree = SOURCE_ROOT; };
+		B4CBB0765E60286BDA8D5AFD /* ScanDebugStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugStore.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugStore.swift"; sourceTree = SOURCE_ROOT; };
+		58857FA0813C8A49820EF381 /* ScanDebugViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugViewModel.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugViewModel.swift"; sourceTree = SOURCE_ROOT; };
+		17B300C7207345A99F062DE7 /* ScanDebugExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugExport.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugExport.swift"; sourceTree = SOURCE_ROOT; };
+		EF1C39743888B4F553E3DB95 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "SunriseDebugMac/Info.plist"; sourceTree = SOURCE_ROOT; };
+		44D12831265D1FD0A816EB42 /* SunriseDebugMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Sunrise Scan Editor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B32388CBBEDAB2179FC77F15 /* ScanDebugExportItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugExportItem.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugExportItem.swift"; sourceTree = SOURCE_ROOT; };
+		565E935914DC3F167E04EAA2 /* ScanDebugSnapshotReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugSnapshotReader.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugSnapshotReader.swift"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		209D3D7FC0880C0BE2077A2F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5E8B18935CC62FACD7F23BC4 = {
+			isa = PBXGroup;
+			children = (
+				BB9000BFFE50326DDA369639 /* SunriseDebugMac */,
+				0B9AA83818D1D0E9AD1A0DA8 /* Shared with the iPhone app */,
+				EF1C39743888B4F553E3DB95 /* Info.plist */,
+				2FC81D8766A48C0B3817E56A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BB9000BFFE50326DDA369639 /* SunriseDebugMac */ = {
+			isa = PBXGroup;
+			children = (
+				100990EC010949BF862E20B3 /* SunriseDebugMacApp.swift */,
+				2EE0D486A59A59CC8AFD2C34 /* ScanLibrary.swift */,
+				860BCFDB32F4575D91C0CAB4 /* ContentView.swift */,
+				798F8E47EF23556E26E48A18 /* EditorView.swift */,
+				75218CA6D1DD043A938E2760 /* AppColors.swift */,
+			);
+			name = SunriseDebugMac;
+			sourceTree = "<group>";
+		};
+		0B9AA83818D1D0E9AD1A0DA8 /* Shared with the iPhone app */ = {
+			isa = PBXGroup;
+			children = (
+				479828A621225345427392BB /* ScanOverlay.swift */,
+				4A2359792908B04201425358 /* ScanOverlayView.swift */,
+				4EBAE9D42AA6DFCCB9ED792F /* FaceShapeClassifier.swift */,
+				6536D06CE3A286FCF8D9C808 /* FaceProportions.swift */,
+				6CA3C4A6A00DC1D3F66308E5 /* FaceShape.swift */,
+				2EFCA96A2BB2792567C932E9 /* PhotoFaceMeasurer.swift */,
+				AEFBABF732E9E49E135EF654 /* FaceContourMeasurer.swift */,
+				C18C4F31DDC5F15B8139669D /* FaceMeshMeasurer.swift */,
+				4179A72B8D153380FF3C829F /* EyeMeasurer.swift */,
+				0C736FA2B9346116A9A3C2A6 /* EyeShapeClassifier.swift */,
+				BCE44E100D62707AA96C9740 /* EyeShapeResult.swift */,
+				5D77BE76E8CB6E0F1643BD0B /* EyeLandmarks.swift */,
+				81A97AFA31A6DC5A2FEFFC9C /* ScanDebugModels.swift */,
+				B4CBB0765E60286BDA8D5AFD /* ScanDebugStore.swift */,
+				58857FA0813C8A49820EF381 /* ScanDebugViewModel.swift */,
+				17B300C7207345A99F062DE7 /* ScanDebugExport.swift */,
+				565E935914DC3F167E04EAA2 /* ScanDebugSnapshotReader.swift */,
+				B32388CBBEDAB2179FC77F15 /* ScanDebugExportItem.swift */,
+			);
+			name = "Shared with the iPhone app";
+			sourceTree = "<group>";
+		};
+		2FC81D8766A48C0B3817E56A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				44D12831265D1FD0A816EB42 /* SunriseDebugMac.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5704E25460B8233E66ECF152 /* SunriseDebugMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C2F7EDC3A0E5581844944FE4 /* Build configuration list for PBXNativeTarget "SunriseDebugMac" */;
+			buildPhases = (
+				05268E3EC823A8277F49D02F /* Sources */,
+				209D3D7FC0880C0BE2077A2F /* Frameworks */,
+				1376FD7CAC0533D959BF06C5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SunriseDebugMac;
+			productName = SunriseDebugMac;
+			productReference = 44D12831265D1FD0A816EB42 /* SunriseDebugMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1CF868BBAF8D19090E5C825E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = C7C80C6714903C0708490F30 /* Build configuration list for PBXProject "SunriseDebugMac" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5E8B18935CC62FACD7F23BC4;
+			productRefGroup = 2FC81D8766A48C0B3817E56A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5704E25460B8233E66ECF152 /* SunriseDebugMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1376FD7CAC0533D959BF06C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		05268E3EC823A8277F49D02F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3EE84684E4D030E0816BF306 /* SunriseDebugMacApp.swift in Sources */,
+				348EB4A6B536D219963C3719 /* ScanLibrary.swift in Sources */,
+				A6B6A4C52B2C0544A1331BAE /* ContentView.swift in Sources */,
+				EC09096A882F488EBFA3E741 /* EditorView.swift in Sources */,
+				74F560283AAEC82DB39A098E /* AppColors.swift in Sources */,
+				2449CB411E60FF109F95DEE2 /* ScanOverlay.swift in Sources */,
+				BF977DD87EB5E09E51B671A6 /* ScanOverlayView.swift in Sources */,
+				EEDEEB14A95231BEE4626EC2 /* FaceShapeClassifier.swift in Sources */,
+				FDF5E794F20CACB799FA5228 /* FaceProportions.swift in Sources */,
+				503AC09F0E01BFDE3027F3FE /* FaceShape.swift in Sources */,
+				361A8B890BEB418067C11B4D /* PhotoFaceMeasurer.swift in Sources */,
+				7DF8855A66F46A68FBD3DF9E /* FaceContourMeasurer.swift in Sources */,
+				DE6D4666C057D30F0A29A498 /* FaceMeshMeasurer.swift in Sources */,
+				06EF38DC6AEF8AA1FD56EDAC /* EyeMeasurer.swift in Sources */,
+				E3CDDAFC6FF66C617BC04C8C /* EyeShapeClassifier.swift in Sources */,
+				AD0F2F674C670333D6A20E37 /* EyeShapeResult.swift in Sources */,
+				A20049C1E2FD39AC7056D777 /* EyeLandmarks.swift in Sources */,
+				A7086C4482B514E646F9CB39 /* ScanDebugModels.swift in Sources */,
+				CE21856D3CC37410B34A1D07 /* ScanDebugStore.swift in Sources */,
+				5AECAA172FFE5AB9ED92F870 /* ScanDebugViewModel.swift in Sources */,
+				1066F3D183E651CCDFFA6846 /* ScanDebugExport.swift in Sources */,
+				8CD9F834CAD6A01D1327BF9D /* ScanDebugSnapshotReader.swift in Sources */,
+				2134154EDBE2656F2FFECB12 /* ScanDebugExportItem.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		6939C58A799B2CE63A1DEBF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		11FAF7D96FAF49D5690618CC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		8C9983C16583FF7F5CF0F849 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SunriseDebugMac/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunrise.SunriseDebugMac;
+				PRODUCT_NAME = "Sunrise Scan Editor";
+			};
+			name = Debug;
+		};
+		A7CFBD160D598C39DE71F824 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SunriseDebugMac/Info.plist;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunrise.SunriseDebugMac;
+				PRODUCT_NAME = "Sunrise Scan Editor";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C7C80C6714903C0708490F30 /* Build configuration list for PBXProject "SunriseDebugMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6939C58A799B2CE63A1DEBF8 /* Debug */,
+				11FAF7D96FAF49D5690618CC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C2F7EDC3A0E5581844944FE4 /* Build configuration list for PBXNativeTarget "SunriseDebugMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8C9983C16583FF7F5CF0F849 /* Debug */,
+				A7CFBD160D598C39DE71F824 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1CF868BBAF8D19090E5C825E /* Project object */;
+}

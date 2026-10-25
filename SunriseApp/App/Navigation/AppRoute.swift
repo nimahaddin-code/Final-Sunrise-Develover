@@ -1,7 +1,7 @@
-// -Nimah: Shared integration preserves all team tabs.
-enum AppTab: Hashable { case tryOn, discover, myLooks }
+enum AppTab: Hashable { case tryOn, discover, myLooks, scanDebug }
 
 enum AppRoute: Hashable {
+    case scanDebug
     case referenceDetail(MakeupReference)
     // -Nimah: Eyebrow module memakai sesi AR foundation aplikasi yang sama.
     case eyebrowGuide

@@ -3,6 +3,8 @@ import SwiftUI
 struct FaceShapeResultView: View {
     let result: FaceShapeResult
     @AppStorage(DeveloperTools.key) private var developerTools = false
+    /// The scan picture with the measured lines; shown when the camera could provide it.
+    var snapshot: ScanSnapshot?
     var continueTitle: LocalizedStringKey = "Try on recommended makeup"
 
     var onScanAgain: () -> Void
@@ -16,6 +18,7 @@ struct FaceShapeResultView: View {
                 summaryCard
                 eyeCard
                 // -Nimah: Blush guidance now belongs exclusively to Nimah studio.
+                if let snapshot { measurementCard(snapshot) }
                 card(title: "Closest matches") {
                     ForEach(result.rankedShapes.prefix(3), id: \.shape) { match in
                         VStack(alignment: .leading, spacing: AppSpacing.small) {
@@ -90,6 +93,14 @@ struct FaceShapeResultView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(AppSpacing.large)
         .background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
+    }
+
+    private func measurementCard(_ snapshot: ScanSnapshot) -> some View {
+        card(title: "What we measured") {
+            ScanOverlayView(snapshot: snapshot)
+            Text("The solid line follows your face. The dashed lines are the forehead, cheekbone and jaw widths and the face length. If they do not sit on your face, scan again. This picture is not saved.")
+                .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+        }
     }
 
     private func card<Content: View>(title: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {

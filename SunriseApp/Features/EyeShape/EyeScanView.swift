@@ -7,6 +7,8 @@ struct EyeScanView: View {
     /// Label of the result sheet's main button.
     var continueTitle: LocalizedStringKey = "See my makeup"
     var onFinish: () -> Void = {}
+    /// Called with the scan picture when a scan finishes (before the result sheet's button is used). Debug tools only.
+    var onResult: (ScanSnapshot?) -> Void = { _ in }
     @StateObject private var model = EyeScanViewModel()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
@@ -21,7 +23,7 @@ struct EyeScanView: View {
             .onDisappear { model.stop() }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {
-                    EyeShapeResultView(result: result, continueTitle: continueTitle, onChooseLid: model.chooseLid,
+                    EyeShapeResultView(result: result, snapshot: model.snapshot, continueTitle: continueTitle, onChooseLid: model.chooseLid,
                                        onScanAgain: model.scanAgain) {
                         // Stopping clears the result, which closes this popup before leaving the scan.
                         model.stop()
@@ -34,7 +36,7 @@ struct EyeScanView: View {
                 }
             }
             .onChange(of: model.result) { _, result in
-                if let result { store.eyes = result }
+                if let result { store.eyes = result; onResult(model.snapshot) }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 // Re-check camera access after returning from Settings.
