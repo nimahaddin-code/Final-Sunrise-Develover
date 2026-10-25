@@ -1,37 +1,48 @@
 import SwiftUI
 
-/// First launch: a short welcome, then the face shape scan, then the eye shape scan. Finishing (or skipping) leads to the
-/// Try On home screen.
+// -Nimah: Launch scan owns all classification and makeup fitting; try-on never repeats it.
 struct OnboardingView: View {
-    private enum Step { case welcome, faceScan, eyeScan }
-
+    private enum Step { case welcome, faceScan, eyeScan, preparing }
     @ObservedObject var store: FaceShapeStore
     var onFinish: () -> Void
-    @State private var step = Step.welcome
+    @State private var step:Step
+    @State private var started=false
+    @StateObject private var preparation=LaunchFitPreparation()
+    @State private var preparationFailed=false
 
+    // -Nimah: Repeat analysis on launch, with welcome shown only on the first launch.
+    init(store:FaceShapeStore,showWelcome:Bool = true,onFinish:@escaping ()->Void) {
+        self.store=store;self.onFinish=onFinish;_step=State(initialValue:showWelcome ? .welcome : .faceScan)
+    }
     var body: some View {
         NavigationStack {
             switch step {
-            case .welcome:
-                welcome
+            case .welcome:welcome
             case .faceScan:
-                FaceAnalysis.scanScreen(store: store, continueTitle: "Next: scan your eyes") { step = .eyeScan }
-                    .toolbar { navigation(back: .welcome, skip: { step = .eyeScan }) }
+                FaceAnalysis.scanScreen(store:store,continueTitle:"Next: scan your eyes",onScanFrame:{ frame,face in
+                    // -Nimah: Compute brow/cheek attachments here, while the launch scan is still visible.
+                    preparation.submit(FaceLandmarkFrame(frame:frame,anchor:face))
+                }) { step = .eyeScan }
             case .eyeScan:
-                EyeAnalysis.scanScreen(store: store, continueTitle: "See my makeup", onFinish: onFinish)
-                    .toolbar { navigation(back: .faceScan, skip: onFinish) }
+                EyeAnalysis.scanScreen(store:store,continueTitle:"See my makeup") {
+                    step = .preparing
+                    Task {
+                        let fitted=await preparation.finish()
+                        // -Nimah: A neutral eye recommendation is a valid fallback, not a failed face scan.
+                        guard fitted,store.latest != nil,store.eyes != nil else {
+                            preparationFailed=true;return
+                        }
+                        onFinish()
+                    }
+                }
+            case .preparing:ProgressView("Preparing your recommended makeup")
             }
         }
-    }
-
-    /// Skip leaves only the current step, so the face scan can be skipped (or unavailable) and the eye scan still offered.
-    @ToolbarContentBuilder private func navigation(back: Step, skip: @escaping () -> Void) -> some ToolbarContent {
-        ToolbarItem(placement: .cancellationAction) {
-            Button("Back") { step = back }
-        }
-        ToolbarItem(placement: .primaryAction) {
-            Button("Skip", action: skip)
-        }
+        .onAppear { if !started { started=true;LaunchMakeupFit.shared.clear() } }
+        .alert("Brow fitting unavailable",isPresented:$preparationFailed) {
+            Button("Continue with available makeup") { onFinish() }
+            Button("Repeat initial scan") { LaunchMakeupFit.shared.clear();step = .faceScan }
+        } message: { Text("Brow contours could not be fitted from the initial scan. Your face and eye results are retained. You can continue with available makeup.") }
     }
 
     private var welcome: some View {

@@ -1,3 +1,28 @@
+## Koreksi kegagalan persiapan awal — -Nimah
+
+Frame yang ditawarkan selama face scan dibatasi 400 ms dengan satu pekerjaan aktif; collector berhenti setelah
+fit berhasil. Frame akhir yang buruk tidak menghapus hasil valid. Pemetaan awal memakai kontur alis terdeteksi
+meski titik tambahan pupil/hidung tidak tersedia. Garis rumus tidak dibuat jika datanya tidak ada.
+Rekomendasi eyeliner netral tidak lagi memblokir pembukaan aplikasi. Jika fitting tetap gagal, hasil klasifikasi
+dipertahankan dan pengguna bisa melanjutkan dengan kategori tersedia. Brow/blush tanpa fit diberi keterangan
+dan dinonaktifkan; tidak ditampilkan sebagai sukses. Tidak ada pengukuran ulang di try-on.
+
+---
+
+## Scan hanya di awal aplikasi — -Nimah
+
+Setiap cold launch: face scan → eye scan → persiapan fit makeup di awal → try-on. Welcome hanya muncul pertama kali.
+Scan bukan autentikasi identitas; yang diukur tetap bentuk wajah/mata. Tidak ada klasifikasi/kalibrasi ulang per fitur.
+Frame akhir face scan digunakan untuk Vision pemetaan alis/pipi di background selama layar awal masih aktif.
+`LaunchMakeupFit` menahan attachment/mesh di memori sesi aplikasi saja; foto tidak disimpan, data tidak diupload.
+Try-on memakai attachment ini dengan vertex ARKit live; anchor baru diperbolehkan hanya dengan topologi yang sama.
+Tracking gerakan masih diperlukan untuk menempelkan overlay, tetapi tidak meminta user scan/diam/mengatur jarak lagi.
+Alis, blush, eyeliner yang punya assignment valid langsung aktif. Tidak ada tombol scan ulang di try-on.
+Pindah tutorial, color picker, dan kembali ke home tidak mengulang flow awal. Gagal persiapan ditangani di awal.
+Referensi pear/rectangle tetap belum tersedia; cache fitting tidak mengarang rekomendasi yang belum ada.
+
+---
+
 ## Warna dan foto palet — -Nimah
 
 User melihat try-on rekomendasi terlebih dahulu. Shade tidak mengubah assignment wajah/placement.

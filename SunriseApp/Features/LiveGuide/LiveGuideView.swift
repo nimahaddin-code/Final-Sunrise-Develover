@@ -278,7 +278,7 @@ struct LiveGuideView: UIViewRepresentable {
             SCNTransaction.begin(); SCNTransaction.disableActions=true
             face.makeupNode.isHidden=true; face.dots.isHidden=true; face.eyelinerRoot.isHidden=true; face.labels.isHidden=true
             face.depth.update(from:anchor.geometry)
-            let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.showAllRegions,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
+            let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.needsBrow,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
             let vertices=Array(anchor.geometry.vertices)
             face.eyebrowRenderer.update(guide:configuration.needsBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
             face.foreheadRenderer.update(guide:result.foreheadGuide,vertices:vertices,configuration:configuration)
@@ -420,7 +420,14 @@ struct LiveGuideView: UIViewRepresentable {
             let options=snapshot().0
             if let configuration=options.eyebrows {
                 if isTracked,let face {
+                    if configuration.usesLaunchFit {
+                        // -Nimah: Reattach the launch fit to this live mesh; never run a second scan in try-on.
+                        eyebrowPipeline.followLaunchFit(anchorID:face.identifier,vertices:Array(face.geometry.vertices),
+                            triangles:Array(face.geometry.triangleIndices),timestamp:frame.timestamp,style:configuration.style,
+                            blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
+                    } else {
                     eyebrowPipeline.observe(frame:frame,anchor:face,canCalibrate:self.fitStable && relaxed && abs(relative.columns.2.z)>0.85,style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
+                    }
                 } else { eyebrowPipeline.trackingLost() }
             }
             guard frame.timestamp-lastReport>=0.1 else { return }; lastReport=frame.timestamp

@@ -5,6 +5,8 @@ import Foundation
     static let onboardingCompleteKey = "onboardingComplete"
 
     @Published private(set) var onboardingComplete: Bool
+    // -Nimah: Welcome is remembered, but every cold launch requires fresh face/eye analysis.
+    @Published private(set) var launchScanComplete=false
     /// Try On is the home tab once onboarding is done.
     @Published var selectedTab: AppTab = .tryOn
     @Published var discoverPath: [AppRoute] = []
@@ -22,6 +24,7 @@ import Foundation
         defaults.set(true, forKey: Self.onboardingCompleteKey)
         selectedTab = .tryOn
         onboardingComplete = true
+        launchScanComplete = true
     }
 
     func open(_ route: AppRoute, in tab: AppTab) {

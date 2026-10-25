@@ -168,3 +168,40 @@ Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. R
 - Photos stay in memory, processing is off the UI thread, maximum raster dimension 1024 pixels. The existing
   camera usage description now covers rear-camera palette capture. System PhotosPicker requires no full-library read grant.
 - Preset colours are approximate sRGB interpretations of the supplied product images; no calibrated match is claimed.
+
+## Visible pigment fix — -Nimah
+
+- Fixed layered render snapshot dropping the eyebrow input whenever blush was requested.
+- Stronger brow/blush alpha and 0.85 initial intensity, narrower feather and 1 mm surface lift reduce fading/clipping.
+- Simulator: **261 tests, 257 pass, 4 skips, 0 failures**. Includes combined brow/blush inputs and actual
+  offscreen SceneKit rendering with an assertion that the image contains visible coloured blush pixels.
+- Signed generic iPhone build: **BUILD SUCCEEDED**. No live iPhone visual acceptance was performed.
+- On device: rebuild/run staging, select After, try Pink/Muted Mauve and Brown/Soft black, then turn both tools on;
+  check that both stay visible and intensity/Before still remove or soften them as expected.
+
+## Launch-only analysis and fitting — -Nimah
+
+- Simulator: **263 tests, 259 passed, 4 skipped, 0 failures**. Signed generic iPhone build: **BUILD SUCCEEDED**.
+- Regression test prepares fitting once from initial-scan input, then reuses it after AR session/anchor recreation.
+  Its live pipeline has a provider that fails the test if Vision scanning is invoked; brow and blush remain available.
+- Additional checks: all assigned tools are enabled on home entry, launch fitting is selected, welcome persistence
+  does not bypass the new-launch scan gate, and cache reset/topology mismatch cannot reuse stale fitting.
+- Cold-launch scan/eye flow and live transfer have not been validated on a physical face in this change.
+- Device checklist: complete launch scan once, confirm all supported overlays; switch tools/tutorial/palette picker
+  and return, with no scan/hold-still prompts; briefly lose tracking and return; terminate/reopen and verify the
+  startup scan is required again. Unsupported devices/denied permissions remain in startup with clear fallback.
+
+## Startup preparation recovery — -Nimah
+
+- Simulator: **266 tests, 262 passed, 4 skipped, 0 failures**. Signed generic iPhone build: **BUILD SUCCEEDED**.
+- Regression coverage: retry early rejected frames in the same launch scan; preserve the first valid fit; use
+  measured brow contours when optional pupil/nose points are absent; disable only unfitted pigment.
+- The screenshot's combined startup guard has been split: neutral eyeliner no longer invalidates otherwise
+  successful face fitting; failed fitting can continue with available categories while retaining scan results.
+- Installation attempted but the iPhone 17 is currently unavailable to CoreDevice. This build has not been
+  installed or validated on a real face in this change. Reconnect the device and run the staging build.
+
+## Smooth try-on — -Nimah
+
+270 tests: 266 passed, 4 skipped, no failures. Signed Release iPhone build succeeded. See Performance.md for
+work-elimination regressions and required device checks. No measured live FPS or hitch reduction is claimed.

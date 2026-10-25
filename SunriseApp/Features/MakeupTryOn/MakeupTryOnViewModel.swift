@@ -123,6 +123,8 @@ import UIKit
         session.run(ARFaceTrackingConfiguration(), options: [.resetTracking, .removeExistingAnchors])
         isSessionRunning = true
         syncLiner()
+        // -Nimah: MediaPipe liner follows live eyes directly; no second Vision placement scan.
+        if !MakeupTextureRenderer.legacyMeshEyeliner { phase = .ready;return }
         // Placement is kept across pauses; the same person is most likely still in front of the camera.
         if features == nil { resetPlacement() } else {
             phase = .ready

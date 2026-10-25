@@ -36,6 +36,16 @@ extension MakeupShade {
     var color: Color { Color(red: red, green: green, blue: blue) }
 }
 
+// -Nimah: Budget overlay work, not camera tracking; no backlog and recover from a new session clock.
+struct LiveOverlayBudget {
+    private var last:TimeInterval?
+    mutating func accepts(_ timestamp:TimeInterval)->Bool {
+        guard timestamp.isFinite else { return false }
+        if let last,timestamp>=last,timestamp-last<1.0/30.0-0.000001 { return false }
+        last=timestamp;return true
+    }
+}
+
 /// Hands ARKit frames from the shared camera session to the eyeliner overlay. Frames that arrive while the previous one
 /// is still being handed over are dropped, so ARKit never waits on the main thread.
 final class LinerFrameRelay: @unchecked Sendable {
@@ -43,6 +53,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     private let lock = NSLock()
     private var pending = false
     private var isEnabled = false
+    private var budget=LiveOverlayBudget()
     private weak var model: LinerOverlayModel?
 
     @MainActor init(model: LinerOverlayModel) { self.model = model }
@@ -52,7 +63,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     func deliver(_ frame: ARFrame, _ face: ARFaceAnchor) {
         lock.lock()
-        if pending || !isEnabled { lock.unlock(); return }
+        if pending || !isEnabled || !budget.accepts(frame.timestamp) { lock.unlock(); return }
         pending = true
         lock.unlock()
         let box = Box(frame: frame, face: face)
@@ -67,11 +78,12 @@ final class LinerFrameRelay: @unchecked Sendable {
 /// eyebrow on the face mesh, and the same frames feed Hanum's eyeliner overlay (`LinerOverlayModel`) drawn on top.
 /// Each tool has its own on/off state, shade and intensity, so the looks can be switched on and off together.
 @MainActor final class TryOnHomeModel: ObservableObject {
-    static let defaultIntensity = 0.65
+    // -Nimah: Start with a clearly visible simulation; the slider can soften it.
+    static let defaultIntensity = 0.85
 
     /// The tool the shade row and intensity bar currently control.
     @Published private(set) var tool: TryOnTool = .blush
-    @Published private(set) var enabled: Set<TryOnTool> = [.blush]
+    @Published private(set) var enabled: Set<TryOnTool> = Set(TryOnTool.allCases)
     @Published private(set) var shades: [TryOnTool: MakeupShade]
     /// Colours picked from a product photo, kept per tool so they stay in the shade row after another swatch is chosen.
     @Published private(set) var customShades: [TryOnTool: [MakeupShade]] = [:]
@@ -86,13 +98,18 @@ final class LinerFrameRelay: @unchecked Sendable {
     let liner = LinerOverlayModel()
     let relay: LinerFrameRelay
     // -Nimah: Refresh assignments after a rescan; no camera/model recreation is needed.
+    @Published private(set) var hasLaunchFit:Bool
     private var linerStyle: LinerStyle?
     private var linerIsNeutral = true
     @Published private(set) var linerRecommendation: MakeupRecommendation?
     private var activation: Task<Void,Never>?
     private var active = false
+    private var hasAppliedAnalysis=false
+    private var appliedFace:FaceShapeResult?
+    private var appliedEyes:EyeShapeResult?
 
-    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
+    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,hasLaunchFit:Bool? = nil) {
+        self.hasLaunchFit=hasLaunchFit ?? LaunchMakeupFit.shared.hasFit
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
         // A thin natural line is used when the eye scan is missing or unclear, so the colour can still be tried.
         linerIsNeutral = plan.eyeliner.isNeutral
@@ -108,12 +125,13 @@ final class LinerFrameRelay: @unchecked Sendable {
     // -Nimah: Database/catalog selection is automatic; tools only switch category, never placement style.
     func canTry(_ tool: TryOnTool)->Bool {
         switch tool {
-        case .eyebrow:return brow.selectedBrow != nil
-        case .blush:return brow.selectedBlush != nil
+        case .eyebrow:return hasLaunchFit && brow.selectedBrow != nil
+        case .blush:return hasLaunchFit && brow.selectedBlush != nil
         case .eyeliner:return linerStyle != nil
         }
     }
     var recommendationTitle: String {
+        if tool != .eyeliner && !hasLaunchFit { return String(localized:"Brow and blush unavailable: initial contour fitting was not captured") }
         switch tool {
         case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"No saved recommendation for this face shape")
         case .blush:return brow.selectedBlush?.title ?? String(localized:"No saved recommendation for this face shape")
@@ -121,6 +139,11 @@ final class LinerFrameRelay: @unchecked Sendable {
         }
     }
     func updateRecommendations(face: FaceShapeResult?, eyes: EyeShapeResult?) {
+        // -Nimah: SwiftUI can resubscribe to @Published outputs; identical scans must not republish/reset the entire home.
+        let prepared=LaunchMakeupFit.shared.hasFit
+        guard !hasAppliedAnalysis || appliedFace != face || appliedEyes != eyes || prepared != hasLaunchFit else { return }
+        hasAppliedAnalysis=true;appliedFace=face;appliedEyes=eyes
+        hasLaunchFit=prepared
         let shape=face.map { $0.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:$0.shape.rawValue) ?? .unknown } ?? .unknown
         brow.applyAssessment(FaceShapeAssessment(shape:shape,origin:.analysis,confidence:face.map { Float($0.confidence) }))
         let plan=face.map { MakeupPlan(scan:$0,eyeScan:eyes) } ?? MakeupPlan(shape:.oval,eyeScan:eyes)
@@ -160,7 +183,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     func choose(_ newTool: TryOnTool) {
         tool = newTool
         if canTry(newTool) { enabled.insert(newTool) }
-        syncLiner()
+        if newTool == .eyeliner { syncLiner() }
     }
 
     func choose(shade: MakeupShade) {
@@ -172,19 +195,19 @@ final class LinerFrameRelay: @unchecked Sendable {
         }
         shades[tool] = shade
         enabled.insert(tool)
-        syncLiner()
+        if tool == .eyeliner { syncLiner() }
     }
 
     func turnOff() {
         enabled.remove(tool)
-        syncLiner()
+        if tool == .eyeliner { syncLiner() }
     }
 
     func setIntensity(_ value: Double) {
         guard canTry(tool) else { return }
         intensities[tool] = min(max(value, 0.1), 1)
         enabled.insert(tool)
-        syncLiner()
+        if tool == .eyeliner { syncLiner() }
     }
 
     /// Starts the one camera. Blush and eyebrow are placed as soon as it runs, whichever tools are on, so switching a

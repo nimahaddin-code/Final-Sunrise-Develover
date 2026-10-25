@@ -29,6 +29,36 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 - The face-mesh triangle list is copied once per face, not on every SceneKit frame.
 - Not yet measured on a device: confirm on a Face ID iPhone, with eyeliner off and on. Tunables: `LinerOverlayModel.landmarkThrottle`/`occlusionThrottle`.
 
+### Performance — reduce try-on stalls -Nimah
+- Ignore identical replayed analysis outputs before republishing state; preserve user on/off choices.
+- Recolour cached pigment materials without rebinding mesh attachments. Use a triangle spatial index for first binding.
+- Skip hidden guide node creation/animation and avoid intermediate per-frame position/index arrays.
+- Budget shared-camera eyeliner delivery to 30 Hz; brow/blush controls no longer republish unchanged eyeliner settings.
+- Signed Release build provided for device testing; no live FPS/transition-latency improvement measured yet.
+
+
+### Fixed — startup preparation failure -Nimah
+- Collect bounded fitting attempts throughout the initial scan instead of trusting one final frame; keep valid fits across later rejected frames.
+- Fit actual brow contours when optional pupil/nose formula landmarks are unavailable; retain strict legacy formula behavior.
+- Stop treating neutral eyeliner as an overall preparation failure. Preserve existing results and allow partial continuation if fitting fails.
+- Mark unfitted pigment unavailable instead of silently enabling layers that cannot render. No extra scan is added to try-on.
+
+
+### Fixed — scan only at launch -Nimah
+- Require fresh face/eye analysis on every cold launch; keep only the welcome-completed preference across launches.
+- Build transient brow/cheek fitting from the initial face scan and transfer it into try-on and tutorials, including
+  recreated AR sessions. No per-feature Vision scan, hold-still gate, or scan instructions in that path.
+- Enable all assigned makeup layers on entry. Disable launch Skip and keep unusable preparation at startup.
+- Remove try-on rescan controls/profile rescan actions and skip the legacy eyeliner Vision placement phase.
+- Core face/eye classification and Hanum liner mathematics are unchanged; live camera tracking remains necessary.
+
+
+### Fixed — visible brow and blush pigment -Nimah
+- Keep the brow input in the layered snapshot when blush is enabled; a ready status could previously coexist with no brow rendering.
+- Increase pigment core alpha/default strength, narrow the feather and raise patches above the depth mesh to reduce clipping.
+- Preserve recommendations, chosen RGB, comparison and user intensity controls. Device visual acceptance still required.
+
+
 ### Added — reference colours and palette picker -Nimah
 - Blush presets: Pink, Peach, Winter Pink, Muted Mauve. Brows: Bistre, Brown, Chocolate, Tan, Soft black.
   RGB values approximate the supplied photos; they are not measured brand shade matches.

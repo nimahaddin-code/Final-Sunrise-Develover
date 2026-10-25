@@ -55,7 +55,7 @@ import SwiftUI
     }
     // -Nimah: Consume Holly/Khalish analysis; manual labels never create scan recommendations.
     func applyAssessment(_ value:FaceShapeAssessment) {
-        assessment=value; browPreferenceID=nil; blushPreferenceID=nil
+        assessment=value; configuration.usesLaunchFit=value.origin == .analysis; browPreferenceID=nil; blushPreferenceID=nil
         if let first=browOptions.first { choose(first) } else { configuration.style = .natural }
         if let first=blushOptions.first { choose(first) } else { configuration.blushStyle = .apple }
         stepIndex=0
@@ -64,7 +64,7 @@ import SwiftUI
     // -Nimah: A new try explicitly restores visible preview; Before/Hide from the previous try must not silently carry over.
     func restorePreview() {
         configuration.previewAfter=true; configuration.showGuide=true
-        if configuration.previewIntensity<=0 { configuration.previewIntensity=0.65 }
+        if configuration.previewIntensity<=0 { configuration.previewIntensity=0.85 }
     }
     func choose(_ preference:BrowPreference) {
         guard browOptions.contains(where:{ $0.id==preference.id }) else { return }

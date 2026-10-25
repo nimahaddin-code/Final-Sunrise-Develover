@@ -23,7 +23,8 @@ final class EyebrowSceneRenderer {
     }()
     init() { root.renderingOrder=8; root.isHidden=true }
     func update(guide:EyebrowGuide?,vertices:[SIMD3<Float>],configuration:EyebrowConfiguration) {
-        guard let guide else { root.isHidden=true; return }
+        // -Nimah: Hidden tutorial guides must not build or animate hundreds of nodes during try-on.
+        guard configuration.showGuide,let guide else { root.isHidden=true; return }
         if guideID != guide.id || step != configuration.tutorialStep || showFormula != configuration.showMappingFormula { step=configuration.tutorialStep; showFormula=configuration.showMappingFormula; rebuild(guide) }
         root.isHidden = !configuration.showGuide
         for dot in dots {

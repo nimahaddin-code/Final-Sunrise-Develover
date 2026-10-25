@@ -7,6 +7,39 @@ shade and strength are carried over from Try On). Eyeliner steps come from the f
 
 ## Current merged scope — -Nimah
 
+Smooth try-on — -Nimah: replayed identical scan outputs are ignored before any published state changes.
+Brow/blush shade changes update material tint only: keep surface attachments, feather sources and topology.
+`FaceRegionPreviewRenderer` uses a 6 mm XY triangle index for exact barycentric binding; live vertex updates
+avoid intermediate arrays. Hidden guide renderers return before node construction/animation. Shared-camera
+`LinerFrameRelay` budgets overlay delivery to 30 Hz without changing ARKit camera tracking or Hanum formulas.
+Non-eyeliner tool/shade/intensity changes do not resynchronize eyeliner. For device performance acceptance,
+use a Release build without Xcode's debugger; no measured physical-device FPS is claimed by simulator tests.
+
+
+Startup recovery — -Nimah: initial face scanning offers tracked frames every 400 ms to a bounded background
+`LaunchFitPreparation`; retain the first valid fit, rather than relying on one final frame. Launch fitting can
+use observed brow contours without optional pupil/nose formula points; no missing landmarks are invented.
+Legacy formula-dependent fitting remains strict. Neutral eyeliner does not block startup. If contour fitting
+still fails, retain scan results and offer continuing with available makeup; home explicitly disables and labels
+unfitted brow/blush layers instead of claiming they are rendered. Try-on still never runs another Vision scan.
+
+
+Launch-only scan — -Nimah: `AppNavigator.launchScanComplete` is memory-only and starts false on every cold launch.
+Welcome is remembered, analysis is not skipped. Launch runs face scan, eye scan, and transient makeup fitting before
+try-on. `FaceAnalysis.scanScreen(onScanFrame:)` exposes the completed AR frame to the launch integrator without
+changing classification formulas. `LaunchMakeupFit` keeps only in-memory fitting geometry for the current run;
+no image/mesh is written to disk. Try-on/tutorial use `usesLaunchFit` and `followLaunchFit`, which reattach the
+initial fit on matching ARKit topology without Vision scanning, sample accumulation or hold-still gates. No scan
+prompts or rescan controls appear in try-on. All supported assigned layers start on. Liner live tracking remains
+automatic; it skips the legacy Vision fitting phase. Initial preparation failures stay in the launch flow.
+
+
+Visible pigment fix — -Nimah: layered render snapshots must request `includeBrow: configuration.needsBrow`,
+otherwise turning on blush strips the brow input from the renderer. Brow/blush pigment cores use stronger alpha,
+14% feather width, 1 mm surface lift, and default intensity 0.85. Before/After and intensity still control visibility.
+These are preview rendering parameters, not measured real-world colour accuracy.
+
+
 Palette try-on — -Nimah: `Features/TryOnHome/PaletteColorPicker.swift` provides a native ColorPicker,
 PhotosPicker import and rear-camera capture, followed by tap-to-sample from bounded upright sRGB pixels.
 Photos are memory-only and never uploaded/saved. Home dismantles the face camera while picking a palette,

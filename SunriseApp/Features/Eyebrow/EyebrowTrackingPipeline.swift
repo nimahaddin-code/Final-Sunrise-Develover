@@ -43,6 +43,23 @@ final class EyebrowTrackingPipeline: @unchecked Sendable {
         guard self.anchorID==anchorID else { return }
         wasTracked=true; lostSince=nil
     }
+    // -Nimah: No Vision scan, sample accumulation, head-pose or hold-still gate in try-on.
+    func followLaunchFit(anchorID:UUID,vertices:[SIMD3<Float>],triangles:[Int16],timestamp:TimeInterval,
+                         style:EyebrowStyle,blushStyle:BlushPlacementStyle?,cache:LaunchMakeupFit = .shared) {
+        resumeTracking(anchorID:anchorID)
+        lock.lock()
+        guard self.anchorID==anchorID,!busy else { lock.unlock();return }
+        guard region==nil || guide?.style != style || blush?.style != blushStyle else { lock.unlock();return }
+        let token=ticket;busy=true;lock.unlock()
+        guard let fitted=cache.fittedRegion(anchorID:anchorID,vertices:vertices,triangles:triangles,timestamp:timestamp) else {
+            complete(token:token,id:anchorID,region:nil,guide:nil,errorMessage:"Launch fit unavailable")
+            return
+        }
+        worker.async {
+            self.complete(token:token,id:anchorID,region:fitted,guide:EyebrowGuideGenerator.make(region:fitted,style:style),
+                blush:blushStyle.flatMap { BlushPlacementGenerator.make(region:fitted,style:$0) },blushRequested:blushStyle != nil)
+        }
+    }
     private func key(_ style:ForeheadStyle,_ height:Float) -> String { style.rawValue+"-\(max(0.45,min(1,height)))" }
     func snapshot(style:EyebrowStyle,foreheadStyle:ForeheadStyle? = nil,height:Float = 0.8,includeBrow:Bool = false,blushStyle:BlushPlacementStyle? = nil) -> Snapshot {
         lock.lock(); defer { lock.unlock() }
@@ -159,4 +176,51 @@ final class EyebrowTrackingPipeline: @unchecked Sendable {
         } else if blushRequested && blush==nil { message="Cheek placement unavailable on this mesh · refit with eyes and cheeks visible" }
         else if foreheadRequested && forehead==nil { message="Area outside tracked forehead · lower the top limit or refit" }
     }
+}
+
+// -Nimah: Transient fitting from the launch scan. No photo or mesh is written to disk.
+// A new launch scan invalidates the old fit; try-on only reuses attachments on matching ARKit topology.
+final class LaunchMakeupFit: @unchecked Sendable {
+    static let shared=LaunchMakeupFit()
+    private let lock=NSLock()
+    private var epoch=UUID()
+    private var region:EyebrowRegion?
+    var hasFit:Bool { lock.lock();defer { lock.unlock() };return region != nil }
+    func clear() { lock.lock();epoch=UUID();region=nil;lock.unlock() }
+    func prepare(_ input:FaceLandmarkFrame,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider(requireEyeFormula:false))->Bool {
+        lock.lock();let token=epoch;lock.unlock()
+        guard let detected=try? provider.detectEyebrows(in:input),!Task.isCancelled else { return false }
+        let mapped=detected.compactMap { detection in
+            EyebrowRegionMapper.map(detection,projection:input.projection,vertices:input.vertices,triangles:input.triangles,
+                leftEye:input.leftEye,rightEye:input.rightEye,timestamp:input.timestamp,anchorID:input.anchorID,requireFormula:false)
+        }.max { $0.faceObservationConfidence < $1.faceObservationConfidence }
+        guard let mapped,EyebrowGuideGenerator.make(region:mapped,style:.natural) != nil else { return false }
+        lock.lock();defer { lock.unlock() }
+        guard epoch==token,!Task.isCancelled else { return false }
+        region=mapped;return true
+    }
+    func fittedRegion(anchorID:UUID,vertices:[SIMD3<Float>],triangles:[Int16],timestamp:TimeInterval)->EyebrowRegion? {
+        lock.lock();defer { lock.unlock() }
+        guard let region,region.restVertices.count==vertices.count,region.triangles==triangles else { return nil }
+        return EyebrowRegion(brows:region.brows,faceObservationConfidence:region.faceObservationConfidence,
+            timestamp:timestamp,anchorID:anchorID,restVertices:region.restVertices,triangles:region.triangles)
+    }
+}
+
+// -Nimah: Bounded background fitting during the initial scan, retaining the first valid observation.
+@MainActor final class LaunchFitPreparation:ObservableObject {
+    private var pending:Task<Void,Never>?
+    private let cache:LaunchMakeupFit
+    private let provider:any FaceLandmarkProviding
+    init(cache:LaunchMakeupFit = .shared,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider(requireEyeFormula:false)) {
+        self.cache=cache;self.provider=provider
+    }
+    func submit(_ input:FaceLandmarkFrame) {
+        guard pending==nil,!cache.hasFit else { return }
+        pending=Task {
+            _=await Task.detached(priority:.userInitiated) { [cache,provider] in cache.prepare(input,provider:provider) }.value
+            pending=nil
+        }
+    }
+    func finish() async -> Bool { await pending?.value;return cache.hasFit }
 }
