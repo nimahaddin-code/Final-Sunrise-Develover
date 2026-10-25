@@ -43,6 +43,7 @@ struct ProfileView: View {
             let mapped = Self.makeupShape(result.shape)
             portrait { FaceOutline(shape: result.shape).stroke(AppColors.snow, style: StrokeStyle(lineWidth: 3, dash: [7, 6])).padding(34) }
             Text(result.shape.title).font(.system(.largeTitle, design: .rounded).weight(.bold))
+            closestMatches(result)
             card("Your Features") {
                 tile("Forehead", symbol: "arrow.up.and.down.and.arrow.left.and.right")
                 tile("Chin", symbol: "chevron.down")
@@ -77,6 +78,7 @@ struct ProfileView: View {
             Text(eyes.openness.title).font(.system(.largeTitle, design: .rounded).weight(.bold))
             Text("\(Text(eyes.tilt.title)) · \(Text(eyes.spacing.title))")
                 .font(AppTypography.caption).foregroundStyle(AppColors.snow.opacity(0.75))
+            eyelidPicker(eyes)
             card("Your Signature Look") {
                 tile("Eyeliner", symbol: "pencil.tip", detail: linerName.map { Text($0) })
                 tile("Lashes", symbol: "eyelashes")
@@ -113,6 +115,47 @@ struct ProfileView: View {
     private var linerName: LocalizedStringResource? {
         let plan = store.latest.map { MakeupPlan(scan: $0, eyeScan: store.eyes) } ?? MakeupPlan(shape: .oval, eyeScan: store.eyes)
         return plan.eyeliner.isNeutral ? nil : plan.eyeliner.primary?.title
+    }
+
+    /// The three nearest face shapes with their scores, as on the scan result.
+    private func closestMatches(_ result: FaceShapeResult) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.small) {
+            Text("Closest matches").font(.headline)
+            ForEach(result.rankedShapes.prefix(3), id: \.shape) { match in
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Label { Text(match.shape.title) } icon: { Image(systemName: match.shape.symbol) }
+                        Spacer()
+                        Text(match.score, format: .percent.precision(.fractionLength(0))).monospacedDigit()
+                    }
+                    .font(.subheadline)
+                    ProgressView(value: match.score).tint(AppColors.flamingo)
+                }
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.medium)
+        .background(AppColors.snow.opacity(0.08), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.25), radius: 6, y: 4)
+    }
+
+    /// The eyelid the person chose after the eye scan; changing it here updates the saved result.
+    private func eyelidPicker(_ eyes: EyeShapeResult) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.small) {
+            Text("Your Eyelid").font(.headline)
+            Picker("Eyelid", selection: Binding(get: { store.eyes?.lid ?? eyes.lid }, set: { store.eyes?.lid = $0 })) {
+                Text("Not chosen").tag(EyeLid?.none)
+                ForEach(EyeLid.allCases) { Text($0.title).tag(EyeLid?.some($0)) }
+            }
+            .pickerStyle(.segmented)
+            Text("The camera cannot see the crease, so this one is up to you.")
+                .font(AppTypography.caption).foregroundStyle(AppColors.snow.opacity(0.7))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(AppSpacing.medium)
+        .background(AppColors.snow.opacity(0.08), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.25), radius: 6, y: 4)
     }
 
     private func section<Content: View>(_ title: LocalizedStringKey, @ViewBuilder content: () -> Content) -> some View {
