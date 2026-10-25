@@ -200,3 +200,8 @@ Simulator: 241 tests, 237 pass, 4 skip, 0 fail. Signed iPhone build succeeded. R
   successful face fitting; failed fitting can continue with available categories while retaining scan results.
 - Installation attempted but the iPhone 17 is currently unavailable to CoreDevice. This build has not been
   installed or validated on a real face in this change. Reconnect the device and run the staging build.
+
+## Smooth try-on — -Nimah
+
+270 tests: 266 passed, 4 skipped, no failures. Signed Release iPhone build succeeded. See Performance.md for
+work-elimination regressions and required device checks. No measured live FPS or hitch reduction is claimed.

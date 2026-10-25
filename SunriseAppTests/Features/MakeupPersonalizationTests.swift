@@ -1,4 +1,5 @@
 import XCTest
+import Combine
 import simd
 @testable import SunriseApp
 
@@ -90,6 +91,21 @@ final class MakeupPersonalizationTests: XCTestCase {
         XCTAssertTrue(home.enabled.isEmpty)
         XCTAssertFalse(home.liveConfiguration.browLayer.on)
         XCTAssertFalse(home.liveConfiguration.blushLayer.on)
+        home.deactivate()
+    }
+
+    // -Nimah: Replayed scan publishers must not create an invalidation loop or turn makeup back on.
+    @MainActor func testRepeatedScanOutputsDoNotRepublishHome() {
+        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5)),face=scan()
+        let home=TryOnHomeModel(plan:MakeupPlan(scan:face,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        home.updateRecommendations(face:face,eyes:eyes)
+        home.choose(.eyeliner);home.turnOff()
+        var events=0
+        let subscription=home.objectWillChange.sink { events += 1 }
+        for _ in 0..<30 { home.updateRecommendations(face:face,eyes:eyes) }
+        XCTAssertEqual(events,0)
+        XCTAssertFalse(home.enabled.contains(.eyeliner))
+        withExtendedLifetime(subscription) {}
         home.deactivate()
     }
 
