@@ -52,12 +52,7 @@ struct AppRootView: View {
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
             FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
-        // -Nimah: Profile shows launch results, without starting another scan.
-        case .profile: MakeupRecommendationsView(store:faceShapeStore,allowsRescan:false,
-            onScanFace:{ navigator.open(.faceScan,in:.tryOn) },onScanEyes:{ navigator.open(.eyeScan,in:.tryOn) })
-        case .tutorial: BlankPageView(title: "Tutorial")
-        case .eyeScan:
-            EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }
-        }
-    }
-}
+        // -Nimah: Keep scan results and rescan actions reachable after the single-camera redesign.
+        case .profile: ProfileView(store:faceShapeStore,onRetake:{ navigator.open(.fullScan,in:.tryOn) },
+            onTry:{ navigator.returnToRoot(of:.tryOn) })
+        case .fullScan: FullScanFlow(store:faceShapeStore) { navigator.returnToRoot(of:.tryOn) }

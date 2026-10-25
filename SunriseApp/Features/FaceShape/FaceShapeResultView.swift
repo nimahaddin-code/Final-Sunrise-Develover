@@ -29,7 +29,7 @@ struct FaceShapeResultView: View {
                         }
                     }
                 }
-                Text("An estimate from ARKit's face mesh, not a professional assessment. Only the face shape and eye measurements are kept on this device; no photos are saved or uploaded.")
+                Text("An estimate from ARKit's face mesh, not a professional assessment. Only the face shape, eye measurements and one small photo from the scan are kept on this device; nothing is uploaded.")
                     .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
                 if DeveloperTools.isOn(developerTools) { EyeDebugView(eyes: result.eyes) }
                 if let onShowMakeup {

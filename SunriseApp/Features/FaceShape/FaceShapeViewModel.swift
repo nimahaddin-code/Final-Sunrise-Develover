@@ -146,6 +146,9 @@ import ImageIO
             result.contourSamples = contourCorrections.count
             // The face is done; the eyes are measured next, in the same session.
             pendingFace = result
+            // The straight-ahead frame that finished the measurement becomes the profile portrait.
+            let frame = sample.contourInput.pixelBuffer, orientation = contourOrientation ?? .right
+            Task.detached(priority: .utility) { ScanSnapshots.save(frame, orientation: orientation, as: .face) }
             eyeDeadline = Date().addingTimeInterval(Self.eyePhaseTimeout)
             phase = .scanning(progress: Self.faceProgressShare, guidance: .lookStraight)
         } else {
