@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		033A5C6F22B5AC3CD0D490DB /* LiveGuideDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */; };
 		07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */; };
@@ -71,10 +70,12 @@
 		5AF705A9207A9DD3364DC86F /* ReferenceCatalogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7638C7BA24A4126BC5039EA5 /* ReferenceCatalogViewModel.swift */; };
 		5BB89CA48CF97ABD604521AF /* EyebrowTrackingPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F03830273DCC9E47775164 /* EyebrowTrackingPipeline.swift */; };
 		5CB96A3A7D31F2FC76679F9C /* EyebrowGuideGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */; };
+		5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */; };
 		5F3395078FFF3780060850A7 /* SavedLooksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C3F953C55A05FCE0F8F428E /* SavedLooksView.swift */; };
 		601CB711F407BB508AE96EDE /* HandOcclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64DA4C04FEDB41433C2EFE1 /* HandOcclusion.swift */; };
 		61802B9A9C3D59B870EFDC76 /* EyeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */; };
 		63A3A48CCC399EC783EE5E76 /* BlushPlacementSketch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE83A467EAAC48EF29EBFB8 /* BlushPlacementSketch.swift */; };
+		65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */; };
 		66ABECA0E68ED4FBDD399A7A /* MakeupRecommenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0CCC055355A1EC0AF155313 /* MakeupRecommenderTests.swift */; };
 		67129ECB6F6B3907B6557698 /* MakeupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528DBE5F90FFAE037040249C /* MakeupPreferences.swift */; };
 		685BC99DAFA493FCEB389B85 /* FaceShapeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21CE064275C7C47713A1B7F0 /* FaceShapeViewModel.swift */; };
@@ -94,6 +95,8 @@
 		7AF5B8DC4F8C75789B37EA2C /* FaceAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCF5B207D9540E466654FF8 /* FaceAnalysis.swift */; };
 		7B2C5442D94A8D5854261CCB /* ReferenceImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 787FC7E50E3814ED5F8E71BF /* ReferenceImportView.swift */; };
 		7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 133DCD5B481F352F758A1E3F /* Assets.xcassets */; };
+		7DA8D6F9D6CE3EDC61076E3F /* LinerInk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432B2E544594984149CB89AA /* LinerInk.swift */; };
+		7F3A91C2D45E6B80A1C9E0F4 /* GuidedTutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */; };
 		81C6BD9EDD701F40A703E2F6 /* MakeupReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3C4D0A24B6DEC94B862617 /* MakeupReference.swift */; };
 		8344B16103485A1C292BE01E /* MediaPipeEyeDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */; };
 		8390F5679DF570C890190E7C /* FaceContourDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46FF01BBC0933B3F49A571A /* FaceContourDetector.swift */; };
@@ -110,9 +113,7 @@
 		965089157E47007D209C0413 /* ComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8904D808C7A57AB024FAEFB7 /* ComparisonView.swift */; };
 		97282C821FE1244E279E7756 /* ReferenceDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CC9653DA95040834114EE5 /* ReferenceDetailView.swift */; };
 		984FD73DF3F4DCFF8AB8A6BF /* LinerOverlayRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C5565CCE7AF4F0C16F9F0A /* LinerOverlayRenderer.swift */; };
-		7DA8D6F9D6CE3EDC61076E3F /* LinerInk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432B2E544594984149CB89AA /* LinerInk.swift */; };
 		9909AED933CB17E8692EAA5B /* EyelinerMappingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */; };
-		B9DE9F52EC5429FA7C407B2B /* LinerInkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64D36919DA720D73B370998 /* LinerInkTests.swift */; };
 		9BBFBF26B88D5A1CB066AA9D /* FaceShapeClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */; };
 		A1B2C3D4E5F60718293A4B5C /* LinerGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* LinerGeometry.swift */; };
 		A1B8254BAD7ABE34EFF29C32 /* MakeupARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF8905476C966096CB0770C /* MakeupARView.swift */; };
@@ -120,6 +121,7 @@
 		A3C86C57A3B3DE9202A267CF /* EyebrowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10F58ECBC93C435DE28667D /* EyebrowTests.swift */; };
 		AC0A6723DBB80D2189C985C6 /* EyebrowOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929EC20AE526B170AB21CE88 /* EyebrowOverlayView.swift */; };
 		ACDF3453576FADCFE7CD7EEE /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEF4BC9014B9B481912D63 /* PrimaryButton.swift */; };
+		AD829C69DD73C01C6DCD473D /* TryOnHomeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */; };
 		AECE21EC64B858B3E9302E8D /* EyebrowRegionMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */; };
 		AF98C397F82E4D7F9517A8E4 /* BundledReferenceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEC597CCC28516E52ED551A2 /* BundledReferenceCatalog.swift */; };
 		B1B2C3D4E5F60718293A4B5C /* LinerGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2C3D4E5F60718293A4B5D /* LinerGeometryTests.swift */; };
@@ -127,6 +129,8 @@
 		B3C5787F1841D0350274F90E /* FaceLandmarkProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */; };
 		B4A68F2B3FF0993A80DC8193 /* EyeShapeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */; };
 		B8EAE5AAE0A46180B2B92BC2 /* LocalSavedLooksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */; };
+		B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */; };
+		B9DE9F52EC5429FA7C407B2B /* LinerInkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64D36919DA720D73B370998 /* LinerInkTests.swift */; };
 		BBC1AC7A0CD90B0E7BC75223 /* LandmarkSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E763EDC56C953EA58AFBB1 /* LandmarkSpace.swift */; };
 		C37D0B4D531BBB231AC8A90A /* DeviceFaceTrackingChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1601274318B8DCA422ED931 /* DeviceFaceTrackingChecker.swift */; };
 		C4A5F9A53088B1E800BFECB0 /* MediaPipeTasksVision in Frameworks */ = {isa = PBXBuildFile; productRef = C4A5F9A43088B1E800BFECB0 /* MediaPipeTasksVision */; };
@@ -148,6 +152,7 @@
 		D9D6D606230E23D7BC356D38 /* ServiceStubs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CAF4AC5FE94A9CCBD43461F /* ServiceStubs.swift */; };
 		DB800B2849D00487C7191B04 /* SunriseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5841E6C956B66A11234989 /* SunriseApp.swift */; };
 		DFE49476F0DF2E2C54A6BA8C /* HandOcclusionSegmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792C45EC0F1AB54F3358E303 /* HandOcclusionSegmenter.swift */; };
+		E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A92B86027ED154A52F5754 /* ProductCamera.swift */; };
 		E12D0FA8EDEAC708EA387AC1 /* FaceMeshARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 454D9F210C849C41D0E8378C /* FaceMeshARView.swift */; };
 		E28CA8BC201771E861AFEA21 /* AppNavigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A31E43DAD88366AB1ECB5C /* AppNavigator.swift */; };
 		E44486D30307E00936281E51 /* LinerTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB847F5E015413B5B6CDA3FB /* LinerTracker.swift */; };
@@ -160,17 +165,12 @@
 		E80000005D30E5A2A05DAB6C /* EyeDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7000000671282B495B3FED6 /* EyeDebugView.swift */; };
 		E8A4161080FEE103C1D2E314 /* MakeupSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13D8455EFF6A75DF7B4631CC /* MakeupSessionView.swift */; };
 		E91A2322FF10D46090575498 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68347A4A84BC0644A4FE6F07 /* EmptyStateView.swift */; };
+		EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */; };
 		F69EBE2B5722EEBEF5B9B0A7 /* SavedLooksViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4ACC8BE3EAE74653E78A54F /* SavedLooksViewModel.swift */; };
 		F83E4FF1665636FA83213151 /* ARFaceTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF45679699AC7CB5E530CA1C /* ARFaceTrackingManager.swift */; };
 		F88C4B1A73633332F0DE36C2 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */; };
 		F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */; };
-		7F3A91C2D45E6B80A1C9E0F4 /* GuidedTutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */; };
 		FD2E311FC44972331A578843 /* TutorialViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */; };
-		AD829C69DD73C01C6DCD473D /* TryOnHomeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */; };
-		65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */; };
-		EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */; };
-		B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */; };
-		E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A92B86027ED154A52F5754 /* ProductCamera.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -184,7 +184,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteColorPicker.swift; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
 		01F40072E3CF347862554017 /* face_landmarker.task */ = {isa = PBXFileReference; lastKnownFileType = file; path = face_landmarker.task; sourceTree = "<group>"; };
 		045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSavedLooksStore.swift; sourceTree = "<group>"; };
@@ -225,17 +224,16 @@
 		3CAF4AC5FE94A9CCBD43461F /* ServiceStubs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceStubs.swift; sourceTree = "<group>"; };
 		3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanTests.swift; sourceTree = "<group>"; };
 		413DF4F73EF8C9FCD698014E /* CameraPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPreviewView.swift; sourceTree = "<group>"; };
+		432B2E544594984149CB89AA /* LinerInk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerInk.swift; sourceTree = "<group>"; };
 		43A7AA6990D68C43A68511C9 /* LinerGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerGuide.swift; sourceTree = "<group>"; };
 		454D9F210C849C41D0E8378C /* FaceMeshARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMeshARView.swift; sourceTree = "<group>"; };
 		49C5565CCE7AF4F0C16F9F0A /* LinerOverlayRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerOverlayRenderer.swift; sourceTree = "<group>"; };
-		432B2E544594984149CB89AA /* LinerInk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerInk.swift; sourceTree = "<group>"; };
 		4A6545BC9255A551C688D4B1 /* FaceGuideFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceGuideFlow.swift; sourceTree = "<group>"; };
 		4A66892916F906242E0EB942 /* FaceMeshMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMeshMeasurer.swift; sourceTree = "<group>"; };
 		4D6FD918F6AD3EFDBC821053 /* MediaPipeEyeLandmarkProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeLandmarkProvider.swift; sourceTree = "<group>"; };
 		4DD93F3E7DA4BDAA776A4A5A /* LidFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidFlow.swift; sourceTree = "<group>"; };
 		4F5841E6C956B66A11234989 /* SunriseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseApp.swift; sourceTree = "<group>"; };
 		507F8ABB438F67B20D0A1A2C /* MakeupRecommender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommender.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedTutorialView.swift; sourceTree = "<group>"; };
 		513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialViewModel.swift; sourceTree = "<group>"; };
 		528DBE5F90FFAE037040249C /* MakeupPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPreferences.swift; sourceTree = "<group>"; };
 		541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGuideDiagnostics.swift; sourceTree = "<group>"; };
@@ -246,9 +244,11 @@
 		5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTypography.swift; sourceTree = "<group>"; };
 		5F3C4D0A24B6DEC94B862617 /* MakeupReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupReference.swift; sourceTree = "<group>"; };
 		5F6D1A9D904A10807700F875 /* FaceShapeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeClassifier.swift; sourceTree = "<group>"; };
+		64A92B86027ED154A52F5754 /* ProductCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCamera.swift; sourceTree = "<group>"; };
 		676226E236A23E238E3B1C77 /* EyeCameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeCameraSession.swift; sourceTree = "<group>"; };
 		68347A4A84BC0644A4FE6F07 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowViewModel.swift; sourceTree = "<group>"; };
+		6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPages.swift; sourceTree = "<group>"; };
 		6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeResultView.swift; sourceTree = "<group>"; };
 		6D795F13C8C22E022040EE00 /* SunriseApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = SunriseApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		719471221F004F211C0E7FF8 /* FaceShapeDatasetEvalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeDatasetEvalTests.swift; sourceTree = "<group>"; };
@@ -262,11 +262,11 @@
 		7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPersonalizationTests.swift; sourceTree = "<group>"; };
 		7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeView.swift; sourceTree = "<group>"; };
 		7ED8B4D9166DBE43F2B1D643 /* FaceFeatureLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceFeatureLocator.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedTutorialView.swift; sourceTree = "<group>"; };
 		832873944F90986F04549D21 /* LidFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidFlowTests.swift; sourceTree = "<group>"; };
 		85190E6578A99E0FCFAD9638 /* FaceShapeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeStore.swift; sourceTree = "<group>"; };
 		86692327C6B7D587C8265F12 /* TrackingReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingReadiness.swift; sourceTree = "<group>"; };
 		87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerMappingTests.swift; sourceTree = "<group>"; };
-		C64D36919DA720D73B370998 /* LinerInkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerInkTests.swift; sourceTree = "<group>"; };
 		880B8ADAAD4B4CCC9E778686 /* ForeheadGuideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForeheadGuideTests.swift; sourceTree = "<group>"; };
 		8904D808C7A57AB024FAEFB7 /* ComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComparisonView.swift; sourceTree = "<group>"; };
 		8A67639F74080F56C5AA328F /* MediaPipeEyeDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeDetector.swift; sourceTree = "<group>"; };
@@ -277,6 +277,7 @@
 		9342DC399ECDC1D13247975B /* FaceCameraState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceCameraState.swift; sourceTree = "<group>"; };
 		98F393F180238C7106FB99C0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		9BE83A467EAAC48EF29EBFB8 /* BlushPlacementSketch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlushPlacementSketch.swift; sourceTree = "<group>"; };
+		9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeView.swift; sourceTree = "<group>"; };
 		9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowGuideGenerator.swift; sourceTree = "<group>"; };
 		9DC0612A3CD82563E49C6CB2 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeResult.swift; sourceTree = "<group>"; };
@@ -296,12 +297,15 @@
 		B8A0C7629D5BE6A59E2A595E /* TrackingReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingReadinessTests.swift; sourceTree = "<group>"; };
 		BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPreferenceTests.swift; sourceTree = "<group>"; };
 		BC38DE15F5318E7DBE6A6A6A /* BlushMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlushMask.swift; sourceTree = "<group>"; };
+		BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeModel.swift; sourceTree = "<group>"; };
+		C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnLiveCard.swift; sourceTree = "<group>"; };
 		C1810A54CE6D4BC94E7F122D /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		C42CEFA28CA243E75B5D3DA1 /* LinerOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerOverlayModel.swift; sourceTree = "<group>"; };
 		C46FF01BBC0933B3F49A571A /* FaceContourDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceContourDetector.swift; sourceTree = "<group>"; };
 		C4ACC8BE3EAE74653E78A54F /* SavedLooksViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLooksViewModel.swift; sourceTree = "<group>"; };
 		C4AE33974D71FD4A86072E97 /* TutorialInstructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialInstructions.swift; sourceTree = "<group>"; };
 		C5F03830273DCC9E47775164 /* EyebrowTrackingPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowTrackingPipeline.swift; sourceTree = "<group>"; };
+		C64D36919DA720D73B370998 /* LinerInkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerInkTests.swift; sourceTree = "<group>"; };
 		C7EC61DDA286A934C9E046A3 /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeMeasurerTests.swift; sourceTree = "<group>"; };
 		CC4E2FA16FB3D83A6DDC1EDB /* MakeupRecommendationsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommendationsView.swift; sourceTree = "<group>"; };
@@ -340,15 +344,11 @@
 		F8BC42C353CA045B4AC94AF5 /* FaceCalibrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceCalibrationView.swift; sourceTree = "<group>"; };
 		F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeClassifierTests.swift; sourceTree = "<group>"; };
 		F9A809519AC15D1F2A75FC7E /* MakeupTextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupTextureRenderer.swift; sourceTree = "<group>"; };
+		FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteColorPicker.swift; sourceTree = "<group>"; };
 		FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanView.swift; sourceTree = "<group>"; };
 		FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeDetectorTests.swift; sourceTree = "<group>"; };
 		FE2B5E1913561C0593FD7840 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowRegionMapper.swift; sourceTree = "<group>"; };
-		BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeModel.swift; sourceTree = "<group>"; };
-		9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeView.swift; sourceTree = "<group>"; };
-		C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnLiveCard.swift; sourceTree = "<group>"; };
-		6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPages.swift; sourceTree = "<group>"; };
-		64A92B86027ED154A52F5754 /* ProductCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCamera.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1130,7 +1130,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WP97CT3PT7;
+				DEVELOPMENT_TEAM = 5NYWSR69FZ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1172,7 +1172,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WP97CT3PT7;
+				DEVELOPMENT_TEAM = 5NYWSR69FZ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
