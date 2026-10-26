@@ -13,7 +13,7 @@ file and adds a `CHANGELOG.md` entry in the same PR.
   and lets you try them on live with AR.
 - SwiftUI, iOS 17+, iPhone portrait. Swift 5 language mode with `SWIFT_STRICT_CONCURRENCY = complete`.
 - One third-party dependency: **MediaPipe Tasks Vision** (Swift Package from `google-ai-edge/mediapipe`, pinned to the `v1.1.1` commit `50505c8`; it must be pinned by revision, see ADR 0002), used only by the
-  eye scan in `Features/EyeShape`. One app target (`SunriseApp`) and one unit test target (`SunriseAppTests`).
+  eye scan in `Features/EyeShape`. One app target (`SunriseApp`), one unit test target (`SunriseAppTests`) and one app extension (`SunriseLiveActivity`, the scan's Dynamic Island).
   Why and how: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
 - Light MVVM: ViewModels are `@MainActor final class … : ObservableObject` with `@Published`. Stateless views have no ViewModel.
 - Apple frameworks, plus MediaPipe for the eye scan: ARKit + SceneKit (face tracking and makeup rendering), Vision (landmarks and face outline), AVFoundation (camera permission and the eye-scan camera), MediaPipe (eye and iris landmarks).
@@ -65,6 +65,7 @@ SunriseApp/
   PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
   Configuration/          Info.plist (camera + photo-library-add usage strings)
+SunriseLiveActivity/      app extension: the scan's Live Activity (Dynamic Island). `ScanActivityAttributes` (Core/Models) is shared with the app; keep it free of app-only imports
 SunriseDebugMac/          separate Mac-only Xcode project: edits scans exported from the Scan Debug tab (see below and its README)
 SunriseAppTests/
   Features/               face shape, head pose, photo measurer, makeup recommender/personalization/texture tests

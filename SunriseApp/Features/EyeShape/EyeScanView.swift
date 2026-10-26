@@ -22,6 +22,7 @@ struct EyeScanView: View {
             .navigationBarTitleDisplayMode(.inline)
             .task { await model.startIfNeeded() }
             .onDisappear { model.stop() }
+            .scanFeedback(title: String(localized: "Eye scan"), progress: scanStatus.progress, isDone: model.result != nil)
             // Let the "done" badge show for a moment before the result sheet covers the camera.
             .task(id: model.result != nil) {
                 guard model.result != nil else { resultReady = false; return }

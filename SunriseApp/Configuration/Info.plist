@@ -22,6 +22,8 @@
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
 	<string>The front camera is used to track your face and estimate your face and eye shape. Only the resulting shapes are kept on this device; no images are saved or uploaded.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Lets you save photos of your makeup try-on to your library.</string>
 	<key>UIApplicationSceneManifest</key>

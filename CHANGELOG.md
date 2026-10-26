@@ -6,6 +6,11 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 ## Unreleased
 
 ### Added
+- Dynamic Island and done sound for the face and eye scans. New app extension target `SunriseLiveActivity` (bundle id `com.sunrise.foundation.LiveActivity`)
+  shows the scan as a Live Activity: a progress ring while scanning, a green checkmark when done. `ScanActivityAttributes` is compiled into both
+  targets, `ScanFeedback` (`.scanFeedback(title:progress:isDone:)`) starts, updates and ends it, and `ScanDoneSound` plays an original two-note chime
+  (or `scan_done.caf` / `.wav` if one is added to the app). The done sound is the system's `payment_success.caf` when it exists, with the chime as fallback.. `NSSupportsLiveActivities` is set in `Info.plist`. Not checked on a device; the extension's
+  text is English only.
 - Scan done badge (`ScanDoneBadge`): when the face or eye scan finishes, a black rounded square with a green checkmark pops up over the camera with a
   success haptic, and the result sheet follows about 1.1 s later. The ring no longer plays the success haptic itself. Not checked on a device.
 - Scan progress ring (`ScanProgressRing`) on the face and eye scan cards, replacing the linear bar: App Store-style ring with the percentage inside,

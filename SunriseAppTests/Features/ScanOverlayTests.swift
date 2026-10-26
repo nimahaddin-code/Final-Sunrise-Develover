@@ -1,5 +1,6 @@
 import CoreGraphics
 import CoreVideo
+import AVFoundation
 import XCTest
 import simd
 @testable import SunriseApp
@@ -203,5 +204,29 @@ final class ContourReportTests: XCTestCase {
 
     func testReportHandlesNoOutlines() {
         XCTAssertTrue(ContourCorrection.report(of: []).contains("jaw: no samples"))
+    }
+}
+
+final class ScanDoneSoundTests: XCTestCase {
+    func testSystemSoundFileIsReadableWhenPresent() throws {
+        guard FileManager.default.fileExists(atPath: ScanDoneSound.systemSoundURL.path) else {
+            throw XCTSkip("This iOS version has no payment_success.caf; the app falls back to the built-in chime.")
+        }
+        let player = try AVAudioPlayer(contentsOf: ScanDoneSound.systemSoundURL)
+        XCTAssertGreaterThan(player.duration, 0.1)
+        print("payment_success.caf duration:", player.duration)
+    }
+
+    func testChimeIsAValidQuietOneSecondWav() throws {
+        let data = ScanDoneSound.wav()
+        XCTAssertEqual(String(decoding: data.prefix(4), as: UTF8.self), "RIFF")
+        XCTAssertEqual(String(decoding: data[8..<12], as: UTF8.self), "WAVE")
+        let samples = data.dropFirst(44).withUnsafeBytes { Array($0.bindMemory(to: Int16.self)) }
+        XCTAssertEqual(samples.count, 44_100)
+        let peak = samples.map { abs(Int($0)) }.max() ?? 0
+        XCTAssertGreaterThan(peak, 3_000, "silent")
+        XCTAssertLessThan(peak, Int(Int16.max) * 9 / 10, "clipping")
+        XCTAssertLessThan(abs(Int(samples.last ?? 0)), 50, "should have faded out")
+        XCTAssertNoThrow(try AVAudioPlayer(data: data))
     }
 }
