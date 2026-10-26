@@ -112,6 +112,8 @@
 		0C90D62191AAC5BBC99F3911 /* ScanDebugOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1FDAE6BFC80E75E654F77A6 /* ScanDebugOrientation.swift */; };
 		593842C770E854852081D3E8 /* ScanDebugExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A51CAF7FA0265EAB6596B84 /* ScanDebugExport.swift */; };
 		E8F1F7A7AE27577299DFB07E /* ScanDebugExportItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D16CB2566D28F8E592B43F8 /* ScanDebugExportItem.swift */; };
+		9A1ECD81756B7FC306ABEF27 /* ScanProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8426AFA7FA227DE043A7E7 /* ScanProgressRing.swift */; };
+		EB33DC8CCBC2AB8760E0FE55 /* ScanDoneBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782BAD5F63492D1E34911828 /* ScanDoneBadge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -232,6 +234,8 @@
 		B1FDAE6BFC80E75E654F77A6 /* ScanDebugOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugOrientation.swift; sourceTree = "<group>"; };
 		3A51CAF7FA0265EAB6596B84 /* ScanDebugExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugExport.swift; sourceTree = "<group>"; };
 		5D16CB2566D28F8E592B43F8 /* ScanDebugExportItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugExportItem.swift; sourceTree = "<group>"; };
+		EE8426AFA7FA227DE043A7E7 /* ScanProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanProgressRing.swift; sourceTree = "<group>"; };
+		782BAD5F63492D1E34911828 /* ScanDoneBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDoneBadge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -393,6 +397,8 @@
 				9E2CC9392658B0606CBF7775 /* FeaturePlaceholderView.swift */,
 				8DEEF4BC9014B9B481912D63 /* PrimaryButton.swift */,
 				CFC99C146DF9B268DA514E88 /* ScanOverlayView.swift */,
+				EE8426AFA7FA227DE043A7E7 /* ScanProgressRing.swift */,
+				782BAD5F63492D1E34911828 /* ScanDoneBadge.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -836,6 +842,8 @@
 				B82426BCCB6209B4DC3E2179 /* FaceSnapshotter.swift in Sources */,
 				0BBE8A5B3E3F09BF342D6207 /* EyeOverlay.swift in Sources */,
 				9C841A1866B628B70947A967 /* EyeFrameSnapshot.swift in Sources */,
+				9A1ECD81756B7FC306ABEF27 /* ScanProgressRing.swift in Sources */,
+				EB33DC8CCBC2AB8760E0FE55 /* ScanDoneBadge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

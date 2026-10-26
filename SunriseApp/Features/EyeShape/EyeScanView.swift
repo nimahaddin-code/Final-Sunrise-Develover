@@ -10,6 +10,7 @@ struct EyeScanView: View {
     /// Called with the scan picture when a scan finishes (before the result sheet's button is used). Debug tools only.
     var onResult: (ScanSnapshot?) -> Void = { _ in }
     @StateObject private var model = EyeScanViewModel()
+    @State private var resultReady = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
@@ -21,6 +22,12 @@ struct EyeScanView: View {
             .navigationBarTitleDisplayMode(.inline)
             .task { await model.startIfNeeded() }
             .onDisappear { model.stop() }
+            // Let the "done" badge show for a moment before the result sheet covers the camera.
+            .task(id: model.result != nil) {
+                guard model.result != nil else { resultReady = false; return }
+                try? await Task.sleep(for: .seconds(1.1))
+                if !Task.isCancelled { resultReady = true }
+            }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {
                     EyeShapeResultView(result: result, snapshot: model.snapshot, continueTitle: continueTitle, onChooseLid: model.chooseLid,
@@ -77,7 +84,7 @@ struct EyeScanView: View {
 
     /// Dismissing the popup starts a new measurement.
     private var resultPresented: Binding<Bool> {
-        Binding(get: { model.result != nil }, set: { presented in
+        Binding(get: { model.result != nil && resultReady }, set: { presented in
             if !presented, model.result != nil { model.scanAgain() }
         })
     }
@@ -99,18 +106,28 @@ struct EyeScanView: View {
                 .frame(width: 260, height: 340).offset(y: -40).accessibilityHidden(true)
             VStack {
                 Spacer()
-                VStack(spacing: AppSpacing.medium) {
-                    Text(message).font(AppTypography.body).multilineTextAlignment(.center)
-                    ProgressView(value: progress).tint(AppColors.rose)
-                    Text("Look straight at the camera with your eyes open and relaxed.")
-                        .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
-                        .multilineTextAlignment(.center)
+                HStack(spacing: AppSpacing.medium) {
+                    ScanProgressRing(progress: progress)
+                    VStack(alignment: .leading, spacing: AppSpacing.small) {
+                        Text(message).font(AppTypography.body)
+                        Text("Look straight at the camera with your eyes open and relaxed.")
+                            .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(AppSpacing.large)
                 .background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
                 .padding(AppSpacing.large)
                 .accessibilityElement(children: .combine)
             }
+        }
+        .overlay { doneBadge }
+        .animation(.spring(duration: 0.35), value: model.result != nil)
+    }
+
+    @ViewBuilder private var doneBadge: some View {
+        if model.result != nil {
+            ScanDoneBadge().transition(.scale(scale: 0.6).combined(with: .opacity))
         }
     }
 }

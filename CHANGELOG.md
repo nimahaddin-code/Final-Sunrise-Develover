@@ -6,6 +6,11 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 ## Unreleased
 
 ### Added
+- Scan done badge (`ScanDoneBadge`): when the face or eye scan finishes, a black rounded square with a green checkmark pops up over the camera with a
+  success haptic, and the result sheet follows about 1.1 s later. The ring no longer plays the success haptic itself. Not checked on a device.
+- Scan progress ring (`ScanProgressRing`) on the face and eye scan cards, replacing the linear bar: App Store-style ring with the percentage inside,
+  a checkmark when done, a light haptic tick every 10% and a success haptic at the end. Applies to onboarding and Scan Debug too.
+  Haptics and the look have not been checked on a device.
 - Scan Debug bulk export: the tab keeps every scan taken this session in memory (a newer scan of the same outline no longer replaces the older one in the
   list), with "Export all N for Mac" that shares all of them as `.sunrisescan` files, per-scan Edit / share / remove, and "Share all saved files" for the
   raw and corrected JSON files. The single "Export for Mac" button stays. Scans are not kept after the app closes.
