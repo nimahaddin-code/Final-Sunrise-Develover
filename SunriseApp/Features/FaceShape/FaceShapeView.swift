@@ -13,6 +13,7 @@ struct FaceShapeView: View {
     /// Called with the scan picture when a scan finishes (before the result popup's button is used). Debug tools only.
     var onResult: (ScanSnapshot?) -> Void = { _ in }
     @StateObject private var model = FaceShapeViewModel()
+    @State private var resultReady = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
@@ -34,6 +35,13 @@ struct FaceShapeView: View {
                 }
             }
             .onDisappear { model.stop() }
+            .scanFeedback(title: String(localized: "Face scan"), progress: scanStatus.progress, isDone: model.result != nil)
+            // Let the "done" badge show for a moment before the result sheet covers the camera.
+            .task(id: model.result != nil) {
+                guard model.result != nil else { resultReady = false; return }
+                try? await Task.sleep(for: .seconds(1.1))
+                if !Task.isCancelled { resultReady = true }
+            }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {
                     FaceShapeResultView(result: result, snapshot:model.snapshot, continueTitle:continueTitle, onScanAgain:model.scanAgain, onLidTypeChange:model.setLidType) {
@@ -95,7 +103,7 @@ struct FaceShapeView: View {
 
     /// Dismissing the popup starts a new measurement on the still-running camera.
     private var resultPresented: Binding<Bool> {
-        Binding(get: { model.result != nil }, set: { presented in
+        Binding(get: { model.result != nil && resultReady }, set: { presented in
             if !presented, model.result != nil { model.scanAgain() }
         })
     }
@@ -112,17 +120,28 @@ struct FaceShapeView: View {
         let (progress, message) = scanStatus
         return ZStack(alignment: .bottom) {
             FaceMeshARView(session: model.session, snapshotter: model.snapshotter).ignoresSafeArea()
-            VStack(spacing: AppSpacing.medium) {
-                Text(message).font(AppTypography.body).multilineTextAlignment(.center)
-                ProgressView(value: progress).tint(AppColors.rose)
-                Text("Keep a neutral face and look straight at the camera.")
-                    .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
-                    .multilineTextAlignment(.center)
+            HStack(spacing: AppSpacing.medium) {
+                ScanProgressRing(progress: progress)
+                VStack(alignment: .leading, spacing: AppSpacing.small) {
+                    Text(message).font(AppTypography.body)
+                    Text("Keep a neutral face and look straight at the camera.")
+                        .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(AppSpacing.large)
             .background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
             .padding(AppSpacing.large)
             .accessibilityElement(children: .combine)
+        }
+        .overlay { doneBadge }
+        .animation(.spring(duration: 0.35), value: model.result != nil)
+    }
+
+    @ViewBuilder private var doneBadge: some View {
+        // With a Dynamic Island the confirmation grows out of it instead (`DynamicIslandConfirmation`, from `scanFeedback`).
+        if model.result != nil, !DynamicIslandConfirmation.isAvailable {
+            ScanDoneBadge().transition(.scale(scale: 0.6).combined(with: .opacity))
         }
     }
 }
