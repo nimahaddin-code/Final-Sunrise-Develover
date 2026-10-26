@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A60100000000000000000002 /* EyeScan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60100000000000000000001; };
 		3EE84684E4D030E0816BF306 /* SunriseDebugMacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100990EC010949BF862E20B3 /* SunriseDebugMacApp.swift */; };
 		348EB4A6B536D219963C3719 /* ScanLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE0D486A59A59CC8AFD2C34 /* ScanLibrary.swift */; };
 		A6B6A4C52B2C0544A1331BAE /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 860BCFDB32F4575D91C0CAB4 /* ContentView.swift */; };
@@ -23,7 +24,7 @@
 		06EF38DC6AEF8AA1FD56EDAC /* EyeMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4179A72B8D153380FF3C829F /* EyeMeasurer.swift */; };
 		E3CDDAFC6FF66C617BC04C8C /* EyeShapeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C736FA2B9346116A9A3C2A6 /* EyeShapeClassifier.swift */; };
 		AD0F2F674C670333D6A20E37 /* EyeShapeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE44E100D62707AA96C9740 /* EyeShapeResult.swift */; };
-		A20049C1E2FD39AC7056D777 /* EyeLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D77BE76E8CB6E0F1643BD0B /* EyeLandmarks.swift */; };
+		A20049C1E2FD39AC7056D777 /* EyeScanLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D77BE76E8CB6E0F1643BD0B /* EyeScanLandmarks.swift */; };
 		A7086C4482B514E646F9CB39 /* ScanDebugModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A97AFA31A6DC5A2FEFFC9C /* ScanDebugModels.swift */; };
 		CE21856D3CC37410B34A1D07 /* ScanDebugStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CBB0765E60286BDA8D5AFD /* ScanDebugStore.swift */; };
 		5AECAA172FFE5AB9ED92F870 /* ScanDebugViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58857FA0813C8A49820EF381 /* ScanDebugViewModel.swift */; };
@@ -33,6 +34,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		A60100000000000000000001 /* EyeScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeScan.swift; path = "../SunriseApp/Features/FaceShape/EyeScan.swift"; sourceTree = SOURCE_ROOT; };
 		100990EC010949BF862E20B3 /* SunriseDebugMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SunriseDebugMacApp.swift; path = "SunriseDebugMac/SunriseDebugMacApp.swift"; sourceTree = SOURCE_ROOT; };
 		2EE0D486A59A59CC8AFD2C34 /* ScanLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanLibrary.swift; path = "SunriseDebugMac/ScanLibrary.swift"; sourceTree = SOURCE_ROOT; };
 		860BCFDB32F4575D91C0CAB4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ContentView.swift; path = "SunriseDebugMac/ContentView.swift"; sourceTree = SOURCE_ROOT; };
@@ -49,7 +51,7 @@
 		4179A72B8D153380FF3C829F /* EyeMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeMeasurer.swift; path = "../SunriseApp/Features/EyeShape/EyeMeasurer.swift"; sourceTree = SOURCE_ROOT; };
 		0C736FA2B9346116A9A3C2A6 /* EyeShapeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeShapeClassifier.swift; path = "../SunriseApp/Features/EyeShape/EyeShapeClassifier.swift"; sourceTree = SOURCE_ROOT; };
 		BCE44E100D62707AA96C9740 /* EyeShapeResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeShapeResult.swift; path = "../SunriseApp/Features/EyeShape/EyeShapeResult.swift"; sourceTree = SOURCE_ROOT; };
-		5D77BE76E8CB6E0F1643BD0B /* EyeLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeLandmarks.swift; path = "../SunriseApp/Features/EyeShape/EyeLandmarks.swift"; sourceTree = SOURCE_ROOT; };
+		5D77BE76E8CB6E0F1643BD0B /* EyeScanLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = EyeScanLandmarks.swift; path = "../SunriseApp/Features/EyeShape/EyeScanLandmarks.swift"; sourceTree = SOURCE_ROOT; };
 		81A97AFA31A6DC5A2FEFFC9C /* ScanDebugModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugModels.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugModels.swift"; sourceTree = SOURCE_ROOT; };
 		B4CBB0765E60286BDA8D5AFD /* ScanDebugStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugStore.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugStore.swift"; sourceTree = SOURCE_ROOT; };
 		58857FA0813C8A49820EF381 /* ScanDebugViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScanDebugViewModel.swift; path = "../SunriseApp/Features/ScanDebug/ScanDebugViewModel.swift"; sourceTree = SOURCE_ROOT; };
@@ -96,6 +98,7 @@
 		0B9AA83818D1D0E9AD1A0DA8 /* Shared with the iPhone app */ = {
 			isa = PBXGroup;
 			children = (
+				A60100000000000000000001 /* EyeScan.swift */,
 				479828A621225345427392BB /* ScanOverlay.swift */,
 				4A2359792908B04201425358 /* ScanOverlayView.swift */,
 				4EBAE9D42AA6DFCCB9ED792F /* FaceShapeClassifier.swift */,
@@ -107,7 +110,7 @@
 				4179A72B8D153380FF3C829F /* EyeMeasurer.swift */,
 				0C736FA2B9346116A9A3C2A6 /* EyeShapeClassifier.swift */,
 				BCE44E100D62707AA96C9740 /* EyeShapeResult.swift */,
-				5D77BE76E8CB6E0F1643BD0B /* EyeLandmarks.swift */,
+				5D77BE76E8CB6E0F1643BD0B /* EyeScanLandmarks.swift */,
 				81A97AFA31A6DC5A2FEFFC9C /* ScanDebugModels.swift */,
 				B4CBB0765E60286BDA8D5AFD /* ScanDebugStore.swift */,
 				58857FA0813C8A49820EF381 /* ScanDebugViewModel.swift */,
@@ -189,6 +192,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A60100000000000000000002 /* EyeScan.swift in Sources */,
 				3EE84684E4D030E0816BF306 /* SunriseDebugMacApp.swift in Sources */,
 				348EB4A6B536D219963C3719 /* ScanLibrary.swift in Sources */,
 				A6B6A4C52B2C0544A1331BAE /* ContentView.swift in Sources */,
@@ -205,7 +209,7 @@
 				06EF38DC6AEF8AA1FD56EDAC /* EyeMeasurer.swift in Sources */,
 				E3CDDAFC6FF66C617BC04C8C /* EyeShapeClassifier.swift in Sources */,
 				AD0F2F674C670333D6A20E37 /* EyeShapeResult.swift in Sources */,
-				A20049C1E2FD39AC7056D777 /* EyeLandmarks.swift in Sources */,
+				A20049C1E2FD39AC7056D777 /* EyeScanLandmarks.swift in Sources */,
 				A7086C4482B514E646F9CB39 /* ScanDebugModels.swift in Sources */,
 				CE21856D3CC37410B34A1D07 /* ScanDebugStore.swift in Sources */,
 				5AECAA172FFE5AB9ED92F870 /* ScanDebugViewModel.swift in Sources */,

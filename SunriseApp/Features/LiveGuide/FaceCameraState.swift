@@ -22,6 +22,7 @@ import ImageIO
     @Published var debugMode: LiveGuideDebugMode = .off
     @Published var renderMessage = "Preview not started"
     @Published var debugMessage = ""
+    @Published var beautyStatus:String?
     @Published var previewStrength: Float = 0.8
     // -Nimah: Shared session + eyebrow module status; tidak menyimpan gambar atau landmark ke disk.
     let trackingManager=ARFaceTrackingManager.shared

@@ -16,6 +16,8 @@ struct OcclusionMask {
     let time: CFTimeInterval
     /// 1 where the mask is set, row by row (`size` pixels); lets the mask be asked where a hand is.
     var occupied: [UInt8] = []
+    // -Nimah: Optional soft non-face confidence, used only by the blush GPU visibility path.
+    var opacity:[UInt8] = []
 
     /// A mask older than this is not trusted: the hand may be gone.
     static let maxAge: CFTimeInterval = 0.5

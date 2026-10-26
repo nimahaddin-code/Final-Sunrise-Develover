@@ -81,7 +81,7 @@ final class ScanDebugTests: XCTestCase {
     }
 
     func testEyeScanOverlayRoundTripsToThePointsTheScanDrew() throws {
-        func eye(innerX: Float, outerX: Float) -> EyeLandmarks.Eye {
+        func eye(innerX: Float, outerX: Float) -> EyeScanLandmarks.Eye {
             let y: Float = 100
             let xs = (0..<7).map { outerX + (innerX - outerX) * Float($0 + 1) / 8 }
             let upper = xs.map { SIMD2($0, y - 6) }, lower = xs.map { SIMD2($0, y + 6) }
@@ -90,7 +90,7 @@ final class ScanDebugTests: XCTestCase {
                          iris: [SIMD2(middle - 4, y), SIMD2(middle + 4, y), SIMD2(middle, y - 4), SIMD2(middle, y + 4)],
                          brow: (0..<5).map { SIMD2(xs[0] + Float($0) * 5, y - 25) })
         }
-        let landmarks = EyeLandmarks(first: eye(innerX: 180, outerX: 120), second: eye(innerX: 220, outerX: 280))
+        let landmarks = EyeScanLandmarks(first: eye(innerX: 180, outerX: 120), second: eye(innerX: 220, outerX: 280))
         let overlay = try XCTUnwrap(EyeOverlay.overlay(for: landmarks, imageSize: SIMD2(400, 200)))
         let positions = try XCTUnwrap(ScanDebugSnapshotReader.eyePositions(overlay))
         XCTAssertEqual(positions.count, 14)

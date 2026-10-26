@@ -66,7 +66,7 @@ struct TryOnLiveCard: View {
 
     private var live: some View {
         ZStack {
-            LiveGuideView(camera: camera, referenceID: "eyebrows", active: scenePhase == .active,
+            LiveGuideView(camera: camera, referenceID: "eyebrows", active: home.active && scenePhase == .active,
                           eyebrowConfiguration: home.liveConfiguration, onFrame: { [relay = home.relay] frame, face in
                               relay.deliver(frame, face)
                           })
@@ -80,7 +80,7 @@ struct TryOnLiveCard: View {
     /// Tells the person what the face scan is waiting for, for the selected tool only. Eyeliner follows the eyes on its own,
     /// so it never shows the blush/eyebrow scan messages, even while those looks are on.
     // -Nimah: Launch already handles scanning. Live tracking has no calibration prompts or scan controls.
-    private var status: String? { nil }
+    private var status: String? {home.tool == .blush ? camera.beautyStatus:nil}
 
     private func openSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }

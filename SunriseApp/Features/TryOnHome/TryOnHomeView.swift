@@ -35,6 +35,13 @@ struct TryOnHomeView: View {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
             }
             toolStrip
+            // -Nimah: Old installs may have analysis but no persisted fit; never silently show an empty tool.
+            if !home.canTry(home.tool) {
+                Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
+                if !home.hasLaunchFit && home.tool != .eyeliner {
+                    Button("Open Profile to retake") { onProfile() }
+                }
+            }
             shadeRow.disabled(!home.canTry(home.tool))
             IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
                          tint: home.currentShade?.color ?? AppColors.flamingo)
@@ -53,7 +60,11 @@ struct TryOnHomeView: View {
         .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
             PaletteColorPicker(initial:home.currentShade ?? home.swatches[0]) { home.choose(shade:$0) }
         }
-        .onAppear { isVisible=true; if !showColours { home.activate() } }
+        .onAppear {
+            // -Nimah: Fitting can finish after the final analysis publisher; refresh even when classifications match.
+            isVisible=true;home.updateRecommendations(face:store.latest,eyes:store.eyes)
+            if !showColours { home.activate() }
+        }
         .onDisappear { isVisible=false; home.deactivate() }
         .onChange(of: scenePhase) { _, phase in
             // Pause the camera off-screen; resume through the same guarded path.
@@ -184,7 +195,7 @@ private struct IntensityBar: View {
     var body: some View {
         GeometryReader { proxy in
             let travel = max(proxy.size.width - thumbSize, 1)
-            let thumbX = thumbSize / 2 + travel * CGFloat((value - 0.1) / 0.9)
+            let thumbX = thumbSize / 2 + travel * CGFloat(value)
             ZStack(alignment: .leading) {
                 Capsule().strokeBorder(AppColors.snow.opacity(0.9), lineWidth: 1)
                     .frame(height: trackHeight)
@@ -206,7 +217,7 @@ private struct IntensityBar: View {
                 .onChanged { drag in
                     isDragging = true
                     let fraction = (drag.location.x - thumbSize / 2) / travel
-                    value = 0.1 + 0.9 * min(max(Double(fraction), 0), 1)
+                    value = min(max(Double(fraction), 0), 1)
                 }
                 .onEnded { _ in isDragging = false })
             .animation(.easeOut(duration: 0.12), value: isDragging)
@@ -218,7 +229,7 @@ private struct IntensityBar: View {
         .accessibilityAdjustableAction { direction in
             switch direction {
             case .increment: value = min(value + 0.1, 1)
-            case .decrement: value = max(value - 0.1, 0.1)
+            case .decrement: value = max(value - 0.1, 0)
             @unknown default: break
             }
         }

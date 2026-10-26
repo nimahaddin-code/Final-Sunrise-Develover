@@ -112,7 +112,7 @@ import Combine
             if let snapshot {
                 Task.detached(priority: .utility) { ScanSnapshots.save(snapshot.buffer, crop: snapshot.crop, as: .eyes) }
             }
-            snapshot = latestSnapshot
+            self.snapshot = latestSnapshot
             phase = .finished(classifier.classify(median))
         } else {
             let next = Phase.scanning(progress: sampler.progress, guidance: frame.guidance)

@@ -90,6 +90,11 @@ final class FaceTrackingDotsRenderer {
 final class FaceRegionPreviewRenderer {
     let root=SCNNode()
     private var key:String?
+    private var lastDiagnostic:String?
+    private func diagnose(_ message:String,region:FaceGuideRegion) {
+        guard message != lastDiagnostic else { return };lastDiagnostic=message
+        UserDefaults.standard.set(message,forKey:"makeupRender.\(region).v1")
+    }
     private var previousTint:SIMD3<Float>?
     private(set) var bindingBuildCount=0
     private struct Cell:Hashable { let x:Int;let y:Int }
@@ -106,7 +111,7 @@ final class FaceRegionPreviewRenderer {
     }
     private var patches:[Patch]=[]
     func update(brow:EyebrowGuide?,forehead:ForeheadGuide?,blush:BlushPlacementGuide? = nil,vertices:[SIMD3<Float>],triangles:[Int16],configuration:EyebrowConfiguration) {
-        guard configuration.showMakeupPreview && configuration.previewAfter else { root.isHidden=true; return }
+        guard configuration.showMakeupPreview && configuration.previewAfter else { root.isHidden=true;diagnose("hidden-by-configuration",region:configuration.region); return }
         let regionKey:String?
         switch configuration.region {
         case .eyebrows:regionKey=brow?.id.uuidString
@@ -115,7 +120,7 @@ final class FaceRegionPreviewRenderer {
         }
         // -Nimah: Shade/intensity changes never rebind skin attachments.
         let newKey=regionKey
-        guard let newKey else { root.isHidden=true; return }
+        guard let newKey else { root.isHidden=true;diagnose("missing-guide",region:configuration.region);return }
         let rebuilding=key != newKey
         if rebuilding {
             bindingBuildCount += 1
@@ -123,15 +128,18 @@ final class FaceRegionPreviewRenderer {
             key=newKey; root.childNodes.forEach { $0.removeFromParentNode() }; patches=[]
             if configuration.region == .eyebrows,let brow {
                 for curve in brow.curves {
-                    // -Nimah: Do not bridge missing outline attachments across unmapped skin.
-                    guard curve.outline.allSatisfy({ $0 != nil }) else { continue }
-                    let polygon=curve.outline.compactMap { $0?.position(in:vertices) }
-                    add(polygon:polygon,vertices:vertices,triangles:triangles,tint:SIMD3(0.16,0.085,0.055),opacity:0.95)
+                    // -Nimah: Render valid strips separately. A missing edge sample must not erase both brows
+                    // or be joined across an unmapped hole in the surface.
+                    for polygon in Self.browPolygons(curve:curve,vertices:vertices) {
+                        add(polygon:polygon,vertices:vertices,triangles:triangles,tint:SIMD3(0.16,0.085,0.055),opacity:MakeupRuleDatabase.brow(brow.style)?.number("max_alpha") ?? 0.55,featherFraction:(MakeupRuleDatabase.brow(brow.style)?.number("edge_feather") ?? 0.55)/2,browFade:curve.samples.compactMap { $0?.position(in:vertices) },headFade:MakeupRuleDatabase.brow(brow.style)?.number("head_fade_extent") ?? 0.18)
+                    }
                 }
             } else if configuration.region == .blush,let blush {
-                for area in blush.areas {
-                    add(polygon:area.boundary.compactMap { $0.position(in:vertices) },vertices:vertices,triangles:triangles,
-                        tint:SIMD3(0.87,0.25,0.37),opacity:0.90)
+                for field in blush.pigmentFields {
+                    let depth=vertices.map(\.z).min() ?? 0
+                    let polygon=field.bounds.map { SIMD3($0.x,$0.y,depth) }
+                    add(polygon:polygon,vertices:vertices,triangles:triangles,
+                        tint:SIMD3(0.87,0.25,0.37),opacity:field.opacity,featherFraction:0.45,softPigment:true,field:field)
                 }
             } else if let forehead {
                 let highlight=forehead.style.category == .highlight
@@ -149,6 +157,7 @@ final class FaceRegionPreviewRenderer {
             }
         }
         root.isHidden=patches.isEmpty
+        diagnose("patches=\(patches.count);browCurves=\(brow?.curves.count ?? 0);missingOutline=\(brow?.curves.reduce(0) { $0+$1.outline.filter { $0==nil }.count } ?? 0);blushFields=\(blush?.pigmentFields.count ?? 0);strength=\(configuration.previewIntensity)",region:configuration.region)
         let strength=max(0,min(1,configuration.previewIntensity))
         for patch in patches {
             // -Nimah: One packed position array, without intermediate compactMap/map arrays per frame.
@@ -166,12 +175,13 @@ final class FaceRegionPreviewRenderer {
             patch.node.geometry=geometry
         }
     }
-    private func add(polygon:[SIMD3<Float>],vertices:[SIMD3<Float>],triangles:[Int16],tint:SIMD3<Float>,opacity:Float) {
+    private func add(polygon:[SIMD3<Float>],vertices:[SIMD3<Float>],triangles:[Int16],tint:SIMD3<Float>,opacity:Float,featherFraction:Float = 0.14,softPigment:Bool = false,field:BlushPigmentField? = nil,browFade:[SIMD3<Float>] = [],headFade:Float = 0) {
         guard polygon.count>=4,let minX=polygon.map(\.x).min(),let maxX=polygon.map(\.x).max(),
               let minY=polygon.map(\.y).min(),let maxY=polygon.map(\.y).max(),let minZ=polygon.map(\.z).min(),maxX>minX,maxY>minY else { return }
         let outline=polygon.map { SIMD2($0.x,$0.y) }
         let tiny=max(maxX-minX,maxY-minY)<0.008
-        let columns=tiny ? 12 : 36,rows=tiny ? 12 : 24
+        // -Nimah: Denser blush alpha interpolation is cached once; shade edits still reuse all bindings.
+        let columns=tiny ? 12 : (softPigment ? 48 : 36),rows=tiny ? 12 : (softPigment ? 32 : 24)
         var attachments:[SurfaceAttachment]=[],alphas:[Float]=[],mapping:[Int:Int]=[:],indices:[Int32]=[]
         for y in 0...rows {
             for x in 0...columns {
@@ -179,8 +189,19 @@ final class FaceRegionPreviewRenderer {
                 if let nearby=triangleCells[cell(p)],let attachment=SurfaceAttachment.bind(p,vertices:vertices,triangles:nearby,minimumZ:minZ-0.003) {
                     mapping[y*(columns+1)+x]=attachments.count
                     attachments.append(attachment)
-                    let feather=max(0.0005,min(maxX-minX,maxY-minY)*0.14)
-                    alphas.append(Self.coverage(p,polygon:outline,feather:feather)*opacity)
+                    let feather=max(0.0005,min(maxX-minX,maxY-minY)*featherFraction)
+                    let alpha:Float
+                    if softPigment {
+                        let center=SIMD2((minX+maxX)/2,(minY+maxY)/2)
+                        let radius=SIMD2((maxX-minX)/2,(maxY-minY)/2)
+                        alpha=field?.coverage(p) ?? Self.softBlushCoverage(p,center:center,radius:radius)
+                    } else { alpha=Self.coverage(p,polygon:outline,feather:feather) }
+                    var fade:Float=1
+                    if let first=browFade.first,let last=browFade.last,abs(last.x-first.x)>0.0001,headFade>0 {
+                        let t=max(0,min(1,(p.x-first.x)/(last.x-first.x)/headFade))
+                        fade=t*t*(3-2*t)
+                    }
+                    alphas.append(alpha*opacity*fade)
                 }
             }
         }
@@ -203,7 +224,34 @@ final class FaceRegionPreviewRenderer {
         // -Nimah: Keep a strong pigment core with a soft edge; lift above the face depth mesh to avoid clipping.
         node.renderingOrder=1
         let material=EyelinerRenderer.material(tint:.white)
+        // -Nimah: Cosmetic patches are already bound to the visible front skin. The coarse native
+        // face depth mesh must not occlude its own interpolated pigment (camera video has no depth).
+        // Keep this policy local to pigment; guide/eyeliner depth materials are unchanged.
+        material.readsFromDepthBuffer=false
         patches.append(Patch(node:node,attachments:attachments,colors:colorSource,element:element,material:material,baseTint:tint))
+    }
+    static func browPolygons(curve:EyebrowGuide.Curve,vertices:[SIMD3<Float>])->[[SIMD3<Float>]] {
+        let count=curve.samples.count
+        guard count>=2,curve.outline.count>=count*2 else { return [] }
+        var upper:[SIMD3<Float>]=[],lower:[SIMD3<Float>]=[],polygons:[[SIMD3<Float>]]=[]
+        func flush() {
+            if upper.count>=2 { polygons.append(upper+lower.reversed()+[upper[0]]) }
+            upper=[];lower=[]
+        }
+        for i in 0..<count {
+            if let a=curve.outline[i]?.position(in:vertices),let b=curve.outline[count*2-1-i]?.position(in:vertices) {
+                upper.append(a);lower.append(b)
+            } else { flush() }
+        }
+        flush();return polygons
+    }
+    // -Nimah: Smooth radial falloff across the entire patch, with zero pigment at its edge.
+    static func softBlushCoverage(_ p:SIMD2<Float>,center:SIMD2<Float>,radius:SIMD2<Float>)->Float {
+        guard radius.x>0,radius.y>0 else { return 0 }
+        let q=(p-center)/radius,r2=simd_length_squared(q)
+        guard r2.isFinite,r2<1 else { return 0 }
+        let value=1-r2
+        return value*value
     }
     // -Nimah: Spatial lookup preserves exact barycentric binding, while skipping unrelated triangles.
     private func cell(_ point:SIMD2<Float>)->Cell { Cell(x:Int(floor(point.x/cellWidth)),y:Int(floor(point.y/cellWidth))) }

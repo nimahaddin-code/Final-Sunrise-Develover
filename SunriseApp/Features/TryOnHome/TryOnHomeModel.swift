@@ -83,7 +83,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     /// The tool the shade row and intensity bar currently control.
     @Published private(set) var tool: TryOnTool = .blush
-    @Published private(set) var enabled: Set<TryOnTool> = Set(TryOnTool.allCases)
+    @Published private(set) var enabled: Set<TryOnTool> = [.blush]
     @Published private(set) var shades: [TryOnTool: MakeupShade]
     /// Colours picked from a product photo, kept per tool so they stay in the shade row after another swatch is chosen.
     @Published private(set) var customShades: [TryOnTool: [MakeupShade]] = [:]
@@ -103,7 +103,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     private var linerIsNeutral = true
     @Published private(set) var linerRecommendation: MakeupRecommendation?
     private var activation: Task<Void,Never>?
-    private var active = false
+    @Published private(set) var active = false
     private var hasAppliedAnalysis=false
     private var appliedFace:FaceShapeResult?
     private var appliedEyes:EyeShapeResult?
@@ -116,9 +116,9 @@ final class LinerFrameRelay: @unchecked Sendable {
         if case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: .blush)
         relay = LinerFrameRelay(model: liner)
-        shades = [.blush: MakeupPalette.pink, .eyebrow: MakeupPalette.referenceBrown,
+        shades = [.blush: MakeupPalette.shades(for:.blush).first ?? MakeupPalette.pink, .eyebrow: MakeupPalette.shades(for:.eyebrow).first ?? MakeupPalette.referenceBrown,
                   .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
-        intensities = [.blush: Self.defaultIntensity, .eyebrow: Self.defaultIntensity,
+        intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="eyebrow"})?.intensity.default.value ?? 0.65),
                        .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
     }
 
@@ -150,8 +150,8 @@ final class LinerFrameRelay: @unchecked Sendable {
         linerIsNeutral=plan.eyeliner.isNeutral
         linerRecommendation=plan.madeForYou.first
         if case .eyeliner(let style)? = linerRecommendation?.style { linerStyle=style } else { linerStyle=nil }
-        enabled=Set(enabled.filter { canTry($0) })
-        if canTry(tool) { enabled.insert(tool) }
+        // -Nimah: Only the selected category is visible; other shades/intensities are retained.
+        enabled=canTry(tool) ? [tool] : []
         syncLiner()
     }
 
@@ -182,8 +182,10 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// Selecting a tool also switches its makeup on.
     func choose(_ newTool: TryOnTool) {
         tool = newTool
-        if canTry(newTool) { enabled.insert(newTool) }
-        if newTool == .eyeliner { syncLiner() }
+        isComparing=false
+        enabled=canTry(newTool) ? [newTool] : []
+        syncLiner()
+        recordLiveState()
     }
 
     func choose(shade: MakeupShade) {
@@ -194,7 +196,7 @@ final class LinerFrameRelay: @unchecked Sendable {
             customShades[tool] = Array(picked.suffix(Self.maxCustomShades))
         }
         shades[tool] = shade
-        enabled.insert(tool)
+        enabled=[tool]
         if tool == .eyeliner { syncLiner() }
     }
 
@@ -205,8 +207,8 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     func setIntensity(_ value: Double) {
         guard canTry(tool) else { return }
-        intensities[tool] = min(max(value, 0.1), 1)
-        enabled.insert(tool)
+        intensities[tool] = min(max(value, 0), 1)
+        enabled=[tool]
         if tool == .eyeliner { syncLiner() }
     }
 
@@ -216,6 +218,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         // -Nimah: A late permission response must not revive the home camera behind a scan/tutorial.
         guard !active else { return }
         active=true
+        isComparing=false
         syncLiner()
         activation=Task {
             await brow.prepare()
@@ -223,6 +226,9 @@ final class LinerFrameRelay: @unchecked Sendable {
             await camera.requestPermission()
             guard !Task.isCancelled,active else { return }
             camera.overlay = true
+            try? await Task.sleep(for:.seconds(2))
+            guard !Task.isCancelled,active else { return }
+            recordLiveState()
         }
     }
 
@@ -232,6 +238,12 @@ final class LinerFrameRelay: @unchecked Sendable {
         liner.stop()
         camera.stopSession?()
         camera.suspend()
+        recordLiveState()
+    }
+
+    // -Nimah: Local state flags only; no frames or landmark coordinates in diagnostics.
+    private func recordLiveState() {
+        UserDefaults.standard.set("active=\(active);tool=\(tool);fit=\(hasLaunchFit);enabled=\(enabled.contains(tool));overlay=\(camera.overlay);tracked=\(camera.tracked);guide=\(camera.eyebrowGuideReady);liner=\(liner.hasLiner);linerFrame=\(liner.frame != nil)",forKey:"makeupLiveDiagnostic.v1")
     }
 
     private func layer(_ tool: TryOnTool) -> PreviewLayer {
@@ -241,7 +253,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     /// The liner is a 2D overlay fed by MediaPipe; it runs only while the eyeliner is on.
     private func syncLiner() {
-        guard enabled.contains(.eyeliner), let linerStyle else {
+        guard active, enabled.contains(.eyeliner), let linerStyle else {
             relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
             return

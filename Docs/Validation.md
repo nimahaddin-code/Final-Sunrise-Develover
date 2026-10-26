@@ -1,3 +1,118 @@
+## Blush camera parity correction — -Nimah (27 October 2026)
+
+Removed paired extra horizontal reflections from Metal background and face projection after user reported
+a flip on switching to blush. Signed Release build succeeded; git diff --check clean. Physical camera parity
+requires user confirmation; the prior visual/FPS acceptance predates this orientation correction.
+
+## Beauty blush ARKit / Metal v0.3.0 — -Nimah (27 October 2026)
+
+Full suite: 327 executed, 4 hardware skips, 0 failures. Log `/tmp/sunrise-beauty-blush-acceptance-tests.log`.
+Actual Metal shader tests (not node-existence assertions): camera tint pixels, obstruction restores camera,
+sRGB decode round trip, UV atlas independent cheek channels and nose/upper-area exclusion. A synthetic native
+boundary test identifies a mouth hole without semantic indices. Config invalid values rejected; both final
+JSON schemas validate and six malformed configuration cases are rejected. No physical occlusion quality or
+sustained FPS is established by these synthetic tests. Documentation/parameters/dependencies in
+`Docs/Decisions/0010-metal-blush.md`. Final exported assets/config/schema in workspace
+`output/beauty-blush-v0.3.0`. Signed Release build installed and independently launched on iPhone 17.
+
+Physical iPhone 17 Release acceptance, 27 October 2026: user confirmed blush visible, attached during
+still/smile/slow turns, and blended. User answered yes to hiding behind an obstruction; brush-specific
+coverage was not independently confirmed. Latest approximately two-second runtime window: completed /
+presented 59.98 FPS, mean GPU 1.33 ms, CPU frame arrival-to-GPU-completion p95 54.06 ms (not sensor-to-photon),
+projection agreement 0.000037 pixels, segmentation age 101.67 ms, fresh mask, nominal thermal state, no shader
+or engine error. Visibility 0.726; 77 pigment frames counted in that window. These are a snapshot, not a sustained
+thermal benchmark or an accuracy guarantee. User's “ok” does not establish the requested two-minute duration
+or tutorial/category regression completion. Multiple skin tones, lighting changes, fast/extreme poses and thin
+brush/hair boundaries remain unverified. Bundled face-skin model initialization preflight also passed after
+the full 327-test suite (`/tmp/sunrise-beauty-blush-model-preflight.log`).
+
+
+## Blush v0.2.1 — feedback perangkat · -Nimah (27 Oktober 2026)
+
+Pengguna mengonfirmasi blush terlihat, tetapi meminta lebih lebar/halus. JSON aktif dan ekspor standalone
+`output/blush-reference-v0.2.1/blush-reference.v0.2.1.json` sekarang sinkron untuk enam preset aktif.
+Rasio area ellipse desain meningkat sekitar 45–53%; area aktual tetap terkena safe-mask dan bukan diukur
+langsung dari foto. Kurva radial memakai smoothstep mix JSON; mask inward tiap batas dikalikan terpisah,
+lebar transisi 0.022 W. Grid blush 48x32 tetap dicache; warna/intensitas tidak memicu rebinding.
+34 tes makeup lolos, 0 gagal (`/tmp/sunrise-blush-v021-tests.log`), termasuk pembandingan luas/warna off-center
+terhadap parameter v0.2.0, kontinuitas tepi, safety mask, actual pixel rendering dan binding reuse.
+Revisi ini tetap proposal kalibrasi; penerimaan visual/performa di iPhone pending. Tidak mengubah alis,
+eyeliner, hasil scan, atau rute Retake. Tidak memaksa scan ulang.
+
+## Blush v0.2.0 consumed by app — 27 October 2026 · -Nimah
+
+Resource SHA-256: `45fa1c9a4e755a2522a0c019f184187286075e2038ce5d0bb48cdc5701f3db11`.
+Six active preset parameters match `output/blush-reference-v0.2.0/blush-reference.v0.2.0.json`; original brow
+half-thickness remains 0.065. Full suite: 322 executed, 4 hardware skips, 0 failures; log
+`/tmp/sunrise-blush-v2-tests.log`. Checks include large field radii, broad off-center color, inward-safe mask
+feather with zero leakage, default intensity 0.72, depth-occluder pixel rendering, cached shade updates,
+category selection, stored-fit recovery and navigation. SceneKit owns linear color conversion/compositing;
+no extra manual sRGB decode was added (would double-convert existing UIColor inputs).
+No recorded image similarity to the generated target or device calibration is claimed. Existing conservative
+eye-center mask and lack of brow/blush hand/hair segmentation are documented limits. Device visual check pending.
+
+## Brow size revision v0.1.1 — -Nimah
+
+Bundled JSON is now an integration calibration revision, not byte-identical to the original v0.1.0 artifact.
+SHA-256: `85529d700d0d97fb92518f10247121c9d9cbc8538f3c26edf1eee50f780d37b7`.
+Change: half-thickness design 0.035 → 0.065 of observed brow width, within the declared 0.01...0.08 range.
+Head/tail length and arch displacement cap unchanged. Regression measures body thickness and preservation
+of observed span. 53 selected eyebrow/makeup tests passed, 0 failures (`/tmp/sunrise-brow-size-tests.log`).
+Device visual acceptance remains pending; covered eyebrows cannot establish full anatomical alignment.
+
+## Depth occluder control — 26 October 2026 · -Nimah
+
+30 MakeupPreferenceTests passed with cosmetic depth reads disabled (`/tmp/sunrise-pigment-depth-tests.log`).
+The visible-color pixel test includes a colorless, depth-writing surface in front of pigment. Re-enabling
+old pigment depth reads for the control makes that same test fail: 0 visible pixels, expected >40;
+`/tmp/sunrise-pigment-depth-control.log`. Source restored to the passing policy afterwards.
+This establishes a reproduced self-occlusion failure mode; confirmation on the user's AR camera is pending.
+
+## Partial surface rendering regression — -Nimah
+
+After device report of absent pigment, saved analysis/fit and enabled recommendations were present.
+Added local render-state flags (no image/mesh/coordinates) to distinguish absent guides, config-hidden output,
+missing outline samples and rendered patch counts. Device visual confirmation is still required.
+Renderer now splits brow strips around invalid boundary samples rather than rejecting the entire curve.
+Blush field eligibility is independent of peripheral tutorial boundary binding. Exact JSON radii remain intact.
+Targeted MakeupPreferenceTests passed, including missing-outline regression and actual pigment pixel rendering:
+`/tmp/sunrise-pigment-gap-tests.log`. These are robustness fixes, not proof of the reported device cause.
+
+## JSON database integration — 2026-10-26 · -Nimah
+
+Branch `integration/latest-hanum-khalish`. Bundled JSON SHA-256:
+`a515dc4e4b6e55f6e8c8c1451340124160311840d0cf37ae8e60c812114b597b` (identical to authored artifact).
+Full simulator suite: 318 executed, 4 hardware skips, 0 failures; log `/tmp/sunrise-database-full-tests.log`.
+Signed Release iPhone build passed; log `/tmp/sunrise-database-release.log`.
+Tests cover six JSON assignments, uncovered shapes, required-parameter corruption, full-width ellipse radii,
+rotation, nose exclusion, actual SceneKit color pixels, binding reuse on shade changes, fit persistence,
+exclusive category, and navigation regression. No physical-device visual result is claimed by these tests.
+First visual check should reuse saved fit (no compulsory Retake). Check each category, shade/intensity,
+tutorial return, picker cancel, and force-close/reopen. Publication to staging remains pending device acceptance.
+Known adapter limits: conservative eye-center exclusion instead of measured lower-lid mask; brow/blush have
+no hand/hair segmentation. Natural cosmetic accuracy and tracking error require device calibration.
+
+# Saved scan flow verification — 26 October 2026 -Nimah
+
+- Sources: Khalish scan-overlay-lines `b2d8ae0`, Hanum Eyeliner-Hanum `071d2a0`, Hanum Profile `502e423`.
+- Full iOS simulator suite: 314 executed, 4 skipped, zero failures (`/tmp/sunrise-persist-team-final-tests.log`).
+- Regression covers saved fitting recreation, no extra Vision scan on attachment restoration, and Retake clearing fit.
+- iPhone Release build passed (`/tmp/sunrise-persist-team-release.log`).
+- Installation pending: CoreDevice could not locate Nimah New. Previous installed build does not include saved-scan flow.
+- Device reopen/retake acceptance is pending. Earlier lifecycle build was confirmed smooth by the user.
+- Older installations have saved classifications but no fitting descriptors: enter home using saved results, with a Profile Retake action if pigment is unavailable. One explicit Retake saves the new fitting format; later launches reuse it.
+
+# Latest team integration — 26 October 2026 -Nimah
+
+- Sources: Hanum eyeliner/tutorial `071d2a0`, Hanum profile `502e423`, Khalish scan/debug `99791b3`.
+- iOS simulator suite: 308 executed, 4 skipped, 0 failures (`/tmp/sunrise-team-latest-tests.log`).
+- Signed iPhone Release build: passed (`/tmp/sunrise-team-latest-release.log`).
+- Mac scan editor build: passed (`/tmp/sunrise-team-mac-build.log`).
+- Installation: succeeded on Nimah New, bundle `com.sunrise.foundation`.
+- Pending: user verification of cold launch, initial face/eye scan, exclusive makeup categories, tutorial return, profile and camera recovery.
+- Blush appearance remains awaiting visual acceptance; no physical-device FPS measurement or zero-bug guarantee.
+- Original local changes are backed up in stash `backup local pigment and category before team merge` and `/tmp/sunrise-pre-team-merge.patch`.
+
 # Validasi MVP — 15 Oktober 2026
 
 > -Nimah · team integration: simulator build succeeded; 196 tests, 192 passed, 4 skipped, 0 failed. All 43 FaceShape/MakeupTryOn/Onboarding source files match Eyeliner-Hanum 0493a87 byte-for-byte. Native face alignment remains unverified. See CodeOwnership.md for attribution.

@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C489D19343491FCEF4D67B7; };
+		72410046D68478AB147FADEC /* blush-rendering.json in Resources */ = {isa = PBXBuildFile; fileRef = BF09F9EA1B31E2CEA9FCECC1; };
+		8BBA5B983D53C01D8867678A /* BeautyBlush.metal in Sources */ = {isa = PBXBuildFile; fileRef = A7B094CA5F993727AE496FAB; };
+		614F096B937A6AC4C8AAB4C0 /* BeautyBlushConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF70D0A5E75B40E855ECB86; };
+		40B52D80123CEABD55AB6CD6 /* BeautyBlushEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9716ED0CEE2E6410A4313F0; };
+		DA7ABA5E0000000000000001 /* MakeupRuleDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7ABA5E0000000000000002; };
+		DA7ABA5E0000000000000003 /* makeup-reference.database.json in Resources */ = {isa = PBXBuildFile; fileRef = DA7ABA5E0000000000000004; };
 		5E1A0C0DE0000000000A0012 /* ScanSnapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A0C0DE0000000000A0011 /* ScanSnapshots.swift */; };
 		5E1A0C0DE0000000000A0002 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A0C0DE0000000000A0001 /* ProfileView.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
@@ -173,23 +180,6 @@
 		F88C4B1A73633332F0DE36C2 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */; };
 		F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */; };
 		FD2E311FC44972331A578843 /* TutorialViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */; };
-		747CE2C2522E1795A858B118 /* EyeLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1144E237A35DD2DE14C612B /* EyeLandmarks.swift */; };
-		7949BB244D59EAC66163BCBF /* EyeMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */; };
-		B4A68F2B3FF0993A80DC8193 /* EyeShapeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */; };
-		44431B838956C0B3B1E95ABB /* EyeShapeClassifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */; };
-		1ABF13B48BB7A217862917C2 /* EyeMeasurerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */; };
-		1A5307ED011AADB5879ED95C /* EyeShapeClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */; };
-		CDF83FD989E60F210402362D /* MediaPipeEyeDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A67639F74080F56C5AA328F /* MediaPipeEyeDetector.swift */; };
-		53C9EFC6D892AA68BFCC8C92 /* EyeCameraSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676226E236A23E238E3B1C77 /* EyeCameraSession.swift */; };
-		8344B16103485A1C292BE01E /* MediaPipeEyeDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */; };
-		4FC2D031C41885221C25F6AA /* face_landmarker.task in Resources */ = {isa = PBXBuildFile; fileRef = 01F40072E3CF347862554017 /* face_landmarker.task */; };
-		55C8DD2C95B58EFD9E5AFE38 /* EyeScanGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A37DFE702393E0FA6C8BBC2 /* EyeScanGuide.swift */; };
-		36702EAD50B5B6386984383D /* EyeScanViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A299E490BBED2CF3DFC8DF07 /* EyeScanViewModel.swift */; };
-		531B53A829A58820D8D01370 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413DF4F73EF8C9FCD698014E /* CameraPreviewView.swift */; };
-		933BAE1CA6ED3B8C9B1D09A9 /* EyeScanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */; };
-		39DA0A61353314B90D4BDCC7 /* EyeShapeResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */; };
-		D7450C847008FD8A42518AA1 /* EyeAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */; };
-		07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */; };
 		C5980BE20EF00A5A204E0A33 /* ScanOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2E39F57A28387DE8DE1C1B /* ScanOverlay.swift */; };
 		F98D0D3E66B44C6597817B04 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC99C146DF9B268DA514E88 /* ScanOverlayView.swift */; };
 		107897E62FF99509FF0E00C1 /* FaceGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B60D876730C5FD85E6425C1 /* FaceGuide.swift */; };
@@ -250,6 +240,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blush-wash-mask.png"; sourceTree = "<group>"; };
+		BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "blush-rendering.json"; sourceTree = "<group>"; };
+		A7B094CA5F993727AE496FAB /* BeautyBlush.metal */ = {isa = PBXFileReference; lastKnownFileType = text; path = "BeautyBlush.metal.txt"; sourceTree = "<group>"; };
+		3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyBlushConfiguration.swift"; sourceTree = "<group>"; };
+		F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyBlushEngine.swift"; sourceTree = "<group>"; };
+		DA7ABA5E0000000000000002 /* MakeupRuleDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRuleDatabase.swift; sourceTree = "<group>"; };
+		DA7ABA5E0000000000000004 /* makeup-reference.database.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "makeup-reference.database.json"; sourceTree = "<group>"; };
 		5E1A0C0DE0000000000A0011 /* ScanSnapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSnapshots.swift; sourceTree = "<group>"; };
 		5E1A0C0DE0000000000A0001 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
@@ -417,9 +414,6 @@
 		FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeDetectorTests.swift; sourceTree = "<group>"; };
 		FE2B5E1913561C0593FD7840 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowRegionMapper.swift; sourceTree = "<group>"; };
-		6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeShapeResultView.swift; sourceTree = "<group>"; };
-		2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeAnalysis.swift; sourceTree = "<group>"; };
-		3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanTests.swift; sourceTree = "<group>"; };
 		FA2E39F57A28387DE8DE1C1B /* ScanOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanOverlay.swift; sourceTree = "<group>"; };
 		CFC99C146DF9B268DA514E88 /* ScanOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanOverlayView.swift; sourceTree = "<group>"; };
 		1B60D876730C5FD85E6425C1 /* FaceGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceGuide.swift; sourceTree = "<group>"; };
@@ -468,6 +462,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BEA07F000000000000000001 /* BeautyBlush */ = {isa = PBXGroup; children = (
+				F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */,
+				3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */,
+				A7B094CA5F993727AE496FAB /* BeautyBlush.metal */,
+			); path = BeautyBlush; sourceTree = "<group>"; };
 		0EB509C6F62AD9CF0B9F3D96 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -481,6 +480,9 @@
 			isa = PBXGroup;
 			children = (
 				133DCD5B481F352F758A1E3F /* Assets.xcassets */,
+				DA7ABA5E0000000000000004 /* makeup-reference.database.json */,
+				9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */,
+				BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */,
 				98F393F180238C7106FB99C0 /* Localizable.xcstrings */,
 				CD73965C5395C3CFB4F69902 /* face_landmarker.task */,
 				AA605D264DFFC483849D92C1 /* selfie_multiclass_256x256.tflite */,
@@ -513,6 +515,7 @@
 				3A07AB7461B6903140D1D165 /* BlushPlacementGuide.swift */,
 				9BE83A467EAAC48EF29EBFB8 /* BlushPlacementSketch.swift */,
 				528DBE5F90FFAE037040249C /* MakeupPreferences.swift */,
+				DA7ABA5E0000000000000002 /* MakeupRuleDatabase.swift */,
 			);
 			path = MakeupPreferences;
 			sourceTree = "<group>";
@@ -733,7 +736,8 @@
 				D86BBF720312D2F3CC3CEEAD /* Eyebrow */,
 				D087DAE48C0672211810B9AA /* Forehead */,
 				3023F688733753EB734C8BF9 /* MakeupPreferences */,
-				B95177704166936436E03B4B /* EyeShape */,
+				BEA07F000000000000000001 /* BeautyBlush */,
+
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -807,6 +811,8 @@
 				FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */,
 				6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */,
 				2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */,
+				4029000509C3EA2D31D5DC1C /* EyeOverlay.swift */,
+				72D4C5F7F0C50715B8E1FF04 /* EyeFrameSnapshot.swift */,
 			);
 			path = EyeShape;
 			sourceTree = "<group>";
@@ -961,8 +967,6 @@
 				FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */,
 				6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */,
 				2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */,
-				4029000509C3EA2D31D5DC1C /* EyeOverlay.swift */,
-				72D4C5F7F0C50715B8E1FF04 /* EyeFrameSnapshot.swift */,
 			);
 			path = TryOnHome;
 			sourceTree = "<group>";
@@ -1102,6 +1106,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */,
+				DA7ABA5E0000000000000003 /* makeup-reference.database.json in Resources */,
+				8BBA5B983D53C01D8867678A /* BeautyBlush.metal in Resources */,
+				E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */,
+				72410046D68478AB147FADEC /* blush-rendering.json in Resources */,
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
 				CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */,
 				349F2CBF0A4352FF1D05B64A /* selfie_multiclass_256x256.tflite in Resources */,
@@ -1275,6 +1283,10 @@
 				3063A4C8D849393B67C7EA9E /* BlushPlacementGuide.swift in Sources */,
 				63A3A48CCC399EC783EE5E76 /* BlushPlacementSketch.swift in Sources */,
 				67129ECB6F6B3907B6557698 /* MakeupPreferences.swift in Sources */,
+				DA7ABA5E0000000000000001 /* MakeupRuleDatabase.swift in Sources */,
+
+				614F096B937A6AC4C8AAB4C0 /* BeautyBlushConfiguration.swift in Sources */,
+				40B52D80123CEABD55AB6CD6 /* BeautyBlushEngine.swift in Sources */,
 				DFE49476F0DF2E2C54A6BA8C /* HandOcclusionSegmenter.swift in Sources */,
 				601CB711F407BB508AE96EDE /* HandOcclusion.swift in Sources */,
 				08141B51E306391DEED79934 /* LidFlow.swift in Sources */,
@@ -1344,7 +1356,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1386,7 +1398,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1461,7 +1473,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1483,7 +1495,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

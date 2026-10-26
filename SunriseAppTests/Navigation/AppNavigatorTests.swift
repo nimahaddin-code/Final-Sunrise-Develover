@@ -33,8 +33,8 @@ final class AppNavigatorTests: XCTestCase {
         AppNavigator(defaults: defaults).completeOnboarding()
         let relaunched = AppNavigator(defaults: defaults)
         XCTAssertTrue(relaunched.onboardingComplete)
-        // -Nimah: Remember welcome, but require a new launch scan before try-on.
-        XCTAssertFalse(relaunched.launchScanComplete)
+        // -Nimah: Reopening uses saved results; Profile owns explicit retakes.
+        XCTAssertTrue(relaunched.launchScanComplete)
         XCTAssertEqual(relaunched.selectedTab, .tryOn)
     }
     @MainActor func testFinishingDiscoverFlowPreservesSavedTabHistory() {
@@ -69,6 +69,23 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertEqual(navigator.selectedTab, .tryOn)
         XCTAssertTrue(navigator.tryOnPath.isEmpty)
         XCTAssertEqual(navigator.discoverPath, [.referenceImport])
+    }
+    @MainActor func testProfileRetakeKeepsProfileUntilCompletedOrCancelled() {
+        let navigator=AppNavigator(defaults:defaults)
+        navigator.open(.profile,in:.tryOn)
+        navigator.beginRetake()
+        XCTAssertTrue(navigator.retakePresented)
+        XCTAssertEqual(navigator.tryOnPath,[.profile])
+        navigator.cancelRetake()
+        navigator.retakeDismissed()
+        XCTAssertFalse(navigator.retakePresented)
+        XCTAssertEqual(navigator.tryOnPath,[.profile])
+        navigator.beginRetake()
+        navigator.finishRetake()
+        XCTAssertFalse(navigator.retakePresented)
+        XCTAssertEqual(navigator.tryOnPath,[.profile],"Wait for cover dismissal before activating home")
+        navigator.retakeDismissed()
+        XCTAssertTrue(navigator.tryOnPath.isEmpty)
     }
     @MainActor func testRescanFromHomeReturnsToTryOnRoot() {
         let navigator = AppNavigator(defaults: defaults)

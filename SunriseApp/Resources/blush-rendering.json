@@ -1,0 +1,22 @@
+{
+  "mask_asset": "blush-wash-mask.png",
+  "atlas_size": 1024,
+  "coverage": 0.9,
+  "absorption": 0.65,
+  "saturation": 0.85,
+  "pigment_mix": 0.68,
+  "min_cutoff_hz": 6.0,
+  "velocity_beta": 80.0,
+  "visibility_tau_seconds": 0.055,
+  "mask_max_age_seconds": 0.15,
+  "max_yaw_degrees": 72,
+  "stretch_fade": [
+    0.45,
+    0.7,
+    1.45,
+    1.85
+  ],
+  "target_fps": 60,
+  "thermal_fps": 30,
+  "paint_feather": 0.9
+}

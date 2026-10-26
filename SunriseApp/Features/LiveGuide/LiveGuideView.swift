@@ -14,21 +14,26 @@ struct LiveGuideView: UIViewRepresentable {
     var onFrame: (@Sendable (ARFrame, ARFaceAnchor) -> Void)? = nil
     func makeCoordinator() -> Coordinator { Coordinator(camera: camera, referenceID: referenceID, manager:camera.trackingManager) }
     func makeUIView(context: Context) -> ARSCNView {
-        let view=ARSCNView(frame:.zero)
+        let view=BeautyBlushARView(frame:.zero)
         view.session=camera.trackingManager.session
         view.scene=SCNScene(); view.delegate=context.coordinator
         view.preferredFramesPerSecond=60
         view.rendersContinuously=true; view.isJitteringEnabled=false
         view.antialiasingMode = .multisampling4X
         view.automaticallyUpdatesLighting=false
+        Task { [weak view,coordinator=context.coordinator] in
+            guard let view else{return}
+            if let beauty=await BeautyBlushEngine.make(on:view) {coordinator.installBeauty(beauty)} else {coordinator.camera.beautyStatus=String(localized:"Blush renderer is unavailable")}
+        }
         camera.view=view
         camera.stopSession = { [weak coordinator=context.coordinator, weak view] in if let view { coordinator?.pause(view) } }
         return view
     }
     func updateUIView(_ view: ARSCNView, context: Context) {
-        context.coordinator.configure(visible:camera.overlay, step:camera.guideStep, mode:camera.previewMode,
+        context.coordinator.configure(visible:camera.overlay && active, step:camera.guideStep, mode:camera.previewMode,
             fullLook:camera.previewFullLook, strength:camera.previewStrength, previous:camera.showPreviousSteps,
             style:camera.eyelinerStyle, debug:camera.debugMode, eyebrows:eyebrowConfiguration)
+        context.coordinator.configureBeauty(eyebrowConfiguration,visible:camera.overlay && active)
         context.coordinator.setFrameHandler(onFrame)
         if active && camera.authorized && camera.failure == nil { context.coordinator.start(view) }
         else { context.coordinator.pause(view) }
@@ -38,13 +43,22 @@ struct LiveGuideView: UIViewRepresentable {
     final class Coordinator: NSObject, ARSCNViewDelegate, ARSessionDelegate, @unchecked Sendable {
         let queue=DispatchQueue(label:"sunrise.face-session")
         private let fitQueue=DispatchQueue(label:"sunrise.face-surface-fit",qos:.userInitiated)
-        private let camera: FaceCameraState
+        fileprivate let camera: FaceCameraState
         private let manager: ARFaceTrackingManager
         private let leaseID=UUID()
         private let eyebrowPipeline=EyebrowTrackingPipeline()
         private let referenceID: String
         private let lock=NSLock()
         private var settings=Settings()
+        private var beauty:BeautyBlushEngine?
+        @MainActor func installBeauty(_ engine:BeautyBlushEngine) {
+            engine.onStatus={ [weak camera] message in Task { @MainActor in camera?.update(\.beautyStatus,message) } }
+            lock.lock();beauty=engine;lock.unlock()
+            let s=snapshot().0;lock.lock();let active=sessionActive;lock.unlock();engine.configure(s.visible && active ? s.eyebrows:nil)
+        }
+        @MainActor func configureBeauty(_ config:EyebrowConfiguration?,visible:Bool) {
+            lock.lock();let engine=beauty;lock.unlock();engine?.configure(visible ? config:nil)
+        }
         private var frameHandler: (@Sendable (ARFrame, ARFaceAnchor) -> Void)?
         private var tracked=false, fitAllowed=false
         private var generation=UUID()
@@ -162,6 +176,7 @@ struct LiveGuideView: UIViewRepresentable {
             view.session.run(configuration,options:[.resetTracking,.removeExistingAnchors])
         }
         @MainActor func pause(_ view:ARSCNView) {
+            lock.lock();let engine=beauty;lock.unlock();engine?.pause()
             desiredRunning=false; setTracking(false,canFit:false)
             lock.lock(); generation=UUID(); pending=nil; pendingStyles=[:]; activeAnchorID=nil; sessionActive=false; lock.unlock()
             eyebrowPipeline.reset()
@@ -292,9 +307,14 @@ struct LiveGuideView: UIViewRepresentable {
                 var blush=configuration; blush.region = .blush; blush.showMakeupPreview=configuration.blushLayer.on
                 blush.previewIntensity=configuration.blushLayer.intensity; blush.shadeTint=configuration.blushLayer.tint
                 face.previewRenderer.update(brow:result.guide,forehead:nil,vertices:vertices,triangles:triangles,configuration:brow)
+                lock.lock();let usesBeauty=beauty != nil;lock.unlock()
+                if usesBeauty {blush.showMakeupPreview=false}
                 face.blushPreviewRenderer.update(brow:nil,forehead:nil,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:blush)
             } else {
-                face.previewRenderer.update(brow:result.guide,forehead:result.foreheadGuide,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:configuration)
+                var preview=configuration
+                lock.lock();let usesBeauty=beauty != nil;lock.unlock()
+                if usesBeauty && preview.region == .blush {preview.showMakeupPreview=false}
+                face.previewRenderer.update(brow:result.guide,forehead:result.foreheadGuide,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:preview)
             }
             face.trackingDots.update(vertices:vertices,visible:configuration.showTrackingPoints)
             face.diagnosticNode.isHidden = !configuration.debugMesh
@@ -408,6 +428,7 @@ struct LiveGuideView: UIViewRepresentable {
             lock.lock(); let ticket=generation, active=sessionActive; lock.unlock()
             guard active else { return }
             let face=frame.anchors.compactMap { $0 as? ARFaceAnchor }.first
+            lock.lock();let beautyEngine=beauty;lock.unlock();beautyEngine?.submit(frame,face:face)
             lock.lock(); let handler=frameHandler; lock.unlock()
             if let face,face.isTracked,let handler { handler(frame,face) }
             let normal:Bool
@@ -424,7 +445,8 @@ struct LiveGuideView: UIViewRepresentable {
                         // -Nimah: Reattach the launch fit to this live mesh; never run a second scan in try-on.
                         eyebrowPipeline.followLaunchFit(anchorID:face.identifier,vertices:Array(face.geometry.vertices),
                             triangles:Array(face.geometry.triangleIndices),timestamp:frame.timestamp,style:configuration.style,
-                            blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
+                            blushStyle:configuration.needsBlush ? configuration.blushStyle : nil,
+                            eyeCenters:[face.leftEyeTransform,face.rightEyeTransform].map { SIMD3($0.columns.3.x,$0.columns.3.y,$0.columns.3.z) })
                     } else {
                     eyebrowPipeline.observe(frame:frame,anchor:face,canCalibrate:self.fitStable && relaxed && abs(relative.columns.2.z)>0.85,style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
                     }

@@ -44,74 +44,106 @@ struct BlushPlacementGuide:Sendable {
     let style:BlushPlacementStyle
     let areas:[FaceGuideArea]
     let blendArrows:[FaceGuideArea]
+    var pigmentFields:[BlushPigmentField] = []
+}
+// -Nimah: Exact JSON ellipse in native ARKit face-local metres. Pigment is independent of tutorial marks.
+struct BlushPigmentField:Sendable {
+    let center:SIMD2<Float>
+    let radius:SIMD2<Float>
+    let angle:Float
+    let side:Float
+    let nasalLimit:Float
+    let outerLimit:Float
+    let eyeLimit:Float
+    let opacity:Float
+    let power:Float
+    var edgeFeather:Float = 0
+    var smoothstepMix:Float = 0
+    var bounds:[SIMD2<Float>] {
+        (0...64).map { i in
+            let a=Float(i)*2*Float.pi/64
+            let q=SIMD2(radius.x*cos(a),radius.y*sin(a))
+            return center+SIMD2(side*(q.x*cos(angle)-q.y*sin(angle)),q.x*sin(angle)+q.y*cos(angle))
+        }
+    }
+    func coverage(_ point:SIMD2<Float>)->Float {
+        guard point.x*side>=nasalLimit,point.x*side<=outerLimit,point.y<=eyeLimit else { return 0 }
+        let d=point-center,x=d.x*side,y=d.y
+        let q=SIMD2((x*cos(angle)+y*sin(angle))/radius.x,(-x*sin(angle)+y*cos(angle))/radius.y)
+        let raw=pow(max(0,1-simd_length_squared(q)),power)
+        let smooth=raw*raw*(3-2*raw)
+        let radial=raw+(smooth-raw)*smoothstepMix
+        // -Nimah: Fade inward at safe skin boundaries, without moving or shrinking the JSON ellipse.
+        func mask(_ clearance:Float)->Float {
+            let t=edgeFeather>0 ? max(0,min(1,clearance/edgeFeather)) : 1
+            return t*t*(3-2*t)
+        }
+        // Separate smooth masks avoid a hard gradient ridge where two exclusions meet.
+        return radial*mask(point.x*side-nasalLimit)*mask(outerLimit-point.x*side)*mask(eyeLimit-point.y)
+    }
 }
 enum BlushPlacementGenerator {
     static func make(region:EyebrowRegion,style:BlushPlacementStyle) -> BlushPlacementGuide? {
+        guard let rule=MakeupRuleDatabase.blush(style) else { return nil }
         let vertices=region.restVertices
         guard region.brows.count==2,let lo=vertices.map(\.x).min(),let hi=vertices.map(\.x).max() else { return nil }
-        let width=(hi-lo)/2
-        guard width>0.02,width<0.16 else { return nil }
-        var areas:[FaceGuideArea]=[],arrows:[FaceGuideArea]=[]
+        let width=hi-lo // Full face width, exactly as declared by the database.
+        guard width>0.04,width<0.32 else { return nil }
+        let mappings=region.brows.compactMap(\.mapping)
+        let eyes=region.eyeCenters.count==2 ? region.eyeCenters : mappings.map(\.pupil)
+        guard eyes.count==2 else { return nil }
+        var areas:[FaceGuideArea]=[],fields:[BlushPigmentField]=[],arrows:[FaceGuideArea]=[]
         for brow in region.brows {
-            guard let map=brow.mapping else { return nil }
-            let eye=map.pupil,nose=map.ala,sign:Float=eye.x>0 ? 1 : -1
-            let eyeNose=eye.y-nose.y
-            guard eyeNose>width*0.12,eyeNose<width*1.1 else { return nil }
-            let nasalLimit=abs(nose.x)+width*0.025,outerLimit=width*0.94,eyeLimit=eye.y-width*0.085
-            func bind(_ points:[SIMD2<Float>],id:String,closed:Bool) -> FaceGuideArea? {
-                guard !points.isEmpty,points.allSatisfy({ p in
-                    p.x.isFinite && p.y.isFinite && sign*p.x>=nasalLimit && abs(p.x)<=outerLimit && p.y<=eyeLimit
-                }) else { return nil }
-                let attachments=points.compactMap { SurfaceAttachment.bind($0,vertices:vertices,triangles:region.triangles,minimumZ:map.ala.z-width*0.7) }
-                guard attachments.count==points.count else { return nil }
-                return .init(id:id,boundary:attachments)
+            let points=brow.landmarks.compactMap { $0.position(in:vertices) }
+            guard !points.isEmpty else { return nil }
+            let sign:Float=points.map(\.x).reduce(0,+)>0 ? 1 : -1
+            // Anatomical side comes from measured coordinates, never mirrored screen labels.
+            guard let eye=eyes.first(where:{$0.x*sign>0}) else { return nil }
+            let center=SIMD2(eye.x+sign*width*rule.number("center_outward_offset"),eye.y+width*rule.number("center_vertical_offset"))
+            let nose=brow.mapping.map { abs($0.ala.x)+width*rule.number("nose_margin") }
+                ?? width*rule.number("fallback_midline_exclusion_half_width")
+            // Current adapter lacks a lower-eyelid contour: conservative eye-center exclusion is explicit,
+            // pending contour calibration; it is not represented as a measured eyelid boundary.
+            let field=BlushPigmentField(center:center,radius:SIMD2(width*rule.number("major_radius"),width*rule.number("minor_radius")),
+                angle:rule.number("outward_up_angle")*Float.pi/180,side:sign,nasalLimit:nose,
+                outerLimit:(sign>0 ? hi : -lo)-width*rule.number("face_edge_margin"),
+                eyeLimit:eye.y-width*max(0.06,rule.number("eye_margin")),opacity:rule.number("max_alpha"),power:rule.number("radial_power"),edgeFeather:width*rule.number("mask_edge_feather"),smoothstepMix:rule.number("falloff_smoothstep_mix"))
+            let minimumZ=eye.z-width*0.35
+            func bind(_ p:SIMD2<Float>)->SurfaceAttachment? {
+                SurfaceAttachment.bind(p,vertices:vertices,triangles:region.triangles,minimumZ:minimumZ)
             }
-            var center=SIMD2(abs(eye.x)+width*0.08,eye.y-eyeNose*0.85)
-            var rx=width*0.14,ry=width*0.13,angle:Float=0
-            var blend=SIMD2<Float>.zero
+            // Reject unsafe coverage instead of collapsing the original radii into small dots.
+            var retained=0,total=0
+            for y in -10...10 { for x in -10...10 {
+                let q=SIMD2(Float(x)/10*field.radius.x,Float(y)/10*field.radius.y)
+                guard simd_length_squared(q/field.radius)<=1 else { continue }
+                total += 1
+                let p=center+SIMD2(sign*(q.x*cos(field.angle)-q.y*sin(field.angle)),q.x*sin(field.angle)+q.y*cos(field.angle))
+                if field.coverage(p)>0 { retained += 1 }
+            } }
+            guard Float(retained)/Float(total)>=0.5 else { return nil }
+            let clipped=field.bounds.map { p in SIMD2(sign*max(field.nasalLimit,min(field.outerLimit,sign*p.x)),min(field.eyeLimit,p.y)) }
+            let boundary=clipped.compactMap(bind)
+            // Tutorial boundary and filled pigment have separate eligibility. Do not lose a valid
+            // cheek field because a peripheral guide point falls outside the mesh.
+            if boundary.count==clipped.count { areas.append(.init(id:brow.side.rawValue+"-pigment",boundary:boundary)) }
+            fields.append(field)
+            // Tutorial direction only; final pigment always remains one continuous ellipse per cheek.
+            let direction:SIMD2<Float>
             switch style {
-            case .apple:break
-            case .centerCheek:rx=width*0.17; ry=width*0.14
-            case .cheekbone:center=SIMD2(abs(eye.x)+width*0.11,eye.y-eyeNose*0.62);rx=width*0.20;ry=width*0.08;angle=0.25;blend=SIMD2(width*0.12,width*0.04)
-            case .outerSweep:center=SIMD2(abs(eye.x)+width*0.16,eye.y-eyeNose*0.75);rx=width*0.23;ry=width*0.09;angle=0.25;blend=SIMD2(width*0.11,width*0.03)
-            case .highLift:center=SIMD2(abs(eye.x)+width*0.13,eye.y-eyeNose*0.53);rx=width*0.18;ry=width*0.065;angle=0.20;blend=SIMD2(width*0.10,width*0.025)
-            case .wideHorizontal:center=SIMD2(abs(eye.x)+width*0.08,eye.y-eyeNose*0.94);rx=width*0.22;ry=width*0.09;blend=SIMD2(width*0.12,0)
-            case .centerDown:rx=width*0.16;ry=width*0.16;blend=SIMD2(0,-width*0.10)
-            case .upperInner:center=SIMD2(abs(eye.x)+width*0.015,eye.y-eyeNose*0.65);rx=width*0.12;ry=width*0.10;angle = -0.20
-            case .templeSweep:center=SIMD2(abs(eye.x)+width*0.23,eye.y-eyeNose*0.52);rx=width*0.23;ry=width*0.07;angle=0.65;blend=SIMD2(width*0.10,width*0.09)
-            case .diagonalBlend:center=SIMD2(abs(eye.x)+width*0.12,eye.y-eyeNose*0.72);rx=width*0.20;ry=width*0.10;angle=0.45;blend=SIMD2(width*0.10,width*0.08)
-            case .placementDots:rx=width*0.035;ry=width*0.035
-            case .innerCheek:rx=width*0.17;ry=width*0.09;blend=SIMD2(-width*0.10,0)
+            case .centerDown:direction=SIMD2(0,-1)
+            case .innerCheek:direction=SIMD2(-sign,0)
+            case .wideHorizontal:direction=SIMD2(sign,0)
+            default:direction=SIMD2(sign*cos(field.angle),sin(field.angle))
             }
-            // -Nimah: Personalize width to available cheek skin; no camera-distance scaling or screen offset.
-            rx=min(rx,max(0,center.x-nasalLimit-width*0.005),max(0,outerLimit-center.x-width*0.005))
-            guard rx>width*0.025 else { return nil }
-            var offsets:[SIMD2<Float>] = [.zero]
-            if style == .placementDots { offsets=[.init(-width*0.045,width*0.035),.init(width*0.045,width*0.035),.init(-width*0.045,-width*0.035),.init(width*0.045,-width*0.035)] }
-            for (index,offset) in offsets.enumerated() {
-                var points:[SIMD2<Float>]
-                if style == .upperInner {
-                    points=[.init(-rx,ry*0.5),.init(0,-ry),.init(rx,ry*0.5),.init(rx*0.7,ry),.init(0,-ry*0.25),.init(-rx*0.7,ry),.init(-rx,ry*0.5)]
-                } else {
-                    points=(0...48).map { i in let a=Float(i)*2*Float.pi/48; return SIMD2(rx*cos(a),ry*sin(a)) }
-                }
-                let rotated=points.map { p -> SIMD2<Float> in
-                    let x=p.x*cos(angle)-p.y*sin(angle),y=p.x*sin(angle)+p.y*cos(angle)
-                    return SIMD2(sign*(center.x+offset.x+x),center.y+offset.y+y)
-                }
-                guard let area=bind(rotated,id:"\(brow.side.rawValue)-\(index)",closed:true) else { return nil }
-                areas.append(area)
-            }
-            if simd_length(blend)>0 {
-                let a=SIMD2(sign*center.x,center.y),b=a+SIMD2(sign*blend.x,blend.y)
-                let d=simd_normalize(b-a),perp=SIMD2(-d.y,d.x),head=width*0.035
-                let body=(0...12).map { a+(b-a)*Float($0)/12 }
-                let paths=[body,[b-d*head+perp*head*0.6,b,b-d*head-perp*head*0.6]]
-                for (i,path) in paths.enumerated() {
-                    if let arrow=bind(path,id:"arrow-\(brow.side.rawValue)-\(i)",closed:false) { arrows.append(arrow) }
-                }
+            let end=center+direction*width*rule.number("blend_distance")
+            let perpendicular=SIMD2(-direction.y,direction.x),head=width*0.015
+            let paths=[(0...12).map { center+(end-center)*Float($0)/12 },[end-direction*head+perpendicular*head*0.6,end,end-direction*head-perpendicular*head*0.6]]
+            for (index,path) in paths.enumerated() {
+                let bound=path.compactMap(bind)
+                if bound.count==path.count { arrows.append(.init(id:"arrow-\(brow.side.rawValue)-\(index)",boundary:bound)) }
             }
         }
-        return .init(id:UUID(),style:style,areas:areas,blendArrows:arrows)
+        return .init(id:UUID(),style:style,areas:areas,blendArrows:arrows,pigmentFields:fields)
     }
 }
