@@ -24,6 +24,28 @@ struct EyeScanLandmarks: Equatable, Sendable {
     /// How far the head is turned away from the camera: 0 when facing it, up to 1 when the nose is over a face edge
     /// (positive toward the person's left edge). `nil` when unknown. Turned heads squash one eye and distort tilt, so scans only use frames near 0.
     var headTurn: Float? = nil
+    /// Up/down angle between where the face points and the camera, in radians: positive when the face points above the camera, which
+    /// means the phone is held below eye level. `nil` when unknown. Seen from above or below, lids and tilt look different, so scans only
+    /// use frames near 0. See `pitch(fromPoseMatrix:)`.
+    var headPitch: Float? = nil
+}
+
+extension EyeScanLandmarks {
+    /// The up/down angle from MediaPipe's facial transformation matrix: 4 x 4 values taking its canonical face (looking down +z) into
+    /// camera space (the camera looks down -z with +y up). The face's forward direction there is the rotation's third column.
+    ///
+    /// The storage order (column- or row-major) is told from where the translation sits: the face is always in front of the camera,
+    /// so its z translation is clearly non-zero. `nil` for a matrix that is not 4 x 4 or a face pointing away from the camera.
+    static func pitch(fromPoseMatrix m: [Float]) -> Float? {
+        guard m.count == 16 else { return nil }
+        let columnMajor = abs(m[14]) >= abs(m[11])
+        let forward = columnMajor ? SIMD3<Float>(m[8], m[9], m[10]) : SIMD3<Float>(m[2], m[6], m[10])
+        let length = simd_length(forward)
+        guard length > 0 else { return nil }
+        let direction = forward / length
+        guard direction.z > 0 else { return nil }
+        return asin(direction.y)
+    }
 }
 
 extension EyeScanLandmarks {

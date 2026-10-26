@@ -57,3 +57,10 @@ struct AppRootView: View {
             onTry:{ navigator.returnToRoot(of:.tryOn) })
             .toolbar { NavigationLink("Scan Debug",value:AppRoute.scanDebug) }
         case .fullScan: FullScanFlow(store:faceShapeStore) { navigator.returnToRoot(of:.tryOn) }
+        case .tutorial: BlankPageView(title: "Tutorial")
+        case .eyeScan:
+            EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }
+        case .scanDebug: EmptyView()
+        }
+    }
+}

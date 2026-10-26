@@ -99,12 +99,16 @@ struct EyeScanView: View {
                 .frame(width: 260, height: 340).offset(y: -40).accessibilityHidden(true)
             VStack {
                 Spacer()
-                VStack(spacing: AppSpacing.medium) {
-                    Text(message).font(AppTypography.body).multilineTextAlignment(.center)
-                    ProgressView(value: progress).tint(AppColors.rose)
+                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                    ScanLoadingBar(progress: progress)
+                    HStack(alignment: .firstTextBaseline) {
+                        Text(message).font(AppTypography.body)
+                        Spacer(minLength: AppSpacing.small)
+                        Text(progress, format: .percent.precision(.fractionLength(0)))
+                            .font(AppTypography.body.monospacedDigit()).foregroundStyle(AppColors.subtle)
+                    }
                     Text("Look straight at the camera with your eyes open and relaxed.")
                         .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
-                        .multilineTextAlignment(.center)
                 }
                 .padding(AppSpacing.large)
                 .background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
@@ -115,6 +119,25 @@ struct EyeScanView: View {
     }
 }
 
+/// A rounded rose loading bar that fills smoothly as the scan collects frames.
+struct ScanLoadingBar: View {
+    /// 0 to 1.
+    let progress: Double
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .leading) {
+                Capsule().fill(AppColors.subtle.opacity(0.2))
+                Capsule().fill(AppColors.rose)
+                    .frame(width: geometry.size.width * min(1, max(0, progress)))
+            }
+        }
+        .frame(height: 8)
+        .animation(.linear(duration: 0.25), value: progress)
+        .accessibilityHidden(true)
+    }
+}
+
 private extension EyeScanGuidance {
     var message: LocalizedStringKey {
         switch self {
@@ -122,6 +145,8 @@ private extension EyeScanGuidance {
         case .moveCloser: "Bring the phone a little closer"
         case .moveBack: "Hold the phone a little farther away"
         case .lookStraight: "Face the camera straight on"
+        case .raisePhone: "Raise the phone to eye level"
+        case .lowerPhone: "Lower the phone to eye level"
         case .openEyes: "Open your eyes a little wider"
         case .holdStill: "Hold still, measuring…"
         }

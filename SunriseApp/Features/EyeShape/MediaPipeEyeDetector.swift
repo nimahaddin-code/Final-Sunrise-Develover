@@ -34,6 +34,8 @@ final class MediaPipeEyeDetector: @unchecked Sendable {
         options.baseOptions.modelAssetPath = modelURL.path
         options.runningMode = .video
         options.numFaces = 1
+        // The head pose, for `EyeScanLandmarks.headPitch`.
+        options.outputFacialTransformationMatrixes = true
         do {
             landmarker = try FaceLandmarker(options: options)
         } catch {
@@ -50,7 +52,10 @@ final class MediaPipeEyeDetector: @unchecked Sendable {
               let result = try? landmarker.detect(videoFrame: image, timestampInMilliseconds: timestampMs) else { return nil }
         guard let face = result.faceLandmarks.first else { return .noFace }
         let size = SIMD2(Float(CVPixelBufferGetWidth(pixelBuffer)), Float(CVPixelBufferGetHeight(pixelBuffer)))
-        guard let landmarks = EyeScanLandmarks(normalizedMesh: face.map { SIMD2($0.x, $0.y) }, imageSize: size) else { return nil }
+        guard var landmarks = EyeScanLandmarks(normalizedMesh: face.map { SIMD2($0.x, $0.y) }, imageSize: size) else { return nil }
+        if let pose = result.facialTransformationMatrixes.first, pose.rows == 4, pose.columns == 4 {
+            landmarks.headPitch = EyeScanLandmarks.pitch(fromPoseMatrix: Array(UnsafeBufferPointer(start: pose.data, count: 16)))
+        }
         return .face(landmarks)
     }
 

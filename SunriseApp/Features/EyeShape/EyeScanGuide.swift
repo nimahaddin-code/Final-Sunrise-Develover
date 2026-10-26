@@ -3,7 +3,7 @@ import simd
 
 /// What to tell the person during the eye scan, most urgent first.
 enum EyeScanGuidance: Equatable, Sendable {
-    case findFace, moveCloser, moveBack, lookStraight, openEyes, holdStill
+    case findFace, moveCloser, moveBack, lookStraight, raisePhone, lowerPhone, openEyes, holdStill
 }
 
 /// One camera frame, judged. `measurements` is only set when the frame is good enough to count.
@@ -18,6 +18,8 @@ struct EyeScanFrame: Equatable, Sendable {
 enum EyeScanGuide {
     /// `EyeScanLandmarks.headTurn` beyond this is a turned head.
     static let maxHeadTurn: Float = 0.12
+    /// `EyeScanLandmarks.headPitch` beyond this (10°, the face scan's `HeadPose` limit) means the phone is not at eye level.
+    static let maxHeadPitch: Float = .pi / 18
     /// Distance between the two eye centres as a fraction of the image width. About 0.17 at 30 cm on an iPhone.
     static let eyeSeparationRange: ClosedRange<Float> = 0.12...0.35
 
@@ -30,6 +32,10 @@ enum EyeScanGuide {
         if separation < eyeSeparationRange.lowerBound { return EyeScanFrame(guidance: .moveCloser) }
         if separation > eyeSeparationRange.upperBound { return EyeScanFrame(guidance: .moveBack) }
         if let turn = landmarks.headTurn, abs(turn) > maxHeadTurn { return EyeScanFrame(guidance: .lookStraight) }
+        if let pitch = landmarks.headPitch {
+            if pitch > maxHeadPitch { return EyeScanFrame(guidance: .raisePhone) }
+            if pitch < -maxHeadPitch { return EyeScanFrame(guidance: .lowerPhone) }
+        }
         guard let measurements = EyeMeasurer.measure(landmarks) else { return EyeScanFrame(guidance: .findFace) }
         if measurements.openness < EyeMeasurer.minimumOpenness { return EyeScanFrame(guidance: .openEyes) }
         return EyeScanFrame(guidance: .holdStill, measurements: measurements)

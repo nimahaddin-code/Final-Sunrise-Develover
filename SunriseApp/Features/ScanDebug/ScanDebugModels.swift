@@ -176,16 +176,16 @@ enum ScanDebugMeasure {
         return ScanDebugReport(metrics: metrics, classification: "\(name) · \(Int((result.confidence * 100).rounded()))%")
     }
 
-    /// The eye points as `EyeLandmarks`, so the same measurer and classifier the scan uses can judge them.
-    static func landmarks(from set: ScanDebugPointSet) -> EyeLandmarks? {
-        func eye(_ side: String) -> EyeLandmarks.Eye? {
+    /// The eye points as `EyeScanLandmarks`, so the same measurer and classifier the scan uses can judge them.
+    static func landmarks(from set: ScanDebugPointSet) -> EyeScanLandmarks? {
+        func eye(_ side: String) -> EyeScanLandmarks.Eye? {
             func p(_ part: String) -> SIMD2<Float>? { set.pixel("eye.\(side).\(part)") }
             guard let inner = p("inner"), let outer = p("outer"), let top = p("lidTop"), let bottom = p("lidBottom"),
                   let irisA = p("irisA"), let irisB = p("irisB"), let brow = p("brow") else { return nil }
             return .init(innerCorner: inner, outerCorner: outer, lid: [top, bottom], iris: [irisA, irisB], brow: [brow])
         }
         guard let first = eye("left"), let second = eye("right") else { return nil }
-        return EyeLandmarks(first: first, second: second)
+        return EyeScanLandmarks(first: first, second: second)
     }
 
     private static func zip2<A, B>(_ a: A?, _ b: B?) -> (A, B)? {

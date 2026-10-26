@@ -140,8 +140,9 @@ Plan and decisions: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
   before its `onShowMakeup` runs.
 - Flow: onboarding is welcome, face scan (its result button reads "Next: scan your eyes"), eye scan, then home. Skip leaves only the
   current step. The Try On home shows an eye card ("Scan your eye shape" or the result, with "Scan eyes again") through `AppRoute.eyeScan`.
-- `EyeScanViewModel`: phases idle / unavailable / cameraDenied / failed / scanning / finished. It takes 30 good frames (`EyeScanGuide`
-  rejects too far or close, turned head, closed eyes), classifies their median and stops the camera. The result sheet asks which eyelid
+- `EyeScanViewModel`: phases idle / unavailable / cameraDenied / failed / scanning / finished. It takes 90 good frames (about 3 s; `EyeScanGuide`
+  rejects too far or close, turned head, phone not at eye level, closed eyes), classifies their median and stops the camera. The scan card shows a rounded rose
+  loading bar (`ScanLoadingBar`) with the percentage. The result sheet asks which eyelid
   the person has (`EyeLid`, optional).
 - The eye shape is shown on the home screen but does **not** change the makeup recommendations yet.
 - On devices without TrueDepth the face scan is unavailable, and the home screen still needs a face shape before it shows anything, so
@@ -151,6 +152,9 @@ Plan and decisions: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
   outlines are checked against MediaPipe's own tables in `MediaPipeEyeDetectorTests`; the brow rows and the iris-to-eye assignment (done
   by distance, because MediaPipe's iOS right-iris table returns the left ring) are not, so **check them on a real scan on a device**.
   `headTurn` (0 facing the camera, 1 nose over a face edge) is for gating frames; its limit is still to be chosen on a device.
+  `headPitch` (radians, positive = phone below eye level) comes from MediaPipe's facial transformation matrix
+  (`outputFacialTransformationMatrixes`, read by `EyeScanLandmarks.pitch(fromPoseMatrix:)`); frames beyond ±10° get "Raise / Lower the phone to
+  eye level". The sign convention follows MediaPipe's camera space (+y up); **check on a device that the raise/lower directions are right**.
 - `MediaPipeEyeDetector`: the only file that imports MediaPipe. Wraps Face Landmarker in video mode; `detect(pixelBuffer:timestampMs:)`
   wants upright BGRA frames in increasing time order from one serial queue. The model is `Resources/face_landmarker.task`, bundled, never downloaded.
 - `EyeCameraSession`: front `AVCaptureSession` delivering upright BGRA frames off the main thread. Stop the ARKit face session

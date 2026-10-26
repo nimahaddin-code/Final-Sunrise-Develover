@@ -5,6 +5,18 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Changed
+- Eye scan: takes 90 good frames (about 3 s) instead of 30, so it no longer feels rushed, and the scan card's progress bar is now a rounded rose
+  loading bar with the percentage (`ScanLoadingBar`). Not yet checked on a device.
+- Eye scan only counts frames with the phone at eye level: the head's up/down angle comes from MediaPipe's facial transformation matrix
+  (`EyeScanLandmarks.headPitch`), and beyond ±10° the scan pauses with "Raise the phone to eye level" or "Lower the phone to eye level", like
+  the face scan. Unit tested on synthetic matrices; the raise/lower direction still needs a device check.
+
+### Fixed
+- Build broken by earlier merges: `AppRootView`'s route switch was cut off (restored `tutorial` and `eyeScan`; `scanDebug` shows an empty view),
+  the project listed the eye scan files a second time under `TryOnHome`, `EyeScanViewModel` assigned the result picture to a shadowing parameter,
+  and Scan Debug plus two test files still used the old `EyeLandmarks` name for `EyeScanLandmarks`.
+
 ### Added — Profile page
 - `ProfileView` (profile button): face shape, eye shape and signature look, with the face portrait and eye strip taken from the scans.
 - `ScanSnapshots` keeps one small JPEG per scan on device (not backed up, never uploaded); privacy copy and `AGENTS.md` updated.

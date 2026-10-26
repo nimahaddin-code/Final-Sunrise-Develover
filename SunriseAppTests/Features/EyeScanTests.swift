@@ -218,3 +218,44 @@ final class EyeScanGuideTests: XCTestCase {
         XCTAssertNil(FaceShapeStore(defaults: defaults).eyes)
     }
 }
+
+final class EyeScanLevelTests: XCTestCase {
+    /// A pose 40 cm in front of the camera, pitched by `angle` (positive turns the face's forward direction up, toward +y).
+    private func pose(pitch angle: Float, columnMajor: Bool) -> [Float] {
+        let c = cos(angle), s = sin(angle)
+        // Rotation about x taking (0, 0, 1) to (0, sin, cos); rows of R.
+        let rows: [[Float]] = [[1, 0, 0, 0], [0, c, s, 0], [0, -s, c, -40], [0, 0, 0, 1]]
+        return columnMajor ? (0..<4).flatMap { column in rows.map { $0[column] } } : rows.flatMap { $0 }
+    }
+
+    func testPitchIsReadInEitherStorageOrder() throws {
+        for columnMajor in [true, false] {
+            let angle: Float = 0.3
+            XCTAssertEqual(try XCTUnwrap(EyeScanLandmarks.pitch(fromPoseMatrix: pose(pitch: angle, columnMajor: columnMajor))),
+                           angle, accuracy: 1e-5, "columnMajor \(columnMajor)")
+            XCTAssertEqual(try XCTUnwrap(EyeScanLandmarks.pitch(fromPoseMatrix: pose(pitch: 0, columnMajor: columnMajor))), 0, accuracy: 1e-6)
+        }
+    }
+
+    func testUnusableMatricesGiveNoPitch() {
+        XCTAssertNil(EyeScanLandmarks.pitch(fromPoseMatrix: [1, 2, 3]))
+        XCTAssertNil(EyeScanLandmarks.pitch(fromPoseMatrix: pose(pitch: .pi, columnMajor: true)), "face pointing away")
+    }
+
+    private func evaluate(pitch: Float?) -> EyeScanFrame {
+        var landmarks = SyntheticEyes().landmarks()
+        landmarks.headTurn = 0
+        landmarks.headPitch = pitch
+        return EyeScanGuide.evaluate(landmarks, imageWidth: 300)
+    }
+
+    func testOnlyFramesNearEyeLevelCount() {
+        XCTAssertEqual(evaluate(pitch: 0).guidance, .holdStill)
+        XCTAssertEqual(evaluate(pitch: 0.1).guidance, .holdStill)
+        XCTAssertEqual(evaluate(pitch: nil).guidance, .holdStill)
+        XCTAssertEqual(evaluate(pitch: 0.3).guidance, .raisePhone)
+        XCTAssertEqual(evaluate(pitch: -0.3).guidance, .lowerPhone)
+        XCTAssertNil(evaluate(pitch: 0.3).measurements)
+        XCTAssertNil(evaluate(pitch: -0.3).measurements)
+    }
+}

@@ -130,14 +130,14 @@ final class FaceGuideTests: XCTestCase {
 
 final class EyeOverlayTests: XCTestCase {
     /// Shifted so every point falls inside a 400 x 300 picture.
-    private func landmarks() -> EyeLandmarks {
+    private func landmarks() -> EyeScanLandmarks {
         let synthetic = SyntheticEyes().landmarks()
-        func move(_ eye: EyeLandmarks.Eye) -> EyeLandmarks.Eye {
+        func move(_ eye: EyeScanLandmarks.Eye) -> EyeScanLandmarks.Eye {
             func place(_ p: SIMD2<Float>) -> SIMD2<Float> { SIMD2(p.x + 200, 150 - p.y) }
-            return EyeLandmarks.Eye(innerCorner: place(eye.innerCorner), outerCorner: place(eye.outerCorner),
+            return EyeScanLandmarks.Eye(innerCorner: place(eye.innerCorner), outerCorner: place(eye.outerCorner),
                                     lid: eye.lid.map(place), iris: eye.iris.map(place), brow: eye.brow.map(place))
         }
-        return EyeLandmarks(first: move(synthetic.first), second: move(synthetic.second))
+        return EyeScanLandmarks(first: move(synthetic.first), second: move(synthetic.second))
     }
 
     func testDrawsEachEyeAndTheGapBetweenThem() throws {

@@ -14,8 +14,8 @@ import Combine
         case finished(EyeShapeResult)
     }
 
-    /// About 1 to 2 seconds of good frames at the camera's frame rate.
-    static let requiredSamples = 30
+    /// About 3 seconds of good frames at the camera's 30 fps (longer when frames are rejected), so the scan does not feel rushed.
+    static let requiredSamples = 90
 
     @Published private(set) var phase: Phase = .idle
     /// The last good frame, cropped around the eyes, with the measured lines. For the result screen; in memory only, never saved.
@@ -112,7 +112,7 @@ import Combine
             if let snapshot {
                 Task.detached(priority: .utility) { ScanSnapshots.save(snapshot.buffer, crop: snapshot.crop, as: .eyes) }
             }
-            snapshot = latestSnapshot
+            self.snapshot = latestSnapshot
             phase = .finished(classifier.classify(median))
         } else {
             let next = Phase.scanning(progress: sampler.progress, guidance: frame.guidance)
