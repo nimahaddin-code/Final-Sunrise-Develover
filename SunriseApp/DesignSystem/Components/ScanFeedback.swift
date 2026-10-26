@@ -1,7 +1,9 @@
 import ActivityKit
 import SwiftUI
+import UIKit
 
-/// Runs the scan's Live Activity (the Dynamic Island) and plays the done chime. One instance per scan screen.
+/// Runs the scan's Live Activity. iOS shows it in the Dynamic Island and on the Lock Screen only while the app is *not* open,
+/// so it covers someone who leaves mid-scan; the "done" confirmation inside the app is `DynamicIslandConfirmation`.
 @MainActor final class ScanActivityController {
     private var activity: Activity<ScanActivityAttributes>?
     private var lastStep = -1
@@ -23,7 +25,7 @@ import SwiftUI
             queue = Task {
                 await previous?.value
                 if isDone {
-                    await activity.end(content, dismissalPolicy: .after(.now + 4))
+                    await activity.end(content, dismissalPolicy: .immediate)
                 } else {
                     await activity.update(content)
                 }
@@ -58,14 +60,21 @@ private struct ScanFeedbackModifier: ViewModifier {
             .onChange(of: progress) { _, _ in controller.update(title: title, progress: progress, isDone: isDone) }
             .onChange(of: isDone) { _, done in
                 controller.update(title: title, progress: progress, isDone: done)
-                if done { ScanDoneSound.play() } else { controller.reset() }
+                guard done else { controller.reset(); return }
+                let confirm = {
+                    ScanDoneSound.play()
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                }
+                // Out of the Dynamic Island when there is one; otherwise the scan screen shows `ScanDoneBadge` and this just confirms.
+                if !DynamicIslandConfirmation.show(onCheck: confirm) { confirm() }
             }
             .onDisappear { controller.end() }
     }
 }
 
 extension View {
-    /// Shows the scan in the Dynamic Island while it runs and plays the done chime when `isDone` turns true.
+    /// Keeps the scan's Live Activity current and, when `isDone` turns true, plays the done confirmation: the check out of the
+    /// Dynamic Island with its sound and haptic.
     func scanFeedback(title: String, progress: Double, isDone: Bool) -> some View {
         modifier(ScanFeedbackModifier(title: title, progress: progress, isDone: isDone))
     }

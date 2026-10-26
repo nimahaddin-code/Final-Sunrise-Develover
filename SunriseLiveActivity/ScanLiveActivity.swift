@@ -29,9 +29,7 @@ struct ScanLiveActivity: Widget {
                     }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    if context.state.isDone {
-                        Image(systemName: "checkmark.circle.fill").font(.title).foregroundStyle(Self.done).padding(.trailing, 4)
-                    } else {
+                    if !context.state.isDone {
                         Text(context.state.progress, format: .percent.precision(.fractionLength(0)))
                             .font(.title3.weight(.semibold)).monospacedDigit().padding(.trailing, 4)
                     }

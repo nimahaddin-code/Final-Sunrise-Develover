@@ -52,7 +52,7 @@ SunriseApp/
     Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
-    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge
+    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge, DynamicIslandConfirmation
   Features/
     FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
     MakeupTryOn/          makeup recommendations and live AR try-on

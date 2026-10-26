@@ -121,6 +121,7 @@
 		40A389D58D719C03E924A289 /* ScanDoneSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00FE0CBA25F721369EA024 /* ScanDoneSound.swift */; };
 		095C73223CB18F4CB87D8F88 /* ScanFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAFDE71642B1BA27C0BE123 /* ScanFeedback.swift */; };
 		12B67771C3412EA4AF42638C /* SunriseLiveActivity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2C119ABC2B1BD58FDEE9F41D /* SunriseLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BB162716CFEE33695A896252 /* DynamicIslandConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52A4B9EF768A842105901F0 /* DynamicIslandConfirmation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -271,6 +272,7 @@
 		9F00FE0CBA25F721369EA024 /* ScanDoneSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDoneSound.swift; sourceTree = "<group>"; };
 		2AAFDE71642B1BA27C0BE123 /* ScanFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanFeedback.swift; sourceTree = "<group>"; };
 		2C119ABC2B1BD58FDEE9F41D /* SunriseLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SunriseLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C52A4B9EF768A842105901F0 /* DynamicIslandConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandConfirmation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -436,6 +438,7 @@
 				782BAD5F63492D1E34911828 /* ScanDoneBadge.swift */,
 				9F00FE0CBA25F721369EA024 /* ScanDoneSound.swift */,
 				2AAFDE71642B1BA27C0BE123 /* ScanFeedback.swift */,
+				C52A4B9EF768A842105901F0 /* DynamicIslandConfirmation.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -918,6 +921,7 @@
 				6A8DCD535B6ECFB290460BAF /* ScanActivityAttributes.swift in Sources */,
 				40A389D58D719C03E924A289 /* ScanDoneSound.swift in Sources */,
 				095C73223CB18F4CB87D8F88 /* ScanFeedback.swift in Sources */,
+				BB162716CFEE33695A896252 /* DynamicIslandConfirmation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

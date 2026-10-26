@@ -121,7 +121,8 @@ struct FaceShapeView: View {
     }
 
     @ViewBuilder private var doneBadge: some View {
-        if model.result != nil {
+        // With a Dynamic Island the confirmation grows out of it instead (`DynamicIslandConfirmation`, from `scanFeedback`).
+        if model.result != nil, !DynamicIslandConfirmation.isAvailable {
             ScanDoneBadge().transition(.scale(scale: 0.6).combined(with: .opacity))
         }
     }

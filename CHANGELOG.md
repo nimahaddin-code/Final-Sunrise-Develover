@@ -6,6 +6,12 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 ## Unreleased
 
 ### Added
+- Scan "done" confirmation out of the Dynamic Island (`DynamicIslandConfirmation`), mimicking the App Store / Apple Pay confirmation: a black shape over
+  the hardware island grows into a rounded square, a green check draws itself (with the done sound and a success haptic), then it shrinks back. Drawn by
+  the app in a window above the status bar, because iOS hides an app's own Live Activity from the island while the app is open and the system animation
+  is not available to apps. The island position is estimated from the top safe area. iPhones without an island show `ScanDoneBadge` on the camera
+  instead. The Live Activity now only covers leaving the app mid-scan and ends as soon as the scan finishes. Checked in the iOS 26.2 Simulator
+  (iPhone 17 Pro) through a temporary launch hook; not yet on a device.
 - Dynamic Island and done sound for the face and eye scans. New app extension target `SunriseLiveActivity` (bundle id `com.sunrise.foundation.LiveActivity`)
   shows the scan as a Live Activity: a progress ring while scanning, a green checkmark when done. `ScanActivityAttributes` is compiled into both
   targets, `ScanFeedback` (`.scanFeedback(title:progress:isDone:)`) starts, updates and ends it, and `ScanDoneSound` plays an original two-note chime
