@@ -21,7 +21,7 @@ struct InkColor: Equatable {
 enum LinerInk {
     /// Real liner is a thin, slightly translucent film: the skin's tone bleeds into it. Fraction of the skin colour
     /// mixed into the pigment.
-    static let skinBleed = 0.12
+    static let skinBleed = 0.04
     /// Skin farther than this from the median brightness of the samples is hair, brow or shadow, and is ignored.
     static let skinLumaSpread = 0.16
 

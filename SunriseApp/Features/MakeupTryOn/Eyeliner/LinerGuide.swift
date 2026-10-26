@@ -30,7 +30,7 @@ struct LinerBuildOptions: Equatable {
 
     /// How steeply the wing may point up or down, either way, in radians. The spike clamped it to -20...60 degrees; a
     /// lid pulled hard sideways or upward needs far more room, so the wing may follow the eye up to 80 degrees.
-    static let wingElevationLimit: CGFloat = 80 * .pi / 180
+    static let wingElevationLimit: CGFloat = 24 * .pi / 180
     /// Largest slope (rise over run, in eye widths) used to extend the lash line past a corner. The spike used 0.6.
     static let extensionSlopeLimit: CGFloat = 1.2
 
@@ -38,7 +38,7 @@ struct LinerBuildOptions: Equatable {
     /// beyond the outer corner, a little above the lash line. Lid tracking follows a skin point there.
     static let wingAnchorLocal = CGPoint(x: 1.1, y: -0.05)
     /// The wing tip moves with how far the anchor has moved from that place, at most this many eye widths.
-    static let wingAnchorReach: CGFloat = 0.8
+    static let wingAnchorReach: CGFloat = 0.1
 
     /// Multiplies every thickness of the style (upper liner, wing, lower line). The styles' thicknesses are the research's
     /// natural-line numbers; on screen a marker-like liner reads better thicker, and a squeezed or stretched eye needs it.

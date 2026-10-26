@@ -35,6 +35,7 @@ struct TryOnHomeView: View {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
             }
             toolStrip
+            if home.tool == .eyeliner { linerLookPicker }
             shadeRow.disabled(!home.canTry(home.tool))
             IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
                          tint: home.currentShade?.color ?? AppColors.flamingo)
@@ -120,6 +121,28 @@ struct TryOnHomeView: View {
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+    }
+
+    // MARK: Liner look
+
+    /// Line only or with wing; "no liner" is the no-sign button in the shade row.
+    private var linerLookPicker: some View {
+        HStack(spacing: AppSpacing.small) {
+            ForEach(LinerLook.allCases) { look in
+                let selected = !home.isOff && home.linerLook == look
+                Button { home.setLinerLook(look) } label: {
+                    Text(look.title)
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .background(AppColors.flamingo.opacity(selected ? 0.32 : 0.16), in: Capsule())
+                        .overlay(Capsule().strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0))
+                        .foregroundStyle(AppColors.snow)
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected ? .isSelected : [])
+            }
+        }
+        .disabled(!home.canTry(.eyeliner))
     }
 
     // MARK: Shades

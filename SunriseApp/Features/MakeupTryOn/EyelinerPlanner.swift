@@ -42,6 +42,17 @@ struct EyelinerPlan: Sendable {
     }
 }
 
+/// The two eyeliner looks offered on Try On (a third state, no liner, is the tool being off).
+enum LinerLook: String, CaseIterable, Identifiable, Sendable {
+    /// A clean line along the upper lash line that ends at the outer corner, no wing.
+    case lineOnly
+    /// The same line with the pointed wing from the reference sheet.
+    case winged
+
+    var id: String { rawValue }
+    var title: LocalizedStringResource { self == .lineOnly ? "Liner only" : "With wing" }
+}
+
 /// Picks one liner per eye shape from the research (`Docs/Research/makeup_placement_rules.json`, `eye_shape`) and
 /// combines the strongest two with its `blend_rules` and `combination_rules`.
 ///
@@ -64,6 +75,33 @@ enum EyelinerPlanner {
             style.wingAngle = 0
         }
         return EyelinerPlan(blend: blend, style: style, isNeutral: false, wingRemoved: removesWing)
+    }
+
+    /// `base` (the fitted liner) drawn as `look`. Line only has no wing at all. Winged keeps the fitted wing, but a
+    /// fitted style with a short or no wing (wide-set, neutral) gets the classic cat-eye wing of the reference sheet,
+    /// so the two looks always differ clearly.
+    static func style(_ base: LinerStyle, look: LinerLook) -> LinerStyle {
+        var style = base
+        switch look {
+        case .lineOnly:
+            style.wingLength = 0
+            style.wingAngle = 0
+        case .winged:
+            let classic = variant(for: .almond)
+            if style.wingLength < classic.wingLength {
+                style.wingLength = classic.wingLength
+                style.wingAngle = classic.wingAngle
+                style.wingBase = classic.wingBase
+                style.wingOrigin = classic.wingOrigin
+            }
+            // Reference wings run sideways from the outer corner with only a slight lift, never steeply upward.
+            style.wingBase = .horizontal
+            style.wingTargetsBrowTail = false
+            style.wingAngle = min(max(style.wingAngle, 6), 10)
+            // The wing grows out of the line, so the outer end must be thick enough to carry it.
+            style.outerWidth = max(style.outerWidth, classic.outerWidth)
+        }
+        return style
     }
 
     static var neutralPlan: EyelinerPlan {
@@ -100,36 +138,36 @@ enum EyelinerPlanner {
         switch shape {
         case .almond:
             // Follows the natural lash line from the inner corner, small flick, light lower line.
-            return LinerStyle(innerWidth: 0.010, outerWidth: 0.036, midWidth: 0.022, start: 0, wingLength: 0.15,
-                              wingAngle: 8, wingBase: .lowerLidTangent,
+            return LinerStyle(innerWidth: 0.010, outerWidth: 0.036, midWidth: 0.022, start: 0, wingLength: 0.26,
+                              wingAngle: 14, wingBase: .lowerLidTangent,
                               lowerLine: LowerLine(enabled: true, extent: 0.5, thickness: 0.010), shade: black)
         case .round:
             // Starts a little in from the inner corner, thickens toward a medium wing, light lower line.
-            return LinerStyle(innerWidth: 0.008, outerWidth: 0.030, midWidth: 0.010, start: 0.08, wingLength: 0.20,
-                              wingAngle: 5, wingBase: .lowerLidTangent,
+            return LinerStyle(innerWidth: 0.008, outerWidth: 0.030, midWidth: 0.012, start: 0.08, wingLength: 0.32,
+                              wingAngle: 12, wingBase: .lowerLidTangent,
                               lowerLine: LowerLine(enabled: true, extent: 0.67, thickness: 0.010), shade: black)
         case .hooded:
             // Thin line with a small lifted wing; the tightline is modelled but not drawn.
-            return LinerStyle(innerWidth: 0.006, outerWidth: 0.020, midWidth: 0.012, start: 0, wingLength: 0.16,
-                              wingAngle: 10, wingBase: .lowerLidTangent, tightline: true,
+            return LinerStyle(innerWidth: 0.006, outerWidth: 0.032, midWidth: 0.012, start: 0, wingLength: 0.24,
+                              wingAngle: 18, wingBase: .lowerLidTangent, tightline: true,
                               lowerLine: LowerLine(enabled: true, extent: 0.33, thickness: 0.014), shade: black)
         case .monolid:
             // Thicker toward the outer end so it does not vanish with the eyes open; the wing extends and lifts.
-            return LinerStyle(innerWidth: 0.014, outerWidth: 0.045, midWidth: 0.030, start: 0, wingLength: 0.22,
-                              wingAngle: 10, wingBase: .lowerLidTangent, shade: black)
+            return LinerStyle(innerWidth: 0.014, outerWidth: 0.045, midWidth: 0.030, start: 0, wingLength: 0.32,
+                              wingAngle: 14, wingBase: .lowerLidTangent, shade: black)
         case .upturned:
             // Full upper line, short level wing, lower liner on the outer half.
-            return LinerStyle(innerWidth: 0.008, outerWidth: 0.018, midWidth: 0.012, start: 0, wingLength: 0.12,
-                              wingAngle: 2, wingBase: .horizontal,
+            return LinerStyle(innerWidth: 0.008, outerWidth: 0.018, midWidth: 0.012, start: 0, wingLength: 0.20,
+                              wingAngle: 6, wingBase: .horizontal,
                               lowerLine: LowerLine(enabled: true, extent: 0.5, thickness: 0.012), shade: black)
         case .downturned:
             // Inner corner left open, wing follows the lower lash line toward the brow tail with no extra lift.
-            return LinerStyle(innerWidth: 0.008, outerWidth: 0.034, midWidth: 0.018, start: 0.10, wingLength: 0.15,
-                              wingAngle: 0, wingBase: .lowerLidTangent, shade: black)
+            return LinerStyle(innerWidth: 0.008, outerWidth: 0.034, midWidth: 0.018, start: 0.10, wingLength: 0.28,
+                              wingAngle: 18, wingBase: .lowerLidTangent, shade: black)
         case .closeSet:
             // Very thin from the inner corner, thickest at the outer end, tapered wing in line with the brow tail.
-            return LinerStyle(innerWidth: 0.004, outerWidth: 0.034, midWidth: 0.008, start: 0, wingLength: 0.30,
-                              wingAngle: 0, wingBase: .horizontal, wingTargetsBrowTail: true, shade: black)
+            return LinerStyle(innerWidth: 0.004, outerWidth: 0.034, midWidth: 0.008, start: 0, wingLength: 0.34,
+                              wingAngle: 6, wingBase: .horizontal, wingTargetsBrowTail: true, shade: black)
         case .wideSet:
             // Strongest at the inner corner, thinning outward, no wing.
             return LinerStyle(innerWidth: 0.028, outerWidth: 0.010, midWidth: 0.020, start: 0, wingLength: 0,

@@ -115,4 +115,13 @@ final class EyelinerPlannerTests: XCTestCase {
         XCTAssertTrue(plan.eyeliner.isNeutral)
         XCTAssertEqual(plan.madeForYou.last?.style, .eyeliner(EyelinerPlanner.naturalLine))
     }
+
+    func testLinerLooksDifferClearly() {
+        for shape in EyeShape.allCases {
+            let base = EyelinerPlanner.variant(for: shape)
+            XCTAssertEqual(EyelinerPlanner.style(base, look: .lineOnly).wingLength, 0, "\(shape)")
+            XCTAssertGreaterThanOrEqual(EyelinerPlanner.style(base, look: .winged).wingLength, 0.20, "\(shape)")
+        }
+        XCTAssertGreaterThan(EyelinerPlanner.style(EyelinerPlanner.naturalLine, look: .winged).wingLength, 0)
+    }
 }

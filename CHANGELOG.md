@@ -5,6 +5,13 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Added — eyeliner looks: line only or with wing
+- Try On eyeliner has "Liner only" (no wing) and "With wing" (default); the no-sign button is the third state. `LinerLook` and
+  `EyelinerPlanner.style(_:look:)` choose the style: winged runs sideways from the outer corner (horizontal base, 6-10 deg lift) and always
+  has at least the classic cat-eye wing length. Per-shape wing lengths/angles follow the reference sheet.
+- Wing elevation limit 80 -> 24 deg and wing skin-anchor reach 0.8 -> 0.1 so the wing no longer points steeply up.
+- Liner ink is darker and less see-through (`maxOpacity` 1.0, `inkReflectance` 0.05, `skinBleed` 0.04). Not checked on a real device.
+
 ### Changed — colour sheet follows the design
 - The shade row's last button is a "+" again. It opens `PaletteColorPicker` as the design's two steps: "Snap Your Product" (live back camera,
   `ProductCamera`, shutter) then "Pick Your Colour" (drag the pin, retake, colour preview, confirm). A picked colour shows as an extra
