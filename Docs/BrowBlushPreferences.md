@@ -1,3 +1,55 @@
+## Blush v0.2.1 — feedback perangkat · -Nimah (27 Oktober 2026)
+
+Pengguna mengonfirmasi blush terlihat, tetapi meminta lebih lebar/halus. JSON aktif dan ekspor standalone
+`output/blush-reference-v0.2.1/blush-reference.v0.2.1.json` sekarang sinkron untuk enam preset aktif.
+Rasio area ellipse desain meningkat sekitar 45–53%; area aktual tetap terkena safe-mask dan bukan diukur
+langsung dari foto. Kurva radial memakai smoothstep mix JSON; mask inward tiap batas dikalikan terpisah,
+lebar transisi 0.022 W. Grid blush 48x32 tetap dicache; warna/intensitas tidak memicu rebinding.
+34 tes makeup lolos, 0 gagal (`/tmp/sunrise-blush-v021-tests.log`), termasuk pembandingan luas/warna off-center
+terhadap parameter v0.2.0, kontinuitas tepi, safety mask, actual pixel rendering dan binding reuse.
+Revisi ini tetap proposal kalibrasi; penerimaan visual/performa di iPhone pending. Tidak mengubah alis,
+eyeliner, hasil scan, atau rute Retake. Tidak memaksa scan ulang.
+
+## Blush v0.2.0 — JSON aktif dan renderer · -Nimah
+
+Revisi JSON berikutnya langsung dihubungkan ke aplikasi dalam pekerjaan yang sama. Tetap perlu build/install;
+bukan hot update dari server. Tidak otomatis merge ke staging/main.
+
+Visual lebar/membaur diterjemahkan ke enam preset aktif: radius utama 0.150–0.190 dan radius kecil 0.095–0.115
+kali lebar **penuh** wajah, falloff power 1.10–1.15, alpha maksimum 0.44–0.48, intensitas awal 0.72.
+`mask_edge_feather` 0.012 W dipakai oleh `BlushPigmentField.coverage` sebagai smoothstep ke dalam batas aman.
+Medan warna tetap satu per pipi, tidak mengecil menjadi titik saat terpotong batas dan tidak memakai panah.
+Render contract dibundel di `tracking_and_rendering.blush_wide_wash_contract`; parameter runtime dikonsumsi
+oleh decoder/generator/renderer, bukan sekadar instruksi teks. Rules/palettes alis dan Hanum eyeliner dipertahankan.
+Revisi ini target visual hasil arahan pengguna, belum ukuran yang dikalibrasi di perangkat atau jaminan pixel-identik.
+
+## Kalibrasi ukuran alis v0.1.1 — -Nimah
+
+Feedback pengguna: badan alis terlalu kecil. Salinan JSON integration memakai half-thickness 0.065 dari
+panjang alis teramati (sebelumnya 0.035). Ini ketebalan desain yang dikalibrasi, bukan ketebalan hasil deteksi.
+Sumber penelitian v0.1.0 di workspace tidak ditimpa. Panjang kepala-ke-ekor dan batas displacement tetap.
+
+## Implementasi JSON di integration — 26 Oktober 2026 · -Nimah
+
+`integration/latest-hanum-khalish` membundel JSON penelitian utuh, tanpa mengubah status draft sumber.
+Mode integrasi mengaktifkan preset untuk kalibrasi sesuai permintaan pengguna. Tidak ada database jaringan.
+`MakeupRuleDatabase` memvalidasi join assignment, keunikan ID, parameter wajib, unit, batas numerik, dan RGB.
+Kegagalan decode tidak kembali diam-diam ke assignment lama.
+
+Rasio blush dikalikan **lebar penuh** mesh wajah dalam meter. Mata tiap sisi menjadi anchor; sumbu native
+ARKit face-local mengikuti pose melalui barycentric attachments. Radius dan sudut JSON tidak diperbesar lagi
+oleh renderer. Warna adalah satu medan alpha `(1-r²)^power` per pipi. Mask hidung konservatif dipakai jika
+formula ala tidak tersedia. Batas mata saat ini memakai proksi konservatif pusat mata, belum kontur kelopak
+terukur. Tidak ada masking tangan/hijab untuk brow/blush; eyeliner Hanum tetap menggunakan jalurnya sendiri.
+
+Alis mempertahankan centerline observasi, dengan dua segmen cubic dan displacement maksimum JSON. Ketebalan
+awal adalah rasio desain terhadap lebar alis, bukan diakui sebagai ketebalan yang terukur dari Vision.
+Head fade, taper dan edge feather menjaga ujung lebih lembut. Palette dan intensitas awal dibaca dari JSON.
+Warna custom tidak mengganti preset penempatan. Before/After dan kategori tunggal tetap berlaku.
+
+Database sumber: `output/makeup-reference-database-v1` pada workspace SUNRISE. Tes geometri/simulator tidak
+membuktikan akurasi wajah nyata. Validasi visual iPhone masih diperlukan sebelum publikasi staging.
+
 ## Koreksi kegagalan persiapan awal — -Nimah
 
 Frame yang ditawarkan selama face scan dibatasi 400 ms dengan satu pekerjaan aktif; collector berhenti setelah
@@ -47,19 +99,19 @@ karena cahaya, white balance, dan warna layar berbeda.
 ## Rekomendasi otomatis dari hasil scan — -Nimah
 
 Alur pengguna menampilkan satu hasil per kategori, bukan pilihan semua referensi.
-Data saat ini adalah katalog lokal `MakeupPreferenceCatalog`, bukan database server.
+Data aktif dibaca sekali dari JSON lokal `Resources/makeup-reference.database.json` oleh `MakeupRuleDatabase`.
 `assignedBrowIDs` dan `assignedBlushIDs` menetapkan ID stabil; varian penelitian tetap disimpan
-untuk provenance, tanpa picker A/B/C. Aturan MVP ini mempertahankan default sebelumnya secara eksplisit,
-bukan klaim satu style yang paling benar untuk setiap orang.
+untuk provenance, tanpa picker A/B/C. Pilihan JSON menggantikan default A sebelumnya. Semua parameter masih proposal kalibrasi,
+bukan hasil pengukuran poster atau klaim style universal.
 
 | Hasil wajah | Eyebrow | Blush |
 | --- | --- | --- |
-| Oval | A · upward brow | A · outer sweep |
-| Round | A · defined angle | A · apple |
-| Square | A · rounded curve | A · placement dots |
-| Oblong | B · straight | B · wide horizontal |
-| Heart | B · low arch | A · upper inner |
-| Diamond | A · soft arch | A · temple sweep |
+| Oval | C · natural | B · cheekbone |
+| Round | C · high arch | D · high cheekbone |
+| Square | C · rounded | B · apple |
+| Oblong | C · straight | D · horizontal |
+| Heart | B · low arch | B · center cheek |
+| Diamond | C · soft arch | A · temple sweep |
 | Triangle / pear, rectangle | Belum ada data | Belum ada data |
 
 Data kosong atau tanpa scan: overlay kategori tersebut mati dan tidak diganti style generik.

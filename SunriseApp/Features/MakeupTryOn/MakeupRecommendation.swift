@@ -39,12 +39,18 @@ struct MakeupShade: Identifiable, Hashable, Sendable {
 enum MakeupPalette {
     static func shades(for category: MakeupCategory) -> [MakeupShade] {
         switch category {
-        case .eyebrow: [bistre, referenceBrown, chocolate, tan, softBlack]
-        case .blush: [pink, peach, winterPink, mutedMauve]
+        case .eyebrow: databaseShades(category:"eyebrow")
+        case .blush: databaseShades(category:"blush")
         case .eyeliner: [brown, plum, navy, black]
         }
     }
 
+    // -Nimah: Chosen JSON palette, decoded once with the geometry rules.
+    static func databaseShades(category:String)->[MakeupShade] {
+        (MakeupRuleDatabase.shared?.palettes ?? []).filter { $0.category==category }.map {
+            MakeupShade(id:$0.id,name:LocalizedStringResource("\($0.name)"),red:$0.color.value[0],green:$0.color.value[1],blue:$0.color.value[2],opacity:1)
+        }
+    }
     // -Nimah: Approximate sRGB previews inspired by the supplied photos, not measured product colours.
     static let pink = MakeupShade(id:"blush.pink",name:"01 Pink",red:0.91,green:0.29,blue:0.38,opacity:0.36)
     static let winterPink = MakeupShade(id:"blush.winterPink",name:"03 Winter Pink",red:0.89,green:0.48,blue:0.57,opacity:0.36)

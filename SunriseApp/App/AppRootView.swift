@@ -7,7 +7,7 @@ struct AppRootView: View {
 
     var body: some View {
         Group {
-            if navigator.launchScanComplete {
+            if navigator.launchScanComplete && faceShapeStore.latest != nil && faceShapeStore.eyes != nil {
                 // Try On is the only screen: no tab bar.
                 NavigationStack(path: $navigator.tryOnPath) {
                     TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
@@ -22,6 +22,10 @@ struct AppRootView: View {
             } else {
                 OnboardingView(store: faceShapeStore, showWelcome:!navigator.onboardingComplete, onFinish: navigator.completeOnboarding)
             }
+        }
+        .fullScreenCover(isPresented:$navigator.retakePresented,onDismiss:navigator.retakeDismissed) {
+            OnboardingView(store:faceShapeStore,showWelcome:false,onCancel:navigator.cancelRetake,
+                           onFinish:navigator.finishRetake)
         }
     }
 
@@ -52,9 +56,12 @@ struct AppRootView: View {
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
         case .faceScan:
             FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
-        // -Nimah: Profile shows launch results, without starting another scan.
-        case .profile: MakeupRecommendationsView(store:faceShapeStore,allowsRescan:false,
-            onScanFace:{ navigator.open(.faceScan,in:.tryOn) },onScanEyes:{ navigator.open(.eyeScan,in:.tryOn) })
+        // -Nimah: Integrate Hanum profile and Khalish debug without changing the launch-only scan flow.
+        case .profile: ProfileView(store:faceShapeStore,onRetake:navigator.beginRetake,
+            onTry:{ navigator.returnToRoot(of:.tryOn) })
+            .toolbar { NavigationLink("Scan Debug",value:AppRoute.scanDebug) }
+        case .fullScan: OnboardingView(store:faceShapeStore,showWelcome:false,onCancel:{ navigator.returnToRoot(of:.tryOn) }) { navigator.returnToRoot(of:.tryOn) }
+        case .scanDebug: ScanDebugView()
         case .tutorial: BlankPageView(title: "Tutorial")
         case .eyeScan:
             EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }

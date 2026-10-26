@@ -52,6 +52,8 @@ enum TutorialTab: CaseIterable, Identifiable {
     private let linerStyle: LinerStyle?
     private let linerIsNeutral: Bool
     private var bag = Set<AnyCancellable>()
+    // -Nimah: Hidden tutorial tabs must not start a second detector during navigation.
+    private var active = false
 
     init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment, plan: MakeupPlan, handoff: TutorialHandoff) {
         self.handoff = handoff
@@ -116,9 +118,10 @@ enum TutorialTab: CaseIterable, Identifiable {
         return false
     }
 
-    func activate() { camera.overlay = true; syncLiner() }
+    func activate() { active = true; camera.overlay = true; syncLiner() }
 
     func deactivate() {
+        active = false
         relay.setEnabled(false)
         liner.stop()
         camera.stopSession?()
@@ -132,7 +135,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     private func syncLiner() {
-        guard tab == .eyeliner, let linerStyle else {
+        guard active, tab == .eyeliner, let linerStyle else {
             relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
             return

@@ -2,7 +2,7 @@
 import Foundation
 import simd
 
-struct SurfaceAttachment: Sendable {
+struct SurfaceAttachment: Sendable, Codable {
     let indices: SIMD3<Int>
     let weights: SIMD3<Float>
     func position(in vertices: [SIMD3<Float>], lift: Float = 0) -> SIMD3<Float>? {

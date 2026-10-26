@@ -2,7 +2,7 @@ import Combine
 import Foundation
 
 /// The latest face shape scan, shared by onboarding and the Try On home screen.
-/// When given `UserDefaults`, only the classified result is kept on device so onboarding runs once; no images or meshes are saved.
+/// When given `UserDefaults`, the classified result is kept on device so onboarding runs once; meshes are never saved. Scan stills live in `ScanSnapshots`.
 @MainActor final class FaceShapeStore: ObservableObject {
     static let latestKey = "latestFaceShapeResult"
     static let latestEyesKey = "latestEyeShapeResult"

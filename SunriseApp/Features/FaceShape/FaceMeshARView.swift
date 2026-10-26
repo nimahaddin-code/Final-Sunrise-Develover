@@ -5,12 +5,15 @@ import SwiftUI
 /// Front camera feed with ARKit's face mesh drawn as a wireframe that follows the face.
 struct FaceMeshARView: UIViewRepresentable {
     let session: ARSession
+    /// Gets this view, so the result can show the camera picture the person saw.
+    var snapshotter: FaceSnapshotter?
 
     func makeCoordinator() -> FaceMeshRenderer { FaceMeshRenderer() }
 
     func makeUIView(context: Context) -> ARSCNView {
         let view = ARSCNView(frame: .zero)
         view.session = session
+        snapshotter?.view = view
         view.delegate = context.coordinator
         view.automaticallyUpdatesLighting = false
         return view

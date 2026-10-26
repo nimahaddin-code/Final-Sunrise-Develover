@@ -45,13 +45,13 @@ final class EyebrowTrackingPipeline: @unchecked Sendable {
     }
     // -Nimah: No Vision scan, sample accumulation, head-pose or hold-still gate in try-on.
     func followLaunchFit(anchorID:UUID,vertices:[SIMD3<Float>],triangles:[Int16],timestamp:TimeInterval,
-                         style:EyebrowStyle,blushStyle:BlushPlacementStyle?,cache:LaunchMakeupFit = .shared) {
+                         style:EyebrowStyle,blushStyle:BlushPlacementStyle?,eyeCenters:[SIMD3<Float>] = [],cache:LaunchMakeupFit = .shared) {
         resumeTracking(anchorID:anchorID)
         lock.lock()
         guard self.anchorID==anchorID,!busy else { lock.unlock();return }
         guard region==nil || guide?.style != style || blush?.style != blushStyle else { lock.unlock();return }
         let token=ticket;busy=true;lock.unlock()
-        guard let fitted=cache.fittedRegion(anchorID:anchorID,vertices:vertices,triangles:triangles,timestamp:timestamp) else {
+        guard let fitted=cache.fittedRegion(anchorID:anchorID,vertices:vertices,triangles:triangles,timestamp:timestamp,eyeCenters:eyeCenters) else {
             complete(token:token,id:anchorID,region:nil,guide:nil,errorMessage:"Launch fit unavailable")
             return
         }
@@ -181,29 +181,82 @@ final class EyebrowTrackingPipeline: @unchecked Sendable {
 // -Nimah: Transient fitting from the launch scan. No photo or mesh is written to disk.
 // A new launch scan invalidates the old fit; try-on only reuses attachments on matching ARKit topology.
 final class LaunchMakeupFit: @unchecked Sendable {
-    static let shared=LaunchMakeupFit()
+    static let shared=LaunchMakeupFit(defaults:.standard)
     private let lock=NSLock()
     private var epoch=UUID()
     private var region:EyebrowRegion?
-    var hasFit:Bool { lock.lock();defer { lock.unlock() };return region != nil }
-    func clear() { lock.lock();epoch=UUID();region=nil;lock.unlock() }
+    // -Nimah: Persist only sparse fitting descriptors, never a frame, full mesh or triangle array.
+    private struct SavedFit:Codable {
+        let brows:[EyebrowRegion.Brow]
+        let vertexCount:Int
+        let triangleCount:Int
+        let confidence:Float
+        var eyeCenters:[SIMD3<Float>]? = nil
+    }
+    private static let key="savedMakeupAttachments.v1"
+    private let defaults:UserDefaults?
+    private var saved:SavedFit?
+    private var lastStage="not_started"
+    var diagnostic:String { lock.lock();defer { lock.unlock() };return lastStage }
+    init(defaults:UserDefaults? = nil) {
+        self.defaults=defaults
+        saved=defaults?.data(forKey:Self.key).flatMap { try? JSONDecoder().decode(SavedFit.self,from:$0) }
+        if saved?.brows.count != 2 { saved=nil }
+    }
+    var hasFit:Bool { lock.lock();defer { lock.unlock() };return region != nil || saved != nil }
+    func clear() { lock.lock();epoch=UUID();region=nil;saved=nil;defaults?.removeObject(forKey:Self.key);lock.unlock() }
     func prepare(_ input:FaceLandmarkFrame,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider(requireEyeFormula:false))->Bool {
         lock.lock();let token=epoch;lock.unlock()
-        guard let detected=try? provider.detectEyebrows(in:input),!Task.isCancelled else { return false }
-        let mapped=detected.compactMap { detection in
-            EyebrowRegionMapper.map(detection,projection:input.projection,vertices:input.vertices,triangles:input.triangles,
-                leftEye:input.leftEye,rightEye:input.rightEye,timestamp:input.timestamp,anchorID:input.anchorID,requireFormula:false)
-        }.max { $0.faceObservationConfidence < $1.faceObservationConfidence }
-        guard let mapped,EyebrowGuideGenerator.make(region:mapped,style:.natural) != nil else { return false }
+        // -Nimah: Match the scan module's supported sensor orientations during enrollment only.
+        // Validate actual projected brow attachments before accepting a fallback; no guessed coordinates.
+        var mapped:EyebrowRegion?
+        var stage="landmarks_not_detected"
+        let orientations=[input.orientation]+FaceContourDetector.orientations.filter { $0 != input.orientation }
+        for orientation in orientations {
+            guard !Task.isCancelled else { return false }
+            let sample=FaceLandmarkFrame(pixelBuffer:input.pixelBuffer,projection:input.projection,orientation:orientation,
+                timestamp:input.timestamp,anchorID:input.anchorID,vertices:input.vertices,triangles:input.triangles,
+                leftEye:input.leftEye,rightEye:input.rightEye)
+            guard let detected=try? provider.detectEyebrows(in:sample) else { continue }
+            mapped=detected.compactMap { detection in
+                EyebrowRegionMapper.map(detection,projection:sample.projection,vertices:sample.vertices,triangles:sample.triangles,
+                    leftEye:sample.leftEye,rightEye:sample.rightEye,timestamp:sample.timestamp,anchorID:sample.anchorID,requireFormula:false,diagnostic:{ stage=$0 })
+            }.filter {
+                let valid=EyebrowGuideGenerator.make(region:$0,style:.natural) != nil
+                if !valid { stage="guide_generation" };return valid
+            }
+                .max { $0.faceObservationConfidence < $1.faceObservationConfidence }
+            if mapped != nil { break }
+        }
+        guard let mapped else { lock.lock();lastStage=stage;lock.unlock();return false }
         lock.lock();defer { lock.unlock() }
         guard epoch==token,!Task.isCancelled else { return false }
-        region=mapped;return true
+        region=mapped;lastStage="fit_ready"
+        saved=SavedFit(brows:mapped.brows,vertexCount:mapped.restVertices.count,triangleCount:mapped.triangles.count,confidence:mapped.faceObservationConfidence,eyeCenters:mapped.eyeCenters)
+        if let saved,let data=try? JSONEncoder().encode(saved) { defaults?.set(data,forKey:Self.key) }
+        return true
     }
-    func fittedRegion(anchorID:UUID,vertices:[SIMD3<Float>],triangles:[Int16],timestamp:TimeInterval)->EyebrowRegion? {
+    // -Nimah: Commit a completed retake atomically; cancellation/failure keeps the previous saved fit.
+    func replace(with candidate:LaunchMakeupFit)->Bool {
+        candidate.lock.lock();let next=candidate.region,descriptor=candidate.saved;candidate.lock.unlock()
+        guard let next,let descriptor else { return false }
         lock.lock();defer { lock.unlock() }
+        epoch=UUID();region=next;saved=descriptor
+        if let data=try? JSONEncoder().encode(descriptor) { defaults?.set(data,forKey:Self.key) }
+        return true
+    }
+    func fittedRegion(anchorID:UUID,vertices:[SIMD3<Float>],triangles:[Int16],timestamp:TimeInterval,eyeCenters:[SIMD3<Float>] = [])->EyebrowRegion? {
+        lock.lock();defer { lock.unlock() }
+        if region==nil,let saved,saved.vertexCount==vertices.count,saved.triangleCount==triangles.count,
+           saved.brows.allSatisfy({ $0.landmarks.count>=3 && $0.landmarks.allSatisfy { $0.position(in:vertices) != nil } }) {
+            // -Nimah: Reattach stored barycentric brow anchors to the current live face; no classification or Vision scan.
+            region=EyebrowRegion(brows:saved.brows,faceObservationConfidence:saved.confidence,timestamp:timestamp,
+                anchorID:anchorID,restVertices:vertices,triangles:triangles,eyeCenters:saved.eyeCenters ?? eyeCenters)
+        }
         guard let region,region.restVertices.count==vertices.count,region.triangles==triangles else { return nil }
         return EyebrowRegion(brows:region.brows,faceObservationConfidence:region.faceObservationConfidence,
-            timestamp:timestamp,anchorID:anchorID,restVertices:region.restVertices,triangles:region.triangles)
+            timestamp:timestamp,anchorID:anchorID,restVertices:region.restVertices,triangles:region.triangles,
+            eyeCenters:region.eyeCenters.isEmpty ? eyeCenters : region.eyeCenters)
     }
 }
 
@@ -212,15 +265,24 @@ final class LaunchMakeupFit: @unchecked Sendable {
     private var pending:Task<Void,Never>?
     private let cache:LaunchMakeupFit
     private let provider:any FaceLandmarkProviding
+    private var candidate=LaunchMakeupFit()
+    private var generation=UUID()
+    private var attempts=0
     init(cache:LaunchMakeupFit = .shared,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider(requireEyeFormula:false)) {
         self.cache=cache;self.provider=provider
     }
     func submit(_ input:FaceLandmarkFrame) {
-        guard pending==nil,!cache.hasFit else { return }
+        guard pending==nil,!candidate.hasFit else { return }
+        let token=generation
+        attempts += 1
         pending=Task {
-            _=await Task.detached(priority:.userInitiated) { [cache,provider] in cache.prepare(input,provider:provider) }.value
+            _=await Task.detached(priority:.userInitiated) { [candidate,provider] in candidate.prepare(input,provider:provider) }.value
+            guard generation==token else { return }
+            // -Nimah: Local stage/counter only; never log images, landmarks or mesh coordinates.
+            UserDefaults.standard.set("attempts=\(attempts);stage=\(candidate.diagnostic)",forKey:"makeupFitDiagnostic.v1")
             pending=nil
         }
     }
-    func finish() async -> Bool { await pending?.value;return cache.hasFit }
+    func finish() async -> Bool { await pending?.value;return cache.replace(with:candidate) }
+    func restart() { generation=UUID();attempts=0;pending?.cancel();pending=nil;candidate=LaunchMakeupFit();UserDefaults.standard.set("attempts=0;stage=waiting_for_frame",forKey:"makeupFitDiagnostic.v1") }
 }

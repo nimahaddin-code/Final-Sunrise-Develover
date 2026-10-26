@@ -1,9 +1,114 @@
+## Blush camera parity — -Nimah (2026-10-27)
+
+Removed the extra horizontal reflection from both Metal camera sampling and mesh projection.
+Blush now uses ARFrame displayTransform/projection directly to match the existing ARSCNView categories.
+Keep camera and mesh transforms paired; do not introduce category-specific mirroring. Device acceptance pending.
+
+## Native UV Metal blush — -Nimah (2026-10-27)
+
+Primary blush engine is ARKit + Metal via BeautyBlushARView/BeautyBlushEngine, sharing the existing ARSession.
+Shader source runtime-compiles once off-main from BeautyBlush.metal.txt. Author mask: blush-wash-mask.png;
+separate validated render/tracking configuration: blush-rendering.json. Native UV atlas, native mesh depth
+prepass, synchronized camera/pose, linear matte absorption/tint, local One Euro residual smoothing, pose/stretch
+gating, and face-skin-only visibility from the existing MediaPipe multiclass segmenter. No second face tracker.
+The old CPU grid remains only if Metal setup is unavailable (surfaced status); it is not the active blush path.
+Camera/frame/mesh remain transient. Local metrics are scalar timing/state only. Screen pose is not double-smoothed.
+Legacy Hanum segmenter default remains body-skin; faceSkinOnly is opt-in for blush. No paid SDK is installed.
+See Docs/Decisions/0010-metal-blush.md for verified SDK comparison, dependencies and known occlusion limits.
+Do not claim TikTok equivalence, 60 FPS, thin-brush occlusion or sustained performance without device evidence.
+
+## Blush v0.2.1 device-feedback calibration — -Nimah (2026-10-27)
+
+User confirmed v0.2.0 visible but requested wider/softer. Six active radii expand to 0.185–0.225 W by
+0.120–0.135 W. Numeric upper range extended explicitly for major radius (0.24 W); no hidden multiplier.
+JSON falloff_smoothstep_mix=1 smooths radial alpha; independent inward-safe mask transitions use 0.022 W.
+Blush sampling grid increases to 48x32, cached on placement change. User shade/intensity and existing
+brow/eyeliner settings remain unchanged. No extra try-on scan. Device acceptance of this revision pending.
+
+## Blush JSON v0.2.0 integration — -Nimah (2026-10-27)
+
+User preference: implement requested JSON revisions into the consuming app in the same task, including renderer
+support, checks and build; do not leave an external JSON file disconnected. No automatic staging/main merge.
+Bundled full database now merges the six wide-wash blush presets by stable ID. Preserve eyebrow v0.1.1 and all
+Hanum eyeliner/scan/profile rules. Blush has wider radii, radial exponent 1.10–1.15, max alpha 0.44–0.48,
+default intensity 0.72. Inward smooth mask feather is 0.012 of full face width, decoded and used in coverage.
+One field per cheek; do not shrink its radii or use tutorial shapes as pigment. Existing skin bindings and
+color-only update caching remain. Saved analysis is reused with no compulsory Retake. The visual target is
+art-directed, not pixel-exact or device calibrated; existing lower-lid/hand/hair adapter limits remain.
+
+## Brow size calibration v0.1.1 — -Nimah
+
+Following user feedback, integration JSON increases brow design half-thickness from 3.5% to 6.5% of observed
+brow width. Preserve measured head/tail and bounded arch adjustment; no guessed extension. This is an explicit
+calibration revision to the bundled copy; the original research artifact remains unchanged. Device visual
+acceptance pending. Hand/hair occlusion masking for brow/blush is still not implemented.
+
+## Pigment depth compositing — -Nimah
+
+FaceRegionPreviewRenderer cosmetic materials composite over camera video without reading the coarse native
+face depth buffer. Their placement still uses measured front-skin barycentric attachments, not screen offsets.
+Guide/eyeliner depth policies remain unchanged. Render tests must include a colorless depth-writing occluder;
+a blank SceneKit scene cannot detect self-occlusion. Device visual confirmation is still required.
+
+## JSON makeup integration — -Nimah (2026-10-26)
+
+Integration previews consume bundled `Resources/makeup-reference.database.json` through `MakeupRuleDatabase`.
+JSON assignments supersede historical A defaults: oval natural/cheekbone; round high arch/high cheekbone;
+square rounded/apple; oblong straight/horizontal; heart low arch/center cheek; diamond soft arch/temple.
+Uncovered rectangle/pear stay unavailable. Research draft is explicitly enabled for integration calibration only.
+Brow local displacement, two cubic segments, taper, head fade, feather and pigment alpha use rule parameters.
+Blush uses full face width, measured per-side eye centers and exact rotated elliptical alpha fields, without
+bbox enlargement or tutorial V/dot silhouettes. Palette and initial strength use JSON; custom sampling remains.
+No classification or Hanum eyeliner formulas change. No extra try-on scan. Existing saved fit remains usable.
+Current adapter uses native ARKit face-local axes and conservative eye-center exclusion where eyelid contours
+are absent. Hair/hand occlusion and measured lower-lid masks are not implemented for brow/blush; no production
+calibration, product color accuracy or TikTok-equivalent quality is claimed. Device visual acceptance pending.
+
 # AGENTS.md — read this first
+
+## Saved scan flow — -Nimah (supersedes launch-only scan)
+
+Completed face/eye analysis is reused on reopening. Root requires both saved results; Retake in Profile reruns
+complete preparation. Sparse barycentric brow attachments and anatomical mapping points persist locally in
+UserDefaults (versioned), with vertex/triangle counts and observed confidence. No full mesh, topology array or
+camera frame is persisted by fitting. A new live mesh reattaches those sparse descriptors without Vision scanning.
+Old installs with analysis but no sparse fit can enter home and explicitly use Profile Retake; unavailable tools
+show a message instead of silently rendering nothing. First-launch incomplete analysis still opens onboarding.
+Team sources: Khalish scan-overlay-lines b2d8ae0; Hanum Eyeliner-Hanum 071d2a0; profile-page supplies Profile.
+
+
+## Soft cheek preview — -Nimah
+
+Blush uses a common eye/nose reference for both cheek guides in face-local coordinates. Tutorial dots/V shapes
+remain guidance; try-on combines each cheek into a wider elliptical pigment patch with continuous radial alpha.
+Observed brow contours are retained even when optional formula annotations cannot bind. No extra try-on scan.
+Device visual acceptance is required; these parameters do not establish TikTok-equivalent rendering quality.
+
+## Detector lifecycle — -Nimah
+
+A nil eyeliner style hides output and skips inference while retaining this screen's warmed models.
+Only screen deactivation stops/releases them. A category change during startup must not leave startupTask stuck.
+Home/tutorial sync is gated by active visibility so hidden routes cannot restart detection.
+
+## Latest integration — -Nimah
+
+Hanum profile `502e423`, eyeliner/tutorial `071d2a0`, and Khalish scan overlays/debug `99791b3` are integrated.
+Home retains one selected makeup category, remembered shades/intensities, and launch-only fitting.
+Profile retake uses the same complete launch preparation flow; Scan Debug is reachable from the profile toolbar.
+Scan landmarks keep the `EyeScanLandmarks` name to avoid colliding with Hanum live `EyeLandmarks`.
+Upper-inner blush try-on fills a wider soft cheek area; the tutorial V remains a placement guide.
+These notes supersede older all-layers-on descriptions. Device visual/performance acceptance remains pending.
+
 
 ## Tutorial — scan-assigned
 
 `AppRoute.recommendedTutorial(TutorialHandoff)` opens `Features/Tutorial/GuidedTutorialView` (tabs Brows / Eyeliner / Blush, no settings;
 shade and strength are carried over from Try On). Eyeliner steps come from the fitted `LinerStyle`. Not yet checked on a real device.
+## Profile — scan stills
+
+`AppRoute.profile` opens `ProfileView` (face + eye analysis, signature look). Its retake button opens `AppRoute.fullScan`
+(`FullScanFlow`: face scan then eye scan in one flow). Portraits are the stills saved by `ScanSnapshots` at scan completion
+(face: ARKit frame, oriented via the Vision orientation; eyes: MediaPipe frame cropped around the eyes). Not yet checked on a real device.
 
 ## Current merged scope — -Nimah
 
@@ -94,7 +199,7 @@ file and adds a `CHANGELOG.md` entry in the same PR.
   and lets you try them on live with AR.
 - SwiftUI, iOS 17+, iPhone portrait. Swift 5 language mode with `SWIFT_STRICT_CONCURRENCY = complete`.
 - One third-party dependency: **MediaPipe Tasks Vision** (Swift Package from `google-ai-edge/mediapipe`, pinned to the `v1.1.1` commit `50505c8`; it must be pinned by revision, see ADR 0002), used only by the
-  eye scan in `Features/EyeShape`. One app target (`SunriseApp`) and one unit test target (`SunriseAppTests`).
+  eye scan in `Features/EyeShape`. One app target (`SunriseApp`), one unit test target (`SunriseAppTests`) and one app extension (`SunriseLiveActivity`, the scan's Dynamic Island).
   Why and how: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
 - Light MVVM: ViewModels are `@MainActor final class … : ObservableObject` with `@Published`. Stateless views have no ViewModel.
 - Apple frameworks, plus MediaPipe for the eye scan: ARKit + SceneKit (face tracking and makeup rendering), Vision (landmarks and face outline), AVFoundation (camera permission and the eye-scan camera), MediaPipe (eye and iris landmarks).
@@ -129,22 +234,25 @@ SunriseApp/
   App/                    SunriseApp entry, AppContainer (composition root), AppRootView (tabs + route destinations)
     Navigation/           AppRoute (all destinations), AppNavigator (tabs, per-tab paths, onboarding flag)
   Core/
-    Models/               cross-feature models: MakeupReference, Tutorial, SavedLookMetadata, FaceTrackingAvailability
+    Models/               cross-feature models: MakeupReference, Tutorial, SavedLookMetadata, FaceTrackingAvailability, ScanOverlay (+ ScanSnapshot)
     Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
-    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView
+    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge, DynamicIslandConfirmation
   Features/
     FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
     MakeupTryOn/          makeup recommendations and live AR try-on
     Onboarding/           welcome screen, then the face scan
     EyeShape/             eye shape (openness, tilt, spacing) from MediaPipe landmarks. In progress: measuring and classifying are done and tested,
                           the scan screen, onboarding step, home card and Try On route exist; not yet checked on a real face
+    ScanDebug/            debug tab: correct the face and eye outline points from a live scan by hand and save raw + corrected as JSON (see below)
     ReferenceCatalog/ ReferenceDetail/ ReferenceImport/ FaceCalibration/ Tutorial/ LiveGuide/ Comparison/ SavedLooks/
                           scaffold features: mostly placeholder UI on mock data
   PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
   Configuration/          Info.plist (camera + photo-library-add usage strings)
+SunriseLiveActivity/      app extension: the scan's Live Activity (Dynamic Island). `ScanActivityAttributes` (Core/Models) is shared with the app; keep it free of app-only imports
+SunriseDebugMac/          separate Mac-only Xcode project: edits scans exported from the Scan Debug tab (see below and its README)
 SunriseAppTests/
   Features/               face shape, head pose, photo measurer, makeup recommender/personalization/texture tests
   Navigation/             AppNavigatorTests
@@ -190,6 +298,10 @@ FaceShapeStore(latest: result)                      // in-memory store for previ
   Tuning lives in `FaceShapeClassifier` (prototypes, `unit`) and `PhotoFaceMeasurer` (photo reference). Check
   accuracy changes with the dataset eval.
 - Privacy: only the classified result is stored. No photos or meshes are saved or uploaded.
+- Result picture: `FaceShapeViewModel.snapshot` is the camera picture (from the `ARSCNView`, wireframe hidden) with the face outline and the
+  forehead, cheekbone and jaw widths and the length drawn on it (`FaceMeshMeasurer.guide` → `FaceGuide.overlay` → `FaceSnapshotter`), shown
+  by `FaceShapeResultView`. The widths are scaled by the Vision correction, so the lines are the widths the classifier used. In memory only.
+  It needs a device to check: the Simulator has no TrueDepth camera, so `FaceSnapshotter.capture` has only been compiled.
 
 ### Makeup try-on — `Features/MakeupTryOn`
 
@@ -230,11 +342,31 @@ Plan and decisions: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
 - `EyeCameraSession`: front `AVCaptureSession` delivering upright BGRA frames off the main thread. Stop the ARKit face session
   (`FaceShapeViewModel.stop()`) before `start()`; the two must not run together. It only checks camera permission, the mesh scan asks for it.
 - The Simulator build is arm64 only (`EXCLUDED_ARCHS[sdk=iphonesimulator*] = x86_64`): MediaPipe has no Intel-Simulator slice.
+- Result picture: `EyeScanViewModel.snapshot` is the last good frame, mirrored like the preview and cropped around the eyes, with the lines
+  from `EyeOverlay` (outlines, corner lines, opening, iris, brow, spacing), made by `EyeFrameSnapshot` on the camera queue and shown by
+  `EyeShapeResultView`. In memory only. The eyelid split in `EyeOverlay` assumes `lid` lists the upper lid, then the lower, both from
+  the outer corner (true for `MeshIndex`); check the drawn outline on a real scan.
 - `EyeMeasurer.measure(_:)` gives `EyeMeasurements` (openness, tilt, spacing, lidSpace in iris diameters). It derives the face's own axes
   from the points, so roll, scale, mirroring and y-down images do not matter. `EyeMeasurementsSampler` takes the per-field median and skips blinks.
 - `EyeShapeClassifier` turns measurements into `EyeShapeResult` (`EyeOpenness`, `EyeTilt`, `EyeSpacing`, `mayBeHooded`, `confidence`). The eyelid
   (`EyeLid`) cannot be seen in landmarks, so the person chooses it later; it stays `nil` until then.
 - The thresholds in `EyeShapeClassifier.Thresholds` and `EyeMeasurer.minimumOpenness` are starting guesses, not tuned on real faces.
+
+### Scan Debug — `Features/ScanDebug`
+
+A fourth tab (`AppTab.scanDebug`, "Scan Debug") for correcting outlines by hand. It runs the same `FaceShapeView` / `EyeScanView` as onboarding
+(into a throwaway `FaceShapeStore`, so real results are not changed) and takes their scan picture through the new optional `onResult` callback.
+`ScanDebugSnapshotReader` turns that picture's overlay strokes into raw points (10 face, 14 eye). Corrected stage: points drag. Final: corrected vs
+raw numbers, and Confirm writes `<face|eyes>-<name>.raw.json` and `.corrected.json` via `ScanDebugStore` (Application Support/ScanDebug; a name already
+used gets `-2`). Only coordinates are stored. Measuring uses `FaceShapeClassifier.photo` and `EyeMeasurer` / `EyeShapeClassifier`. If `FaceGuide.overlay`
+or `EyeOverlay.overlay` change their stroke order, update the reader (tests cover it). Its UI strings are English-only, not in `Localizable.xcstrings`.
+
+#### Export for Mac and the Mac editor — `SunriseDebugMac/`
+
+Scan Debug has an **Export for Mac** share button (`ScanDebugExportItem`, file format `ScanDebugExportFile`, extension `.sunrisescan`, type
+`com.sunrise.scan-debug` declared in `Info.plist`). `SunriseDebugMac/SunriseDebugMac.xcodeproj` is a separate macOS app with no scanning that opens those
+files (AirDrop), corrects the points with the mouse and writes the same raw and corrected JSON files. It compiles files from `SunriseApp/` directly, so a
+shared file (listed in its project) must not import ARKit, UIKit or MediaPipe. See `SunriseDebugMac/README.md`.
 
 ### Scaffold features
 
@@ -255,7 +387,9 @@ Keep their placeholder labels until a real implementation is tested (see `Docs/P
   snapshots across actors, and `nonisolated` ARSession delegate methods with `MainActor.assumeIsolated`.
 - **UI:** use `AppColors` / `AppSpacing` / `AppTypography` and Dynamic Type text styles. User-facing strings go in
   `Localizable.xcstrings`, with English as the source language.
-- **Privacy:** no networking, analytics or uploads. Never persist photos, camera frames or face meshes. A new permission needs an Info.plist usage string.
+- **Privacy:** no networking, analytics or uploads. Never persist camera frames or face meshes. The one exception is `Features/FaceShape/ScanSnapshots.swift`: one small JPEG per scan (face, eyes) in Application Support, excluded from backup, shown on the profile (`TryOnHome/ProfileView`); a new scan replaces it. A new permission needs an Info.plist usage string.
+- **Privacy:** no networking, analytics or uploads. The one exception to "never write pictures" is Scan Debug's **Export for Mac**: only when tapped, it hands the scan picture and points to the system share sheet as a `.sunrisescan` file (`ScanDebugExportItem`); the app writes nothing itself. Never persist photos, camera frames or face meshes. The scan result pictures
+  (`ScanSnapshot`) are held in a view model for the result screen only; never write them to disk, `FaceShapeStore` or the photo library. A new permission needs an Info.plist usage string.
 - **Honesty:** don't describe mock or sample data as real user results, and don't claim AR works on the strength of a Simulator run.
 - **Git:** branch from `main` as `feature/…`, `fix/…` or `chore/…`. Use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`).
   Keep refactors separate from features.

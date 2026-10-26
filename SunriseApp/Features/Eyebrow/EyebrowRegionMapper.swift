@@ -2,9 +2,9 @@
 import Foundation
 import simd
 
-enum EyebrowSide: String, Sendable { case left, right }
+enum EyebrowSide: String, Sendable, Codable { case left, right }
 struct EyebrowRegion: Sendable {
-    struct Brow: Sendable {
+    struct Brow: Sendable, Codable {
         let side: EyebrowSide
         let landmarks: [SurfaceAttachment]
         var mapping:BrowAnatomicalMapping? = nil
@@ -15,10 +15,11 @@ struct EyebrowRegion: Sendable {
     let anchorID: UUID
     let restVertices: [SIMD3<Float>]
     let triangles: [Int16]
+    var eyeCenters:[SIMD3<Float>] = []
 }
 enum EyebrowRegionMapper {
     static func map(_ detection: DetectedEyebrows, projection: FaceLandmarkProjection, vertices:[SIMD3<Float>], triangles:[Int16],
-                    leftEye: SIMD3<Float>, rightEye: SIMD3<Float>, timestamp: TimeInterval, anchorID: UUID,requireFormula:Bool = true) -> EyebrowRegion? {
+                    leftEye: SIMD3<Float>, rightEye: SIMD3<Float>, timestamp: TimeInterval, anchorID: UUID,requireFormula:Bool = true,diagnostic:((String)->Void)? = nil) -> EyebrowRegion? {
         guard detection.faceObservationConfidence>=0.5,vertices.count>=12,
               vertices.allSatisfy({ $0.x.isFinite && $0.y.isFinite && $0.z.isFinite }),
               let low=vertices.map(\.x).min(),let high=vertices.map(\.x).max() else { return nil }
@@ -28,7 +29,7 @@ enum EyebrowRegionMapper {
         for points in [detection.first,detection.second] {
             guard points.count>=3 else { return nil }
             let attachments=points.compactMap { projection.attachment(for:$0,vertices:vertices,triangles:triangles) }
-            guard attachments.count>=3,Float(attachments.count)/Float(points.count)>=0.8 else { return nil }
+            guard attachments.count>=3,Float(attachments.count)/Float(points.count)>=0.8 else { diagnostic?("projection_insufficient_attachments");return nil }
             let local=attachments.compactMap { $0.position(in:vertices) }
             guard local.count==attachments.count else { return nil }
             let center=local.reduce(SIMD3<Float>.zero,+)/Float(local.count)
@@ -40,21 +41,21 @@ enum EyebrowRegionMapper {
             guard center.y-eye.y>width*0.025,center.y-eye.y<width*0.65,
                   abs(center.x-eye.x)<width*0.35,browWidth>width*0.12,browWidth<width*0.9,
                   local.allSatisfy({ abs($0.x)<width*1.15 && $0.y>eye.y-width*0.03 }),
-                  !brows.contains(where: { $0.side==side }) else { return nil }
+                  !brows.contains(where: { $0.side==side }) else { diagnostic?("anatomical_bounds");return nil }
             // -Nimah: Pigment uses measured brow contours. Optional formula rays must not invalidate those contours.
             let mapping=detection.eyeScan.flatMap { scan in BrowMappingFormula.scan(scan,side:side,eye:eye,otherEye:side == .left ? rightEye : leftEye,
                 brow:local,projection:projection,vertices:vertices,triangles:triangles,faceWidth:width) }
-            if requireFormula && mapping==nil { return nil }
+            if requireFormula && mapping==nil { diagnostic?("formula_missing");return nil }
             brows.append(.init(side:side,landmarks:attachments,mapping:mapping))
         }
         guard brows.count==2 else { return nil }
         return EyebrowRegion(brows:brows,faceObservationConfidence:detection.faceObservationConfidence,timestamp:timestamp,
-            anchorID:anchorID,restVertices:vertices,triangles:triangles)
+            anchorID:anchorID,restVertices:vertices,triangles:triangles,eyeCenters:[leftEye,rightEye])
     }
 }
 
 // -Nimah: Makeup mapping convention, not a universal rule of beauty or a symmetry correction.
-struct BrowAnatomicalMapping:Sendable {
+struct BrowAnatomicalMapping:Sendable,Codable {
     let ala:SIMD3<Float>
     let pupil:SIMD3<Float>
     let outerEye:SIMD3<Float>

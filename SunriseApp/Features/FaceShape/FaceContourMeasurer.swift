@@ -72,6 +72,24 @@ struct ContourCorrection: Equatable, Sendable {
     }
 }
 
+extension ContourCorrection {
+    /// One line per band for the debug log: how many outlines reached the band and how much their ratios spread.
+    /// A large spread means Vision's outline is noisy there, so the median is less trustworthy.
+    static func report(of corrections: [ContourCorrection]) -> String {
+        let bands: [(String, KeyPath<ContourCorrection, Float?>)] = [("chin", \.chin), ("jaw", \.jaw), ("cheekbones", \.cheekbones)]
+        let median = ContourCorrection.median(of: corrections)
+        let lines = bands.map { name, path -> String in
+            let values = corrections.compactMap { $0[keyPath: path] }
+            guard let low = values.min(), let high = values.max() else { return "\(name): no samples" }
+            let mean = values.reduce(0, +) / Float(values.count)
+            let deviation = (values.map { ($0 - mean) * ($0 - mean) }.reduce(0, +) / Float(values.count)).squareRoot()
+            return String(format: "%@: n=%d median=%.3f min=%.3f max=%.3f sd=%.3f", name, values.count,
+                          median?[keyPath: path] ?? mean, low, high, deviation)
+        }
+        return "outlines=\(corrections.count)\n" + lines.joined(separator: "\n")
+    }
+}
+
 enum FaceContourMeasurer {
     /// Locates the mesh bands in the image. `projected[i]` is the image position of `vertices[i]`.
     static func silhouette(vertices: [SIMD3<Float>], projected: [SIMD2<Float>], frame: FaceFrame2D) -> MeshSilhouette? {

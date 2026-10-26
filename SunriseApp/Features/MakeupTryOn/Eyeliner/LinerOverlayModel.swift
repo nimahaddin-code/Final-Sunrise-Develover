@@ -48,7 +48,7 @@ import SwiftUI
     /// Off unless a developer switches it on: the upper lid follows the skin between detector results (a pulled lid).
     private static var lidTrackingEnabled: Bool { UserDefaults.standard.bool(forKey: "enableLidTracking") }
 
-    /// `style == nil` switches the overlay off and stops the detector.
+    /// A nil style hides the overlay; screen deactivation releases the detectors.
     func setStyle(_ style: LinerStyle?, shade: MakeupShade?, intensity: Double) {
         self.shade = shade
         self.intensity = intensity
@@ -59,7 +59,9 @@ import SwiftUI
             solution = nil
             frame = nil
         }
-        if spec == nil { stop() } else { startIfNeeded() }
+        // -Nimah: Category switches reuse loaded models. submit() skips all inference while spec is nil.
+        // Releasing/reloading both GPU models on every tab switch creates transition stalls.
+        if spec != nil { startIfNeeded() }
         objectWillChange.send()
     }
 
@@ -99,7 +101,9 @@ import SwiftUI
             guard let self,!Task.isCancelled,self.runID==token else { return }
             do {
                 try await self.provider.start()
-                guard !Task.isCancelled,self.runID==token,self.spec != nil else { return }
+                guard !Task.isCancelled,self.runID==token else { return }
+                // -Nimah: A category can change while loading. Finish warming this screen's model;
+                // only stop()/deactivation invalidates this run, so returning cannot leave startup stuck.
                 self.isStarted=true; self.unavailableReason=nil
                 try? await self.occluder.start()
                 guard !Task.isCancelled,self.runID==token else { return }

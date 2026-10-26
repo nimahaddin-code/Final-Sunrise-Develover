@@ -2,6 +2,7 @@ import ARKit
 import AVFoundation
 import Combine
 import ImageIO
+import os
 
 /// Runs an ARKit face tracking session, collects neutral, front-facing mesh samples and classifies the face shape.
 /// Every few accepted frames, Vision traces the real face outline to correct the jaw and chin of ARKit's template mesh.
@@ -35,7 +36,10 @@ import ImageIO
     static let minimumEyeSamples = 3
 
     @Published private(set) var phase: Phase = .idle
+    /// The scan picture with the measured lines, for the result screen. Held in memory only, never saved.
+    @Published private(set) var snapshot: ScanSnapshot?
     let session = ARSession()
+    let snapshotter = FaceSnapshotter()
     private var sampler = FaceProportionsSampler(requiredSamples: FaceShapeViewModel.requiredSamples)
     private var classifier: FaceShapeClassifier?
     private var isSessionRunning = false
@@ -94,6 +98,7 @@ import ImageIO
     func stop() {
         session.pause()
         isSessionRunning = false
+        snapshot = nil
         switch phase {
         case .scanning, .finished, .interrupted: phase = .idle
         default: break
@@ -109,6 +114,7 @@ import ImageIO
         isLocatingEyes = false
         eyeFrames = 0
         scanID += 1
+        snapshot = nil
         phase = .scanning(progress: 0, guidance: .findFace)
     }
 
@@ -146,8 +152,15 @@ import ImageIO
             result.contourSamples = contourCorrections.count
             // The face is done; the eyes are measured next, in the same session.
             pendingFace = result
+            // The straight-ahead frame that finished the measurement becomes the profile portrait.
+            let frame = sample.contourInput.pixelBuffer, orientation = contourOrientation ?? .right
+            Task.detached(priority: .utility) { ScanSnapshots.save(frame, orientation: orientation, as: .face) }
             eyeDeadline = Date().addingTimeInterval(Self.eyePhaseTimeout)
             phase = .scanning(progress: Self.faceProgressShare, guidance: .lookStraight)
+            #if DEBUG
+            Self.logCorrection(contourCorrections, mesh: median, corrected: correction?.applied(to: median))
+            #endif
+            snapshot = FaceMeshMeasurer.guide(of: sample.vertices, correction: correction).flatMap(snapshotter.capture)
         } else {
             let next = Phase.scanning(progress: sampler.progress * Self.faceProgressShare, guidance: guidance)
             if next != phase { phase = next }
@@ -213,6 +226,18 @@ import ImageIO
         eyeMaps.removeAll()
         phase = .finished(result)
     }
+    #if DEBUG
+    /// Debug builds only; stays on the device (Console.app or Xcode). Logs only numbers, never images.
+    private static let log = Logger(subsystem: "SunriseApp", category: "FaceContour")
+
+    private static func logCorrection(_ corrections: [ContourCorrection], mesh: FaceProportions, corrected: FaceProportions?) {
+        func line(_ p: FaceProportions) -> String {
+            String(format: "length=%.3f forehead=%.3f jaw=%.3f chin=%.3f", p.length, p.forehead, p.jaw, p.chin)
+        }
+        let after = corrected.map(line) ?? "none, no outline found"
+        log.debug("Contour correction (ratio = real outline width / mesh width)\n\(ContourCorrection.report(of: corrections))\nmesh only: \(line(mesh))\ncorrected: \(after)")
+    }
+    #endif
 
     private func requestContour(for sample: FaceSample) {
         acceptedFrames += 1

@@ -57,22 +57,36 @@ enum EyebrowGuideGenerator {
             }
             // -Nimah: Fit all measured eyebrow points, not the highest point or formula endpoints.
             guard let fit=ObservedBrowFit(points:points,inner:inner,outer:outer) else { return nil }
+            let rule=MakeupRuleDatabase.brow(style == .thin || style == .feathered ? .natural : style)
+            guard let rule else { return nil }
+            let peak=rule.number("arch_t"),limit=rule.number("max_displacement")
+            func adjusted(_ t:Float)->SIMD2<Float> {
+                let phase=t<=peak ? t/max(peak,0.0001) : (1-t)/max(1-peak,0.0001)
+                let bump=phase*phase*(3-2*phase)
+                let shift=width*(rule.number("arch_delta")*bump+rule.number("tail_delta")*t)
+                return SIMD2(inner.x+(outer.x-inner.x)*t,fit.height(at:t)+max(-limit,min(limit,shift)))
+            }
+            // Two cubic segments keep measured head/tail and the selected arch continuous.
+            func tangent(_ t:Float)->SIMD2<Float> {
+                let lo=max(0,t-0.001),hi=min(1,t+0.001)
+                return (adjusted(hi)-adjusted(lo))/(hi-lo)
+            }
             func intended(_ t:Float) -> SIMD2<Float> {
-                let x=inner.x+(outer.x-inner.x)*t
-                let bump=sin(Float.pi*t)*sin(Float.pi*t)
-                let adjustment:Float
-                switch style {
-                case .straight:adjustment = -min(fit.rise*0.4,0.001)*bump
-                case .softArch:adjustment = 0
-                case .highArch:adjustment = 0.0006*bump
-                case .feathered:adjustment = 0.0002*bump
-                case .natural,.thin:adjustment=0
-                case .lifted:adjustment=0.0008*t
-                case .angular:adjustment=0.0008*max(0,1-abs(t-0.64)/0.36)
-                case .rounded:adjustment=0.0005*sin(Float.pi*t)
-                case .lowArch:adjustment = -min(fit.rise*0.55,0.0012)*bump
-                }
-                return SIMD2(x,fit.height(at:t)+adjustment)
+                let start:Float=t<=peak ? 0 : peak,end:Float=t<=peak ? peak : 1
+                let fraction=(t-start)/(end-start),span=end-start
+                let params=MakeupRuleDatabase.shared?.runtime_fitting_rules.parameters
+                let h0=params?[start==0 ? "brow_handle_head" : "brow_handle_arch"]?.value ?? 0.33
+                let h1=params?[end==1 ? "brow_handle_tail" : "brow_handle_arch"]?.value ?? 0.33
+                let p0=adjusted(start),p3=adjusted(end)
+                let p1=p0+tangent(start)*span*h0,p2=p3-tangent(end)*span*h1
+                let u=1-fraction
+                let b0:Float=u*u*u,b1:Float=3*u*u*fraction
+                let b2:Float=3*u*fraction*fraction,b3:Float=fraction*fraction*fraction
+                let first=p0*b0+p1*b1
+                let second=p2*b2+p3*b3
+                let p=first+second
+                let baseline=fit.height(at:t)
+                return SIMD2(p.x,baseline+max(-limit,min(limit,p.y-baseline)))
             }
             let samples=(0...40).map { bind(intended(Float($0)/40)) }
             guard samples.compactMap({ $0 }).count>=36 else { return nil }
@@ -81,7 +95,13 @@ enum EyebrowGuideGenerator {
                 (0...40).map { i in
                     let t=Float(i)/40
                     let center=intended(t)
-                    let half=fit.halfThickness*(1-0.75*t)*(style == .thin ? 0.55 : 1)
+                    let rule=MakeupRuleDatabase.brow(style == .thin || style == .feathered ? .natural : style)
+                    let peak=rule?.number("arch_t") ?? 0.64
+                    let head=rule?.number("head_taper") ?? 0.65,tail=rule?.number("tail_taper") ?? 0.08
+                    let taper=t<=peak ? head+(1-head)*t/peak : 1+(tail-1)*(t-peak)/(1-peak)
+                    // Vision open contour supplies centerline, not measured brow thickness.
+                    let designHalf=width*(rule?.number("half_thickness_design") ?? 0.035)
+                    let half=designHalf*taper*(rule?.number("thickness_scale") ?? 1)*(style == .thin ? 0.55 : 1)
                     return bind(center+SIMD2(0,upper ? half : -half))
                 }
             }
@@ -97,13 +117,15 @@ enum EyebrowGuideGenerator {
                 }
             }
             var mappingLines:[[SurfaceAttachment?]]=[],keyPoints:[SurfaceAttachment]=[]
-            if let m=brow.mapping {
-                guard let peak=calibratedPeak(mapping:m,style:style) else { return nil }
-                for p in [m.start,peak,m.tail] {
-                    guard let mark=bind(p) else { return nil }
-                    keyPoints.append(mark)
-                    let n=SIMD2(m.ala.x,m.ala.y)
-                    mappingLines.append((0...60).map { bind(n+(p-n)*Float($0)/60) })
+            // -Nimah: Optional formula annotations cannot erase a correctly fitted observed brow.
+            if let m=brow.mapping,let peak=calibratedPeak(mapping:m,style:style) {
+                let marks=[m.start,peak,m.tail].compactMap(bind)
+                if marks.count==3 {
+                    keyPoints=marks
+                    for p in [m.start,peak,m.tail] {
+                        let n=SIMD2(m.ala.x,m.ala.y)
+                        mappingLines.append((0...60).map { bind(n+(p-n)*Float($0)/60) })
+                    }
                 }
             }
             let peakIndex=(0..<samples.count).max { a,b in

@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */ = {isa = PBXBuildFile; fileRef = 9C489D19343491FCEF4D67B7; };
+		72410046D68478AB147FADEC /* blush-rendering.json in Resources */ = {isa = PBXBuildFile; fileRef = BF09F9EA1B31E2CEA9FCECC1; };
+		8BBA5B983D53C01D8867678A /* BeautyBlush.metal in Sources */ = {isa = PBXBuildFile; fileRef = A7B094CA5F993727AE496FAB; };
+		614F096B937A6AC4C8AAB4C0 /* BeautyBlushConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF70D0A5E75B40E855ECB86; };
+		40B52D80123CEABD55AB6CD6 /* BeautyBlushEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9716ED0CEE2E6410A4313F0; };
+		DA7ABA5E0000000000000001 /* MakeupRuleDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7ABA5E0000000000000002; };
+		DA7ABA5E0000000000000003 /* makeup-reference.database.json in Resources */ = {isa = PBXBuildFile; fileRef = DA7ABA5E0000000000000004; };
+		5E1A0C0DE0000000000A0012 /* ScanSnapshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A0C0DE0000000000A0011 /* ScanSnapshots.swift */; };
+		5E1A0C0DE0000000000A0002 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1A0C0DE0000000000A0001 /* ProfileView.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		033A5C6F22B5AC3CD0D490DB /* LiveGuideDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */; };
 		07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */; };
@@ -171,6 +180,32 @@
 		F88C4B1A73633332F0DE36C2 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */; };
 		F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */; };
 		FD2E311FC44972331A578843 /* TutorialViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */; };
+		C5980BE20EF00A5A204E0A33 /* ScanOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA2E39F57A28387DE8DE1C1B /* ScanOverlay.swift */; };
+		F98D0D3E66B44C6597817B04 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC99C146DF9B268DA514E88 /* ScanOverlayView.swift */; };
+		107897E62FF99509FF0E00C1 /* FaceGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B60D876730C5FD85E6425C1 /* FaceGuide.swift */; };
+		B82426BCCB6209B4DC3E2179 /* FaceSnapshotter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7512B62F7A8614E0911E45 /* FaceSnapshotter.swift */; };
+		0BBE8A5B3E3F09BF342D6207 /* EyeOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4029000509C3EA2D31D5DC1C /* EyeOverlay.swift */; };
+		9C841A1866B628B70947A967 /* EyeFrameSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72D4C5F7F0C50715B8E1FF04 /* EyeFrameSnapshot.swift */; };
+		708366985B936B12809A316F /* ScanOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25A1FF79B52FC86C08F38CA0 /* ScanOverlayTests.swift */; };
+		10192FFA6B666A53C21FE386 /* ScanDebugModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54C9F2EF8EC063F993D669BE /* ScanDebugModels.swift */; };
+		59D6EA2DF7E51C66D368F82F /* ScanDebugSnapshotReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71AD50F301A19401F102C24F /* ScanDebugSnapshotReader.swift */; };
+		BB039D7DA36A0FB33B41DF86 /* ScanDebugStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E949FB745DC93941E4F229 /* ScanDebugStore.swift */; };
+		ABC7C2CE96E8842C5A7042B3 /* ScanDebugViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303946BF8D8BF820779CF1BC /* ScanDebugViewModel.swift */; };
+		7DB81FB8CB5E3553D1C1A689 /* ScanDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01B2455DB9CB4D248BF904A /* ScanDebugView.swift */; };
+		6A8C2622ACAEA7EE31724796 /* ScanDebugTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BF4416A01BB829B158798D /* ScanDebugTests.swift */; };
+		0C90D62191AAC5BBC99F3911 /* ScanDebugOrientation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1FDAE6BFC80E75E654F77A6 /* ScanDebugOrientation.swift */; };
+		593842C770E854852081D3E8 /* ScanDebugExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A51CAF7FA0265EAB6596B84 /* ScanDebugExport.swift */; };
+		E8F1F7A7AE27577299DFB07E /* ScanDebugExportItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D16CB2566D28F8E592B43F8 /* ScanDebugExportItem.swift */; };
+		9A1ECD81756B7FC306ABEF27 /* ScanProgressRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8426AFA7FA227DE043A7E7 /* ScanProgressRing.swift */; };
+		EB33DC8CCBC2AB8760E0FE55 /* ScanDoneBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 782BAD5F63492D1E34911828 /* ScanDoneBadge.swift */; };
+		BBE804D2D4693D09D09D180B /* SunriseLiveActivityBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C17692F1078CCC08D571C92 /* SunriseLiveActivityBundle.swift */; };
+		2448CB1A103BD565BB04A887 /* ScanLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B31E3824243E3448EB27BD /* ScanLiveActivity.swift */; };
+		3964477E5838A05D4079C378 /* ScanActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99549249E6BCB01A01F44B1F /* ScanActivityAttributes.swift */; };
+		6A8DCD535B6ECFB290460BAF /* ScanActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99549249E6BCB01A01F44B1F /* ScanActivityAttributes.swift */; };
+		40A389D58D719C03E924A289 /* ScanDoneSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F00FE0CBA25F721369EA024 /* ScanDoneSound.swift */; };
+		095C73223CB18F4CB87D8F88 /* ScanFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AAFDE71642B1BA27C0BE123 /* ScanFeedback.swift */; };
+		12B67771C3412EA4AF42638C /* SunriseLiveActivity.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 2C119ABC2B1BD58FDEE9F41D /* SunriseLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BB162716CFEE33695A896252 /* DynamicIslandConfirmation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C52A4B9EF768A842105901F0 /* DynamicIslandConfirmation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -181,9 +216,39 @@
 			remoteGlobalIDString = 48338DE28C732258BB72957A;
 			remoteInfo = SunriseApp;
 		};
+		6A70B3F1E580E5AC2281491D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 98F54143AB4E86B28C3AFEE0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = ED9404564EF566C75982F013;
+			remoteInfo = SunriseLiveActivity;
+		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		826404A9FC9603C30B88EDF0 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				12B67771C3412EA4AF42638C /* SunriseLiveActivity.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blush-wash-mask.png"; sourceTree = "<group>"; };
+		BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "blush-rendering.json"; sourceTree = "<group>"; };
+		A7B094CA5F993727AE496FAB /* BeautyBlush.metal */ = {isa = PBXFileReference; lastKnownFileType = text; path = "BeautyBlush.metal.txt"; sourceTree = "<group>"; };
+		3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyBlushConfiguration.swift"; sourceTree = "<group>"; };
+		F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BeautyBlushEngine.swift"; sourceTree = "<group>"; };
+		DA7ABA5E0000000000000002 /* MakeupRuleDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRuleDatabase.swift; sourceTree = "<group>"; };
+		DA7ABA5E0000000000000004 /* makeup-reference.database.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "makeup-reference.database.json"; sourceTree = "<group>"; };
+		5E1A0C0DE0000000000A0011 /* ScanSnapshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanSnapshots.swift; sourceTree = "<group>"; };
+		5E1A0C0DE0000000000A0001 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
 		01F40072E3CF347862554017 /* face_landmarker.task */ = {isa = PBXFileReference; lastKnownFileType = file; path = face_landmarker.task; sourceTree = "<group>"; };
 		045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSavedLooksStore.swift; sourceTree = "<group>"; };
@@ -349,6 +414,32 @@
 		FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeDetectorTests.swift; sourceTree = "<group>"; };
 		FE2B5E1913561C0593FD7840 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowRegionMapper.swift; sourceTree = "<group>"; };
+		FA2E39F57A28387DE8DE1C1B /* ScanOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanOverlay.swift; sourceTree = "<group>"; };
+		CFC99C146DF9B268DA514E88 /* ScanOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanOverlayView.swift; sourceTree = "<group>"; };
+		1B60D876730C5FD85E6425C1 /* FaceGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceGuide.swift; sourceTree = "<group>"; };
+		AC7512B62F7A8614E0911E45 /* FaceSnapshotter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceSnapshotter.swift; sourceTree = "<group>"; };
+		4029000509C3EA2D31D5DC1C /* EyeOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeOverlay.swift; sourceTree = "<group>"; };
+		72D4C5F7F0C50715B8E1FF04 /* EyeFrameSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeFrameSnapshot.swift; sourceTree = "<group>"; };
+		25A1FF79B52FC86C08F38CA0 /* ScanOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanOverlayTests.swift; sourceTree = "<group>"; };
+		54C9F2EF8EC063F993D669BE /* ScanDebugModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugModels.swift; sourceTree = "<group>"; };
+		71AD50F301A19401F102C24F /* ScanDebugSnapshotReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugSnapshotReader.swift; sourceTree = "<group>"; };
+		24E949FB745DC93941E4F229 /* ScanDebugStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugStore.swift; sourceTree = "<group>"; };
+		303946BF8D8BF820779CF1BC /* ScanDebugViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugViewModel.swift; sourceTree = "<group>"; };
+		C01B2455DB9CB4D248BF904A /* ScanDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugView.swift; sourceTree = "<group>"; };
+		24BF4416A01BB829B158798D /* ScanDebugTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugTests.swift; sourceTree = "<group>"; };
+		B1FDAE6BFC80E75E654F77A6 /* ScanDebugOrientation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugOrientation.swift; sourceTree = "<group>"; };
+		3A51CAF7FA0265EAB6596B84 /* ScanDebugExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugExport.swift; sourceTree = "<group>"; };
+		5D16CB2566D28F8E592B43F8 /* ScanDebugExportItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDebugExportItem.swift; sourceTree = "<group>"; };
+		EE8426AFA7FA227DE043A7E7 /* ScanProgressRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanProgressRing.swift; sourceTree = "<group>"; };
+		782BAD5F63492D1E34911828 /* ScanDoneBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDoneBadge.swift; sourceTree = "<group>"; };
+		3C17692F1078CCC08D571C92 /* SunriseLiveActivityBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SunriseLiveActivityBundle.swift; sourceTree = "<group>"; };
+		38B31E3824243E3448EB27BD /* ScanLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanLiveActivity.swift; sourceTree = "<group>"; };
+		D66A4C9BC7C4B78425F60BE9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		99549249E6BCB01A01F44B1F /* ScanActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanActivityAttributes.swift; sourceTree = "<group>"; };
+		9F00FE0CBA25F721369EA024 /* ScanDoneSound.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanDoneSound.swift; sourceTree = "<group>"; };
+		2AAFDE71642B1BA27C0BE123 /* ScanFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanFeedback.swift; sourceTree = "<group>"; };
+		2C119ABC2B1BD58FDEE9F41D /* SunriseLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SunriseLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C52A4B9EF768A842105901F0 /* DynamicIslandConfirmation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicIslandConfirmation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -371,6 +462,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BEA07F000000000000000001 /* BeautyBlush */ = {isa = PBXGroup; children = (
+				F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */,
+				3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */,
+				A7B094CA5F993727AE496FAB /* BeautyBlush.metal */,
+			); path = BeautyBlush; sourceTree = "<group>"; };
 		0EB509C6F62AD9CF0B9F3D96 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -384,6 +480,9 @@
 			isa = PBXGroup;
 			children = (
 				133DCD5B481F352F758A1E3F /* Assets.xcassets */,
+				DA7ABA5E0000000000000004 /* makeup-reference.database.json */,
+				9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */,
+				BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */,
 				98F393F180238C7106FB99C0 /* Localizable.xcstrings */,
 				CD73965C5395C3CFB4F69902 /* face_landmarker.task */,
 				AA605D264DFFC483849D92C1 /* selfie_multiclass_256x256.tflite */,
@@ -416,6 +515,7 @@
 				3A07AB7461B6903140D1D165 /* BlushPlacementGuide.swift */,
 				9BE83A467EAAC48EF29EBFB8 /* BlushPlacementSketch.swift */,
 				528DBE5F90FFAE037040249C /* MakeupPreferences.swift */,
+				DA7ABA5E0000000000000002 /* MakeupRuleDatabase.swift */,
 			);
 			path = MakeupPreferences;
 			sourceTree = "<group>";
@@ -500,7 +600,10 @@
 				7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */,
 				A674174BCE6CB2E205B8DE7B /* FaceShapeResultView.swift */,
 				85190E6578A99E0FCFAD9638 /* FaceShapeStore.swift */,
+				5E1A0C0DE0000000000A0011 /* ScanSnapshots.swift */,
 				0DCF5B207D9540E466654FF8 /* FaceAnalysis.swift */,
+				1B60D876730C5FD85E6425C1 /* FaceGuide.swift */,
+				AC7512B62F7A8614E0911E45 /* FaceSnapshotter.swift */,
 			);
 			path = FaceShape;
 			sourceTree = "<group>";
@@ -561,6 +664,12 @@
 				9E2CC9392658B0606CBF7775 /* FeaturePlaceholderView.swift */,
 				B2B0023A348FAD79C48161E9 /* LookArtwork.swift */,
 				8DEEF4BC9014B9B481912D63 /* PrimaryButton.swift */,
+				CFC99C146DF9B268DA514E88 /* ScanOverlayView.swift */,
+				EE8426AFA7FA227DE043A7E7 /* ScanProgressRing.swift */,
+				782BAD5F63492D1E34911828 /* ScanDoneBadge.swift */,
+				9F00FE0CBA25F721369EA024 /* ScanDoneSound.swift */,
+				2AAFDE71642B1BA27C0BE123 /* ScanFeedback.swift */,
+				C52A4B9EF768A842105901F0 /* DynamicIslandConfirmation.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -601,6 +710,8 @@
 				CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */,
 				FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */,
 				3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */,
+				25A1FF79B52FC86C08F38CA0 /* ScanOverlayTests.swift */,
+				24BF4416A01BB829B158798D /* ScanDebugTests.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -619,11 +730,14 @@
 				6ACE9C80936BA0AA803627E9 /* SavedLooks */,
 				C4208C4BC220C4C631815466 /* Tutorial */,
 				78BC181F4289544F053C7765 /* FaceShape */,
+				B95177704166936436E03B4B /* EyeShape */,
+				5748080315332B832AA1B191 /* ScanDebug */,
 				F62FFB0088DC3F46B57C2CA3 /* MakeupTryOn */,
 				D86BBF720312D2F3CC3CEEAD /* Eyebrow */,
 				D087DAE48C0672211810B9AA /* Forehead */,
 				3023F688733753EB734C8BF9 /* MakeupPreferences */,
-				B95177704166936436E03B4B /* EyeShape */,
+				BEA07F000000000000000001 /* BeautyBlush */,
+
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -635,6 +749,8 @@
 				5F3C4D0A24B6DEC94B862617 /* MakeupReference.swift */,
 				00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */,
 				73EEC8668C59A63EE58717BF /* Tutorial.swift */,
+				FA2E39F57A28387DE8DE1C1B /* ScanOverlay.swift */,
+				99549249E6BCB01A01F44B1F /* ScanActivityAttributes.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -645,6 +761,7 @@
 				7A1EF99F369FF90802A9EE53 /* SunriseApp */,
 				6018AF2785A5C14223064FCC /* SunriseAppTests */,
 				FBDC4F23F93125BBEEAE800C /* Products */,
+				DC562864117F059437919394 /* SunriseLiveActivity */,
 			);
 			sourceTree = "<group>";
 		};
@@ -694,6 +811,8 @@
 				FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */,
 				6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */,
 				2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */,
+				4029000509C3EA2D31D5DC1C /* EyeOverlay.swift */,
+				72D4C5F7F0C50715B8E1FF04 /* EyeFrameSnapshot.swift */,
 			);
 			path = EyeShape;
 			sourceTree = "<group>";
@@ -821,6 +940,7 @@
 			children = (
 				6D795F13C8C22E022040EE00 /* SunriseApp.app */,
 				AEAE4B28CDFF08F590396BA5 /* SunriseAppTests.xctest */,
+				2C119ABC2B1BD58FDEE9F41D /* SunriseLiveActivity.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -834,8 +954,46 @@
 				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
 				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
 				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
+				5E1A0C0DE0000000000A0001 /* ProfileView.swift */,
+				F1144E237A35DD2DE14C612B /* EyeLandmarks.swift */,
+				396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */,
+				9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */,
+				544E9E401E873FD44F70DB25 /* EyeShapeClassifier.swift */,
+				8A67639F74080F56C5AA328F /* MediaPipeEyeDetector.swift */,
+				676226E236A23E238E3B1C77 /* EyeCameraSession.swift */,
+				3A37DFE702393E0FA6C8BBC2 /* EyeScanGuide.swift */,
+				A299E490BBED2CF3DFC8DF07 /* EyeScanViewModel.swift */,
+				413DF4F73EF8C9FCD698014E /* CameraPreviewView.swift */,
+				FB68FEFD19AE3E8E5DF28FB3 /* EyeScanView.swift */,
+				6D4E020E267318B40AF47F49 /* EyeShapeResultView.swift */,
+				2D549DC46C03C21BB00FA9EA /* EyeAnalysis.swift */,
 			);
 			path = TryOnHome;
+			sourceTree = "<group>";
+		};
+		5748080315332B832AA1B191 /* ScanDebug */ = {
+			isa = PBXGroup;
+			children = (
+				54C9F2EF8EC063F993D669BE /* ScanDebugModels.swift */,
+				71AD50F301A19401F102C24F /* ScanDebugSnapshotReader.swift */,
+				24E949FB745DC93941E4F229 /* ScanDebugStore.swift */,
+				303946BF8D8BF820779CF1BC /* ScanDebugViewModel.swift */,
+				C01B2455DB9CB4D248BF904A /* ScanDebugView.swift */,
+				5D16CB2566D28F8E592B43F8 /* ScanDebugExportItem.swift */,
+				3A51CAF7FA0265EAB6596B84 /* ScanDebugExport.swift */,
+				B1FDAE6BFC80E75E654F77A6 /* ScanDebugOrientation.swift */,
+			);
+			path = ScanDebug;
+			sourceTree = "<group>";
+		};
+		DC562864117F059437919394 /* SunriseLiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				3C17692F1078CCC08D571C92 /* SunriseLiveActivityBundle.swift */,
+				38B31E3824243E3448EB27BD /* ScanLiveActivity.swift */,
+				D66A4C9BC7C4B78425F60BE9 /* Info.plist */,
+			);
+			path = SunriseLiveActivity;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -848,10 +1006,12 @@
 				E4A9877846F7E14E120A0C25 /* Sources */,
 				624D0503EC8FAD9DEB266B14 /* Frameworks */,
 				4B8B87285CBE34CF457FD716 /* Resources */,
+				826404A9FC9603C30B88EDF0 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				72B2710DAD4A1BEC30A63B81 /* PBXTargetDependency */,
 			);
 			name = SunriseApp;
 			packageProductDependencies = (
@@ -880,6 +1040,21 @@
 			productReference = AEAE4B28CDFF08F590396BA5 /* SunriseAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		ED9404564EF566C75982F013 /* SunriseLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D7009ABE3EDF963920C399E /* Build configuration list for PBXNativeTarget "SunriseLiveActivity" */;
+			buildPhases = (
+				6D2FF8DE9B309136A73B5B66 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SunriseLiveActivity;
+			productName = SunriseLiveActivity;
+			productReference = 2C119ABC2B1BD58FDEE9F41D /* SunriseLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -889,6 +1064,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					ED9404564EF566C75982F013 = {
+						CreatedOnToolsVersion = 26.0;
+					};
 					48338DE28C732258BB72957A = {
 						CreatedOnToolsVersion = 26.0;
 					};
@@ -917,6 +1095,7 @@
 			targets = (
 				48338DE28C732258BB72957A /* SunriseApp */,
 				5263EC3D7F5E85BF38460F22 /* SunriseAppTests */,
+				ED9404564EF566C75982F013 /* SunriseLiveActivity */,
 			);
 		};
 /* End PBXProject section */
@@ -927,6 +1106,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */,
+				DA7ABA5E0000000000000003 /* makeup-reference.database.json in Resources */,
+				8BBA5B983D53C01D8867678A /* BeautyBlush.metal in Resources */,
+				E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */,
+				72410046D68478AB147FADEC /* blush-rendering.json in Resources */,
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
 				CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */,
 				349F2CBF0A4352FF1D05B64A /* selfie_multiclass_256x256.tflite in Resources */,
@@ -975,6 +1158,8 @@
 				1A5307ED011AADB5879ED95C /* EyeShapeClassifierTests.swift in Sources */,
 				8344B16103485A1C292BE01E /* MediaPipeEyeDetectorTests.swift in Sources */,
 				07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */,
+				708366985B936B12809A316F /* ScanOverlayTests.swift in Sources */,
+				6A8C2622ACAEA7EE31724796 /* ScanDebugTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1011,6 +1196,7 @@
 				EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */,
 				E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */,
 				B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */,
+				5E1A0C0DE0000000000A0002 /* ProfileView.swift in Sources */,
 				2C53F0CCE66A98AF04B7B2D4 /* ReferenceCatalogView.swift in Sources */,
 				5AF705A9207A9DD3364DC86F /* ReferenceCatalogViewModel.swift in Sources */,
 				97282C821FE1244E279E7756 /* ReferenceDetailView.swift in Sources */,
@@ -1037,6 +1223,7 @@
 				F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */,
 				118BFC1BD7F8191164EC1F28 /* FaceShapeResultView.swift in Sources */,
 				84EA260CF3F8677288CBD734 /* FaceShapeStore.swift in Sources */,
+				5E1A0C0DE0000000000A0012 /* ScanSnapshots.swift in Sources */,
 				28A2D07D18A74048D374D78E /* MakeupRecommendation.swift in Sources */,
 				A243507A38CDA620F6EA9CFC /* MakeupRecommender.swift in Sources */,
 				236D9C0C8B7D5C2BB17772D1 /* MakeupPlan.swift in Sources */,
@@ -1096,6 +1283,10 @@
 				3063A4C8D849393B67C7EA9E /* BlushPlacementGuide.swift in Sources */,
 				63A3A48CCC399EC783EE5E76 /* BlushPlacementSketch.swift in Sources */,
 				67129ECB6F6B3907B6557698 /* MakeupPreferences.swift in Sources */,
+				DA7ABA5E0000000000000001 /* MakeupRuleDatabase.swift in Sources */,
+
+				614F096B937A6AC4C8AAB4C0 /* BeautyBlushConfiguration.swift in Sources */,
+				40B52D80123CEABD55AB6CD6 /* BeautyBlushEngine.swift in Sources */,
 				DFE49476F0DF2E2C54A6BA8C /* HandOcclusionSegmenter.swift in Sources */,
 				601CB711F407BB508AE96EDE /* HandOcclusion.swift in Sources */,
 				08141B51E306391DEED79934 /* LidFlow.swift in Sources */,
@@ -1112,6 +1303,36 @@
 				39DA0A61353314B90D4BDCC7 /* EyeShapeResultView.swift in Sources */,
 				D7450C847008FD8A42518AA1 /* EyeAnalysis.swift in Sources */,
 				7AF5B8DC4F8C75789B37EA2C /* FaceAnalysis.swift in Sources */,
+				C5980BE20EF00A5A204E0A33 /* ScanOverlay.swift in Sources */,
+				F98D0D3E66B44C6597817B04 /* ScanOverlayView.swift in Sources */,
+				107897E62FF99509FF0E00C1 /* FaceGuide.swift in Sources */,
+				10192FFA6B666A53C21FE386 /* ScanDebugModels.swift in Sources */,
+				59D6EA2DF7E51C66D368F82F /* ScanDebugSnapshotReader.swift in Sources */,
+				BB039D7DA36A0FB33B41DF86 /* ScanDebugStore.swift in Sources */,
+				ABC7C2CE96E8842C5A7042B3 /* ScanDebugViewModel.swift in Sources */,
+				7DB81FB8CB5E3553D1C1A689 /* ScanDebugView.swift in Sources */,
+				E8F1F7A7AE27577299DFB07E /* ScanDebugExportItem.swift in Sources */,
+				593842C770E854852081D3E8 /* ScanDebugExport.swift in Sources */,
+				0C90D62191AAC5BBC99F3911 /* ScanDebugOrientation.swift in Sources */,
+				B82426BCCB6209B4DC3E2179 /* FaceSnapshotter.swift in Sources */,
+				0BBE8A5B3E3F09BF342D6207 /* EyeOverlay.swift in Sources */,
+				9C841A1866B628B70947A967 /* EyeFrameSnapshot.swift in Sources */,
+				9A1ECD81756B7FC306ABEF27 /* ScanProgressRing.swift in Sources */,
+				EB33DC8CCBC2AB8760E0FE55 /* ScanDoneBadge.swift in Sources */,
+				6A8DCD535B6ECFB290460BAF /* ScanActivityAttributes.swift in Sources */,
+				40A389D58D719C03E924A289 /* ScanDoneSound.swift in Sources */,
+				095C73223CB18F4CB87D8F88 /* ScanFeedback.swift in Sources */,
+				BB162716CFEE33695A896252 /* DynamicIslandConfirmation.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6D2FF8DE9B309136A73B5B66 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BBE804D2D4693D09D09D180B /* SunriseLiveActivityBundle.swift in Sources */,
+				2448CB1A103BD565BB04A887 /* ScanLiveActivity.swift in Sources */,
+				3964477E5838A05D4079C378 /* ScanActivityAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1123,6 +1344,11 @@
 			target = 48338DE28C732258BB72957A /* SunriseApp */;
 			targetProxy = D799BAE6088A90139B415FCC /* PBXContainerItemProxy */;
 		};
+		72B2710DAD4A1BEC30A63B81 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = ED9404564EF566C75982F013 /* SunriseLiveActivity */;
+			targetProxy = 6A70B3F1E580E5AC2281491D /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -1130,7 +1356,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1172,7 +1398,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1243,6 +1469,50 @@
 			};
 			name = Release;
 		};
+		A8CFC6D83ADBF22CB3A13568 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SunriseLiveActivity/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunrise.foundation.LiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		16887836C9BF15B9D7B0352E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SunriseLiveActivity/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.sunrise.foundation.LiveActivity;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1269,6 +1539,15 @@
 			buildConfigurations = (
 				9E232BE73FECBBF8659C79E7 /* Debug */,
 				95126388EE2677EABF3CF99B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4D7009ABE3EDF963920C399E /* Build configuration list for PBXNativeTarget "SunriseLiveActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A8CFC6D83ADBF22CB3A13568 /* Debug */,
+				16887836C9BF15B9D7B0352E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

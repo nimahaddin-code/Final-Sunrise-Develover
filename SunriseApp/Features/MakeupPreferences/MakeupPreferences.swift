@@ -101,19 +101,23 @@ enum MakeupPreferenceCatalog {
     ]
     // -Nimah: One explicit assignment per covered shape; A/B/C remain source IDs, not user choices.
     // Keep research variants in the catalog for provenance, but never expose the whole catalog as recommendations.
-    static let assignedBrowIDs: [MakeupFaceShape:String] = [
-        .oval:"brow-oval-a", .round:"brow-round-a", .square:"brow-square-a",
-        .oblong:"brow-oblong-b", .heart:"brow-heart-b", .diamond:"brow-diamond-a"
-    ]
-    static let assignedBlushIDs: [MakeupFaceShape:String] = [
-        .oval:"blush-oval-a", .round:"blush-round-a", .square:"blush-square-a",
-        .oblong:"blush-oblong-b", .heart:"blush-heart-a", .diamond:"blush-diamond-a"
-    ]
+    static let assignedBrowIDs: [MakeupFaceShape:String] = Dictionary(uniqueKeysWithValues: MakeupFaceShape.allCases.compactMap { shape in
+        MakeupRuleDatabase.shared?.assignment(shape)?.eyebrow_preset_id.map { (shape,$0) }
+    })
+    static let assignedBlushIDs: [MakeupFaceShape:String] = Dictionary(uniqueKeysWithValues: MakeupFaceShape.allCases.compactMap { shape in
+        MakeupRuleDatabase.shared?.assignment(shape)?.blush_preset_id.map { (shape,$0) }
+    })
     static func assignedBrow(for shape:MakeupFaceShape)->BrowPreference? {
-        brows.first { $0.id == assignedBrowIDs[shape] && $0.shape == shape }
+        guard let a=MakeupRuleDatabase.shared?.assignment(shape),let id=a.eyebrow_preset_id,
+              let historical=brows.first(where: { $0.shape==shape && MakeupRuleDatabase.browID($0.style)==id }) else { return nil }
+        let source=a.selected_reference_ids.first(where:{$0.hasPrefix("brow_")})?.replacingOccurrences(of:"brow_",with:"") ?? historical.source
+        return .init(id:id,shape:shape,source:source,style:historical.style,evidence:historical.evidence)
     }
     static func assignedBlush(for shape:MakeupFaceShape)->BlushPreference? {
-        blush.first { $0.id == assignedBlushIDs[shape] && $0.shape == shape }
+        guard let a=MakeupRuleDatabase.shared?.assignment(shape),let id=a.blush_preset_id,
+              let historical=blush.first(where: { $0.shape==shape && MakeupRuleDatabase.blushID($0.style)==id }) else { return nil }
+        let source=a.selected_reference_ids.first(where:{$0.hasPrefix("blush_")})?.replacingOccurrences(of:"blush_",with:"") ?? historical.source
+        return .init(id:id,shape:shape,source:source,style:historical.style,evidence:historical.evidence)
     }
     static func browOptions(for shape:MakeupFaceShape) -> [BrowPreference] { brows.filter { $0.shape==shape } }
     static func blushOptions(for shape:MakeupFaceShape) -> [BlushPreference] { blush.filter { $0.shape==shape } }

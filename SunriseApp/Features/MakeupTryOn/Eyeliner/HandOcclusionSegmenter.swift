@@ -35,6 +35,9 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
     private let lock = NSLock()
     private var segmenter: ImageSegmenter?
     private var occluders: Set<UInt8> = [2]
+    private let faceSkinOnly:Bool
+    private var faceSkinLabel:Int?
+    init(faceSkinOnly:Bool = false) {self.faceSkinOnly=faceSkinOnly;super.init()}
     private var pending: [Int: Pending] = [:]
     private var inFlightSince: CFTimeInterval?
     private var lastTimestampMs = -1
@@ -71,15 +74,19 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
         options.baseOptions.modelAssetPath = path
         options.runningMode = .liveStream
         options.shouldOutputCategoryMask = true
-        options.shouldOutputConfidenceMasks = false
+        options.shouldOutputConfidenceMasks = faceSkinOnly
         options.imageSegmenterLiveStreamDelegate = self
         let made = try ImageSegmenter(options: options)
         // The class ids come from the model's own labels; "body-skin" is a hand, "face-skin" is not.
         let body = made.labels.enumerated().filter { $0.element.lowercased().contains("body") }.map { UInt8($0.offset) }
+        let faceLabels=made.labels.enumerated().filter { let s=$0.element.lowercased();return s.contains("face") && s.contains("skin") }.map { UInt8($0.offset) }
+        if faceSkinOnly && faceLabels.count != 1 {throw EyeProviderError.modelMissing}
+        let chosen:Set<UInt8> = faceSkinOnly ? Set(made.labels.indices.map(UInt8.init)).subtracting(faceLabels) : Set(body)
         lock.lock()
         guard lifecycleID==token else { lock.unlock(); throw CancellationError() }
         segmenter = made
-        if !body.isEmpty { occluders = Set(body) }
+        faceSkinLabel=faceLabels.first.map(Int.init)
+        if !chosen.isEmpty { occluders = chosen }
         lock.unlock()
     }
 
@@ -107,7 +114,7 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
         let rotation = DetectorRotation.forHeadUp(input.headUp)
         let now = CACurrentMediaTime()
         inFlightSince = now
-        pending[ms] = Pending(rawSize: raw, rotation: rotation, headAnchors: input.headAnchors, time: now)
+        pending[ms] = Pending(rawSize: raw, rotation: rotation, headAnchors: input.headAnchors, time: faceSkinOnly ? input.timestamp:now)
         lock.unlock()
 
         queue.async { [self] in
@@ -168,6 +175,7 @@ extension HandOcclusionSegmenter: ImageSegmenterLiveStreamDelegate {
         lock.lock()
         let info = pending[timestampInMilliseconds]
         let occluders = occluders
+        let faceIndex=faceSkinLabel
         lock.unlock()
         guard let info else { return }
         guard error == nil, let category = result?.categoryMask else { return finish(timestampInMilliseconds, mask: nil) }
@@ -176,10 +184,16 @@ extension HandOcclusionSegmenter: ImageSegmenterLiveStreamDelegate {
         let categories = Array(UnsafeBufferPointer(start: category.uint8Data, count: width * height))
         guard let image = OcclusionMask.alphaImage(categories: categories, width: width, height: height, occluders: occluders)
         else { return finish(timestampInMilliseconds, mask: nil) }
+        var soft:[UInt8]=[]
+        if faceSkinOnly,let faceIndex,let masks=result?.confidenceMasks,masks.indices.contains(faceIndex) {
+            let confidence=masks[faceIndex]
+            guard confidence.width==width,confidence.height==height else{return finish(timestampInMilliseconds,mask:nil)}
+            soft=UnsafeBufferPointer(start:confidence.float32Data,count:width*height).map {p in p.isFinite ? UInt8((max(0,min(1,1-p))*255).rounded()):255}
+        }
         finish(timestampInMilliseconds, mask: OcclusionMask(
             image: image, size: CGSize(width: width, height: height),
             uprightSize: info.rotation.uprightSize(raw: info.rawSize), rotation: info.rotation, rawSize: info.rawSize,
             headAnchors: info.headAnchors, time: info.time,
-            occupied: categories.map { occluders.contains($0) ? 1 : 0 }))
+            occupied: categories.map { occluders.contains($0) ? 1 : 0 },opacity:soft))
     }
 }

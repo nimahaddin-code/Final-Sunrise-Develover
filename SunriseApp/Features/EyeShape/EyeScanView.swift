@@ -7,7 +7,10 @@ struct EyeScanView: View {
     /// Label of the result sheet's main button.
     var continueTitle: LocalizedStringKey = "See my makeup"
     var onFinish: () -> Void = {}
+    /// Called with the scan picture when a scan finishes (before the result sheet's button is used). Debug tools only.
+    var onResult: (ScanSnapshot?) -> Void = { _ in }
     @StateObject private var model = EyeScanViewModel()
+    @State private var resultReady = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
@@ -19,9 +22,16 @@ struct EyeScanView: View {
             .navigationBarTitleDisplayMode(.inline)
             .task { await model.startIfNeeded() }
             .onDisappear { model.stop() }
+            .scanFeedback(title: String(localized: "Eye scan"), progress: scanStatus.progress, isDone: model.result != nil)
+            // Let the "done" badge show for a moment before the result sheet covers the camera.
+            .task(id: model.result != nil) {
+                guard model.result != nil else { resultReady = false; return }
+                try? await Task.sleep(for: .seconds(1.1))
+                if !Task.isCancelled { resultReady = true }
+            }
             .sheet(isPresented: resultPresented) {
                 if let result = model.result {
-                    EyeShapeResultView(result: result, continueTitle: continueTitle, onChooseLid: model.chooseLid,
+                    EyeShapeResultView(result: result, snapshot: model.snapshot, continueTitle: continueTitle, onChooseLid: model.chooseLid,
                                        onScanAgain: model.scanAgain) {
                         // Stopping clears the result, which closes this popup before leaving the scan.
                         model.stop()
@@ -34,7 +44,7 @@ struct EyeScanView: View {
                 }
             }
             .onChange(of: model.result) { _, result in
-                if let result { store.eyes = result }
+                if let result { store.eyes = result; onResult(model.snapshot) }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 // Re-check camera access after returning from Settings.
@@ -56,7 +66,7 @@ struct EyeScanView: View {
             ContentUnavailableView {
                 Label("Camera access needed", systemImage: "camera")
             } description: {
-                Text("Allow camera access in Settings to scan your eyes. No photos are saved or uploaded.")
+                Text("Allow camera access in Settings to scan your eyes. Nothing is uploaded.")
             } actions: {
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
@@ -75,7 +85,7 @@ struct EyeScanView: View {
 
     /// Dismissing the popup starts a new measurement.
     private var resultPresented: Binding<Bool> {
-        Binding(get: { model.result != nil }, set: { presented in
+        Binding(get: { model.result != nil && resultReady }, set: { presented in
             if !presented, model.result != nil { model.scanAgain() }
         })
     }
@@ -97,18 +107,29 @@ struct EyeScanView: View {
                 .frame(width: 260, height: 340).offset(y: -40).accessibilityHidden(true)
             VStack {
                 Spacer()
-                VStack(spacing: AppSpacing.medium) {
-                    Text(message).font(AppTypography.body).multilineTextAlignment(.center)
-                    ProgressView(value: progress).tint(AppColors.rose)
-                    Text("Look straight at the camera with your eyes open and relaxed.")
-                        .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
-                        .multilineTextAlignment(.center)
+                HStack(spacing: AppSpacing.medium) {
+                    ScanProgressRing(progress: progress)
+                    VStack(alignment: .leading, spacing: AppSpacing.small) {
+                        Text(message).font(AppTypography.body)
+                        Text("Look straight at the camera with your eyes open and relaxed.")
+                            .font(AppTypography.caption).foregroundStyle(AppColors.subtle)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(AppSpacing.large)
                 .background(AppColors.card, in: RoundedRectangle(cornerRadius: AppSpacing.cornerRadius))
                 .padding(AppSpacing.large)
                 .accessibilityElement(children: .combine)
             }
+        }
+        .overlay { doneBadge }
+        .animation(.spring(duration: 0.35), value: model.result != nil)
+    }
+
+    @ViewBuilder private var doneBadge: some View {
+        // With a Dynamic Island the confirmation grows out of it instead (`DynamicIslandConfirmation`, from `scanFeedback`).
+        if model.result != nil, !DynamicIslandConfirmation.isAvailable {
+            ScanDoneBadge().transition(.scale(scale: 0.6).combined(with: .opacity))
         }
     }
 }

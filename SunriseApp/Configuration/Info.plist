@@ -21,7 +21,9 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
-	<string>The camera is used to track your face, estimate your face and eye shape, and photograph a makeup palette so you can pick a colour. Only the resulting shapes are kept on this device; no images are saved or uploaded.</string>
+	<string>The camera is used to track your face, estimate your face and eye shape, and photograph a makeup palette so you can pick a colour. Only the resulting shapes and one small photo from each scan are kept on this device; nothing is uploaded.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Lets you save photos of your makeup try-on to your library.</string>
 	<key>UIApplicationSceneManifest</key>
@@ -34,6 +36,28 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeIdentifier</key>
+			<string>com.sunrise.scan-debug</string>
+			<key>UTTypeDescription</key>
+			<string>Sunrise Scan Debug File</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.json</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>sunrisescan</string>
+				</array>
+			</dict>
+		</dict>
 	</array>
 </dict>
 </plist>
