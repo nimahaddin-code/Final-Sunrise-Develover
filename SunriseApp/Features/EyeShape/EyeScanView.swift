@@ -56,7 +56,7 @@ struct EyeScanView: View {
             ContentUnavailableView {
                 Label("Camera access needed", systemImage: "camera")
             } description: {
-                Text("Allow camera access in Settings to scan your eyes. No photos are saved or uploaded.")
+                Text("Allow camera access in Settings to scan your eyes. Nothing is uploaded.")
             } actions: {
                 Button("Open Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }

@@ -74,6 +74,10 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 - Increase pigment core alpha/default strength, narrow the feather and raise patches above the depth mesh to reduce clipping.
 - Preserve recommendations, chosen RGB, comparison and user intensity controls. Device visual acceptance still required.
 
+### Added — Profile page
+- `ProfileView` (profile button): face shape, eye shape and signature look, with the face portrait and eye strip taken from the scans.
+- `ScanSnapshots` keeps one small JPEG per scan on device (not backed up, never uploaded); privacy copy and `AGENTS.md` updated.
+- `AppRoute.fullScan` / `FullScanFlow`: the retake button runs the face scan then the eye scan in one go.
 
 ### Added — reference colours and palette picker -Nimah
 - Blush presets: Pink, Peach, Winter Pink, Muted Mauve. Brows: Bistre, Brown, Chocolate, Tan, Soft black.

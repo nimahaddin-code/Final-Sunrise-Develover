@@ -15,6 +15,8 @@ enum AppRoute: Hashable {
     case makeupTryOn(plan: MakeupPlan, applied: [MakeupRecommendation])
     case faceScan
     case eyeScan
+    /// Face scan followed straight by the eye scan, as in onboarding.
+    case fullScan
     case profile
     case tutorial
 }

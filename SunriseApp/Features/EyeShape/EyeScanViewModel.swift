@@ -39,8 +39,13 @@ import Combine
                 // Runs on the camera queue, which is the only place the detector is used.
                 let timestamp = Int((CMTimeGetSeconds(time) * 1000).rounded())
                 guard let outcome = detector.detect(pixelBuffer: buffer, timestampMs: timestamp) else { return }
-                let frame = EyeScanGuide.evaluate(outcome.landmarks, imageWidth: Float(CVPixelBufferGetWidth(buffer)))
-                Task { @MainActor in self?.handle(frame) }
+                let width = CVPixelBufferGetWidth(buffer), height = CVPixelBufferGetHeight(buffer)
+                let frame = EyeScanGuide.evaluate(outcome.landmarks, imageWidth: Float(width))
+                // Good frames carry their picture, so the one that completes the scan can become the profile photo.
+                let snapshot = frame.measurements == nil ? nil
+                    : outcome.landmarks.flatMap { ScanSnapshots.eyeCrop($0, imageSize: CGSize(width: width, height: height)) }
+                    .map { Snapshot(buffer: SendablePixelBuffer(buffer: buffer), crop: $0) }
+                Task { @MainActor in self?.handle(frame, snapshot: snapshot) }
             }
         } catch EyeCameraSession.Failure.cameraDenied {
             phase = .cameraDenied
@@ -85,11 +90,20 @@ import Combine
         phase = .scanning(progress: 0, guidance: .findFace)
     }
 
-    func handle(_ frame: EyeScanFrame) {
+    /// An upright camera frame and the part of it around the eyes.
+    struct Snapshot: Sendable {
+        let buffer: SendablePixelBuffer
+        let crop: CGRect
+    }
+
+    func handle(_ frame: EyeScanFrame, snapshot: Snapshot? = nil) {
         guard case .scanning = phase else { return }
         if let measurements = frame.measurements { sampler.add(measurements) }
         if sampler.isComplete, let median = sampler.median() {
             camera.stop()
+            if let snapshot {
+                Task.detached(priority: .utility) { ScanSnapshots.save(snapshot.buffer, crop: snapshot.crop, as: .eyes) }
+            }
             phase = .finished(classifier.classify(median))
         } else {
             let next = Phase.scanning(progress: sampler.progress, guidance: frame.guidance)
