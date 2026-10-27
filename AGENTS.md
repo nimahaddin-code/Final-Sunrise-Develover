@@ -5,6 +5,12 @@
 `AppRoute.recommendedTutorial(TutorialHandoff)` opens `Features/Tutorial/GuidedTutorialView` (tabs Brows / Eyeliner / Blush, no settings;
 shade and strength are carried over from Try On). Eyeliner steps come from the fitted `LinerStyle`. Not yet checked on a real device.
 
+## Photo — after the tutorial
+
+The tutorial's last-step button enters `GuidedTutorialModel.photoMode` (same screen and camera): full look, coloured frame
+(`PhotoTheme`: palette button cycles pink/blue/white), shutter, then `PolaroidResultView`. Views in `Features/Tutorial/PhotoCaptureViews.swift`.
+In-memory only; sharing is the only way it leaves the app. Not yet checked on a real device.
+
 ## Profile — scan stills
 
 `AppRoute.profile` opens `ProfileView` (face + eye analysis, signature look). Its retake button opens `AppRoute.fullScan`

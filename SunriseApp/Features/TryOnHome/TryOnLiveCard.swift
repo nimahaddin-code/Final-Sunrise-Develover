@@ -144,10 +144,11 @@ struct CameraZoomModifier: ViewModifier {
     static let steps: [CGFloat] = [1, 1.5, 2, 3]
     static let range: ClosedRange<CGFloat> = 1...3
 
+    var enabled = true
     @State private var zoom: CGFloat = 1
     @GestureState private var pinch: CGFloat = 1
 
-    private var current: CGFloat { min(max(zoom * pinch, Self.range.lowerBound), Self.range.upperBound) }
+    private var current: CGFloat { !enabled ? 1 : min(max(zoom * pinch, Self.range.lowerBound), Self.range.upperBound) }
 
     func body(content: Content) -> some View {
         content
@@ -158,7 +159,7 @@ struct CameraZoomModifier: ViewModifier {
                 .updating($pinch) { value, state, _ in state = value }
                 .onEnded { value in zoom = min(max(zoom * value, Self.range.lowerBound), Self.range.upperBound) })
             .overlay(alignment: .trailing) {
-                Button {
+                if enabled { Button {
                     let next = Self.steps.first { $0 > zoom + 0.01 } ?? Self.steps[0]
                     withAnimation(.easeOut(duration: 0.2)) { zoom = next }
                 } label: {
@@ -171,13 +172,13 @@ struct CameraZoomModifier: ViewModifier {
                 .buttonStyle(.plain)
                 .padding(.trailing, AppSpacing.small)
                 .accessibilityLabel("Zoom")
-                .accessibilityValue(String(format: "%.1f times", current))
+                .accessibilityValue(String(format: "%.1f times", current)) }
             }
     }
 }
 
 extension View {
-    func cameraZoom() -> some View { modifier(CameraZoomModifier()) }
+    func cameraZoom(_ enabled: Bool = true) -> some View { modifier(CameraZoomModifier(enabled: enabled)) }
 }
 
 private struct CameraZoomKey: EnvironmentKey { static let defaultValue: CGFloat = 1 }

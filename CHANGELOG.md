@@ -5,6 +5,13 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Added — photo step after the tutorial
+- The last tutorial step's button is now a camera: it opens the photo screen in the same `TutorialScreen` (`GuidedTutorialModel.photoMode`,
+  shared camera session, no restart). The camera shows brow, blush and eyeliner in the Try On shades, with no guide dots and no zoom.
+  The palette button (bottom left) cycles the frame pink / blue / white; the bolt toggles a white screen flash. Shutter takes the AR view
+  snapshot with the liner composed on it and shows it as a polaroid (`Features/Tutorial/PhotoCaptureViews.swift`): retake, share (ShareLink,
+  the polaroid image) and done. Photos stay in memory. Not yet checked on a real device (build only).
+
 ### Changed — eyeliner tutorial: key points, one step, zoom
 - The eyeliner tutorial draws only key points on each eye (line start, line end at the outer corner and, for the winged look, the wing
   tip) instead of an outline. They follow a pulled lid (`LinerOverlayModel.followsPulledLid`: lid tracking and quicker smoothing).
