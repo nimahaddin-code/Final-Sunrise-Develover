@@ -1,3 +1,34 @@
+## Brow stability — -Nimah (2026-10-27)
+
+User reports eyebrow jitter after availability recovery. Native brow residuals now use metre-space 2 Hz /
+80 Hz-per-metre-second One Euro filtering plus 0.12 mm output hold; gaps >150 ms reset. Rigid face/camera pose
+remains unsmoothed. Brow-only UV atlas gets mipmaps and anisotropic trilinear sampling to reduce strand
+minification shimmer. Blush keeps its prior filter and non-mipmapped atlas. Physical acceptance pending.
+
+## Makeup visibility recovery — -Nimah (2026-10-27)
+
+Device scalar metrics showed segmentation_unavailable: CancellationError() despite segmenter_available=true;
+mask age 223 ms exceeded the 150 ms freshness guard. Native beauty engine now owns/cancels preparation task,
+ignores expected navigation cancellation, clears recovered segmentation/fitting errors and resets status on
+pause. Opt-in faceSkinOnly preprocessing uses 256 long side for the bundled 256 model; Hanum default stays512.
+Do not remove stale-mask occlusion protection or claim all visibility delays are fixed without device checks.
+
+## Personal blush v0.4.0 — -Nimah (2026-10-27)
+
+Face shape picks artistic style; per-side cheek corridor and observed mouth/nose-to-eye spacing adapt
+center and radii. Uses stored native geometry, independent sides, explicit bounded JSON controls and
+conservative exclusions; no second scan/tracker or semantic cheekbone claim. Shared native mouth-boundary
+helper now lives in BlushPlacementGenerator. Keep Metal and tutorial using the same fields. Preserve all
+pending eyebrow edits and existing eyeliner. See Docs/Decisions/0012-personal-cheek-placement.md.
+
+## Eyebrow UV / Metal strands — -Nimah (2026-10-27)
+
+- Bake personal, JSON-shaped brows to native face UVs; soft heads, tapered tails and deterministic fine strands.
+- Dedicated hair pigment blend and shared depth, camera timing, tracking and obstruction pipeline.
+- Suppress duplicate SceneKit pigment; separate category atlas identity and guard delayed GPU completions.
+- Keep face-shape recommendations, color/intensity controls, stored scans, tutorial and Retake routes.
+- Simulator GPU atlas/occlusion tests included; physical quality acceptance remains pending.
+
 ## Blush camera parity — -Nimah (2026-10-27)
 
 Removed the extra horizontal reflection from both Metal camera sampling and mesh projection.

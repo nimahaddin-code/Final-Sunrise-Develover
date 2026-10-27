@@ -306,14 +306,15 @@ struct LiveGuideView: UIViewRepresentable {
                 brow.previewIntensity=configuration.browLayer.intensity; brow.shadeTint=configuration.browLayer.tint
                 var blush=configuration; blush.region = .blush; blush.showMakeupPreview=configuration.blushLayer.on
                 blush.previewIntensity=configuration.blushLayer.intensity; blush.shadeTint=configuration.blushLayer.tint
-                face.previewRenderer.update(brow:result.guide,forehead:nil,vertices:vertices,triangles:triangles,configuration:brow)
                 lock.lock();let usesBeauty=beauty != nil;lock.unlock()
+                if usesBeauty {brow.showMakeupPreview=false}
+                face.previewRenderer.update(brow:result.guide,forehead:nil,vertices:vertices,triangles:triangles,configuration:brow)
                 if usesBeauty {blush.showMakeupPreview=false}
                 face.blushPreviewRenderer.update(brow:nil,forehead:nil,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:blush)
             } else {
                 var preview=configuration
                 lock.lock();let usesBeauty=beauty != nil;lock.unlock()
-                if usesBeauty && preview.region == .blush {preview.showMakeupPreview=false}
+                if usesBeauty && (preview.region == .blush || preview.region == .eyebrows) {preview.showMakeupPreview=false}
                 face.previewRenderer.update(brow:result.guide,forehead:result.foreheadGuide,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:preview)
             }
             face.trackingDots.update(vertices:vertices,visible:configuration.showTrackingPoints)

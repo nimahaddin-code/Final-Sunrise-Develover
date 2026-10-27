@@ -35,6 +35,33 @@ fragment float4 blushAtlasFragment(O in [[stage_in]],constant Bake& b [[buffer(0
  }
  return float4(masks,0,1);
 }
+// -Nimah: Deterministic strand coordinates baked in native face UVs, never animated noise.
+struct BrowSegment {float4 a;float4 b;};
+fragment float4 browAtlasFragment(O in [[stage_in]],constant BrowSegment* segments [[buffer(0)]],constant float4& controls [[buffer(1)]]) {
+ float2 coverage=0;float hair=0;
+ for(int side=0;side<2;side++) {
+  float best=1e8,t=0,v=0;
+  for(int i=0;i<40;i++) {
+   BrowSegment line=segments[side*40+i];float2 axis=line.b.xy-line.a.xy;
+   float f=clamp(dot(in.local.xy-line.a.xy,axis)/max(dot(axis,axis),1e-12f),0.f,1.f);
+   float4 p=mix(line.a,line.b,f);float2 d=in.local.xy-p.xy;
+   float distance=length(d)/max(p.z,1e-6f);
+   if(distance<best){best=distance;t=p.w;v=d.y/max(p.z,1e-6f);}
+  }
+  float feather=clamp(controls.z,.03f,.7f);
+  float envelope=1-smoothstep(1-feather,1.f,best);
+  float head=smoothstep(0.f,max(controls.y,.02f),t);
+  float tail=1-smoothstep(.97f,1.f,t);
+  float base=envelope*head*tail;
+  // Upright heads gradually sweep outward. Irregular, subpixel-soft strand spacing avoids a solid sticker.
+  float phase=t*78.f-v*mix(.28f,1.8f,t)+.15f*sin(t*93.f)+.09f*sin(v*8.f+t*47.f);
+  float width=max(fwidth(phase),.055f);
+  float strand=1-smoothstep(.08f,.08f+width,abs(fract(phase)-.5f));
+  coverage[side]=base*controls.x;
+  hair=max(hair,base*strand);
+ }
+ return float4(coverage,hair,1);
+}
 vertex O blushBackgroundVertex(uint i [[vertex_id]]) {
  float2 p=float2((i<<1)&2,i&2);O o;o.position=float4(p*2-1,1,1);o.uv=float2(p.x,1-p.y);o.local=0;o.rest=0;return o;
 }
@@ -56,7 +83,7 @@ fragment float4 blushBackgroundFragment(O in [[stage_in]],constant U& u [[buffer
 }
 fragment float4 blushDepthFragment(O in [[stage_in]]) { return 0; }
 fragment float4 blushPigmentFragment(O in [[stage_in]],constant U& u [[buffer(0)]],texture2d<float> y [[texture(0)]],texture2d<float> cb [[texture(1)]],texture2d<float> atlas [[texture(2)]],texture2d<float> obstruction [[texture(3)]]) {
- constexpr sampler s(coord::normalized,address::clamp_to_edge,filter::linear);
+ constexpr sampler s(coord::normalized,address::clamp_to_edge,filter::linear,mip_filter::linear,max_anisotropy(4));
  float2 viewUV=in.position.xy*u.tracking.zw;
  float2 raw=(u.rawFromClip*float4(viewUV,0,1)).xy;
  float3 skin=cameraPixel(raw,u,y,cb);
@@ -73,6 +100,14 @@ fragment float4 blushPigmentFragment(O in [[stage_in]],constant U& u [[buffer(0)
  float3 absorption=skin*exp(-u.controls.y*(1-u.shade.rgb/max(max(u.shade.r,u.shade.g),max(u.shade.b,.001f))));
  float3 target=mix(absorption,mix(skin,tint,u.controls.z),u.controls.w);
  float3 result=mix(skin,clamp(target,0.f,1.f),alpha);
+ if(u.camera.w>.5) {
+  // Brow pigment overlays existing hairs; no skin erasure, no eyebrow morph, no borrowed blush tint model.
+  float strands=atlas.sample(s,in.uv).b;
+  float density=mix(.34f,1.f,saturate(strands/max(max(masks.x,masks.y),.001f)));
+  float browAlpha=saturate(max(masks.x,masks.y)*density*u.shade.w*u.tracking.x*(1-occ)*stretchFade);
+  float3 hairColor=u.shade.rgb*clamp(sqrt(lum/.25f),.55f,1.4f);
+  result=mix(skin,clamp(hairColor,0.f,1.f),browAlpha);
+ }
  // Optional tutorial contour, entirely separate from pigment alpha.
  if(u.tracking.y>.5 && max(masks.x,masks.y)>.02 && max(masks.x,masks.y)<.045) result=mix(result,float3(.95,.72,.80),.7);
  return float4(result,1);

@@ -1,3 +1,37 @@
+## Brow stability — -Nimah (2026-10-27)
+
+User reports eyebrow jitter after availability recovery. Native brow residuals now use metre-space 2 Hz /
+80 Hz-per-metre-second One Euro filtering plus 0.12 mm output hold; gaps >150 ms reset. Rigid face/camera pose
+remains unsmoothed. Brow-only UV atlas gets mipmaps and anisotropic trilinear sampling to reduce strand
+minification shimmer. Blush keeps its prior filter and non-mipmapped atlas. Physical acceptance pending.
+
+## Makeup visibility recovery — -Nimah (2026-10-27)
+
+Device scalar metrics showed segmentation_unavailable: CancellationError() despite segmenter_available=true;
+mask age 223 ms exceeded the 150 ms freshness guard. Native beauty engine now owns/cancels preparation task,
+ignores expected navigation cancellation, clears recovered segmentation/fitting errors and resets status on
+pause. Opt-in faceSkinOnly preprocessing uses 256 long side for the bundled 256 model; Hanum default stays512.
+Do not remove stale-mask occlusion protection or claim all visibility delays are fixed without device checks.
+
+## Personal blush v0.4.0 — -Nimah (2026-10-27)
+
+Face shape picks artistic style; per-side cheek corridor and observed mouth/nose-to-eye spacing adapt
+center and radii. Uses stored native geometry, independent sides, explicit bounded JSON controls and
+conservative exclusions; no second scan/tracker or semantic cheekbone claim. Shared native mouth-boundary
+helper now lives in BlushPlacementGenerator. Keep Metal and tutorial using the same fields. Preserve all
+pending eyebrow edits and existing eyeliner. See Docs/Decisions/0012-personal-cheek-placement.md.
+
+## Native UV strand eyebrow — -Nimah (2026-10-27)
+
+Eyebrow After uses the shared BeautyBlushEngine ARKit/Metal pipeline, one selected category at a time.
+A native UV atlas bakes 80 measured/JSON-shaped centerline segments (40 per side); procedural stable strands,
+head fade, taper, feather and max alpha. Brow fragment uses separate hair pigment shading, not blush tint.
+Preserve observed head/tail, existing face-shape assignments and saved scan flow. No extra scan or tracker.
+Category mode is part of atlas cache identity; hide old layer and epoch-guard GPU completions on switching.
+SceneKit pigment disabled when Metal owns that category; guides/fallback retained. Metrics beautyBrow.metrics.
+Natural hair is not erased: a lighter shade cannot bleach dark brows. Face-skin segmenter is shared, not a
+specialized eyebrow/hair matting model. Physical device quality and segmentation need acceptance.
+
 ## Blush camera parity — -Nimah (2026-10-27)
 
 Removed the extra horizontal reflection from both Metal camera sampling and mesh projection.

@@ -7,6 +7,101 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
+    func testBrowLocalStabilizerRejectsMicroJitterWithoutFreezingExpression() {
+        var stabilizer=BeautyBrowStabilizer(),samples:[Float]=[]
+        for i in 0..<120 {
+            let input=SIMD3<Float>(i%2==0 ? 0.0003:-0.0003,0.05,0.04)
+            let output=stabilizer.update(input,timestamp:Double(i)/60)
+            if i>30 {samples.append(output.x)}
+        }
+        let amplitude=(samples.max() ?? 1)-(samples.min() ?? 0)
+        XCTAssertLessThan(amplitude,0.0002,"Still local mesh noise must be substantially attenuated")
+        var moved=SIMD3<Float>.zero
+        for i in 120..<132 {moved=stabilizer.update(SIMD3(0.003,0.05,0.04),timestamp:Double(i)/60)}
+        XCTAssertGreaterThan(moved.x,0.0025,"Real brow movement must remain responsive")
+        let recovered=stabilizer.update(SIMD3(-0.003,0.05,0.04),timestamp:3)
+        XCTAssertEqual(recovered.x,-0.003,accuracy:0.00001,"Tracking gaps must reset stale residuals")
+    }
+    @MainActor func testCancelledMakeupPreparationDoesNotLatchUnavailable() async throws {
+        let error=try await BeautyBlushEngine.cancelledPreparationFixture()
+        XCTAssertNil(error,"Navigation cancellation must not become a persistent makeup failure")
+        let model=HandOcclusionSegmenter(faceSkinOnly:true)
+        try await model.start();XCTAssertTrue(model.isAvailable)
+        model.stop();XCTAssertFalse(model.isAvailable)
+        try await model.start();XCTAssertTrue(model.isAvailable)
+        model.stop()
+    }
+    func testSameBlushStyleAdaptsToIndividualCheekAndMidfaceProportions() throws {
+        let region=try BrowFixture().region()
+        let base=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.centerCheek))
+        let altered=region.restVertices.map { p -> SIMD3<Float> in
+            var q=p
+            if q.x>0 && q.y<0.025 {q.x *= 0.80}
+            return q
+        }
+        let personal=EyebrowRegion(brows:region.brows,faceObservationConfidence:region.faceObservationConfidence,
+            timestamp:region.timestamp,anchorID:region.anchorID,restVertices:altered,triangles:region.triangles,eyeCenters:region.eyeCenters)
+        let adapted=try XCTUnwrap(BlushPlacementGenerator.make(region:personal,style:.centerCheek))
+        let before=try XCTUnwrap(base.pigmentFields.first(where:{$0.side>0}))
+        let after=try XCTUnwrap(adapted.pigmentFields.first(where:{$0.side>0}))
+        XCTAssertLessThan(after.radius.x,before.radius.x)
+        XCTAssertLessThan(after.outerLimit,before.outerLimit)
+        XCTAssertLessThan(after.center.x,before.center.x)
+        let unchanged=try XCTUnwrap(adapted.pigmentFields.first(where:{$0.side<0}))
+        XCTAssertEqual(unchanged.radius.x,try XCTUnwrap(base.pigmentFields.first(where:{$0.side<0})).radius.x,accuracy:0.0001)
+        let changedBrows=region.brows.map { b -> EyebrowRegion.Brow in
+            guard let m=b.mapping else {return b}
+            var ala=m.ala;ala.y -= 0.01
+            return .init(side:b.side,landmarks:b.landmarks,mapping:.init(ala:ala,pupil:m.pupil,outerEye:m.outerEye,start:m.start,arch:m.arch,tail:m.tail))
+        }
+        let taller=EyebrowRegion(brows:changedBrows,faceObservationConfidence:region.faceObservationConfidence,
+            timestamp:region.timestamp,anchorID:region.anchorID,restVertices:region.restVertices,triangles:region.triangles,eyeCenters:region.eyeCenters)
+        let vertical=try XCTUnwrap(BlushPlacementGenerator.make(region:taller,style:.centerCheek)?.pigmentFields.first)
+        XCTAssertGreaterThan(vertical.radius.y,try XCTUnwrap(base.pigmentFields.first).radius.y)
+    }
+    func testBlushPersonalizationRejectsInvalidConfiguration() throws {
+        let url=try XCTUnwrap(Bundle.main.url(forResource:"makeup-reference.database",withExtension:"json"))
+        var root=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:url)) as? [String:Any])
+        var fitting=try XCTUnwrap(root["runtime_fitting_rules"] as? [String:Any])
+        var parameters=try XCTUnwrap(fitting["parameters"] as? [String:Any])
+        var strength=try XCTUnwrap(parameters["blush_personalization_strength"] as? [String:Any])
+        strength["value"]=99;parameters["blush_personalization_strength"]=strength
+        fitting["parameters"]=parameters;root["runtime_fitting_rules"]=fitting
+        XCTAssertThrowsError(try MakeupRuleDatabase.decode(JSONSerialization.data(withJSONObject:root)))
+    }
+    func testMetalBrowAtlasHasTaperStrandsAndNoBridgePigment() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else {throw XCTSkip("Metal unavailable")}
+        let pixels=try BeautyBlushEngine.renderAtlasFixture(brow:true),n=256
+        func channel(_ x:Int,_ y:Int,_ c:Int)->Float {pixels[(y*n+x)*4+c]}
+        XCTAssertEqual(channel(128,90,0)+channel(128,90,1),0,accuracy:0.0001)
+        var left=0,right=0,strand=0,gap=0
+        for y in 50..<115 {for x in 20..<236 {
+            let a=max(channel(x,y,0),channel(x,y,1))
+            if a>0.1 {
+                if x<128 {left += 1}else{right += 1}
+                if channel(x,y,2)>0.15 {strand += 1}else{gap += 1}
+            }
+        }}
+        XCTAssertGreaterThan(left,100);XCTAssertGreaterThan(right,100)
+        XCTAssertGreaterThan(strand,30);XCTAssertGreaterThan(gap,30)
+    }
+    func testMetalBrowPreservesPersonalHeadTailAndOcclusion() throws {
+        let region=try BrowFixture().region()
+        let natural=try BeautyBlushEngine.browSpanFixture(region:region,style:.natural)
+        let high=try BeautyBlushEngine.browSpanFixture(region:region,style:.highArch)
+        XCTAssertEqual(natural.count,2)
+        for i in 0..<2 {
+            XCTAssertGreaterThan(abs(natural[i].1-natural[i].0),0.008)
+            XCTAssertEqual(natural[i].0,high[i].0,accuracy:0.0001)
+            XCTAssertEqual(natural[i].1,high[i].1,accuracy:0.0001)
+        }
+        let bare=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,brow:true)
+        let ink=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0.9,brow:true)
+        let covered=try BeautyBlushEngine.renderPixelFixture(obstructed:true,intensity:0.9,brow:true)
+        let i=(16*32+16)*4
+        XCTAssertLessThan(Int(ink[i+1]),Int(bare[i+1]))
+        for c in 0..<3 {XCTAssertEqual(Int(covered[i+c]),Int(bare[i+c]),accuracy:1)}
+    }
     func testFaceSkinOcclusionModelInitializesFromBundledLabels() async throws {
         let model=HandOcclusionSegmenter(faceSkinOnly:true)
         try await model.start()
@@ -134,7 +229,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.cheekbone))
         XCTAssertEqual(guide.pigmentFields.count,2)
         for f in guide.pigmentFields {
-            XCTAssertEqual(f.radius.x,0.16*0.210,accuracy:0.000001)
+            XCTAssertTrue((0.16*0.210*0.83...0.16*0.210*1.2125).contains(f.radius.x),"Personal fitting must stay inside declared adaptation bounds")
             XCTAssertEqual(f.radius.y,0.16*0.130,accuracy:0.000001)
             XCTAssertEqual(f.angle,15*Float.pi/180,accuracy:0.000001)
             XCTAssertGreaterThan(f.coverage(f.center),0.99)
@@ -486,7 +581,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertEqual(guide.pigmentFields.count,2)
         for field in guide.pigmentFields {
             XCTAssertGreaterThan(field.coverage(field.center),0.99)
-            XCTAssertEqual(field.radius.x,0.16*0.09,accuracy:0.00001)
+            XCTAssertTrue((0.16*0.09*0.83...0.16*0.09*1.2125).contains(field.radius.x))
             XCTAssertEqual(field.radius.y,0.16*0.075,accuracy:0.00001)
         }
     }

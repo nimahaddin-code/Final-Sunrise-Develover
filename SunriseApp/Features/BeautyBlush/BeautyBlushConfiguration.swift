@@ -66,3 +66,22 @@ enum BeautyBlushShaders {
         }
     }()
 }
+
+// -Nimah: Metre-space brow residual smoothing. Rigid ARKit pose remains current and unfiltered.
+struct BeautyBrowStabilizer {
+    private var axes=[OneEuroFilter(),OneEuroFilter(),OneEuroFilter()]
+    private var output:SIMD3<Float>?
+    private var time:Double?
+    mutating func update(_ point:SIMD3<Float>,timestamp:Double)->SIMD3<Float> {
+        guard timestamp.isFinite,point.x.isFinite,point.y.isFinite,point.z.isFinite else {return output ?? .zero}
+        if let time,timestamp<=time {return output ?? point}
+        if let time,timestamp-time>0.15 {axes=[OneEuroFilter(),OneEuroFilter(),OneEuroFilter()];output=nil}
+        time=timestamp
+        let config=OneEuroConfig(minCutoff:2,beta:80,dCutoff:1,deadband:0)
+        var filtered=point
+        for i in 0..<3 {filtered[i]=Float(axes[i].filter(Double(point[i]),t:timestamp,config:config))}
+        // 0.12 mm local residual hold; accumulated movement eventually exits the band.
+        if let output,simd_distance(output,filtered)<0.00012 {return output}
+        output=filtered;return filtered
+    }
+}

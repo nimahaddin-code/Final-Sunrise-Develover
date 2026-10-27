@@ -59,7 +59,8 @@
     "blush_rules_version": "0.2.1",
     "blush_visual_target_sha256": "0dc0a8b1a6c9b18120da9b1409027d6c8d5a76f6b8672a3b54e7b1dee6a01fc5",
     "blush_calibration_status": "new_renderer_technical_tests_in_progress_device_acceptance_pending",
-    "blush_engine": "arkit_metal_uv"
+    "blush_engine": "arkit_metal_uv",
+    "personalized_blush_revision": "0.4.0"
   },
   "source_registry": [
     {
@@ -7212,6 +7213,48 @@
         "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
         "minimum": 0,
         "maximum": 1
+      },
+      "blush_personalization_strength": {
+        "value": 0.85,
+        "unit": "ratio",
+        "basis": "Per-side face-local cheek adaptation; bounded engineering calibration, not a beauty classifier",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "blush_personal_scale_min": {
+        "value": 0.8,
+        "unit": "ratio",
+        "basis": "Per-side face-local cheek adaptation; bounded engineering calibration, not a beauty classifier",
+        "minimum": 0.6,
+        "maximum": 1
+      },
+      "blush_personal_scale_max": {
+        "value": 1.25,
+        "unit": "ratio",
+        "basis": "Per-side face-local cheek adaptation; bounded engineering calibration, not a beauty classifier",
+        "minimum": 1,
+        "maximum": 1.5
+      },
+      "blush_contour_band": {
+        "value": 0.035,
+        "unit": "ratio",
+        "basis": "Per-side face-local cheek adaptation; bounded engineering calibration, not a beauty classifier",
+        "minimum": 0.015,
+        "maximum": 0.1
+      },
+      "blush_nominal_interocular_ratio": {
+        "value": 0.4,
+        "unit": "ratio",
+        "basis": "Per-side face-local cheek adaptation; bounded engineering calibration, not a beauty classifier",
+        "minimum": 0.25,
+        "maximum": 0.55
+      },
+      "blush_mouth_clearance": {
+        "value": 0.025,
+        "unit": "ratio",
+        "basis": "Per-side face-local cheek adaptation; bounded engineering calibration, not a beauty classifier",
+        "minimum": 0.01,
+        "maximum": 0.08
       }
     },
     "formulas": [

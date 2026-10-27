@@ -147,7 +147,10 @@ final class HandOcclusionSegmenter: NSObject, @unchecked Sendable {
         case .down: .down
         }
         var image = CIImage(cvPixelBuffer: source).oriented(orientation)
-        let scale = Self.longSide / max(image.extent.width, image.extent.height)
+        // -Nimah: Blush/brow model is 256 square; avoid a redundant 512-pixel conversion.
+        // Keep Hanum eyeliner preprocessing unchanged.
+        let inputLongSide:CGFloat = faceSkinOnly ? 256:Self.longSide
+        let scale = inputLongSide / max(image.extent.width, image.extent.height)
         image = image.transformed(by: CGAffineTransform(scaleX: scale, y: scale))
         image = image.transformed(by: CGAffineTransform(translationX: -image.extent.minX, y: -image.extent.minY))
         let size = CGSize(width: image.extent.width.rounded(), height: image.extent.height.rounded())
