@@ -1,3 +1,15 @@
+## Face/eye scan removed from the flow — Khalish (2026-10-27)
+
+The app opens straight on `TryOnHomeView`: no welcome, onboarding, face scan, eye scan, Profile, Retake or
+Scan Debug tab. Routes `faceScan`, `eyeScan`, `fullScan`, `profile`, `scanDebug` and `AppTab.scanDebug` are gone,
+as are `AppNavigator` onboarding/launch-scan/retake state. No face or eye shape is shown anywhere. Everyone gets
+`FaceShapeAssessment.standardLook` (oval assignment: natural brow, cheekbone blush) and the natural eyeliner.
+Brow/blush attachments are fitted from live try-on/tutorial frames (`LaunchMakeupFit.fitLive`, one Vision
+attempt at most every 0.4 s, frontal and relaxed face) and then followed by ARKit; `LaunchMakeupFit.shared` is
+memory-only, cleared on each camera session start, and deletes the old `savedMakeupAttachments.v1` key.
+FaceShape/EyeShape/Onboarding/ProfileView/ScanDebug code stays in the repo, unreferenced, so it can return.
+Sections below that describe the launch scan, saved fit or Profile predate this. Not yet checked on a device.
+
 ## Brow stability — -Nimah (2026-10-27)
 
 User reports eyebrow jitter after availability recovery. Native brow residuals now use metre-space 2 Hz /

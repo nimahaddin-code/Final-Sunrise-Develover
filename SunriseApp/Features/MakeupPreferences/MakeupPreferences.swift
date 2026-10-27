@@ -27,6 +27,9 @@ struct FaceShapeAssessment:Equatable,Sendable {
         self.shape=shape; self.origin=origin
         self.confidence=confidence.flatMap { $0.isFinite && (0...1).contains($0) ? $0 : nil }
     }
+    /// With the face/eye scans removed, everyone gets the oval assignment (natural brow, cheekbone blush);
+    /// no face shape is shown. `.analysis` makes try-on follow the live-camera fit.
+    static let standardLook=FaceShapeAssessment(shape:.oval,origin:.analysis)
 }
 enum PreferenceEvidence:String,Sendable {
     case stated,visualInterpretation,cheekOnlyInterpretation

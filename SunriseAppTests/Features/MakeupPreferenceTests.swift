@@ -184,7 +184,7 @@ final class MakeupPreferenceTests:XCTestCase {
         }
     }
     @MainActor func testBlushIntensityUsesUpdatedJSONWithoutChangingBrowOrLiner() {
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         XCTAssertEqual(home.intensities[.blush] ?? -1,0.72,accuracy:0.00001)
         XCTAssertEqual(home.intensities[.eyebrow] ?? -1,0.65,accuracy:0.00001)
         home.deactivate()
@@ -372,7 +372,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertNil(PalettePhoto.decode(Data([0,1,2])))
     }
     @MainActor func testCustomColourKeepsPlacementAndTransfersToTutorial() throws {
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         let assigned=try XCTUnwrap(home.brow.selectedBlush).id
         let shade=MakeupShade(id:"custom.test",name:"Custom colour",red:0.8,green:0.2,blue:0.4,opacity:0.36)
         home.choose(shade:shade);home.setIntensity(0.8)
@@ -503,7 +503,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
         let plan=MakeupPlan(shape:.heart,eyeScan:eyes)
         let assessment=FaceShapeAssessment(shape:.heart,origin:.analysis)
-        let home=TryOnHomeModel(plan:plan,assessment:assessment,checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:plan,assessment:assessment,checker:MockFaceTrackingChecker())
         home.choose(.eyeliner)
         XCTAssertTrue(home.canTry(.eyeliner))
         XCTAssertFalse(home.liner.hasLiner)
@@ -516,7 +516,7 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     @MainActor func testTryOnShowsOnlySelectedToolAndUsesLaunchFitting() {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         XCTAssertEqual(home.enabled,[.blush])
         XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
         XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on)
@@ -567,11 +567,11 @@ final class MakeupPreferenceTests:XCTestCase {
         let second=await collector.finish();XCTAssertTrue(second)
         XCTAssertTrue(cache.hasFit)
     }
-    @MainActor func testMissingFitDisablesOnlyUnavailablePigment() {
-        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:false)
-        XCTAssertFalse(home.canTry(.eyebrow));XCTAssertFalse(home.canTry(.blush))
-        XCTAssertTrue(home.canTry(.eyeliner))
+    // Without a scan, the standard look offers every tool; brows/blush wait for the live-camera fit.
+    @MainActor func testStandardLookOffersEveryToolWithoutAScan() {
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.oval),assessment:.standardLook,checker:MockFaceTrackingChecker())
+        XCTAssertTrue(home.canTry(.eyebrow));XCTAssertTrue(home.canTry(.blush));XCTAssertTrue(home.canTry(.eyeliner))
+        XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
         home.deactivate()
     }
     // -Nimah: The heart-face tutorial V must render as filled cheek pigment, not a chevron.

@@ -169,6 +169,8 @@ struct LiveGuideView: UIViewRepresentable {
             view.session.delegate=self; view.session.delegateQueue=queue
             running=true
             eyebrowPipeline.reset()
+            // Each camera session fits the face in front of it.
+            LaunchMakeupFit.shared.clear()
             lock.lock(); generation=UUID(); pending=nil; pendingStyles=[:]; activeAnchorID=nil; sessionActive=true; tracked=false; fitAllowed=false; lock.unlock()
             camera.fitReady=false; camera.fitMessage="Look straight ahead with relaxed eyes and lips while the surface is fitted"
             queue.async { self.readiness.reset(); self.previousPosition=nil; self.previousRotation=nil; self.lastReport=0; self.fitStable=false }
@@ -443,7 +445,10 @@ struct LiveGuideView: UIViewRepresentable {
             if let configuration=options.eyebrows {
                 if isTracked,let face {
                     if configuration.usesLaunchFit {
-                        // -Nimah: Reattach the launch fit to this live mesh; never run a second scan in try-on.
+                        // Brow/cheek attachments are fitted from this live camera, then followed by ARKit tracking.
+                        if relaxed && abs(relative.columns.2.z)>0.94 && !LaunchMakeupFit.shared.hasFit {
+                            LaunchMakeupFit.shared.fitLive(FaceLandmarkFrame(frame:frame,anchor:face))
+                        }
                         eyebrowPipeline.followLaunchFit(anchorID:face.identifier,vertices:Array(face.geometry.vertices),
                             triangles:Array(face.geometry.triangleIndices),timestamp:frame.timestamp,style:configuration.style,
                             blushStyle:configuration.needsBlush ? configuration.blushStyle : nil,
