@@ -17,7 +17,16 @@ import Foundation
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         onboardingComplete = defaults.bool(forKey: Self.onboardingCompleteKey)
+        #if DEBUG
+        // Testing shortcut: with onboarding done, go straight to Try On on every launch, using the saved scan results
+        // (eyeliner works from them; brow/blush need the launch fit, so they stay off). Set to false to scan each launch.
+        if Self.debugSkipsLaunchScan, onboardingComplete, defaults === UserDefaults.standard { launchScanComplete = true }
+        #endif
     }
+
+    #if DEBUG
+    static let debugSkipsLaunchScan = true
+    #endif
 
     /// Ends onboarding for good and lands on the Try On home screen.
     func completeOnboarding() {

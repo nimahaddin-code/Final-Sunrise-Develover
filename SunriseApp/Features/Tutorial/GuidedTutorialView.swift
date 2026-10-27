@@ -10,6 +10,8 @@ struct TutorialHandoff: Hashable {
     var tool: TryOnTool
     var shades: [TryOnTool: MakeupShade]
     var intensities: [TryOnTool: Double]
+    /// Which eyeliner look the person was trying: the tutorial guides that same shape.
+    var linerLook: LinerLook = .winged
 }
 
 /// What the bottom-left button shows: the full filter, half filter / half real camera, or no filter.
@@ -57,10 +59,14 @@ enum TutorialTab: CaseIterable, Identifiable {
         self.handoff = handoff
         let start = TutorialTab(tool: handoff.tool)
         tab = start
-        if case .eyeliner(let style)? = plan.madeForYou.first(where: { $0.category == .eyeliner })?.style { linerStyle = style } else { linerStyle = nil }
+        if case .eyeliner(let style)? = plan.madeForYou.first(where: { $0.category == .eyeliner })?.style {
+            linerStyle = EyelinerPlanner.style(style, look: handoff.linerLook)
+        } else { linerStyle = nil }
         linerIsNeutral = plan.eyeliner.isNeutral
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: start == .blush ? .blush : .eyebrows, startTutorial: true)
         relay = LinerFrameRelay(model: liner)
+        // The guide points follow the skin when the person pulls the lid or the corner of the eye outward.
+        liner.followsPulledLid = true
         applyShade(for: start == .blush ? .blush : .eyebrow)
         // The brow model owns the step index for brows/blush; forward its changes so the screen redraws.
         brow.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
@@ -86,6 +92,9 @@ enum TutorialTab: CaseIterable, Identifiable {
     var liveConfiguration: EyebrowConfiguration {
         var value = brow.liveConfiguration
         value.showMappingFormula = tab == .brows
+        // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
+        // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
+        if tab == .eyeliner { value.usesLaunchFit = true }
         if tab == .eyeliner || !hasGuide || compare == .off { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
         return value
     }
@@ -141,34 +150,13 @@ enum TutorialTab: CaseIterable, Identifiable {
         liner.setStyle(linerStyle, shade: handoff.shades[.eyeliner], intensity: handoff.intensities[.eyeliner] ?? 1)
     }
 
-    // -Nimah: Steps follow the fitted liner (start, taper, wing, lower line); wording makes no claim about the person's result.
+    /// One step: the guide shows only the key points of the liner, and the wording says how to join them.
     static func linerLessons(_ style: LinerStyle, neutral: Bool) -> [FaceGuideLesson] {
-        var lessons = [
-            FaceGuideLesson(title: "Mark where it starts",
-                            instruction: style.start > 0.08
-                                ? "Begin the line a little in from the inner corner of your upper lash line, following the dotted outline. Leave the inner corner bare."
-                                : "Begin at the inner corner of your upper lash line, following the dotted outline. Keep the first touch light and close to the lashes."),
-            FaceGuideLesson(title: "Draw along the lash line",
-                            instruction: style.outerWidth > style.innerWidth * 1.2
-                                ? "Work toward the outer corner in short strokes, staying on the lash roots. Let the line grow gradually thicker toward the outside, as outlined."
-                                : "Work toward the outer corner in short strokes, staying on the lash roots and keeping the line an even thickness."),
-        ]
-        if style.wingLength > 0.02 {
-            let tail = style.wingTargetsBrowTail ? ", pointing toward the end of your brow" : ""
-            lessons.append(FaceGuideLesson(title: "Add the wing",
-                                           instruction: "Extend the line past the outer corner as a wing, about \(Int(style.wingAngle.rounded()))° upward\(tail). Follow the dotted tip, then connect it back to the lash line."))
-        } else {
-            lessons.append(FaceGuideLesson(title: "Finish at the corner",
-                                           instruction: "End the line at the outer corner without a wing. Keep the end softly tapered."))
-        }
-        if style.lowerLine.enabled {
-            lessons.append(FaceGuideLesson(title: "Add the lower line",
-                                           instruction: "Draw a thin line under the lower lashes from the outer corner inward, about \(Int((style.lowerLine.extent * 100).rounded()))% of the way. Keep it lighter than the top line."))
-        }
+        let ending = style.wingLength > 0.02
+            ? "Join the dots along your upper lash line from the inner start to the outer corner, then flick out to the last dot to make the wing."
+            : "Join the dots along your upper lash line from the inner start to the outer corner, ending at the last dot."
         let fitted = neutral ? " This is a natural line; scan your eyes from your profile for a fitted style." : ""
-        lessons.append(FaceGuideLesson(title: "Check both eyes",
-                                       instruction: "Look straight ahead and compare both eyes, then soften any hard edge with a cotton swab. The guide follows your eyes but does not judge your application.\(fitted)"))
-        return lessons
+        return [FaceGuideLesson(title: "Follow the dots", instruction: "\(ending) Keep it close to the lashes, then soften any hard edge with a cotton swab.\(fitted)")]
     }
 }
 
@@ -267,15 +255,15 @@ private struct TutorialScreen: View {
             } else if camera.authorized {
                 ZStack {
                     LiveGuideView(camera: camera, referenceID: "eyebrows", active: visible && scenePhase == .active,
+                                  // Always a configuration, never nil: nil falls back to the old per-frame blush surface renderer.
                                   eyebrowConfiguration: model.liveConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   })
                     if model.tab == .eyeliner && model.compare != .off {
                         ZStack {
-                            LinerOverlayView(model: model.liner, isVisible: true)
                             LinerGuideOutline(model: model.liner)
                         }
-                        .mask(alignment: .leading) { halfMask(left: model.compare == .split) }
+                        .mask(alignment: .leading) { halfMask(left: true, half: model.compare == .split) }
                     }
                     if model.compare == .split {
                         // The same camera without the filter, covering the right half.
@@ -284,6 +272,7 @@ private struct TutorialScreen: View {
                         Rectangle().fill(AppColors.snow.opacity(0.85)).frame(width: 1.5).allowsHitTesting(false)
                     }
                 }
+                .cameraZoom()
             } else {
                 ProgressView().tint(AppColors.snow)
             }
@@ -291,9 +280,9 @@ private struct TutorialScreen: View {
     }
 
     /// A mask covering the whole view, or only its left / right half.
-    private func halfMask(left: Bool) -> some View {
+    private func halfMask(left: Bool, half: Bool = true) -> some View {
         GeometryReader { proxy in
-            Rectangle().frame(width: proxy.size.width / 2).frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
+            Rectangle().frame(width: half ? proxy.size.width / 2 : proxy.size.width).frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
         }
     }
 
@@ -392,20 +381,57 @@ private struct TutorialScreen: View {
     }
 }
 
-/// Dotted outline of the eyeliner shape on each eye, drawn from the same geometry as the liner overlay.
+/// The key points of the eyeliner on each eye: where the line starts, where it ends and, when the look has a wing, the
+/// wing's tip. Drawn from the same geometry as the liner overlay; they are only marks to
+/// join with the product, so nothing covers the lid.
 private struct LinerGuideOutline: View {
     @ObservedObject var model: LinerOverlayModel
+    @Environment(\.cameraZoom) private var zoom
+    private let pink = Color(red: 0.93, green: 0.38, blue: 0.68)
 
     var body: some View {
-        Canvas { context, _ in
-            guard let frame = model.frame, let shade = model.shade else { return }
-            for fill in LinerOverlayRenderer.fills(frame, shade: shade, intensity: 1) {
-                context.stroke(Path(fill.path), with: .color(.white.opacity(0.95)),
-                               style: StrokeStyle(lineWidth: 1.5, lineCap: .round, dash: [1, 4]))
+        GeometryReader { proxy in
+            ZStack {
+                canvas
+                if let reason = model.unavailableReason {
+                    // The eye detector could not start: say so instead of silently drawing nothing.
+                    Text(reason).font(.footnote).padding(8).background(.black.opacity(0.6), in: Capsule())
+                        .foregroundStyle(.white).frame(maxHeight: .infinity, alignment: .center)
+                }
             }
+                // The overlay model builds the liner in this view's size, so it must be told before it can run.
+                .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }
         }
         .allowsHitTesting(false)
         .accessibilityHidden(true)
+    }
+
+    /// The three key points: where the line starts, where it ends at the outer corner and, when the look has a wing, the
+    /// wing's tip.
+    static func keyPoints(of guide: LinerGuide) -> [CGPoint] {
+        // `upperLiner` is the lash-line side followed by the outer edge reversed, so its first half is the lash line.
+        let lash = guide.upperLiner.prefix(guide.upperLiner.count / 2)
+        var points = [lash.first ?? guide.anchors.upperStart, lash.last ?? guide.anchors.outerCorner]
+        if let tip = guide.anchors.wingTip { points.append(tip) }
+        return points
+    }
+
+    private var canvas: some View {
+        Canvas { context, _ in
+            guard let frame = model.frame, CACurrentMediaTime() - frame.receivedAt <= LinerOverlayRenderer.maxAge else { return }
+            let thin = 1 / zoom
+            for eye in frame.eyes where eye.alpha > 0.05 {
+                let points = Self.keyPoints(of: eye.guide)
+                for (index, point) in points.enumerated() {
+                    let p = frame.mapping.map(point)
+                    // The wing tip, the last point of a winged look, is a little bigger.
+                    let radius = (eye.guide.anchors.wingTip != nil && index == points.count - 1 ? 5.0 : 3.5) * thin
+                    let dot = Path(ellipseIn: CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2))
+                    context.fill(dot, with: .color(pink))
+                    context.stroke(dot, with: .color(.white), style: StrokeStyle(lineWidth: 1.4 * thin))
+                }
+            }
+        }
     }
 }
 

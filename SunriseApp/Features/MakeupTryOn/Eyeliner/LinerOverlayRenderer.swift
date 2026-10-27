@@ -22,7 +22,7 @@ enum LinerOverlayRenderer {
     static let maxAge: CFTimeInterval = 0.4
 
     /// Even at full intensity the ink lets a little skin show through, so it does not read as a sticker.
-    static let maxOpacity = 1.0
+    static let maxOpacity = 0.95
     /// Real ink still reflects some light: the liner is multiplied over the skin with this much of the light left
     /// (the shade lifted toward white by this share), so it is charcoal on skin, lighter in bright light, darker in dim
     /// light, and tinted by the skin under it, instead of a flat black.

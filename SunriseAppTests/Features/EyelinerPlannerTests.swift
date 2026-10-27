@@ -24,9 +24,9 @@ final class EyelinerPlannerTests: XCTestCase {
         XCTAssertTrue(EyelinerPlanner.plan(for: eyes(lid: .hooded)).style.tightline)
     }
 
-    func testDownturnedWingFollowsTheLowerLashLineWithoutExtraAngle() {
+    func testDownturnedWingStartsFromTheLowerLashLineAndLifts() {
         let style = EyelinerPlanner.variant(for: .downturned)
-        XCTAssertEqual(style.wingAngle, 0)
+        XCTAssertEqual(style.wingAngle, 18)
         XCTAssertEqual(style.wingBase, .lowerLidTangent)
     }
 

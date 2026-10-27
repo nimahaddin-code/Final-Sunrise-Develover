@@ -6,13 +6,16 @@ import UIKit
 /// the face mesh, and the eyeliner overlay sits on top and is fed the same camera frames.
 struct TryOnLiveCard: View {
     @ObservedObject var home: TryOnHomeModel
+    /// False while another screen (the tutorial) is on top: this card must not take the shared face session back.
+    var isActive = true
     @ObservedObject var camera: FaceCameraState
     @ObservedObject var brow: EyebrowViewModel
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
-    init(home: TryOnHomeModel) {
+    init(home: TryOnHomeModel, isActive: Bool = true) {
         self.home = home
+        self.isActive = isActive
         camera = home.camera
         brow = home.brow
     }
@@ -66,11 +69,16 @@ struct TryOnLiveCard: View {
 
     private var live: some View {
         ZStack {
-            LiveGuideView(camera: camera, referenceID: "eyebrows", active: scenePhase == .active,
-                          eyebrowConfiguration: home.liveConfiguration, onFrame: { [relay = home.relay] frame, face in
-                              relay.deliver(frame, face)
-                          })
-            LinerOverlayView(model: home.liner, isVisible: !home.isComparing)
+            ZStack {
+                LiveGuideView(camera: camera, referenceID: "eyebrows", active: scenePhase == .active && isActive,
+                              // Always a configuration, never nil: nil falls back to the old per-frame blush surface renderer.
+                              // Without a launch fit the brow/blush pipeline returns at once (`followLaunchFit`).
+                              eyebrowConfiguration: home.liveConfiguration, onFrame: { [relay = home.relay] frame, face in
+                                  relay.deliver(frame, face)
+                              })
+                LinerOverlayView(model: home.liner, isVisible: !home.isComparing)
+            }
+            .cameraZoom()
             if let status {
                 StatusPill(text: status)
             }
@@ -126,5 +134,58 @@ private struct CardMessage: View {
         .padding(AppSpacing.large)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.cocoa)
+    }
+}
+
+/// Digital zoom for the live camera card: pinch, or tap the chip to step through 1x / 1.5x / 2x / 3x. Everything inside
+/// (camera picture and overlays) scales together around the upper middle of the card, where the eyes are, so overlays
+/// stay on the face. Face tracking is unchanged: only what is shown is enlarged, so nobody has to lean into the phone.
+struct CameraZoomModifier: ViewModifier {
+    static let steps: [CGFloat] = [1, 1.5, 2, 3]
+    static let range: ClosedRange<CGFloat> = 1...3
+
+    @State private var zoom: CGFloat = 1
+    @GestureState private var pinch: CGFloat = 1
+
+    private var current: CGFloat { min(max(zoom * pinch, Self.range.lowerBound), Self.range.upperBound) }
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.cameraZoom, current)
+            .scaleEffect(current, anchor: UnitPoint(x: 0.5, y: 0.42))
+            .clipped()
+            .gesture(MagnificationGesture()
+                .updating($pinch) { value, state, _ in state = value }
+                .onEnded { value in zoom = min(max(zoom * value, Self.range.lowerBound), Self.range.upperBound) })
+            .overlay(alignment: .trailing) {
+                Button {
+                    let next = Self.steps.first { $0 > zoom + 0.01 } ?? Self.steps[0]
+                    withAnimation(.easeOut(duration: 0.2)) { zoom = next }
+                } label: {
+                    Text(String(format: current.rounded() == current ? "%.0f×" : "%.1f×", current))
+                        .font(.footnote.weight(.semibold).monospacedDigit())
+                        .padding(.horizontal, 10).padding(.vertical, 8)
+                        .background(AppColors.wine.opacity(0.75), in: Capsule())
+                        .foregroundStyle(AppColors.snow)
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, AppSpacing.small)
+                .accessibilityLabel("Zoom")
+                .accessibilityValue(String(format: "%.1f times", current))
+            }
+    }
+}
+
+extension View {
+    func cameraZoom() -> some View { modifier(CameraZoomModifier()) }
+}
+
+private struct CameraZoomKey: EnvironmentKey { static let defaultValue: CGFloat = 1 }
+
+extension EnvironmentValues {
+    /// The current camera zoom, so thin overlay strokes can stay the same on-screen width while the picture scales.
+    var cameraZoom: CGFloat {
+        get { self[CameraZoomKey.self] }
+        set { self[CameraZoomKey.self] = newValue }
     }
 }

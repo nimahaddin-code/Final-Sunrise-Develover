@@ -169,6 +169,8 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// The brow/blush preview configuration for the shared camera view: both layers are drawn together.
     var liveConfiguration: EyebrowConfiguration {
         var configuration = brow.liveConfiguration
+        // Without a launch fit there is nothing to scan for: keep the brow pipeline off the camera's session queue.
+        if !hasLaunchFit { configuration.usesLaunchFit = true }
         configuration.layered = true
         configuration.showGuide = false
         configuration.showTrackingPoints = false

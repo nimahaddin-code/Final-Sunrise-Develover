@@ -32,7 +32,7 @@ struct TryOnHomeView: View {
                 RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(AppColors.cocoa)
                     .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
             } else {
-                TryOnLiveCard(home: home).frame(maxHeight:.infinity)
+                TryOnLiveCard(home: home, isActive: isVisible).frame(maxHeight:.infinity)
             }
             toolStrip
             if home.tool == .eyeliner { linerLookPicker }
@@ -84,7 +84,7 @@ struct TryOnHomeView: View {
                 }
                 .accessibilityLabel("Profile")
                 Spacer()
-                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities)) } label: {
+                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,linerLook: home.linerLook)) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)

@@ -5,6 +5,15 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Changed — eyeliner tutorial: key points, one step, zoom
+- The eyeliner tutorial draws only key points on each eye (line start, line end at the outer corner and, for the winged look, the wing
+  tip) instead of an outline. They follow a pulled lid (`LinerOverlayModel.followsPulledLid`: lid tracking and quicker smoothing).
+  The tutorial has one step, "Follow the dots", and uses the look chosen on Try On (`TutorialHandoff.linerLook`).
+- Try On and the tutorial camera card can be zoomed (pinch or the zoom chip, 1x-3x); overlays scale with the picture.
+- Fixes: a mask hid the left eye's guide; Try On kept taking the shared face session back from the tutorial; brow/blush work ran per frame
+  without a launch fit (lag); the old blush surface renderer ran when no brow configuration was passed.
+- Debug builds skip the launch scan (`AppNavigator.debugSkipsLaunchScan`). Not checked on a real device.
+
 ### Added — eyeliner looks: line only or with wing
 - Try On eyeliner has "Liner only" (no wing) and "With wing" (default); the no-sign button is the third state. `LinerLook` and
   `EyelinerPlanner.style(_:look:)` choose the style: winged runs sideways from the outer corner (horizontal base, 6-10 deg lift) and always

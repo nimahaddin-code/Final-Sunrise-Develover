@@ -112,10 +112,13 @@ final class EyelinerGeometryTests: XCTestCase {
         let atRest = try tip(anchorLocal: LinerBuildOptions.wingAnchorLocal)
         XCTAssertEqual((atRest - rigid).length, 0, accuracy: 1e-6, "An anchor that has not moved changes nothing")
         let stretched = try tip(anchorLocal: LinerBuildOptions.wingAnchorLocal + CGPoint(x: 0.2, y: -0.15))
-        // The tip moves by the anchor's stretch, in the eye's own frame (100 px wide here).
+        // The tip moves by the anchor's stretch, in the eye's own frame (100 px wide here), up to `wingAnchorReach`.
         let moved = frame.toLocal(stretched) - frame.toLocal(rigid)
         XCTAssertEqual(moved.x, 0.2, accuracy: 1e-6)
         XCTAssertEqual(moved.y, -0.15, accuracy: 1e-6)
+        let far = try tip(anchorLocal: LinerBuildOptions.wingAnchorLocal + CGPoint(x: 2, y: 0))
+        XCTAssertEqual((frame.toLocal(far) - frame.toLocal(rigid)).length, LinerBuildOptions.wingAnchorReach, accuracy: 1e-6,
+                       "A huge stretch is capped")
     }
 
     func testGeometryDoesNotDependOnHeadRollOrScale() throws {
@@ -148,25 +151,17 @@ final class EyelinerGeometryTests: XCTestCase {
 
     // MARK: Wing, lower line, tightline
 
-    func testWingFollowsTheLowerLashLineForDownturnedEyes() throws {
+    func testDownturnedWingStartsFromTheLowerLashLineAndLifts() throws {
         let eye = SyntheticEye.landmarks()
         let downturned = spec(.downturned)
-        XCTAssertEqual(downturned.wingAngleDeg, 0)
+        // "Lifting wing" in the reference sheet: it leaves along the lower lid and rises above it.
+        XCTAssertEqual(downturned.wingAngleDeg, 18)
         XCTAssertEqual(downturned.wingBase, .lowerLidTangent)
         let wing = try XCTUnwrap(try build(eye, downturned).anchors.wingTip)
-        // Any extra angle lifts the wing above the lower-lash-line extension.
-        var lifted = downturned
-        lifted.wingAngleDeg = 30
-        let liftedTip = try XCTUnwrap(try build(eye, lifted).anchors.wingTip)
-        XCTAssertGreaterThan(height(liftedTip, of: eye), height(wing, of: eye) + 0.04)
-        // With no extra angle the wing leaves along the lower lid's own direction at the outer corner.
-        let frame = EyeCoordinateFrame(inner: eye.innerCorner, outer: eye.outerCorner, upper: eye.upperLid,
-                                       lower: eye.lowerLid, brow: eye.browPoints)!
-        let lower = Polyline2D.smoothed(EyeGeometry.localLashLine(eye.lowerLid, frame: frame))
-        let tangent = (lower.point(at: 1) - lower.point(at: 0.82)).normalized()
-        let direction = (frame.toLocal(wing) - CGPoint(x: 1, y: 0)).normalized()
-        XCTAssertEqual(direction.x, tangent.x, accuracy: 0.02)
-        XCTAssertEqual(direction.y, tangent.y, accuracy: 0.02)
+        var flat = downturned
+        flat.wingAngleDeg = 0
+        let flatTip = try XCTUnwrap(try build(eye, flat).anchors.wingTip)
+        XCTAssertGreaterThan(height(wing, of: eye), height(flatTip, of: eye) + 0.005)
     }
 
     func testNoWingWhenTheStyleHasNone() throws {

@@ -47,6 +47,10 @@ import SwiftUI
 
     /// Off unless a developer switches it on: the upper lid follows the skin between detector results (a pulled lid).
     private static var lidTrackingEnabled: Bool { UserDefaults.standard.bool(forKey: "enableLidTracking") }
+    /// `true` makes this overlay follow a pulled lid whatever the developer flag says (the tutorial's guide points).
+    /// It also smooths less (`OneEuroConfig.responsive`), so the points keep up with a lid that is stretched by hand.
+    var followsPulledLid = false { didSet { tracker.filterConfig = followsPulledLid ? .responsive : .steady } }
+    private var lidTrackingOn: Bool { followsPulledLid || Self.lidTrackingEnabled }
 
     /// `style == nil` switches the overlay off and stops the detector.
     func setStyle(_ style: LinerStyle?, shade: MakeupShade?, intensity: Double) {
@@ -134,7 +138,7 @@ import SwiftUI
         let headAnchors = contour.project(eyePositions.flatMap { [$0 + SIMD3(0, 0.02, 0), $0 - SIMD3(0, 0.02, 0)] })?
             .map(point) ?? []
         let buffer = arFrame.capturedImage
-        if Self.lidTrackingEnabled, headAnchors.count >= 3 {
+        if lidTrackingOn, headAnchors.count >= 3 {
             // Off the main thread, one frame at a time; frames that arrive meanwhile are skipped.
             if !lidBusy {
                 lidBusy = true
@@ -212,13 +216,13 @@ import SwiftUI
             }
         }
         lastHand = hand.values.max() ?? 0
-        let fused = Self.lidTrackingEnabled ? lidFollower.fuse(landmarks, now: landmarks.timestamp, hand: hand) : landmarks
+        let fused = lidTrackingOn ? lidFollower.fuse(landmarks, now: landmarks.timestamp, hand: hand) : landmarks
         let eyes = tracker.render(fused, spec: spec)
         solution = LinerSolution(eyes: eyes, raw: landmarks.eyes, smoothed: tracker.lastSmoothed,
                                  references: context.headAnchors.count >= 3 ? context.headAnchors : context.references.map(\.image),
                                  time: CACurrentMediaTime())
         debugStatus = String(format: "MediaPipe: face, %.0f ms, %d eye(s) drawn%@", landmarks.providerLatencyMs, eyes.count,
-                             Self.lidTrackingEnabled
+                             lidTrackingOn
                                  ? ", lid tracking \(lidFollower.followingCount)/2, hand \(Int(lastHand * 100))%" : "")
     }
 

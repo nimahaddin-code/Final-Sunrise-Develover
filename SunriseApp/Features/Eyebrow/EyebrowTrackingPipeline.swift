@@ -47,6 +47,9 @@ final class EyebrowTrackingPipeline: @unchecked Sendable {
     func followLaunchFit(anchorID:UUID,vertices:[SIMD3<Float>],triangles:[Int16],timestamp:TimeInterval,
                          style:EyebrowStyle,blushStyle:BlushPlacementStyle?,cache:LaunchMakeupFit = .shared) {
         resumeTracking(anchorID:anchorID)
+        // Without a launch fit (scan skipped or failed) there is nothing to attach: stop here instead of failing and
+        // reporting the same error on every camera frame.
+        guard cache.hasFit else { return }
         lock.lock()
         guard self.anchorID==anchorID,!busy else { lock.unlock();return }
         guard region==nil || guide?.style != style || blush?.style != blushStyle else { lock.unlock();return }
