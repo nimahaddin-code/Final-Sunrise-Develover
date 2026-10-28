@@ -3,10 +3,15 @@ import Foundation
 import simd
 
 enum BlushPlacementStyle:String,CaseIterable,Identifiable,Sendable {
-    case apple,cheekbone,outerSweep,highLift,wideHorizontal,centerCheek,centerDown,upperInner,templeSweep,diagonalBlend,placementDots,innerCheek
+    case youthful,sunkissed,lifted,apple,cheekbone,outerSweep,highLift,wideHorizontal,centerCheek,centerDown,upperInner,templeSweep,diagonalBlend,placementDots,innerCheek
+    static let referenceLooks:[Self]=[.youthful,.sunkissed,.lifted]
+    var isReferenceLook:Bool {Self.referenceLooks.contains(self)}
     var id:String { rawValue }
     var title:String {
         switch self {
+        case .youthful:return "Youthful"
+        case .sunkissed:return "Sunkissed"
+        case .lifted:return "Lifted"
         case .apple:return "Apple of cheeks"
         case .cheekbone:return "Cheekbone"
         case .outerSweep:return "Outer sweep"
@@ -23,6 +28,9 @@ enum BlushPlacementStyle:String,CaseIterable,Identifiable,Sendable {
     }
     var instruction:String {
         switch self {
+        case .youthful:return "Focus color on the middle cheeks; softly blend the edges."
+        case .sunkissed:return "Blend a soft horizontal wash over the cheeks and upper nose bridge; keep nostrils clear."
+        case .lifted:return "Sweep from the outer cheek upward toward the temple, below the eyes."
         case .apple:return "Place blush in the compact apple zones. Keep the boundary soft."
         case .cheekbone:return "Apply near the upper cheekbone zones, below the eyes. Blend outward softly."
         case .outerSweep:return "Keep blush on the outer cheeks and blend along the elongated guide."
@@ -45,6 +53,7 @@ struct BlushPlacementGuide:Sendable {
     let areas:[FaceGuideArea]
     let blendArrows:[FaceGuideArea]
     var pigmentFields:[BlushPigmentField] = []
+    var noseBridge:BlushPigmentField? = nil
 }
 // -Nimah: Exact JSON ellipse in native ARKit face-local metres. Pigment is independent of tutorial marks.
 struct BlushPigmentField:Sendable {
@@ -59,20 +68,25 @@ struct BlushPigmentField:Sendable {
     let power:Float
     var edgeFeather:Float = 0
     var smoothstepMix:Float = 0
+    var curvature:Float = 0
+    var softProfile=false
     var bounds:[SIMD2<Float>] {
         (0...64).map { i in
             let a=Float(i)*2*Float.pi/64
-            let q=SIMD2(radius.x*cos(a),radius.y*sin(a))
+            let nx=cos(a)
+            let q=SIMD2(radius.x*nx,radius.y*(sin(a)+curvature*(nx*nx-0.25)))
             return center+SIMD2(side*(q.x*cos(angle)-q.y*sin(angle)),q.x*sin(angle)+q.y*cos(angle))
         }
     }
     func coverage(_ point:SIMD2<Float>)->Float {
         guard point.x*side>=nasalLimit,point.x*side<=outerLimit,point.y<=eyeLimit else { return 0 }
         let d=point-center,x=d.x*side,y=d.y
-        let q=SIMD2((x*cos(angle)+y*sin(angle))/radius.x,(-x*sin(angle)+y*cos(angle))/radius.y)
-        let raw=pow(max(0,1-simd_length_squared(q)),power)
+        var q=SIMD2((x*cos(angle)+y*sin(angle))/radius.x,(-x*sin(angle)+y*cos(angle))/radius.y)
+        q.y -= curvature*(q.x*q.x-0.25)
+        let r2=simd_length_squared(q)
+        let raw=pow(max(0,1-r2),power)
         let smooth=raw*raw*(3-2*raw)
-        let radial=raw+(smooth-raw)*smoothstepMix
+        let radial=softProfile ? raw*exp(-0.8*r2):raw+(smooth-raw)*smoothstepMix
         // -Nimah: Fade inward at safe skin boundaries, without moving or shrinking the JSON ellipse.
         func mask(_ clearance:Float)->Float {
             let t=edgeFeather>0 ? max(0,min(1,clearance/edgeFeather)) : 1
@@ -168,7 +182,7 @@ enum BlushPlacementGenerator {
             let field=BlushPigmentField(center:center,radius:radius,
                 angle:rule.number("outward_up_angle")*Float.pi/180,side:sign,nasalLimit:nose,
                 outerLimit:localOuter,
-                eyeLimit:eyeLimit,opacity:rule.number("max_alpha"),power:rule.number("radial_power"),edgeFeather:width*rule.number("mask_edge_feather"),smoothstepMix:rule.number("falloff_smoothstep_mix"))
+                eyeLimit:eyeLimit,opacity:rule.number("max_alpha"),power:rule.number("radial_power"),edgeFeather:width*rule.number("mask_edge_feather"),smoothstepMix:rule.number("falloff_smoothstep_mix"),curvature:rule.parameters["curvature"]?.value ?? 0,softProfile:style.isReferenceLook)
             let minimumZ=eye.z-width*0.35
             func bind(_ p:SIMD2<Float>)->SurfaceAttachment? {
                 SurfaceAttachment.bind(p,vertices:vertices,triangles:region.triangles,minimumZ:minimumZ)
@@ -205,6 +219,20 @@ enum BlushPlacementGenerator {
                 if bound.count==path.count { arrows.append(.init(id:"arrow-\(brow.side.rawValue)-\(index)",boundary:bound)) }
             }
         }
-        return .init(id:UUID(),style:style,areas:areas,blendArrows:arrows,pigmentFields:fields)
+        var bridge:BlushPigmentField?
+        if style == .sunkissed {
+            let eye=eyes.reduce(SIMD3<Float>.zero,+)/2
+            let radius=SIMD2(width*rule.number("bridge_radius_x"),width*rule.number("bridge_radius_y"))
+            let x=eye.x,y=eye.y+width*rule.number("bridge_vertical_offset")
+            bridge=BlushPigmentField(center:SIMD2(x,y),radius:radius,angle:0,side:1,
+                nasalLimit:x-radius.x,outerLimit:x+radius.x,eyeLimit:eyes.map(\.y).min()!-width*0.08,
+                opacity:rule.number("max_alpha")*rule.number("bridge_strength"),power:rule.number("radial_power"),
+                edgeFeather:width*0.012,smoothstepMix:0,softProfile:true)
+            if let bridge {
+                let boundary=bridge.bounds.compactMap {SurfaceAttachment.bind($0,vertices:vertices,triangles:region.triangles,minimumZ:eye.z-width*0.35)}
+                if boundary.count==bridge.bounds.count {areas.append(.init(id:"nose-bridge",boundary:boundary))}
+            }
+        }
+        return .init(id:UUID(),style:style,areas:areas,blendArrows:arrows,pigmentFields:fields,noseBridge:bridge)
     }
 }

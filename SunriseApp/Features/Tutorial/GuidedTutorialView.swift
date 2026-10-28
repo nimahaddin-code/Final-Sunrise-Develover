@@ -10,6 +10,7 @@ struct TutorialHandoff: Hashable {
     var tool: TryOnTool
     var shades: [TryOnTool: MakeupShade]
     var intensities: [TryOnTool: Double]
+    var blushStyle:BlushPlacementStyle? = nil
 }
 
 /// What the bottom-left button shows: the full filter, half filter / half real camera, or no filter.
@@ -137,6 +138,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     private func applyShade(for tool: TryOnTool) {
+        if tool == .blush,let style=handoff.blushStyle {brow.configuration.blushStyle=style}
         brow.configuration.shadeTint = handoff.shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) }
         let strength = handoff.intensities[tool] ?? TryOnHomeModel.defaultIntensity
         brow.configuration.previewIntensity = Float(min(max(strength, 0), 1))

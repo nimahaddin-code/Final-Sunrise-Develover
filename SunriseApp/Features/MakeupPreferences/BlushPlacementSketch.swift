@@ -33,6 +33,9 @@ struct BlushPlacementSketch:View {
     }
     private var placement:(CGFloat,CGFloat,CGFloat,CGFloat,Double) {
         switch style {
+        case .youthful:return (0.22,0.61,0.13,0.13,0)
+        case .sunkissed:return (0.24,0.57,0.20,0.09,0)
+        case .lifted:return (0.19,0.54,0.20,0.08,-28)
         case .apple:return (0.20,0.57,0.15,0.16,0)
         case .centerCheek:return (0.20,0.56,0.18,0.17,0)
         case .cheekbone:return (0.23,0.49,0.22,0.11,-20)

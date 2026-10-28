@@ -34,7 +34,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private struct HairDraw {var matrix:simd_float4x4;var scale:Float;var probe:SIMD2<Float>}
     private struct BrowFrame:@unchecked Sendable {let frame:ARFrame;let epoch:UUID;let face:BrowFaceFrame?}
     private struct Field {var ellipse:SIMD4<Float>;var shape:SIMD4<Float>;var limits:SIMD4<Float>}
-    private struct Bake {var left:Field;var right:Field;var options=SIMD4<Float>.zero;var mouth=SIMD4<Float>.zero}
+    private struct Bake {var left:Field;var right:Field;var bridge=Field(ellipse:.zero,shape:.zero,limits:.zero);var paint=SIMD4<Float>.zero;var options=SIMD4<Float>.zero;var mouth=SIMD4<Float>.zero}
     private struct Settings {
         var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
     /// Developer brow view (`BrowDebugView` raw value), read each frame so the developer picker applies live.
@@ -148,7 +148,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         depthWrite=dw;depthRead=dr;noDepth=nd
         brush=try MTKTextureLoader(device:d).newTexture(URL:url,options:[.SRGB:false,.textureUsage:MTLTextureUsage.shaderRead.rawValue])
         CVMetalTextureCacheCreate(nil,nil,d,nil,&textureCache)
-        segmenter.onMask={ [weak self] mask in guard let self else{return};self.lock.lock();self.latestMask=mask;self.lock.unlock() }
+        segmenter.onMask={ [weak self] mask in guard let self,let mask else{return};self.lock.lock();self.latestMask=mask;self.lock.unlock() }
         let empty=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.r8Unorm,width:1,height:1,mipmapped:false);empty.usage = .shaderRead;empty.storageMode = .shared
         emptyMask=d.makeTexture(descriptor:empty)
         var zero:UInt8=0;emptyMask?.replace(region:MTLRegionMake2D(0,0,1,1),mipmapLevel:0,withBytes:&zero,bytesPerRow:1)
@@ -286,16 +286,19 @@ final class BeautyBlushEngine:@unchecked Sendable {
         indices=triangles.withUnsafeBytes {device.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}
         guard vertices.count==3,let vb=bakeVertices,let ib=indices else {throw CocoaError(.featureUnsupported)}
         indexCount=triangles.count
-        let desc=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.rgba16Float,width:config.atlas_size,height:config.atlas_size,mipmapped:false)
+        let desc=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.rgba16Float,width:config.atlas_size,height:config.atlas_size,mipmapped:true)
         desc.usage=[.renderTarget,.shaderRead];desc.storageMode = .private
         guard let target=device.makeTexture(descriptor:desc) else {throw CocoaError(.featureUnsupported)}
         let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=target;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else {throw CocoaError(.featureUnsupported)}
         func field(_ f:BlushPigmentField)->Field {.init(ellipse:SIMD4(f.center.x,f.center.y,f.radius.x,f.radius.y),shape:SIMD4(f.side,f.angle,f.opacity,f.power),limits:SIMD4(f.nasalLimit,f.outerLimit,f.eyeLimit,f.edgeFeather))}
         var b=Bake(left:field(guide.pigmentFields[0]),right:field(guide.pigmentFields[1]),options:SIMD4(guide.pigmentFields[0].smoothstepMix,guide.pigmentFields[1].smoothstepMix,config.paint_feather,0))
+        if let bridge=guide.noseBridge {b.bridge=field(bridge)}
+        b.paint=SIMD4(guide.pigmentFields[0].curvature,requested.isReferenceLook ? 1:0,0,0)
         b.mouth=Self.mouthExclusion(vertices:rest,triangles:triangles,eyes:eyes)
         e.setRenderPipelineState(atlasPipeline);e.setVertexBuffer(vb,offset:0,index:0);e.setFragmentBytes(&b,length:MemoryLayout<Bake>.stride,index:0);e.setFragmentTexture(brush,index:0)
         e.drawIndexedPrimitives(type:.triangle,indexCount:indexCount,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0);e.endEncoding()
+        if let mip=command.makeBlitCommandEncoder() {mip.generateMipmaps(for:target);mip.endEncoding()}
         atlas=target;anchorID=anchor.identifier;style=requested
     }
     // Native mesh boundary components, not invented landmark indices. Largest loop is the outer face.
@@ -321,6 +324,13 @@ final class BeautyBlushEngine:@unchecked Sendable {
         let angle=relative.map {acos(max(-1,min(1,simd_normalize(SIMD3($0.columns.2.x,$0.columns.2.y,$0.columns.2.z)).z)))*180/Float.pi} ?? 180
         let normal:Bool;if case .normal=frame.camera.trackingState {normal=true}else{normal=false}
         let tracked=normal && anchor?.isTracked==true && angle<config.max_yaw_degrees
+        let rawSize=CGSize(width:CVPixelBufferGetWidth(frame.capturedImage),height:CVPixelBufferGetHeight(frame.capturedImage))
+        let headAnchors:[CGPoint]=anchor.map {face in
+            [SIMD4<Float>(-0.04,0.025,0,1),SIMD4<Float>(0.04,0.025,0,1),SIMD4<Float>(0,-0.035,0,1)].map {p in
+                let w=face.transform*p
+                return frame.camera.projectPoint(SIMD3(w.x,w.y,w.z),orientation:.landscapeRight,viewportSize:rawSize)
+            }
+        } ?? []
         if let anchor,tracked {
             // Retry an unavailable fit at a bounded cadence instead of rebuilding
             // the same atlas on every frame.
@@ -345,19 +355,50 @@ final class BeautyBlushEngine:@unchecked Sendable {
                 let center=frame.camera.projectPoint(SIMD3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z),orientation:.landscapeRight,viewportSize:rawSize)
                 let upWorld=anchor.transform*SIMD4<Float>(0,0.05,0,1)
                 let up=frame.camera.projectPoint(SIMD3(upWorld.x,upWorld.y,upWorld.z),orientation:.landscapeRight,viewportSize:rawSize)
-                segmenter.submit(.init(pixelBuffer:SendablePixelBuffer(buffer:frame.capturedImage),timestamp:frame.timestamp,headUp:CGPoint(x:up.x-center.x,y:up.y-center.y),headAnchors:[]))
+                segmenter.submit(.init(pixelBuffer:SendablePixelBuffer(buffer:frame.capturedImage),timestamp:frame.timestamp,headUp:CGPoint(x:up.x-center.x,y:up.y-center.y),headAnchors:headAnchors))
             }
         }
         if segmenter.isAvailable && lastError?.hasPrefix("segmentation_unavailable:")==true {lastError=nil}
-        let (frameMask,maskTransform,fresh)=uploadMask(slot:frameSlot,capturedImage:frame.capturedImage,maxAge:config.mask_max_age_seconds)
+        lock.lock();let mask=latestMask;lock.unlock()
+        let age=mask.map {CACurrentMediaTime()-$0.time} ?? .infinity
+        let dimensionsMatch=mask.map {Int($0.rawSize.width)==CVPixelBufferGetWidth(frame.capturedImage) && Int($0.rawSize.height)==CVPixelBufferGetHeight(frame.capturedImage)} ?? false
+        let fresh=dimensionsMatch && age>=0 && age<=config.mask_max_age_seconds
+        let motion=mask.flatMap {SimilarityTransform(from:headAnchors,to:$0.headAnchors)}
+        let usableMotion=motion?.isPlausible ?? false
+        let maskWeight=dimensionsMatch && (fresh || usableMotion) ? BeautyMaskContinuity.weight(age:age,freshAge:config.mask_max_age_seconds,fadeSeconds:config.mask_fade_seconds):0
+        var maskTransform=matrix_identity_float4x4
+        var frameMask:MTLTexture?
+        if let mask,dimensionsMatch {
+            let w=Int(mask.size.width),h=Int(mask.size.height)
+            if lastMaskTime != mask.time {
+                cachedMaskBytes=mask.opacity.count==w*h ? mask.opacity:mask.occupied.map { $0==0 ? UInt8(0):UInt8(255) }
+                lastMaskTime=mask.time
+            }
+            // Match the vertex-buffer ring: never replace a mask while its GPU command is in flight.
+            if maskTextures[frameSlot]?.width != w || maskTextures[frameSlot]?.height != h {
+                let d=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.r8Unorm,width:w,height:h,mipmapped:false);d.usage = .shaderRead;d.storageMode = .shared
+                maskTextures[frameSlot]=device.makeTexture(descriptor:d);maskVersions[frameSlot] = -1
+            }
+            if maskVersions[frameSlot] != mask.time && cachedMaskBytes.count==w*h {
+                cachedMaskBytes.withUnsafeBytes {p in if let address=p.baseAddress {maskTextures[frameSlot]?.replace(region:MTLRegionMake2D(0,0,w,h),mipmapLevel:0,withBytes:address,bytesPerRow:w)}}
+                maskVersions[frameSlot]=mask.time
+            }
+            frameMask=maskTextures[frameSlot]
+            let rawPixels=CGAffineTransform(scaleX:mask.rawSize.width,y:mask.rawSize.height)
+            let normalize=CGAffineTransform(scaleX:1/mask.size.width,y:1/mask.size.height)
+            let reprojection=usableMotion ? motion!.affine:CGAffineTransform.identity
+            maskTransform=Self.affine(rawPixels.concatenating(reprojection).concatenating(mask.toImage.inverted()).concatenating(normalize))
+        }
+        maskAgeMilliseconds=mask.map {max(0,CACurrentMediaTime()-$0.time)*1000} ?? -1
         let compatible=anchorID==anchor?.identifier && style==s.style && atlas != nil
-        let visible=visibility.update(timestamp:frame.timestamp,visible:tracked && fresh && compatible,tau:config.visibility_tau_seconds)
+        let visible=visibility.update(timestamp:frame.timestamp,target:tracked && compatible ? maskWeight:0,tau:config.visibility_tau_seconds)
+        let opacity=maskWeight>0 ? BeautyMaskContinuity.opacity(filtered:visible,age:age,freshAge:config.mask_max_age_seconds,fadeSeconds:config.mask_fade_seconds):0
         let matrixAttachment=CVBufferCopyAttachment(frame.capturedImage,kCVImageBufferYCbCrMatrixKey,nil) as? String
         let transfer=CVBufferCopyAttachment(frame.capturedImage,kCVImageBufferTransferFunctionKey,nil) as? String
         let full=CVPixelBufferGetPixelFormatType(frame.capturedImage)==kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
         var u=Uniforms(mvp:projection*view*(anchor?.transform ?? matrix_identity_float4x4),rawFromClip:raw,maskFromRaw:maskTransform,
             shade:SIMD4(BeautyBlushConfiguration.linear(s.tint.x),BeautyBlushConfiguration.linear(s.tint.y),BeautyBlushConfiguration.linear(s.tint.z),s.intensity),
-            controls:SIMD4(config.coverage,config.absorption,config.saturation,config.pigment_mix),tracking:SIMD4(fresh ? Float(visible):0,s.guide ? 1:0,1/Float(size.width),1/Float(size.height)),
+            controls:SIMD4(config.coverage,config.absorption,config.saturation,config.pigment_mix),tracking:SIMD4(Float(opacity),s.guide ? 1:0,1/Float(size.width),1/Float(size.height)),
             camera:SIMD4(matrixAttachment==(kCVImageBufferYCbCrMatrix_ITU_R_709_2 as String) ? 1:0,full ? 1:0,transfer==(kCVImageBufferTransferFunction_ITU_R_709_2 as String) ? 1:0,0),
             stretch:SIMD4(config.stretch_fade[0],config.stretch_fade[1],config.stretch_fade[2],config.stretch_fade[3]))
         let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=drawable.texture;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
@@ -373,6 +414,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             for i in rest.indices {
                 var p=points[i]
                 for axis in 0..<3 {p[axis]=Float(filters[i*3+axis].filter(Double(p[axis]),t:frame.timestamp,config:smoothing))}
+                p=BeautyBlushConfiguration.limitResidual(filtered:p,current:points[i])
                 pointer[i]=Vertex(position:SIMD4(p,1),rest:SIMD4(rest[i],1),uv:SIMD4(uvs[i].x,uvs[i].y,0,0))
             }
             e.setCullMode(.none) // Native mesh depth prepass resolves visible surfaces without mirrored-winding assumptions.
@@ -398,7 +440,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         #endif
         command.present(drawable)
         let ts=frame.timestamp
-        if tracked && fresh && visible>0.9 {pigmentFrames += 1;lastError=nil}
+        if tracked && opacity>0.9 {pigmentFrames += 1;lastError=nil}
         let retained=FrameLifetime(y:cy,cb:cc,frame:frame)
         let completionGate=inFlight
         command.addCompletedHandler { [weak self] cb in
@@ -408,7 +450,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
                 guard let self else{return};self.lock.lock();let show=self.settings.enabled && self.settings.epoch==s.epoch;self.lock.unlock()
                 if show {self.layer?.isHidden=false}
             }
-            self?.queue.async { [weak self] in self?.report(cb,frameTimestamp:ts,maskFresh:fresh,visibility:visible,isBrow:false) }
+            self?.queue.async { [weak self] in self?.report(cb,frameTimestamp:ts,maskFresh:fresh,visibility:opacity,isBrow:false) }
         }
         committed=true;command.commit()
     }
@@ -935,7 +977,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         var report:[String:Any]=["engine":isBrow ? "mediapipe_metal":"arkit_metal_uv","category":isBrow ? "eyebrow":"blush","fps_completed":Double(reportFrames)/(now-reportStart),"fps_presented":Double(presentedFrames)/(now-reportStart),"pigment_frames":pigmentFrames,"projection_error_pixels":projectionErrorPixels,"gpu_ms_mean":gpuTimes.reduce(0,+)/Double(gpuTimes.count),"frame_age_ms_p95":p95,"thermal_state":ProcessInfo.processInfo.thermalState.rawValue,"mask_fresh":maskFresh,"mask_age_ms":maskAgeMilliseconds,"segmenter_available":segmenter.isAvailable,"visibility":visibility,"error":lastError ?? "none","shader_error":cb.error?.localizedDescription ?? "none"]
         if isBrow {report["landmark_latency_ms"]=browTracker.lastLatencyMs;report["brow_tracker_available"]=browTracker.isAvailable;report["brow_stabilized"]=browStabilized}
         // The brow publishes its own status as soon as it changes (a face found or lost cannot wait two seconds).
-        if !isBrow {onStatus?(lastError != nil || cb.error != nil ? String(localized:"Makeup is temporarily unavailable") : (!maskFresh ? String(localized:"Preparing makeup visibility"):nil))}
+        if !isBrow {onStatus?(lastError != nil || cb.error != nil ? String(localized:"Makeup is temporarily unavailable") : (!maskFresh && visibility<0.1 ? String(localized:"Preparing makeup visibility"):nil))}
         if let data=try? JSONSerialization.data(withJSONObject:report) {UserDefaults.standard.set(data,forKey:isBrow ? "beautyBrow.metrics":"beautyBlush.metrics")}
         reportStart=now;reportFrames=0;presentedFrames=0;pigmentFrames=0;gpuTimes.removeAll(keepingCapacity:true);ages.removeAll(keepingCapacity:true)
     }
@@ -949,17 +991,24 @@ final class BeautyBlushEngine:@unchecked Sendable {
             engine.queue.async {continuation.resume(returning:engine.lastError)}
         }
     }
-    static func renderAtlasFixture()throws->[Float] {
-        let engine=try BeautyBlushEngine(),d=engine.device,n=64
+    static func renderAtlasFixture(placement:BlushPlacementGuide?=nil)throws->[Float] {
+        let engine=try BeautyBlushEngine(),d=engine.device,n=placement == nil ? 64:256
+        let extent:Float=placement == nil ? 1:0.08
         let desc=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.rgba16Float,width:n,height:n,mipmapped:false);desc.storageMode = .shared;desc.usage=[.renderTarget,.shaderRead]
         guard let target=d.makeTexture(descriptor:desc),let command=engine.commands.makeCommandBuffer() else{throw CocoaError(.featureUnsupported)}
         let positions:[SIMD3<Float>]=[.init(-1,-1,0),.init(1,-1,0),.init(1,1,0),.init(-1,1,0)]
-        let points=positions.map {Vertex(position:SIMD4($0,1),rest:SIMD4($0,1),uv:SIMD4(($0.x+1)/2,(1-$0.y)/2,0,0))}
+        let points=positions.map {Vertex(position:SIMD4($0*extent,1),rest:SIMD4($0*extent,1),uv:SIMD4(($0.x+1)/2,(1-$0.y)/2,0,0))}
         let triangles:[UInt16]=[0,1,2,0,2,3]
         guard let vb=points.withUnsafeBytes({d.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}),let ib=triangles.withUnsafeBytes({d.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}) else{throw CocoaError(.featureUnsupported)}
         let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=target;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{throw CocoaError(.featureUnsupported)}
         var b=Bake(left:.init(ellipse:SIMD4(0.4,-0.1,0.3,0.4),shape:SIMD4(1,0.1,0.5,1.15),limits:SIMD4(0.1,0.95,0.4,0.04)),right:.init(ellipse:SIMD4(-0.4,-0.1,0.3,0.4),shape:SIMD4(-1,0.1,0.5,1.15),limits:SIMD4(0.1,0.95,0.4,0.04)),options:SIMD4(1,1,0.9,0))
+        if let placement {
+            func field(_ f:BlushPigmentField)->Field {.init(ellipse:SIMD4(f.center.x,f.center.y,f.radius.x,f.radius.y),shape:SIMD4(f.side,f.angle,f.opacity,f.power),limits:SIMD4(f.nasalLimit,f.outerLimit,f.eyeLimit,f.edgeFeather))}
+            b.left=field(placement.pigmentFields[0]);b.right=field(placement.pigmentFields[1])
+            b.paint=SIMD4(placement.pigmentFields[0].curvature,placement.style.isReferenceLook ? 1:0,0,0)
+            if let bridge=placement.noseBridge {b.bridge=field(bridge)}
+        }
         e.setRenderPipelineState(engine.atlasPipeline);e.setVertexBuffer(vb,offset:0,index:0);e.setFragmentBytes(&b,length:MemoryLayout<Bake>.stride,index:0);e.setFragmentTexture(engine.brush,index:0)
         e.drawIndexedPrimitives(type:.triangle,indexCount:triangles.count,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0);e.endEncoding();command.commit();command.waitUntilCompleted()
         if let error=command.error{throw error}

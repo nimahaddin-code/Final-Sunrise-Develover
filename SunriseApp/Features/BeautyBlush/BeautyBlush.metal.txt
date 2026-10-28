@@ -12,17 +12,22 @@ vertex O blushAtlasVertex(uint i [[vertex_id]],constant V* v [[buffer(0)]]) {
  O o;o.position=float4(v[i].uv.x*2-1,1-v[i].uv.y*2,0,1);o.uv=v[i].uv.xy;o.local=v[i].rest.xyz;o.rest=o.local;return o;
 }
 struct Field { float4 ellipse; float4 shape; float4 limits; };
-struct Bake { Field fields[2];float4 options;float4 mouth; };
+struct Bake { Field fields[2];Field bridge;float4 paint;float4 options;float4 mouth; };
 fragment float4 blushAtlasFragment(O in [[stage_in]],constant Bake& b [[buffer(0)]],texture2d<float> brush [[texture(0)]]) {
  constexpr sampler s(coord::normalized,address::clamp_to_zero,filter::linear);
- float2 masks=0;
- for(int i=0;i<2;i++) {
-  Field f=b.fields[i];float2 d=in.local.xy-f.ellipse.xy;d.x*=f.shape.x;
+ float3 masks=0;
+ for(int i=0;i<3;i++) {
+  Field f=i<2 ? b.fields[i]:b.bridge;
+  if(f.ellipse.z<=0 || f.ellipse.w<=0) continue;float2 d=in.local.xy-f.ellipse.xy;d.x*=f.shape.x;
   float co=cos(f.shape.y),si=sin(f.shape.y);float2 p=float2(d.x*co+d.y*si,-d.x*si+d.y*co)/f.ellipse.zw;
+  p.y -= b.paint.x*(p.x*p.x-.25f)*(i<2 ? 1.f:0.f);
   float width=clamp(b.options.z,.2f,1.f);
   float density=smoothstep(.5-width*.5,.5+width*.5,brush.sample(s,float2(p.x*.5+.5,.5-p.y*.5)).r);
   float a=pow(density,max(f.shape.w,.001f));
-  a=mix(a,a*a*(3-2*a),b.options[i]);
+  if(b.paint.y>.5) {
+   float r2=dot(p,p);
+   a=pow(max(0.f,1-r2),max(f.shape.w,1.f))*exp(-.8f*r2);
+  } else if(i<2) {a=mix(a,a*a*(3-2*a),b.options[i]);}
   float w=max(f.limits.w,.00001);
   a*=smoothstep(0.f,w,in.local.x*f.shape.x-f.limits.x);
   a*=smoothstep(0.f,w,f.limits.y-in.local.x*f.shape.x);
@@ -33,7 +38,7 @@ fragment float4 blushAtlasFragment(O in [[stage_in]],constant Bake& b [[buffer(0
   }
   masks[i]=a*f.shape.z;
  }
- return float4(masks,0,1);
+ return float4(masks,1);
 }
 vertex O blushBackgroundVertex(uint i [[vertex_id]]) {
  float2 p=float2((i<<1)&2,i&2);O o;o.position=float4(p*2-1,1,1);o.uv=float2(p.x,1-p.y);o.local=0;o.rest=0;return o;
@@ -64,10 +69,15 @@ fragment float4 blushPigmentFragment(O in [[stage_in]],constant U& u [[buffer(0)
  float3 skin=cameraPixel(raw,u,y,cb);
  float2 maskUV=(u.maskFromRaw*float4(raw,0,1)).xy;
  float occ=obstruction.sample(s,maskUV).r;
- float2 masks=atlas.sample(s,in.uv).rg;
+ // Do not let small confidence noise modulate clear facial skin every frame.
+ if(u.camera.w<.5) occ=smoothstep(.12f,.65f,occ);
+ float4 atlasValue=atlas.sample(s,in.uv);
+ float2 masks=atlasValue.rg;
+ float pigmentMask=max(masks.x,masks.y);
+ if(u.camera.w<.5) pigmentMask=max(pigmentMask,atlasValue.b);
  float area=length(cross(dfdx(in.local),dfdy(in.local)))/max(length(cross(dfdx(in.rest),dfdy(in.rest))),1e-10f);
  float stretchFade=smoothstep(u.stretch.x,u.stretch.y,area)*(1-smoothstep(u.stretch.z,u.stretch.w,area));
- float alpha=saturate(max(masks.x,masks.y)*u.shade.w*u.controls.x*u.tracking.x*(1-occ)*stretchFade);
+ float alpha=saturate(pigmentMask*u.shade.w*u.controls.x*u.tracking.x*(1-occ)*stretchFade);
  // Luminance-preserving tint + absorption. Matte: add no specular term, LUT or smoothing.
  float lum=max(dot(skin,float3(.2126,.7152,.0722)),.0001f);
  float shadeLum=max(dot(u.shade.rgb,float3(.2126,.7152,.0722)),.02f);
@@ -76,7 +86,7 @@ fragment float4 blushPigmentFragment(O in [[stage_in]],constant U& u [[buffer(0)
  float3 target=mix(absorption,mix(skin,tint,u.controls.z),u.controls.w);
  float3 result=mix(skin,clamp(target,0.f,1.f),alpha);
  // Optional tutorial contour, entirely separate from pigment alpha.
- if(u.tracking.y>.5 && max(masks.x,masks.y)>.02 && max(masks.x,masks.y)<.045) result=mix(result,float3(.95,.72,.80),.7);
+ if(u.tracking.y>.5 && pigmentMask>.02 && pigmentMask<.045) result=mix(result,float3(.95,.72,.80),.7);
  return float4(result,1);
 }
 // MediaPipe brow. The style's brow is baked once into a brow-space texture: x = u (brow head 0, tail 1), y = offset

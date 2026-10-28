@@ -5,11 +5,17 @@ struct AppRootView: View {
     @StateObject private var navigator = AppNavigator()
 
     var body: some View {
-        // Try On is the only screen: no tab bar, onboarding or face/eye scan.
+        Group {
+            if navigator.needsWelcome {
+                OnboardingWelcomeScreen {navigator.dismissWelcome()}
+            } else {
+        // Preserve staging’s scan-free home after the one-time welcome.
         NavigationStack(path: $navigator.tryOnPath) {
             TryOnHomeView(plan: plan, assessment: assessment, checker: container.faceTracking,
                           onTutorial: { handoff in navigator.open(.recommendedTutorial(handoff),in:.tryOn) })
                 .navigationDestination(for: AppRoute.self, destination: destination)
+            }
+        }
         }
     }
 
