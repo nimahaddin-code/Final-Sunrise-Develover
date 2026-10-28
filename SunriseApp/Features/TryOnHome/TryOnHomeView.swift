@@ -125,21 +125,24 @@ struct TryOnHomeView: View {
 
     // MARK: Liner look
 
-    /// Line only or with wing; "no liner" is the no-sign button in the shade row.
+    /// The six liner looks, scrolling sideways; "no liner" is the no-sign button in the shade row.
     private var linerLookPicker: some View {
-        HStack(spacing: AppSpacing.small) {
-            ForEach(LinerLook.allCases) { look in
-                let selected = !home.isOff && home.linerLook == look
-                Button { home.setLinerLook(look) } label: {
-                    Text(look.title)
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 40)
-                        .background(AppColors.flamingo.opacity(selected ? 0.32 : 0.16), in: Capsule())
-                        .overlay(Capsule().strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0))
-                        .foregroundStyle(AppColors.snow)
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: AppSpacing.small) {
+                ForEach(LinerLook.allCases) { look in
+                    let selected = !home.isOff && home.linerLook == look
+                    Button { home.setLinerLook(look) } label: {
+                        Text(look.title)
+                            .font(.subheadline.weight(.semibold))
+                            .padding(.horizontal, AppSpacing.medium)
+                            .frame(minHeight: 40)
+                            .background(AppColors.flamingo.opacity(selected ? 0.32 : 0.16), in: Capsule())
+                            .overlay(Capsule().strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0))
+                            .foregroundStyle(AppColors.snow)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
                 }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
         .disabled(!home.canTry(.eyeliner))

@@ -101,8 +101,8 @@ final class LinerFrameRelay: @unchecked Sendable {
     @Published private(set) var hasLaunchFit:Bool
     private var linerStyle: LinerStyle?
     private var linerIsNeutral = true
-    /// Which of the two eyeliner looks is shown (the third state, none, is the eyeliner tool being off).
-    @Published private(set) var linerLook: LinerLook = .winged
+    /// Which of the six eyeliner looks is shown (none is the eyeliner tool being off).
+    @Published private(set) var linerLook: LinerLook = .classic
     @Published private(set) var linerRecommendation: MakeupRecommendation?
     private var activation: Task<Void,Never>?
     private var active = false

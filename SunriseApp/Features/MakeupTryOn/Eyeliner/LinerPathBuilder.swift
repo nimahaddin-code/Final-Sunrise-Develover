@@ -18,7 +18,7 @@ enum LinerPathBuilder {
         // The corner landmarks sit slightly INSIDE the visible lash line, so the upper line is extended a little
         // past both corners (tangent extrapolation) to cover the whole lid length.
         let upperLine = Polyline2D.smoothed(extended(EyeGeometry.localLashLine(eye.upperLid, frame: frame),
-                                                     inner: options.innerExtension,
+                                                     inner: options.innerExtension + CGFloat(spec.innerExtension),
                                                      outer: options.outerExtension))
         let lowerLine = Polyline2D.smoothed(EyeGeometry.localLashLine(eye.lowerLid, frame: frame))
         let outerLocal = CGPoint(x: 1, y: 0)
@@ -33,7 +33,8 @@ enum LinerPathBuilder {
             let u = CGFloat(i) / CGFloat(n - 1)
             let t = start + (1 - start) * u
             var k: CGFloat = 1
-            if start > 0.001 { k = 0.15 + 0.85 * smoothstep(0, 0.12, t - start) }  // soft start
+            // soft start; also tapers the tip of an inner extension so it does not hang off the lid
+            if start > 0.001 || spec.innerExtension > 0 { k = 0.15 + 0.85 * smoothstep(0, 0.12, t - start) }
             upperOffsets.append(thick(t) * k * options.thicknessScale)
         }
         let upper = strip(base: upperBase, offsets: upperOffsets, side: .up, inset: -options.lashOffset)
@@ -186,7 +187,12 @@ enum LinerPathBuilder {
         var out = pts
         if inner > 0 {
             let f = pts[0], f2 = pts[1]
-            out.insert(CGPoint(x: f.x - inner, y: f.y - slope(f, f2) * inner), at: 0)
+            // Hugs the curve of the inner corner: most of the lid's slope there, easing only slightly, in three steps.
+            let s = slope(f, f2) * 0.8
+            for step in (1...3).reversed() {
+                let u = inner * CGFloat(step) / 3
+                out.insert(CGPoint(x: f.x - u, y: f.y - s * (u - 0.15 * u * u / inner)), at: 0)
+            }
         }
         if outer > 0 {
             let l = pts[pts.count - 1], l2 = pts[pts.count - 2]

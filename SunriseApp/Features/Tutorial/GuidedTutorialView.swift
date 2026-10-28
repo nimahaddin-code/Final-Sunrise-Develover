@@ -11,7 +11,7 @@ struct TutorialHandoff: Hashable {
     var shades: [TryOnTool: MakeupShade]
     var intensities: [TryOnTool: Double]
     /// Which eyeliner look the person was trying: the tutorial guides that same shape.
-    var linerLook: LinerLook = .winged
+    var linerLook: LinerLook = .classic
 }
 
 /// What the bottom-left button shows: the full filter, half filter / half real camera, or no filter.

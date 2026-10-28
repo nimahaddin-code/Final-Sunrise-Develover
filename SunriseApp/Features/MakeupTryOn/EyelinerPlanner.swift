@@ -42,15 +42,21 @@ struct EyelinerPlan: Sendable {
     }
 }
 
-/// The two eyeliner looks offered on Try On (a third state, no liner, is the tool being off).
+/// The six eyeliner looks offered on Try On, after the reference sheet (a seventh state, no liner, is the tool being off).
 enum LinerLook: String, CaseIterable, Identifiable, Sendable {
-    /// A clean line along the upper lash line that ends at the outer corner, no wing.
-    case lineOnly
-    /// The same line with the pointed wing from the reference sheet.
-    case winged
+    case classic, cat, puppy, foxy, arabian, natural
 
     var id: String { rawValue }
-    var title: LocalizedStringResource { self == .lineOnly ? "Liner only" : "With wing" }
+    var title: LocalizedStringResource {
+        switch self {
+        case .classic: "Classic"
+        case .cat: "Cat"
+        case .puppy: "Puppy"
+        case .foxy: "Foxy"
+        case .arabian: "Arabian"
+        case .natural: "Natural"
+        }
+    }
 }
 
 /// Picks one liner per eye shape from the research (`Docs/Research/makeup_placement_rules.json`, `eye_shape`) and
@@ -77,29 +83,50 @@ enum EyelinerPlanner {
         return EyelinerPlan(blend: blend, style: style, isNeutral: false, wingRemoved: removesWing)
     }
 
-    /// `base` (the fitted liner) drawn as `look`. Line only has no wing at all. Winged keeps the fitted wing, but a
-    /// fitted style with a short or no wing (wide-set, neutral) gets the classic cat-eye wing of the reference sheet,
-    /// so the two looks always differ clearly.
+    /// The liner for `look`, in the colour of `base`. Each look is a fixed preset after the reference sheet, so the
+    /// person picks a shape instead of being given one; every number is an estimate to tune on a real face.
     static func style(_ base: LinerStyle, look: LinerLook) -> LinerStyle {
-        var style = base
+        var style: LinerStyle
         switch look {
-        case .lineOnly:
-            style.wingLength = 0
-            style.wingAngle = 0
-        case .winged:
-            let classic = variant(for: .almond)
-            if style.wingLength < classic.wingLength {
-                style.wingLength = classic.wingLength
-                style.wingAngle = classic.wingAngle
-                style.wingBase = classic.wingBase
-                style.wingOrigin = classic.wingOrigin
+        case .classic:
+            // The earlier "With wing" look: the fitted line with its wing. A fitted style with a short or no wing
+            // gets the almond wing; the wing runs sideways from the outer corner with only a slight lift.
+            style = base
+            let almond = variant(for: .almond)
+            if style.wingLength < almond.wingLength {
+                style.wingLength = almond.wingLength
+                style.wingAngle = almond.wingAngle
+                style.wingOrigin = almond.wingOrigin
             }
-            // Reference wings run sideways from the outer corner with only a slight lift, never steeply upward.
             style.wingBase = .horizontal
             style.wingTargetsBrowTail = false
             style.wingAngle = min(max(style.wingAngle, 6), 10)
             // The wing grows out of the line, so the outer end must be thick enough to carry it.
-            style.outerWidth = max(style.outerWidth, classic.outerWidth)
+            style.outerWidth = max(style.outerWidth, almond.outerWidth)
+        case .cat:
+            // Thin start, thick outer end and a long wing sweeping up.
+            style = LinerStyle(innerWidth: 0.006, outerWidth: 0.034, midWidth: 0.016, start: 0, wingLength: 0.36,
+                               wingAngle: 20, wingBase: .horizontal, shade: base.shade)
+        case .puppy:
+            // Soft, rounded line that runs long past the outer corner and droops downward along the eye's shape, with a short lower line.
+            style = LinerStyle(innerWidth: 0.012, outerWidth: 0.034, midWidth: 0.026, start: 0, wingLength: 0.32,
+                               wingAngle: -18, wingBase: .horizontal,
+                               lowerLine: LowerLine(enabled: true, extent: 0.4, thickness: 0.010), shade: base.shade)
+        case .foxy:
+            // Thin line that reaches past the inner corner toward the nose, sharp long wing aimed at the brow tail,
+            // lower line meeting it.
+            style = LinerStyle(innerWidth: 0.006, outerWidth: 0.026, midWidth: 0.010, start: 0, wingLength: 0.42,
+                               wingAngle: 24, wingBase: .horizontal, wingTargetsBrowTail: true,
+                               lowerLine: LowerLine(enabled: true, extent: 0.5, thickness: 0.010),
+                               innerExtension: 0.10, shade: base.shade)
+        case .arabian:
+            // Full outline round the eye; the wing starts under the lower lash line.
+            style = LinerStyle(innerWidth: 0.014, outerWidth: 0.030, midWidth: 0.022, start: 0, wingLength: 0.24,
+                               wingAngle: 8, wingOrigin: .underLowerLash, wingBase: .horizontal,
+                               lowerLine: LowerLine(enabled: true, extent: 1, thickness: 0.016), shade: base.shade)
+        case .natural:
+            style = naturalLine
+            style.shade = base.shade
         }
         return style
     }

@@ -116,12 +116,15 @@ final class EyelinerPlannerTests: XCTestCase {
         XCTAssertEqual(plan.madeForYou.last?.style, .eyeliner(EyelinerPlanner.naturalLine))
     }
 
-    func testLinerLooksDifferClearly() {
-        for shape in EyeShape.allCases {
-            let base = EyelinerPlanner.variant(for: shape)
-            XCTAssertEqual(EyelinerPlanner.style(base, look: .lineOnly).wingLength, 0, "\(shape)")
-            XCTAssertGreaterThanOrEqual(EyelinerPlanner.style(base, look: .winged).wingLength, 0.20, "\(shape)")
-        }
-        XCTAssertGreaterThan(EyelinerPlanner.style(EyelinerPlanner.naturalLine, look: .winged).wingLength, 0)
+    func testSixLooksAreDistinctPresets() {
+        let base = EyelinerPlanner.variant(for: .almond)
+        let looks = LinerLook.allCases.map { EyelinerPlanner.style(base, look: $0) }
+        XCTAssertEqual(looks.count, 6)
+        XCTAssertEqual(Set(looks).count, 6)
+        XCTAssertEqual(EyelinerPlanner.style(base, look: .natural).wingLength, 0)
+        XCTAssertGreaterThan(EyelinerPlanner.style(base, look: .cat).wingAngle, EyelinerPlanner.style(base, look: .classic).wingAngle)
+        XCTAssertLessThan(EyelinerPlanner.style(base, look: .puppy).wingAngle, 0)
+        XCTAssertEqual(EyelinerPlanner.style(base, look: .arabian).lowerLine.extent, 1)
+        for look in LinerLook.allCases { XCTAssertEqual(EyelinerPlanner.style(base, look: look).shade, base.shade) }
     }
 }

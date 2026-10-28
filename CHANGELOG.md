@@ -5,6 +5,11 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Changed — six eyeliner looks on Try On
+- `LinerLook` is now Classic, Cat, Puppy, Foxy, Arabian, Natural (was Liner only / With wing). Each is a fixed preset in
+  `EyelinerPlanner.style(_:look:)` (the fitted style only supplies the shade); the picker on Try On scrolls sideways. Default is Classic;
+  the tutorial follows the chosen look. Preset numbers are estimates, not yet checked on a real face.
+
 ### Added — photo step after the tutorial
 - The last tutorial step's button is now a camera: it opens the photo screen in the same `TutorialScreen` (`GuidedTutorialModel.photoMode`,
   shared camera session, no restart). The camera shows brow, blush and eyeliner in the Try On shades, with no guide dots and no zoom.

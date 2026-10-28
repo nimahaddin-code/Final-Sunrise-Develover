@@ -144,12 +144,15 @@ struct LinerStyle: Hashable, Sendable {
     /// `MakeupTextureRenderer.drawsTightline` is on.
     var tightline: Bool
     var lowerLine: LowerLine
+    /// Extra length of the upper line past the inner corner, toward the nose, as a fraction of the eye width.
+    var innerExtension: Float
     var shade: MakeupShade
 
     init(innerWidth: Float, outerWidth: Float, midWidth: Float? = nil, start: Float, wingLength: Float,
          wingAngle: Float, wingOrigin: WingOrigin = .outerCorner, wingBase: WingBase = .horizontal,
          wingTargetsBrowTail: Bool = false, tightline: Bool = false, lowerLine: LowerLine = LowerLine(),
-         shade: MakeupShade) {
+         innerExtension: Float = 0, shade: MakeupShade) {
+        self.innerExtension = innerExtension
         self.innerWidth = innerWidth
         self.outerWidth = outerWidth
         self.midWidth = midWidth
