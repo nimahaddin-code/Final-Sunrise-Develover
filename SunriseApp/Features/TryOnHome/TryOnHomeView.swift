@@ -35,6 +35,7 @@ struct TryOnHomeView: View {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
             }
             toolStrip
+            if home.tool == .blush {blushPlacementRow}
             // -Nimah: Old installs may have analysis but no persisted fit; never silently show an empty tool.
             if !home.canTry(home.tool) {
                 Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
@@ -94,7 +95,7 @@ struct TryOnHomeView: View {
                 }
                 .accessibilityLabel("Profile")
                 Spacer()
-                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities)) } label: {
+                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,blushStyle:home.blushLook)) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)
@@ -131,6 +132,21 @@ struct TryOnHomeView: View {
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+    }
+
+    // -Nimah: Placement and shade are independent. User requested these three creative alternatives.
+    private var blushPlacementRow:some View {
+        HStack(spacing:8) {
+            ForEach(BlushPlacementStyle.referenceLooks) {look in
+                Button {home.choose(blush:look)} label: {
+                    Text(look.title).font(.subheadline.weight(.semibold))
+                        .frame(maxWidth:.infinity).padding(.vertical,10)
+                        .background(home.blushLook==look ? AppColors.flamingo:AppColors.snow.opacity(0.12),in:Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(home.blushLook==look ? .isSelected:[])
+            }
+        }.disabled(!home.canTry(.blush))
     }
 
     // MARK: Shades

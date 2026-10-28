@@ -17,6 +17,27 @@ final class AppNavigatorTests: XCTestCase {
         super.tearDown()
     }
 
+    @MainActor func testRedesignedWelcomeAppearsOnceWithoutInvalidatingCompletedScan() {
+        defaults.set(true,forKey:AppNavigator.onboardingCompleteKey)
+        let upgraded=AppNavigator(defaults:defaults)
+        XCTAssertTrue(upgraded.needsWelcome)
+        XCTAssertTrue(upgraded.launchScanComplete)
+        upgraded.dismissWelcome()
+        XCTAssertFalse(upgraded.needsWelcome)
+        XCTAssertTrue(upgraded.onboardingComplete)
+        XCTAssertTrue(upgraded.launchScanComplete)
+        let reopened=AppNavigator(defaults:defaults)
+        XCTAssertFalse(reopened.needsWelcome)
+        XCTAssertTrue(reopened.launchScanComplete)
+    }
+    @MainActor func testFreshWelcomeDismissalStillRequiresInitialScan() {
+        let fresh=AppNavigator(defaults:defaults)
+        XCTAssertTrue(fresh.needsWelcome)
+        fresh.dismissWelcome()
+        XCTAssertFalse(fresh.needsWelcome)
+        XCTAssertFalse(fresh.launchScanComplete)
+        XCTAssertFalse(fresh.onboardingComplete)
+    }
     @MainActor func testOnboardingLandsOnTryOnHomeWithoutCreatingAPath() {
         let navigator = AppNavigator(defaults: defaults)
         navigator.selectedTab = .discover

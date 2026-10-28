@@ -7,6 +7,66 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
+    func testMaskDeliveryCadenceDoesNotHardFlashAtFreshnessBoundary() {
+        let fresh=0.15,fade=0.10
+        let before=BeautyMaskContinuity.weight(age:0.149,freshAge:fresh,fadeSeconds:fade)
+        let after=BeautyMaskContinuity.weight(age:0.151,freshAge:fresh,fadeSeconds:fade)
+        XCTAssertLessThan(abs(before-after),0.001)
+        var visibility=BeautyBlushVisibility(),last:Double=0,minimum:Double=1
+        for i in 0..<180 {
+            let t=Double(i)/60
+            let age=0.11+t.truncatingRemainder(dividingBy:0.09)
+            let weight=BeautyMaskContinuity.weight(age:age,freshAge:fresh,fadeSeconds:fade)
+            let filtered=visibility.update(timestamp:t,target:weight,tau:0.055)
+            let output=BeautyMaskContinuity.opacity(filtered:filtered,age:age,freshAge:fresh,fadeSeconds:fade)
+            if i>30 {minimum=min(minimum,output);XCTAssertLessThan(abs(output-last),0.25)}
+            last=output
+        }
+        XCTAssertGreaterThan(minimum,0.5,"Normal delayed delivery must not alternate between full pigment and zero")
+        XCTAssertEqual(BeautyMaskContinuity.opacity(filtered:1,age:0.25,freshAge:fresh,fadeSeconds:fade),0)
+        XCTAssertEqual(BeautyMaskContinuity.weight(age:0.25,freshAge:fresh,fadeSeconds:fade),0)
+        XCTAssertEqual(BeautyMaskContinuity.weight(age:1,freshAge:fresh,fadeSeconds:fade),0)
+        XCTAssertEqual(BeautyMaskContinuity.weight(age:-0.1,freshAge:fresh,fadeSeconds:fade),0)
+    }
+    func testThreeReferenceBlushLooksHaveDifferentGeometryAndBridgeOnlyForSunkissed() throws {
+        let region=try BrowFixture().region()
+        let youth=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.youthful))
+        let sun=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.sunkissed))
+        let lift=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.lifted))
+        XCTAssertNil(youth.noseBridge);XCTAssertNil(lift.noseBridge)
+        let bridge=try XCTUnwrap(sun.noseBridge)
+        XCTAssertGreaterThan(bridge.coverage(bridge.center),0.9)
+        XCTAssertEqual(bridge.coverage(SIMD2(0,region.eyeCenters[0].y)),0)
+        XCTAssertLessThan(youth.pigmentFields[0].center.y,lift.pigmentFields[0].center.y)
+        XCTAssertLessThan(youth.pigmentFields[0].radius.x,lift.pigmentFields[0].radius.x)
+        XCTAssertGreaterThan(lift.pigmentFields[0].curvature,0)
+        for placement in [youth,sun,lift] {
+            let pixels=try BeautyBlushEngine.renderAtlasFixture(placement:placement)
+            let blue=(0..<(256*256)).map {pixels[$0*4+2]}.max() ?? 0
+            if placement.style == .sunkissed {XCTAssertGreaterThan(blue,0.15)}else{XCTAssertEqual(blue,0)}
+            XCTAssertGreaterThan((0..<(256*256)).map {pixels[$0*4]}.max() ?? 0,0.2)
+        }
+    }
+    @MainActor func testCreativeBlushChoiceRetainsShadeAndTutorialStyle() {
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let shade=home.currentShade,intensity=home.intensity
+        home.choose(blush:.sunkissed)
+        XCTAssertEqual(home.liveConfiguration.blushStyle,.sunkissed)
+        XCTAssertEqual(home.enabled,[.blush]);XCTAssertEqual(home.currentShade,shade);XCTAssertEqual(home.intensity,intensity)
+        home.choose(.eyebrow);home.choose(.blush)
+        XCTAssertEqual(home.blushLook,.sunkissed)
+        let handoff=TutorialHandoff(tool:.blush,shades:home.shades,intensities:home.intensities,blushStyle:home.blushLook)
+        XCTAssertEqual(handoff.blushStyle,.sunkissed)
+        home.deactivate()
+    }
+    func testBlushResidualLimitKeepsExpressionAttached() {
+        let current=SIMD3<Float>(0.03,-0.01,0.04)
+        let filtered=current+SIMD3<Float>(0.003,0.002,0)
+        let output=BeautyBlushConfiguration.limitResidual(filtered:filtered,current:current)
+        XCTAssertLessThanOrEqual(simd_distance(output,current),0.000251)
+        let tiny=current+SIMD3<Float>(0.00001,0,0)
+        XCTAssertEqual(BeautyBlushConfiguration.limitResidual(filtered:tiny,current:current),tiny)
+    }
     func testBrowLocalStabilizerRejectsMicroJitterWithoutFreezingExpression() {
         var stabilizer=BeautyBrowStabilizer(),samples:[Float]=[]
         for i in 0..<120 {
@@ -393,12 +453,12 @@ final class MakeupPreferenceTests:XCTestCase {
         var footprints:[BlushPlacementStyle:[SIMD3<Float>]]=[:]
         for style in BlushPlacementStyle.allCases {
             let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:style),style.title)
-            XCTAssertEqual(guide.areas.count,2)
+            XCTAssertEqual(guide.areas.filter {$0.id != "nose-bridge"}.count,2)
             for area in guide.areas {
                 let points=area.boundary.compactMap { $0.position(in:region.restVertices) }
                 XCTAssertEqual(points.count,area.boundary.count)
                 XCTAssertLessThan(simd_distance(points.first!,points.last!),0.00001)
-                XCTAssertTrue(points.allSatisfy { abs($0.x)>0.019 && $0.y<0.024 })
+                XCTAssertTrue(points.allSatisfy { $0.y<0.024 && (area.id=="nose-bridge" || abs($0.x)>0.019) })
                 let moved=region.restVertices.map { $0+SIMD3<Float>(0.001,0.002,0.003) }
                 let before=try XCTUnwrap(area.boundary[0].position(in:region.restVertices))
                 let after=try XCTUnwrap(area.boundary[0].position(in:moved))

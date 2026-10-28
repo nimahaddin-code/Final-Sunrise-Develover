@@ -18,5 +18,6 @@
   ],
   "target_fps": 60,
   "thermal_fps": 30,
-  "paint_feather": 0.9
+  "paint_feather": 0.9,
+  "mask_fade_seconds": 0.1
 }

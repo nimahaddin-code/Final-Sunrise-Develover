@@ -82,6 +82,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     static let defaultIntensity = 0.85
 
     /// The tool the shade row and intensity bar currently control.
+    @Published private(set) var blushLook:BlushPlacementStyle = .youthful
     @Published private(set) var tool: TryOnTool = .blush
     @Published private(set) var enabled: Set<TryOnTool> = [.blush]
     @Published private(set) var shades: [TryOnTool: MakeupShade]
@@ -120,6 +121,9 @@ final class LinerFrameRelay: @unchecked Sendable {
                   .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
         intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="eyebrow"})?.intensity.default.value ?? 0.65),
                        .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
+        if let raw=UserDefaults.standard.string(forKey:"dandan.blush.look"),let look=BlushPlacementStyle(rawValue:raw),look.isReferenceLook {blushLook=look}
+        else {blushLook = brow.selectedBlush?.style == .wideHorizontal ? .sunkissed:(brow.selectedBlush?.style == .centerCheek || brow.selectedBlush?.style == .apple ? .youthful:.lifted)}
+
     }
 
     // -Nimah: Database/catalog selection is automatic; tools only switch category, never placement style.
@@ -134,7 +138,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         if tool != .eyeliner && !hasLaunchFit { return String(localized:"Brow and blush unavailable: initial contour fitting was not captured") }
         switch tool {
         case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"No saved recommendation for this face shape")
-        case .blush:return brow.selectedBlush?.title ?? String(localized:"No saved recommendation for this face shape")
+        case .blush:return canTry(.blush) ? blushLook.title : String(localized:"No saved recommendation for this face shape")
         case .eyeliner:return linerIsNeutral ? String(localized:"Natural line · scan your eyes for a fitted style") : String(localized:"Eyeliner fitted to your eye scan")
         }
     }
@@ -167,6 +171,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// The brow/blush preview configuration for the shared camera view: both layers are drawn together.
     var liveConfiguration: EyebrowConfiguration {
         var configuration = brow.liveConfiguration
+        configuration.blushStyle=blushLook
         configuration.layered = true
         configuration.showGuide = false
         configuration.showTrackingPoints = false
@@ -186,6 +191,13 @@ final class LinerFrameRelay: @unchecked Sendable {
         enabled=canTry(newTool) ? [newTool] : []
         syncLiner()
         recordLiveState()
+    }
+
+    // -Nimah: Three requested creative looks override the initial style, retaining personal scan fitting.
+    func choose(blush look:BlushPlacementStyle) {
+        guard look.isReferenceLook,canTry(.blush) else {return}
+        blushLook=look;UserDefaults.standard.set(look.rawValue,forKey:"dandan.blush.look")
+        tool = .blush;enabled=[.blush];isComparing=false;syncLiner()
     }
 
     func choose(shade: MakeupShade) {

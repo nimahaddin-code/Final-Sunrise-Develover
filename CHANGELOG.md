@@ -1,3 +1,31 @@
+## Mask continuity and welcome migration — -Nimah (2026-10-28)
+
+Device screenshot showed Preparing makeup visibility; scalar report error=none, GPU about1ms, ~60FPS.
+Fix actual hard freshness gate: reprojection uses three native head anchors; 150ms fresh window plus bounded
+100ms smooth opacity fade (new consumed mask_fade_seconds). Never show after250ms; no unlimited old mask.
+Opacity target is continuous and capped by mask weight, not hard fresh ? alpha : 0. Stale/mismatched dimensions
+and implausible reprojection remain excluded. Status waits for low effective visibility. This permits brief
+stale-mask fading, not perfect new-hand occlusion: validate on device.
+Welcome revision gate dandan.welcome.version shows new hi-fi welcome once on upgrade. Get Started dismisses
+welcome; users with completed face/eye results go to try-on, fresh users enter face then eyes. No scan erasure.
+
+## Hi-fi welcome onboarding — -Nimah (2026-10-28)
+
+Welcome uses OnboardingWelcomeScreen, static generated onboarding-silk asset and native logo/copy/CTA.
+Match supplied burgundy silk reference. Responsive scroll fallback, Dynamic Type-scaled text, light status
+appearance and four progress dots (welcome/face/eyes/preparing). Get Started still enters face scan then eyes.
+Preserve saved-scan bypass and Retake routing. No fake system status bar or rasterized controls; no animation,
+second camera or model added. Existing in-flight blush look changes stay intact. No merge/push requested.
+
+## Three reference blush looks v0.5.0 — -Nimah (2026-10-28)
+
+User requested Youthful / Sunkissed / Lifted options, overriding prior no-style-picker for blush only.
+JSON presets drive the three shapes; same per-cheek anatomical fitting. Sunkissed alone adds upper-nose
+bridge channel. Curved Lifted mask, continuous soft falloff, mipmapped pigment atlases, capped 0.25 mm blush
+mesh residual and blush-only mask-confidence threshold. No retouch/morph/scan/extra tracker. Five new colors
+(total nine), design approximations only. Selected look handed to tutorial; shade/intensity stay independent.
+See Docs/Decisions/0013-three-reference-blush-looks.md. Do not merge staging/main without new instruction.
+
 ## Brow stability — -Nimah (2026-10-27)
 
 User reports eyebrow jitter after availability recovery. Native brow residuals now use metre-space 2 Hz /

@@ -1,3 +1,31 @@
+## Mask continuity and welcome upgrade recovery — -Nimah · 28 October 2026
+
+Full suite 340 executed, 4 skipped, zero failures (/tmp/sunrise-mask-welcome-fixed-tests.log); signed Release
+build succeeded (/tmp/sunrise-mask-welcome-fixed-build.log). Earlier run correctly caught12 cadence opacity
+jumps; no failed assertions were loosened. Current path filters recovery before applying a later smooth expiry
+ceiling; exactly zero at250ms default. Same cadence regression now passes. Model nil callbacks retain only the
+original timestamped mask until that finite deadline. Plausible native head reprojection is required in grace.
+Navigator tests verify new welcome shown once on upgrade and no invalidation of completed scan, while fresh
+users still require face+eye scan. Physical flicker/occlusion/onboarding acceptance pending installation.
+
+## Hi-fi onboarding welcome — -Nimah · 28 October 2026
+
+Simulator Debug and signed generic iPhone Release builds succeeded. Fresh disposable iPhone 17 simulator
+(0A67E956-C884-449E-A81B-CCDC16CF7C19) shows actual onboarding at launch; screenshot in workspace
+output/onboarding-hifi/onboarding-iphone17.png inspected for visible CTA, copy and native branding layout.
+Welcome-only presentation change: existing Get Started closure enters .faceScan, followed by .eyeScan and
+.preparing. Saved results/Retake navigation untouched. No new automated tests for reversible visual changes.
+Physical device welcome, VoiceOver and largest Dynamic Type acceptance not performed.
+Logs: /tmp/sunrise-onboarding-hifi-build.log, /tmp/sunrise-onboarding-hifi-release.log.
+
+## Three reference blush looks v0.5.0 — -Nimah · 28 October 2026
+
+Full suite: 337 executed, 4 skipped, no failures (/tmp/sunrise-blush-three-tests.log). Final selected makeup
+GPU suite: 48 tests, no failures (/tmp/sunrise-blush-three-final-gpu.log). Signed Release build succeeded
+(/tmp/sunrise-blush-three-build.log). Install attempted; CoreDevice could not locate paired iPhone despite
+user confirming connection. Device appearance, smoothness and occlusion acceptance pending. Synthetic GPU
+checks validate distinct cheek footprints and bridge channel only in Sunkissed. No TikTok equality claim.
+
 ## Brow stability revision — -Nimah · 27 October 2026
 
 45 selected makeup tests passed, zero failures (/tmp/sunrise-brow-stability-tests.log). Includes local jitter

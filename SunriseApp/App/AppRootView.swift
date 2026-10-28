@@ -7,7 +7,9 @@ struct AppRootView: View {
 
     var body: some View {
         Group {
-            if navigator.launchScanComplete && faceShapeStore.latest != nil && faceShapeStore.eyes != nil {
+            if navigator.needsWelcome {
+                OnboardingWelcomeScreen {navigator.dismissWelcome()}
+            } else if navigator.launchScanComplete && faceShapeStore.latest != nil && faceShapeStore.eyes != nil {
                 // Try On is the only screen: no tab bar.
                 NavigationStack(path: $navigator.tryOnPath) {
                     TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
@@ -20,7 +22,7 @@ struct AppRootView: View {
                         .navigationDestination(for: AppRoute.self, destination: destination)
                 }
             } else {
-                OnboardingView(store: faceShapeStore, showWelcome:!navigator.onboardingComplete, onFinish: navigator.completeOnboarding)
+                OnboardingView(store: faceShapeStore, showWelcome:false, onFinish: navigator.completeOnboarding)
             }
         }
         .fullScreenCover(isPresented:$navigator.retakePresented,onDismiss:navigator.retakeDismissed) {

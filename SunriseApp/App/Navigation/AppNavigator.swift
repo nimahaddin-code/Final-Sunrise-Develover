@@ -2,6 +2,9 @@ import Combine
 import Foundation
 
 @MainActor final class AppNavigator: ObservableObject {
+    static let welcomeVersionKey="dandan.welcome.version"
+    static let currentWelcomeVersion=1
+    @Published private(set) var needsWelcome:Bool
     static let onboardingCompleteKey = "onboardingComplete"
 
     @Published private(set) var onboardingComplete: Bool
@@ -26,12 +29,20 @@ import Foundation
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
+        needsWelcome=defaults.integer(forKey:Self.welcomeVersionKey)<Self.currentWelcomeVersion
         onboardingComplete = defaults.bool(forKey: Self.onboardingCompleteKey)
         launchScanComplete = onboardingComplete
     }
 
+    // -Nimah: Show redesigned welcome once without invalidating saved face/eye results.
+    func dismissWelcome() {
+        defaults.set(Self.currentWelcomeVersion,forKey:Self.welcomeVersionKey)
+        needsWelcome=false
+    }
+
     /// Ends onboarding for good and lands on the Try On home screen.
     func completeOnboarding() {
+        dismissWelcome()
         defaults.set(true, forKey: Self.onboardingCompleteKey)
         selectedTab = .tryOn
         onboardingComplete = true
