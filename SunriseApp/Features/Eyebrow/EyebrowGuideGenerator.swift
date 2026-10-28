@@ -23,8 +23,8 @@ enum EyebrowGuideGenerator {
         let tailSlope=max(-width*0.12,min(width*0.12,outer.y-inner.y))
         let peak:Float=0.64
         let phase=t<peak ? t/peak : (1-t)/(1-peak)
-        let smooth:Float=style == .angular ? phase : (style == .rounded ? sin(t*Float.pi) : phase*phase*(3-2*phase))
-        return SIMD2(inner.x+(outer.x-inner.x)*t,inner.y+tailSlope*t+width*style.archRatio*smooth+(style == .lifted ? width*0.10*t : 0))
+        let smooth:Float=style == .peakedAngle ? phase : (style == .curvedArch ? sin(t*Float.pi) : phase*phase*(3-2*phase))
+        return SIMD2(inner.x+(outer.x-inner.x)*t,inner.y+tailSlope*t+width*style.archRatio*smooth)
     }
     // -Nimah: Anchor height to the observed brow, never add a generic arch percentage above it.
     static func calibratedPeak(mapping m:BrowAnatomicalMapping,style:EyebrowStyle) -> SIMD2<Float>? {
@@ -32,15 +32,14 @@ enum EyebrowGuideGenerator {
         let naturalRise=max(0,m.arch.y-max(m.start.y,m.tail.y))
         let offset:Float
         switch style {
-        case .straight:offset = -min(naturalRise*0.55,0.0015)
-        case .softArch:offset = 0
-        case .highArch:offset = min(span*0.025,0.001)
-        case .feathered:offset = min(span*0.008,0.0004)
-        case .natural,.thin:offset=0
-        case .lifted:offset=0.0004
-        case .angular:offset=0.0008
-        case .rounded:offset=0.0005
-        case .lowArch:offset = -min(naturalRise*0.4,0.001)
+        case .flatStraight,.boldStraight:offset = -min(naturalRise*0.55,0.0015)
+        case .slimStraight:offset = -min(naturalRise*0.4,0.001)
+        case .softNatural:offset=0
+        case .slimArch:offset = min(span*0.008,0.0004)
+        case .curvedArch:offset=0.0005
+        case .peakedAngle:offset=0.0008
+        case .boldArch:offset = min(span*0.02,0.0009)
+        case .fullArch:offset = min(span*0.025,0.001)
         }
         return BrowMappingFormula.intersection(nose:SIMD2(m.ala.x,m.ala.y),through:SIMD2(m.pupil.x,m.pupil.y),level:m.arch.y+offset)
     }
@@ -57,7 +56,7 @@ enum EyebrowGuideGenerator {
             }
             // -Nimah: Fit all measured eyebrow points, not the highest point or formula endpoints.
             guard let fit=ObservedBrowFit(points:points,inner:inner,outer:outer) else { return nil }
-            let rule=MakeupRuleDatabase.brow(style == .thin || style == .feathered ? .natural : style)
+            let rule=MakeupRuleDatabase.brow(style)
             guard let rule else { return nil }
             let peak=rule.number("arch_t"),limit=rule.number("max_displacement")
             func adjusted(_ t:Float)->SIMD2<Float> {
@@ -95,13 +94,13 @@ enum EyebrowGuideGenerator {
                 (0...40).map { i in
                     let t=Float(i)/40
                     let center=intended(t)
-                    let rule=MakeupRuleDatabase.brow(style == .thin || style == .feathered ? .natural : style)
+                    let rule=MakeupRuleDatabase.brow(style)
                     let peak=rule?.number("arch_t") ?? 0.64
                     let head=rule?.number("head_taper") ?? 0.65,tail=rule?.number("tail_taper") ?? 0.08
                     let taper=t<=peak ? head+(1-head)*t/peak : 1+(tail-1)*(t-peak)/(1-peak)
                     // Vision open contour supplies centerline, not measured brow thickness.
                     let designHalf=width*(rule?.number("half_thickness_design") ?? 0.035)
-                    let half=designHalf*taper*(rule?.number("thickness_scale") ?? 1)*(style == .thin ? 0.55 : 1)
+                    let half=designHalf*taper*(rule?.number("thickness_scale") ?? 1)
                     return bind(center+SIMD2(0,upper ? half : -half))
                 }
             }
@@ -109,7 +108,7 @@ enum EyebrowGuideGenerator {
             let outline=upper+Array(lower.reversed())+[upper[0]]
             guard outline.compactMap({ $0 }).count>=75 else { return nil }
             var strokes:[(SurfaceAttachment,SurfaceAttachment)]=[]
-            if style == .feathered {
+            if style == .softNatural {
                 let direction:Float=outer.x>inner.x ? 1 : -1
                 for i in stride(from:3,to:38,by:3) {
                     let p=intended(Float(i)/40)

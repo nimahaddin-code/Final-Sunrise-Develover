@@ -82,15 +82,15 @@ struct MakeupRuleDatabase: Decodable, Sendable {
     }
     static func browID(_ style: EyebrowStyle) -> String? {
         switch style {
-        case .natural:return "brow.natural"
-        case .softArch:return "brow.soft_arch"
-        case .highArch:return "brow.high_arch"
-        case .angular:return "brow.angular"
-        case .rounded:return "brow.rounded"
-        case .straight:return "brow.straight"
-        case .lowArch:return "brow.low_arch"
-        case .lifted:return "brow.lifted"
-        case .thin,.feathered:return nil // Legacy studio modifiers are not assigned research presets.
+        case .boldArch:return "brow.bold_arch"
+        case .slimArch:return "brow.slim_arch"
+        case .softNatural:return "brow.soft_natural"
+        case .flatStraight:return "brow.flat_straight"
+        case .curvedArch:return "brow.curved_arch"
+        case .peakedAngle:return "brow.peaked_angle"
+        case .slimStraight:return "brow.slim_straight"
+        case .fullArch:return "brow.full_arch"
+        case .boldStraight:return "brow.bold_straight"
         }
     }
     static func blushID(_ style: BlushPlacementStyle) -> String {

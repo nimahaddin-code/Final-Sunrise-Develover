@@ -307,7 +307,7 @@ private struct FaceGuideStylePreview:View {
                         for i in 0...30 {
                             let t=Float(edge==0 ? i : 30-i)/30
                             let p=EyebrowGuideGenerator.target(t:t,inner:.init(0,0,0),outer:.init(1,0,0),style:brow)
-                            let thickness=CGFloat(0.07*(1-t)+0.012)*h*(brow == .thin ? 0.55 : 1)
+                            let thickness=CGFloat(0.07*(1-t)+0.012)*h
                             let point=CGPoint(x:10+CGFloat(p.x)*(w-20),y:h*0.65-CGFloat(p.y)*h+(edge==0 ? -thickness : thickness))
                             if edge==0 && i==0 { path.move(to:point) } else { path.addLine(to:point) }
                         }

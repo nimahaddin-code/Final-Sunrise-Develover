@@ -1,4 +1,5 @@
 import ARKit
+import Combine
 import SwiftUI
 
 /// The three makeup tools on the Try On home screen.
@@ -91,6 +92,9 @@ final class LinerFrameRelay: @unchecked Sendable {
     @Published private(set) var intensities: [TryOnTool: Double]
     /// Held down on the camera card to see the bare face.
     @Published var isComparing = false
+    /// Test toggles under the eyebrow tool: the MediaPipe tracking overlay, and the user's own eyebrow.
+    @Published var browLandmarksVisible = true
+    @Published var naturalBrowVisible = true
 
     /// Blush/eyebrow style choices and availability; its configuration is only used as the base for the live preview.
     let brow: EyebrowViewModel
@@ -105,6 +109,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     private var hasAppliedAnalysis=false
     private var appliedFace:FaceShapeResult?
     private var appliedEyes:EyeShapeResult?
+    private var observationBag = Set<AnyCancellable>()
 
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
@@ -117,6 +122,13 @@ final class LinerFrameRelay: @unchecked Sendable {
                   .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
         intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="eyebrow"})?.intensity.default.value ?? 0.65),
                        .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
+        // The style picker mutates the nested brow model. Forward those
+        // changes so the live camera representable receives a new
+        // configuration immediately instead of waiting for another home-level
+        // control to redraw it.
+        brow.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &observationBag)
     }
 
     // -Nimah: Database/catalog selection is automatic; tools only switch category, never placement style.
@@ -170,6 +182,8 @@ final class LinerFrameRelay: @unchecked Sendable {
         configuration.previewAfter = !isComparing
         configuration.browLayer = layer(.eyebrow)
         configuration.blushLayer = layer(.blush)
+        configuration.browTrackingOverlay = EyebrowConfiguration.showsBrowTracking && browLandmarksVisible
+        configuration.hideNaturalBrow = !naturalBrowVisible
         return configuration
     }
 

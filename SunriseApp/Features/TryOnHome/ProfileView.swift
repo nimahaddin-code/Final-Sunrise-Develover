@@ -24,7 +24,7 @@ struct ProfileView: View {
             .padding(.horizontal, AppSpacing.large)
             .padding(.vertical, AppSpacing.medium)
         }
-        .background(AppColors.wine.ignoresSafeArea())
+        .background(AppColors.screen.ignoresSafeArea())
         .foregroundStyle(AppColors.snow)
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)

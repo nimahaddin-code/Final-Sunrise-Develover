@@ -45,7 +45,7 @@ final class ForeheadGuideTests:XCTestCase {
         XCTAssertEqual(ForeheadStyle.softGlow.category,.highlight)
     }
     func testBrowOutlineHasUpperLowerEdgesAndClosedTail() throws {
-        let f=BrowFixture(),guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:try f.region(),style:.softArch))
+        let f=BrowFixture(),guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:try f.region(),style:.softNatural))
         for curve in guide.curves {
             let start=try XCTUnwrap(curve.outline[0]!.position(in:f.vertices))
             let end=try XCTUnwrap(curve.outline[curve.outline.count-1]!.position(in:f.vertices))
@@ -89,17 +89,17 @@ final class ForeheadGuideTests:XCTestCase {
         }
         let f=BrowFixture(),pipeline=EyebrowTrackingPipeline(provider:Provider(result:f.detection()),requiredScanSamples:1)
         pipeline.reset(anchorID:f.anchor)
-        pipeline.calibrate(input:try f.input(),style:.straight,foreheadStyle:.softSculpt,height:0.8)
+        pipeline.calibrate(input:try f.input(),style:.flatStraight,foreheadStyle:.softSculpt,height:0.8)
         for _ in 0..<60 {
-            if pipeline.snapshot(style:.straight,foreheadStyle:.softSculpt).ready { break }
+            if pipeline.snapshot(style:.flatStraight,foreheadStyle:.softSculpt).ready { break }
             try await Task.sleep(for:.milliseconds(25))
         }
-        let forehead=pipeline.snapshot(style:.straight,foreheadStyle:.softSculpt)
+        let forehead=pipeline.snapshot(style:.flatStraight,foreheadStyle:.softSculpt)
         XCTAssertNotNil(forehead.foreheadGuide); XCTAssertNil(forehead.guide)
-        let all=pipeline.snapshot(style:.straight,foreheadStyle:.softSculpt,includeBrow:true)
+        let all=pipeline.snapshot(style:.flatStraight,foreheadStyle:.softSculpt,includeBrow:true)
         XCTAssertNotNil(all.guide); XCTAssertNotNil(all.foreheadGuide)
         pipeline.trackingLost()
-        XCTAssertFalse(pipeline.snapshot(style:.straight,foreheadStyle:.softSculpt).ready)
+        XCTAssertFalse(pipeline.snapshot(style:.flatStraight,foreheadStyle:.softSculpt).ready)
     }
     @MainActor func testForeheadAreasBindToNativeNeutralMesh() throws {
         guard ARFaceTrackingConfiguration.isSupported else { throw XCTSkip("Native forehead mesh requires supported hardware") }

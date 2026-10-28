@@ -50,3 +50,14 @@ uses the current frame. Synthetic alternating 0.3 mm noise attenuation, real 3 m
 are tested. Brow-only atlas mip pyramid is generated after bake, sampled trilinearly with 4x anisotropy.
 This targets local mesh jitter and high-frequency strand shimmer; source of perceived motion cannot be fully
 proven without recorded device comparison. Device visual acceptance remains pending.
+
+## Overlay only, anti-blink, debug views (27 October 2026, Khalish)
+
+An erase-and-inpaint attempt (designed/observed brow region refilled by blending skin above and below) produced horizontal
+bands and a visible soft rectangle and was removed, following eyebrow_filter_rendering_fix.md (Option B, overlay only).
+The brow composites with straight alpha over the unchanged camera pixel; alpha is zero outside the baked brow. Strands keep
+a .35 density floor between them. The atlas alpha channel now carries debug marks only (landmarks, observed centerline).
+Blink causes addressed: the brow pass was skipped whenever the face-skin mask aged past 150 ms (device showed 223 ms) — brow
+now holds the last mask up to 0.3 s; and the segmenter rejecting brow hair flickered occlusion on the brow itself — brow
+pixels are occluded only when skin 9 mm above or below is too. Trade-off: a hand entering can lag up to 0.3 s on the brow.
+Developer views (original, landmarks, fit contours, alpha mask, texture only, final) separate texture/alpha from placement.

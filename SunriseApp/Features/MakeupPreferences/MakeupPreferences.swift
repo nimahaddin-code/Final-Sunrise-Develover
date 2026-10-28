@@ -27,7 +27,7 @@ struct FaceShapeAssessment:Equatable,Sendable {
         self.shape=shape; self.origin=origin
         self.confidence=confidence.flatMap { $0.isFinite && (0...1).contains($0) ? $0 : nil }
     }
-    /// With the face/eye scans removed, everyone gets the oval assignment (natural brow, cheekbone blush);
+    /// With the face/eye scans removed, everyone gets the oval assignment (soft natural brow, cheekbone blush);
     /// no face shape is shown. `.analysis` makes try-on follow the live-camera fit.
     static let standardLook=FaceShapeAssessment(shape:.oval,origin:.analysis)
 }
@@ -59,22 +59,23 @@ struct BlushPreference:Identifiable,Sendable {
 }
 enum MakeupPreferenceCatalog {
     static let brows:[BrowPreference] = [
-        .init(id:"brow-oval-a",shape:.oval,source:"A",style:.lifted,evidence:.stated),
-        .init(id:"brow-oval-b",shape:.oval,source:"B",style:.softArch,evidence:.visualInterpretation),
-        .init(id:"brow-oval-c",shape:.oval,source:"C",style:.natural,evidence:.stated),
-        .init(id:"brow-round-a",shape:.round,source:"A",style:.angular,evidence:.stated),
-        .init(id:"brow-round-b",shape:.round,source:"B",style:.highArch,evidence:.visualInterpretation),
-        .init(id:"brow-round-c",shape:.round,source:"C",style:.highArch,evidence:.stated),
-        .init(id:"brow-square-a",shape:.square,source:"A",style:.rounded,evidence:.stated),
-        .init(id:"brow-square-b",shape:.square,source:"B",style:.angular,evidence:.visualInterpretation),
-        .init(id:"brow-square-c",shape:.square,source:"C",style:.rounded,evidence:.stated),
-        .init(id:"brow-oblong-b",shape:.oblong,source:"B",style:.straight,evidence:.visualInterpretation),
-        .init(id:"brow-oblong-c",shape:.oblong,source:"C",style:.straight,evidence:.stated),
-        .init(id:"brow-heart-b",shape:.heart,source:"B",style:.lowArch,evidence:.visualInterpretation),
-        .init(id:"brow-heart-c",shape:.heart,source:"C · inverted triangle",style:.thin,evidence:.stated),
-        .init(id:"brow-diamond-a",shape:.diamond,source:"A",style:.softArch,evidence:.stated),
-        .init(id:"brow-diamond-b",shape:.diamond,source:"B",style:.softArch,evidence:.visualInterpretation),
-        .init(id:"brow-diamond-c",shape:.diamond,source:"C",style:.softArch,evidence:.stated)
+        // The reference directions per face shape, mapped onto the current brow shape list.
+        .init(id:"brow-oval-a",shape:.oval,source:"A",style:.fullArch,evidence:.stated),
+        .init(id:"brow-oval-b",shape:.oval,source:"B",style:.slimArch,evidence:.visualInterpretation),
+        .init(id:"brow-oval-c",shape:.oval,source:"C",style:.softNatural,evidence:.stated),
+        .init(id:"brow-round-a",shape:.round,source:"A",style:.peakedAngle,evidence:.stated),
+        .init(id:"brow-round-b",shape:.round,source:"B",style:.boldArch,evidence:.visualInterpretation),
+        .init(id:"brow-round-c",shape:.round,source:"C",style:.boldArch,evidence:.stated),
+        .init(id:"brow-square-a",shape:.square,source:"A",style:.curvedArch,evidence:.stated),
+        .init(id:"brow-square-b",shape:.square,source:"B",style:.peakedAngle,evidence:.visualInterpretation),
+        .init(id:"brow-square-c",shape:.square,source:"C",style:.curvedArch,evidence:.stated),
+        .init(id:"brow-oblong-b",shape:.oblong,source:"B",style:.flatStraight,evidence:.visualInterpretation),
+        .init(id:"brow-oblong-c",shape:.oblong,source:"C",style:.flatStraight,evidence:.stated),
+        .init(id:"brow-heart-b",shape:.heart,source:"B",style:.slimStraight,evidence:.visualInterpretation),
+        .init(id:"brow-heart-c",shape:.heart,source:"C · inverted triangle",style:.slimArch,evidence:.stated),
+        .init(id:"brow-diamond-a",shape:.diamond,source:"A",style:.slimArch,evidence:.stated),
+        .init(id:"brow-diamond-b",shape:.diamond,source:"B",style:.slimArch,evidence:.visualInterpretation),
+        .init(id:"brow-diamond-c",shape:.diamond,source:"C",style:.slimArch,evidence:.stated)
     ]
     static let blush:[BlushPreference] = [
         .init(id:"blush-oval-a",shape:.oval,source:"A",style:.outerSweep,evidence:.visualInterpretation),

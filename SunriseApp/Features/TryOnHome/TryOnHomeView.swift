@@ -25,8 +25,18 @@ struct TryOnHomeView: View {
                     .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
             } else {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
+                    .overlay(alignment: .topLeading) {
+                        if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small) }
+                    }
             }
             toolStrip
+            if home.tool == .eyebrow && home.canTry(.eyebrow) && EyebrowConfiguration.showsBrowTracking {
+                browTrackingToggles
+            }
+            if home.tool == .eyebrow && home.canTry(.eyebrow) && !EyebrowConfiguration.showsBrowTracking {
+                BrowStylePicker(styles: home.brow.browStyleChoices, selected: home.brow.configuration.style,
+                                onSelect: home.brow.chooseBrowStyle)
+            }
             // -Nimah: Never silently show an empty tool.
             if !home.canTry(home.tool) {
                 Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
@@ -38,7 +48,7 @@ struct TryOnHomeView: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.wine.ignoresSafeArea())
+        .background(AppColors.screen.ignoresSafeArea())
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: home.tool)
@@ -108,6 +118,28 @@ struct TryOnHomeView: View {
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+    }
+
+    /// Test toggles under the eyebrow tool for the MediaPipe tracking view.
+    private var browTrackingToggles: some View {
+        HStack(spacing: AppSpacing.small) {
+            Spacer()
+            trackingToggle("Landmarks", symbol: "circle.grid.3x3", isOn: $home.browLandmarksVisible)
+            trackingToggle("Natural brow", symbol: "eyebrow", isOn: $home.naturalBrowVisible)
+        }
+    }
+
+    private func trackingToggle(_ title: LocalizedStringKey, symbol: String, isOn: Binding<Bool>) -> some View {
+        Button { isOn.wrappedValue.toggle() } label: {
+            Label(title, systemImage: symbol)
+                .font(AppTypography.caption.weight(.semibold))
+                .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
+                .background(AppColors.flamingo.opacity(isOn.wrappedValue ? 0.32 : 0.12), in: Capsule())
+                .overlay { Capsule().strokeBorder(AppColors.snow, lineWidth: isOn.wrappedValue ? 1.5 : 0) }
+                .foregroundStyle(AppColors.snow.opacity(isOn.wrappedValue ? 1 : 0.6))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
     }
 
     // MARK: Shades

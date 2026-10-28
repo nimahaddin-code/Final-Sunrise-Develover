@@ -56,7 +56,7 @@ import SwiftUI
     // -Nimah: Consume Holly/Khalish analysis; manual labels never create scan recommendations.
     func applyAssessment(_ value:FaceShapeAssessment) {
         assessment=value; configuration.usesLaunchFit=value.origin == .analysis; browPreferenceID=nil; blushPreferenceID=nil
-        if let first=browOptions.first { choose(first) } else { configuration.style = .natural }
+        if let first=browOptions.first { choose(first) } else { configuration.style = .softNatural }
         if let first=blushOptions.first { choose(first) } else { configuration.blushStyle = .apple }
         stepIndex=0
     }
@@ -69,6 +69,15 @@ import SwiftUI
     func choose(_ preference:BrowPreference) {
         guard browOptions.contains(where:{ $0.id==preference.id }) else { return }
         restorePreview(); browPreferenceID=preference.id; configuration.style=preference.style
+    }
+    /// Every style with a research preset in the bundled database, in database order.
+    var browStyleChoices:[EyebrowStyle] {
+        let ids=MakeupRuleDatabase.shared?.eyebrow_presets.map(\.id) ?? []
+        return ids.compactMap { id in EyebrowStyle.allCases.first { MakeupRuleDatabase.browID($0)==id } }
+    }
+    func chooseBrowStyle(_ style:EyebrowStyle) {
+        guard browStyleChoices.contains(style) else { return }
+        restorePreview(); configuration.style=style
     }
     func choose(_ preference:BlushPreference) {
         guard blushOptions.contains(where:{ $0.id==preference.id }) else { return }

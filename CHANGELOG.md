@@ -1,3 +1,90 @@
+## Natural brow: real edge detection, sharper fill — Khalish (2026-10-28)
+
+- Device feedback: brow not fully covered and the fill looked hazy. The eraser now detects the actual brow edge
+  (pixels clearly darker than a blurred skin estimate, past MediaPipe's rows) and hides it too; the fill excludes it.
+- Full-resolution forehead texture is always added (it was off when MI-GAN ran, whose 256-pixel crop looks soft).
+- New test: hair past the landmark rows is hidden; skin above a brow that ends at its landmarks is not.
+- Simulator tests pass (344); device check pending.
+
+## MI-GAN bundled — Khalish (2026-10-28)
+
+- Converted MI-GAN 256 FFHQ (Picsart AI Research, MIT code and weights) to Core ML with
+  `Tools/MIGAN/convert_migan_coreml.py`; matches PyTorch within 0.0072 (PSNR 68-73 dB in the filled area).
+- Bundled as `Resources/MIGANFace256.mlpackage` (12 MB) with its licence notice; "Natural brow" off now uses it on top
+  of the brow-space fill. New test runs the bundled model and checks it fills only the hole.
+- Simulator tests pass (343); device latency and quality still to check.
+
+## Natural-brow hiding: brow-space fill and MI-GAN runtime — Khalish (2026-10-28)
+
+- Replaced the sample-point skin fill with `BrowEraser`: each brow is unwrapped into brow space and filled by
+  push-pull from all the skin around the hidden area (no seams, no grey smudge), with forehead texture and
+  temporal smoothing; the result stays attached to the brow.
+- Added `BrowInpainter`: MI-GAN (MIT code and weights) via Core ML on an upright face crop, cached in brow space and
+  faded over the fill. Runs only once `MIGANFace256` is bundled, which needs the checkpoint converted (ADR 0014).
+- New tests: push-pull fills a hole smoothly from both sides, MI-GAN input/output layout, upright face crop.
+- Simulator tests pass; device check pending.
+
+## Natural-brow hiding without the patch — Khalish (2026-10-28)
+
+- Device feedback: the hidden area read as a lighter patch, with hard bright slabs at the brow heads and a white
+  streak at the temple. Skin colour is now read right next to the brow landmarks and only along the brow (not the
+  nose bridge or past the face edge), averaged around its dominant brightness (hair and shine rejected).
+- 20% of the original shading is kept so the brow ridge looks natural; detail is symmetric (±25%) so nothing brightens.
+- Long, soft fades at the brow head and tail; a slightly smaller area overall.
+- Simulator tests pass (339); device check pending.
+
+## Softer natural-brow edge — Khalish (2026-10-28)
+
+- Device feedback: the lower edge was still harsh. The fade near the eye was only ~25% of the hidden depth; it now
+  spans at least 55% (ending at most 70% of the way to the eyelid) with a smootherstep profile, and the upper fade is wider.
+- Skin fill is sampled at the hidden area's own top and bottom edges and blended between them, so there is no
+  brightness step where it meets the forehead or brow bone.
+- Hair detail is cut harder (dark detail to 20%), so the old brow shape no longer reads through.
+- Simulator tests pass (339); device check pending.
+
+## Smoother natural-brow hiding, black background — Khalish (2026-10-28)
+
+- "Natural brow" off now uses frequency separation: a forehead-weighted, temporally smoothed skin reference for the
+  low frequency, plus the original fine detail with hair contrast cut, so skin texture stays instead of a smudge.
+- The hidden area's lower edge stops at most 55% of the way to MediaPipe's upper-eyelid row (now tracked and drawn
+  in the tracking view), so it covers the lower brow without reaching the crease.
+- App screens use a black background (`AppColors.screen`).
+- Simulator tests pass (339); the look on a face needs a Face ID iPhone.
+
+## Eyebrow tracking view — Khalish (2026-10-27)
+
+- Eyebrow shapes and the shape picker are hidden for now (kept in code, `EyebrowConfiguration.showsBrowTracking`).
+- The eyebrow tool and tutorial Brows tab show MediaPipe tracking: every face landmark, raw vs smoothed brow points,
+  brow contours, fitted centerline and brow frame, labelled with MediaPipe indices, plus head pose and timing.
+- Test toggles under the eyebrow tool: "Landmarks" shows/hides the whole tracking overlay; "Natural brow" hides the
+  user's own eyebrow: a soft-edged, wider-than-contour brow area filled with a smooth, hair-rejecting skin blur
+  (the first version's darkness threshold left a grey outline and missed the brow head). Head pose readout is now in screen terms (roll no longer reads about -90° in portrait).
+- Simulator tests pass (338); the live overlay and brow hiding need a Face ID iPhone to see.
+
+## New eyebrow shape list — Khalish (2026-10-27)
+
+- Replaced all eight brow presets with nine new shapes following the supplied TikTok effect screenshot: Bold arch,
+  Slim arch, Soft natural, Flat straight, Curved arch, Peaked angle, Slim straight, Full arch, Bold straight.
+- New `brow.*` presets in the rule database (source `brow_D`), face-shape assignments remapped, default is Soft natural.
+- Picker thumbnails now draw each shape's real design curve and thickness; names added to the string catalog.
+- Simulator tests pass (336); not yet checked on a device.
+
+## Eyebrow tracking on MediaPipe — Khalish (2026-10-27)
+
+- Eyebrow detection moved from the ARKit mesh + Vision fit to MediaPipe Face Landmarker on the shared camera frames:
+  brow contours, eye/nose points and head pose per frame, smoothed, then a brow-local strip samples the style's baked
+  brow texture on the same frame the landmarks came from.
+- Shader segments the original brow pixels (new "Original brow mask" debug view); composite stays overlay only.
+- Tutorial brow guide and nose-eye mapping lines are drawn by the Metal engine; status pill reports when no face is seen.
+- Removed the ARKit brow atlas, `BeautyBrowStabilizer` and their tests; added `MediaPipeBrowTests`. Blush unchanged.
+- Simulator tests pass; not yet checked on a Face ID iPhone.
+
+## Eyebrow try-on switching and tutorial comparison — 2026-10-27
+
+- Keep the last committed brow atlas visible while a style change is baked, throttle repeated failed binds, and retry a newly selected style immediately so switching does not appear to drop the filter.
+- Hide the brow placement and mapping outlines during the tutorial's split comparison; the filtered half now shows pigment against the real eyebrow without the boxy guide.
+- Simulator build passes; physical-device AR quality and latency still need Face ID iPhone QA.
+
 ## Face/eye scan removed from the flow — Khalish (2026-10-27)
 
 The app opens straight on `TryOnHomeView`: no welcome, onboarding, face scan, eye scan, Profile, Retake or

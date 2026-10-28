@@ -2,8 +2,8 @@ import ARKit
 import SwiftUI
 import UIKit
 
-/// The rounded camera card on the Try On home screen. One ARKit face session fills it: blush and eyebrow are drawn on
-/// the face mesh, and the eyeliner overlay sits on top and is fed the same camera frames.
+/// The rounded camera card on the Try On home screen. One ARKit face session fills it: blush is drawn on the face mesh,
+/// the eyebrow follows MediaPipe landmarks on the same frames, and the eyeliner overlay sits on top.
 struct TryOnLiveCard: View {
     @ObservedObject var home: TryOnHomeModel
     @ObservedObject var camera: FaceCameraState
@@ -71,16 +71,22 @@ struct TryOnLiveCard: View {
                               relay.deliver(frame, face)
                           })
             LinerOverlayView(model: home.liner, isVisible: !home.isComparing)
+            if home.tool == .eyebrow && EyebrowConfiguration.showsBrowTracking && home.browLandmarksVisible
+                && !home.isOff && !home.isComparing {
+                BrowTrackingOverlayView(feed: camera.browTracking)
+            }
             if let status {
                 StatusPill(text: status)
             }
         }
     }
 
-    /// Brow/blush status for the selected tool only: a prompt until the live camera has placed the makeup, then the
-    /// renderer's status. Eyeliner follows the eyes on its own, so it never shows these messages.
+    /// Brow/blush status for the selected tool only. Blush shows a prompt until the live camera has fitted the cheeks,
+    /// then the renderer's status; the eyebrow follows MediaPipe landmarks, so the renderer reports when it has a face.
+    /// Eyeliner follows the eyes on its own, so it never shows these messages.
     private var status: String? {
         guard home.tool == .blush || home.tool == .eyebrow, home.canTry(home.tool), !home.isOff else { return nil }
+        if home.tool == .eyebrow { return camera.beautyStatus }
         return camera.eyebrowGuideReady ? camera.beautyStatus : String(localized: "Look straight at the camera to place your makeup")
     }
 

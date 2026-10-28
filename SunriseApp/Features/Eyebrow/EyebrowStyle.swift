@@ -1,25 +1,31 @@
 // -Nimah: Style mengubah geometry guide; bukan hanya judul pada UI.
 import Foundation
 
+/// The brow shapes offered in try-on, in picker order. Their geometry comes from the matching `brow.*` preset in
+/// makeup-reference.database.json (see `MakeupRuleDatabase.browID`).
 enum EyebrowStyle: String, CaseIterable, Identifiable, Sendable {
-    case straight, softArch, highArch, feathered, natural, lifted, angular, rounded, lowArch, thin
+    case boldArch, slimArch, softNatural, flatStraight, curvedArch, peakedAngle, slimStraight, fullArch, boldStraight
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .straight: return "Straight"
-        case .softArch: return "Soft Arch"
-        case .highArch: return "High Arch"
-        case .feathered: return "Feathered"
-        case .natural:return "Natural"
-        case .lifted:return "Upward brow"
-        case .angular:return "Defined angle"
-        case .rounded:return "Rounded curve"
-        case .lowArch:return "Low arch"
-        case .thin:return "Thin brow"
+        case .boldArch: return String(localized: "Bold arch")
+        case .slimArch: return String(localized: "Slim arch")
+        case .softNatural: return String(localized: "Soft natural")
+        case .flatStraight: return String(localized: "Flat straight")
+        case .curvedArch: return String(localized: "Curved arch")
+        case .peakedAngle: return String(localized: "Peaked angle")
+        case .slimStraight: return String(localized: "Slim straight")
+        case .fullArch: return String(localized: "Full arch")
+        case .boldStraight: return String(localized: "Bold straight")
         }
     }
+    /// Arch height of the mesh guide's generic target curve, as a fraction of brow width.
     var archRatio: Float {
-        switch self { case .straight: return 0.025; case .softArch: return 0.13; case .highArch: return 0.24; case .feathered: return 0.16; case .natural:return 0.10; case .lifted:return 0.04; case .angular:return 0.20; case .rounded:return 0.14; case .lowArch:return 0.06; case .thin:return 0.08 }
+        switch self {
+        case .boldArch: return 0.20; case .slimArch: return 0.14; case .softNatural: return 0.10
+        case .flatStraight: return 0.025; case .curvedArch: return 0.18; case .peakedAngle: return 0.20
+        case .slimStraight: return 0.05; case .fullArch: return 0.24; case .boldStraight: return 0.04
+        }
     }
 }
 enum EyebrowGuideMode: String, CaseIterable, Identifiable, Sendable {
@@ -44,7 +50,7 @@ struct EyebrowConfiguration: Equatable, Sendable {
     var showMappingFormula=false
     var showTrackingPoints=false
     var showAllRegions=false
-    var style: EyebrowStyle = .straight
+    var style: EyebrowStyle = .softNatural
     var mode: EyebrowGuideMode = .dashed
     var showGuide = true
     // -Nimah: Before hides every guide/effect; After is a live simulation.
@@ -62,4 +68,11 @@ struct EyebrowConfiguration: Equatable, Sendable {
     var needsBlush: Bool { layered ? blushLayer.on : region == .blush }
     var showMakeupPreview = false
     var debugMesh = false
+    /// While on, the eyebrow tool shows MediaPipe's tracking (every landmark, the brow points and contours, the fitted
+    /// centerline and brow frame) instead of a brow shape, and the shape picker is hidden. The shapes stay in the app.
+    static let showsBrowTracking = true
+    /// Tracking view: every landmark, contour, line and label MediaPipe tracking draws, plus its readout.
+    var browTrackingOverlay = EyebrowConfiguration.showsBrowTracking
+    /// Hides the user's own eyebrow: hair between the tracked upper and lower brow contours is replaced by skin.
+    var hideNaturalBrow = false
 }

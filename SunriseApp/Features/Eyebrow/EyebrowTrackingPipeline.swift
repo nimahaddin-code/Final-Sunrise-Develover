@@ -239,7 +239,7 @@ final class LaunchMakeupFit: @unchecked Sendable {
                 EyebrowRegionMapper.map(detection,projection:sample.projection,vertices:sample.vertices,triangles:sample.triangles,
                     leftEye:sample.leftEye,rightEye:sample.rightEye,timestamp:sample.timestamp,anchorID:sample.anchorID,requireFormula:false,diagnostic:{ stage=$0 })
             }.filter {
-                let valid=EyebrowGuideGenerator.make(region:$0,style:.natural) != nil
+                let valid=EyebrowGuideGenerator.make(region:$0,style:.softNatural) != nil
                 if !valid { stage="guide_generation" };return valid
             }
                 .max { $0.faceObservationConfidence < $1.faceObservationConfidence }

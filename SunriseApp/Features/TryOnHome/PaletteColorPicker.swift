@@ -94,7 +94,7 @@ struct PaletteColorPicker: View {
         .padding(.horizontal, AppSpacing.medium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .foregroundStyle(AppColors.snow)
-        .presentationBackground(AppColors.wine)
+        .presentationBackground(AppColors.screen)
         .presentationDetents([.height(600), .large])
         .presentationCornerRadius(32)
         .presentationDragIndicator(.visible)

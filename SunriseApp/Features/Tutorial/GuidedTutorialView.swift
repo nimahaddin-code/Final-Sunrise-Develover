@@ -88,6 +88,14 @@ enum TutorialTab: CaseIterable, Identifiable {
     var liveConfiguration: EyebrowConfiguration {
         var value = brow.liveConfiguration
         value.showMappingFormula = tab == .brows
+        // The split comparison is intended to show the applied pigment against the
+        // unfiltered camera. Keep the pigment on the filtered half, but suppress
+        // the placement outline (which reads as a box around the brow at this
+        // scale). The guide remains available in the full-filter tutorial mode.
+        if tab == .brows && compare == .split {
+            value.showGuide = false
+            value.showMappingFormula = false
+        }
         if tab == .eyeliner || !hasGuide || compare == .off { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
         return value
     }
@@ -210,7 +218,7 @@ private struct TutorialScreen: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.wine.ignoresSafeArea())
+        .background(AppColors.screen.ignoresSafeArea())
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden()
@@ -273,6 +281,9 @@ private struct TutorialScreen: View {
                                   eyebrowConfiguration: model.liveConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   })
+                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .off {
+                        BrowTrackingOverlayView(feed: camera.browTracking)
+                    }
                     if model.tab == .eyeliner && model.compare != .off {
                         ZStack {
                             LinerOverlayView(model: model.liner, isVisible: true)

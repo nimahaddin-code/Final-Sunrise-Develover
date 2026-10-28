@@ -5,7 +5,7 @@ struct BlankPageView: View {
     let title: LocalizedStringKey
 
     var body: some View {
-        AppColors.wine
+        AppColors.screen
             .ignoresSafeArea()
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)

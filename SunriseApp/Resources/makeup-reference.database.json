@@ -124,6 +124,26 @@
       ]
     },
     {
+      "id": "brow_D",
+      "name": "Daftar bentuk alis dari efek TikTok (tangkapan layar pengguna)",
+      "category": "eyebrow",
+      "asset": {
+        "file": null,
+        "sha256": null,
+        "kind": "user_supplied_screenshot_shape_categories",
+        "not_original_publication": true
+      },
+      "location": "Sembilan thumbnail bentuk alis pada tangkapan layar efek TikTok yang diberikan pengguna (2026-10-27)",
+      "publication_url": null,
+      "original_author_verified": false,
+      "evidence_strength": "qualitative_shape_categories_only",
+      "independence_group": "brow_D",
+      "notes": [
+        "Hanya kategori bentuk (tebal/tipis, lengkung/lurus, posisi puncak) yang diikuti; tidak ada aset, koordinat atau gambar yang disalin.",
+        "Parameter adalah usulan engineering yang perlu kalibrasi perangkat."
+      ]
+    },
+    {
       "id": "blush_A",
       "name": "Pink",
       "category": "blush",
@@ -1579,7 +1599,7 @@
     {
       "id": "assignment.oval",
       "face_shape": "oval",
-      "eyebrow_preset_id": "brow.natural",
+      "eyebrow_preset_id": "brow.soft_natural",
       "blush_preset_id": "blush.cheekbone",
       "selected_reference_ids": [
         "brow_C",
@@ -1593,8 +1613,8 @@
       "selection_policy": "policy.reference_bound.v1",
       "alternatives": {
         "eyebrow": [
-          "brow.lifted",
-          "brow.soft_arch"
+          "brow.full_arch",
+          "brow.slim_arch"
         ],
         "blush": [
           "blush.apple",
@@ -1609,7 +1629,7 @@
     {
       "id": "assignment.round",
       "face_shape": "round",
-      "eyebrow_preset_id": "brow.high_arch",
+      "eyebrow_preset_id": "brow.bold_arch",
       "blush_preset_id": "blush.high_cheekbone",
       "selected_reference_ids": [
         "brow_C",
@@ -1623,7 +1643,7 @@
       "selection_policy": "policy.reference_bound.v1",
       "alternatives": {
         "eyebrow": [
-          "brow.angular"
+          "brow.peaked_angle"
         ],
         "blush": [
           "blush.apple",
@@ -1638,7 +1658,7 @@
     {
       "id": "assignment.square",
       "face_shape": "square",
-      "eyebrow_preset_id": "brow.rounded",
+      "eyebrow_preset_id": "brow.curved_arch",
       "blush_preset_id": "blush.apple",
       "selected_reference_ids": [
         "brow_C",
@@ -1652,7 +1672,7 @@
       "selection_policy": "policy.reference_bound.v1",
       "alternatives": {
         "eyebrow": [
-          "brow.angular"
+          "brow.peaked_angle"
         ],
         "blush": [
           "blush.center_cheek",
@@ -1668,7 +1688,7 @@
     {
       "id": "assignment.oblong",
       "face_shape": "oblong",
-      "eyebrow_preset_id": "brow.straight",
+      "eyebrow_preset_id": "brow.flat_straight",
       "blush_preset_id": "blush.horizontal",
       "selected_reference_ids": [
         "brow_C",
@@ -1681,7 +1701,9 @@
       "selection_rationale": "Straight dan horizontal blend tertulis jelas; tidak digeneralisasi ke rectangle.",
       "selection_policy": "policy.reference_bound.v1",
       "alternatives": {
-        "eyebrow": [],
+        "eyebrow": [
+          "brow.bold_straight"
+        ],
         "blush": []
       },
       "supported": true,
@@ -1710,7 +1732,7 @@
     {
       "id": "assignment.heart",
       "face_shape": "heart",
-      "eyebrow_preset_id": "brow.low_arch",
+      "eyebrow_preset_id": "brow.slim_straight",
       "blush_preset_id": "blush.center_cheek",
       "selected_reference_ids": [
         "brow_B",
@@ -1738,7 +1760,7 @@
     {
       "id": "assignment.diamond",
       "face_shape": "diamond",
-      "eyebrow_preset_id": "brow.soft_arch",
+      "eyebrow_preset_id": "brow.slim_arch",
       "blush_preset_id": "blush.temple_sweep",
       "selected_reference_ids": [
         "brow_C",
@@ -1780,1355 +1802,14 @@
   ],
   "eyebrow_presets": [
     {
-      "id": "brow.natural",
-      "style_id": "natural",
-      "name": "Natural",
+      "id": "brow.bold_arch",
+      "style_id": "boldArch",
+      "name": "Bold arch",
       "category": "eyebrow",
       "source_reference_ids": [
-        "brow_C"
+        "brow_D"
       ],
-      "source_observation_ids": [
-        "obs.brow.oval.C"
-      ],
-      "source_geometry_status": "qualitative_shape_only",
-      "baseline": {
-        "source": "observed_brow_contour",
-        "fit": "robust_centerline_in_brow_local_frame",
-        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
-        "preserve_observed_head_and_tail": true
-      },
-      "anchors": {
-        "head": "observed_brow_head",
-        "arch": "observed_brow_arch",
-        "tail": "observed_brow_tail",
-        "formula_rays_optional": true,
-        "formula_failure_hides_valid_brow": false
-      },
-      "parameters": {
-        "arch_t": {
-          "value": 0.64,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_delta": {
-          "value": 0,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
-          "minimum": -0.04,
-          "maximum": 0.04
-        },
-        "tail_delta": {
-          "value": 0.0,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
-          "minimum": -0.03,
-          "maximum": 0.03
-        },
-        "length_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Pertahankan panjang yang diamati.",
-          "minimum": 0.9,
-          "maximum": 1.1
-        },
-        "max_displacement": {
-          "value": 0.0015,
-          "unit": "meter",
-          "basis": "face_local_metric",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
-          "minimum": 0,
-          "maximum": 0.003
-        },
-        "half_thickness_design": {
-          "value": 0.065,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
-          "minimum": 0.01,
-          "maximum": 0.08
-        },
-        "thickness_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "measured_or_explicit_design_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0.3,
-          "maximum": 1.5
-        },
-        "head_taper": {
-          "value": 0.65,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_taper": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "tail_taper": {
-          "value": 0.08,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "head_fade_extent": {
-          "value": 0.18,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "edge_feather": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "local_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "max_alpha": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "pigment_alpha",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        }
-      },
-      "centerline": {
-        "representation": "two_cubic_bezier_segments",
-        "control_point_rule_id": "formula.brow_bezier",
-        "displacement_rule_id": "formula.brow_adjustment",
-        "global_y_offset": "forbidden",
-        "width_and_thickness_are_independent": true,
-        "angular_style": "Smooth tangent at arch."
-      },
-      "asymmetry": {
-        "mode": "fit_each_observed_brow_in_one_face_frame",
-        "force_identical_height": false,
-        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
-      },
-      "surface_attachment_rule_id": "surface.barycentric",
-      "render_profile_id": "render.brow",
-      "required_landmarks": [
-        "observed_brow_contour",
-        "observed_brow_head",
-        "observed_brow_tail",
-        "brow_surface"
-      ],
-      "optional_landmarks": [
-        "observed_brow_arch",
-        "nose_boundary",
-        "pupil",
-        "inner_eye_corner",
-        "outer_eye_corner"
-      ],
-      "do_not_render_when": [
-        "missing_observed_brow_contour",
-        "surface_binding_failed",
-        "incompatible_saved_fit",
-        "occluded_region",
-        "stale_tracking"
-      ],
-      "validation_status": "proposed_initial",
-      "device_validated": false
-    },
-    {
-      "id": "brow.soft_arch",
-      "style_id": "soft_arch",
-      "name": "Soft arch",
-      "category": "eyebrow",
-      "source_reference_ids": [
-        "brow_A",
-        "brow_B",
-        "brow_C"
-      ],
-      "source_observation_ids": [
-        "obs.brow.oval.B",
-        "obs.brow.diamond.A",
-        "obs.brow.diamond.B",
-        "obs.brow.diamond.C"
-      ],
-      "source_geometry_status": "qualitative_shape_only",
-      "baseline": {
-        "source": "observed_brow_contour",
-        "fit": "robust_centerline_in_brow_local_frame",
-        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
-        "preserve_observed_head_and_tail": true
-      },
-      "anchors": {
-        "head": "observed_brow_head",
-        "arch": "observed_brow_arch",
-        "tail": "observed_brow_tail",
-        "formula_rays_optional": true,
-        "formula_failure_hides_valid_brow": false
-      },
-      "parameters": {
-        "arch_t": {
-          "value": 0.64,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_delta": {
-          "value": 0.008,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
-          "minimum": -0.04,
-          "maximum": 0.04
-        },
-        "tail_delta": {
-          "value": 0,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
-          "minimum": -0.03,
-          "maximum": 0.03
-        },
-        "length_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Pertahankan panjang yang diamati.",
-          "minimum": 0.9,
-          "maximum": 1.1
-        },
-        "max_displacement": {
-          "value": 0.0015,
-          "unit": "meter",
-          "basis": "face_local_metric",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
-          "minimum": 0,
-          "maximum": 0.003
-        },
-        "half_thickness_design": {
-          "value": 0.065,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
-          "minimum": 0.01,
-          "maximum": 0.08
-        },
-        "thickness_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "measured_or_explicit_design_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0.3,
-          "maximum": 1.5
-        },
-        "head_taper": {
-          "value": 0.65,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_taper": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "tail_taper": {
-          "value": 0.08,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "head_fade_extent": {
-          "value": 0.18,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "edge_feather": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "local_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "max_alpha": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "pigment_alpha",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        }
-      },
-      "centerline": {
-        "representation": "two_cubic_bezier_segments",
-        "control_point_rule_id": "formula.brow_bezier",
-        "displacement_rule_id": "formula.brow_adjustment",
-        "global_y_offset": "forbidden",
-        "width_and_thickness_are_independent": true,
-        "angular_style": "Smooth tangent at arch."
-      },
-      "asymmetry": {
-        "mode": "fit_each_observed_brow_in_one_face_frame",
-        "force_identical_height": false,
-        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
-      },
-      "surface_attachment_rule_id": "surface.barycentric",
-      "render_profile_id": "render.brow",
-      "required_landmarks": [
-        "observed_brow_contour",
-        "observed_brow_head",
-        "observed_brow_tail",
-        "brow_surface"
-      ],
-      "optional_landmarks": [
-        "observed_brow_arch",
-        "nose_boundary",
-        "pupil",
-        "inner_eye_corner",
-        "outer_eye_corner"
-      ],
-      "do_not_render_when": [
-        "missing_observed_brow_contour",
-        "surface_binding_failed",
-        "incompatible_saved_fit",
-        "occluded_region",
-        "stale_tracking"
-      ],
-      "validation_status": "proposed_initial",
-      "device_validated": false
-    },
-    {
-      "id": "brow.high_arch",
-      "style_id": "high_arch",
-      "name": "High arch",
-      "category": "eyebrow",
-      "source_reference_ids": [
-        "brow_B",
-        "brow_C"
-      ],
-      "source_observation_ids": [
-        "obs.brow.round.B",
-        "obs.brow.round.C"
-      ],
-      "source_geometry_status": "qualitative_shape_only",
-      "baseline": {
-        "source": "observed_brow_contour",
-        "fit": "robust_centerline_in_brow_local_frame",
-        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
-        "preserve_observed_head_and_tail": true
-      },
-      "anchors": {
-        "head": "observed_brow_head",
-        "arch": "observed_brow_arch",
-        "tail": "observed_brow_tail",
-        "formula_rays_optional": true,
-        "formula_failure_hides_valid_brow": false
-      },
-      "parameters": {
-        "arch_t": {
-          "value": 0.65,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_delta": {
-          "value": 0.025,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
-          "minimum": -0.04,
-          "maximum": 0.04
-        },
-        "tail_delta": {
-          "value": 0,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
-          "minimum": -0.03,
-          "maximum": 0.03
-        },
-        "length_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Pertahankan panjang yang diamati.",
-          "minimum": 0.9,
-          "maximum": 1.1
-        },
-        "max_displacement": {
-          "value": 0.0015,
-          "unit": "meter",
-          "basis": "face_local_metric",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
-          "minimum": 0,
-          "maximum": 0.003
-        },
-        "half_thickness_design": {
-          "value": 0.065,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
-          "minimum": 0.01,
-          "maximum": 0.08
-        },
-        "thickness_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "measured_or_explicit_design_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0.3,
-          "maximum": 1.5
-        },
-        "head_taper": {
-          "value": 0.65,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_taper": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "tail_taper": {
-          "value": 0.08,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "head_fade_extent": {
-          "value": 0.18,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "edge_feather": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "local_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "max_alpha": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "pigment_alpha",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        }
-      },
-      "centerline": {
-        "representation": "two_cubic_bezier_segments",
-        "control_point_rule_id": "formula.brow_bezier",
-        "displacement_rule_id": "formula.brow_adjustment",
-        "global_y_offset": "forbidden",
-        "width_and_thickness_are_independent": true,
-        "angular_style": "Smooth tangent at arch."
-      },
-      "asymmetry": {
-        "mode": "fit_each_observed_brow_in_one_face_frame",
-        "force_identical_height": false,
-        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
-      },
-      "surface_attachment_rule_id": "surface.barycentric",
-      "render_profile_id": "render.brow",
-      "required_landmarks": [
-        "observed_brow_contour",
-        "observed_brow_head",
-        "observed_brow_tail",
-        "brow_surface"
-      ],
-      "optional_landmarks": [
-        "observed_brow_arch",
-        "nose_boundary",
-        "pupil",
-        "inner_eye_corner",
-        "outer_eye_corner"
-      ],
-      "do_not_render_when": [
-        "missing_observed_brow_contour",
-        "surface_binding_failed",
-        "incompatible_saved_fit",
-        "occluded_region",
-        "stale_tracking"
-      ],
-      "validation_status": "proposed_initial",
-      "device_validated": false
-    },
-    {
-      "id": "brow.angular",
-      "style_id": "angular",
-      "name": "Angular",
-      "category": "eyebrow",
-      "source_reference_ids": [
-        "brow_A",
-        "brow_B"
-      ],
-      "source_observation_ids": [
-        "obs.brow.round.A",
-        "obs.brow.square.B"
-      ],
-      "source_geometry_status": "qualitative_shape_only",
-      "baseline": {
-        "source": "observed_brow_contour",
-        "fit": "robust_centerline_in_brow_local_frame",
-        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
-        "preserve_observed_head_and_tail": true
-      },
-      "anchors": {
-        "head": "observed_brow_head",
-        "arch": "observed_brow_arch",
-        "tail": "observed_brow_tail",
-        "formula_rays_optional": true,
-        "formula_failure_hides_valid_brow": false
-      },
-      "parameters": {
-        "arch_t": {
-          "value": 0.64,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_delta": {
-          "value": 0.02,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
-          "minimum": -0.04,
-          "maximum": 0.04
-        },
-        "tail_delta": {
-          "value": 0,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
-          "minimum": -0.03,
-          "maximum": 0.03
-        },
-        "length_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Pertahankan panjang yang diamati.",
-          "minimum": 0.9,
-          "maximum": 1.1
-        },
-        "max_displacement": {
-          "value": 0.0015,
-          "unit": "meter",
-          "basis": "face_local_metric",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
-          "minimum": 0,
-          "maximum": 0.003
-        },
-        "half_thickness_design": {
-          "value": 0.065,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
-          "minimum": 0.01,
-          "maximum": 0.08
-        },
-        "thickness_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "measured_or_explicit_design_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0.3,
-          "maximum": 1.5
-        },
-        "head_taper": {
-          "value": 0.65,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_taper": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "tail_taper": {
-          "value": 0.08,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "head_fade_extent": {
-          "value": 0.18,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "edge_feather": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "local_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "max_alpha": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "pigment_alpha",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        }
-      },
-      "centerline": {
-        "representation": "two_cubic_bezier_segments",
-        "control_point_rule_id": "formula.brow_bezier",
-        "displacement_rule_id": "formula.brow_adjustment",
-        "global_y_offset": "forbidden",
-        "width_and_thickness_are_independent": true,
-        "angular_style": "Use short continuous handles around arch; no discontinuous vertex jump."
-      },
-      "asymmetry": {
-        "mode": "fit_each_observed_brow_in_one_face_frame",
-        "force_identical_height": false,
-        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
-      },
-      "surface_attachment_rule_id": "surface.barycentric",
-      "render_profile_id": "render.brow",
-      "required_landmarks": [
-        "observed_brow_contour",
-        "observed_brow_head",
-        "observed_brow_tail",
-        "brow_surface"
-      ],
-      "optional_landmarks": [
-        "observed_brow_arch",
-        "nose_boundary",
-        "pupil",
-        "inner_eye_corner",
-        "outer_eye_corner"
-      ],
-      "do_not_render_when": [
-        "missing_observed_brow_contour",
-        "surface_binding_failed",
-        "incompatible_saved_fit",
-        "occluded_region",
-        "stale_tracking"
-      ],
-      "validation_status": "proposed_initial",
-      "device_validated": false
-    },
-    {
-      "id": "brow.rounded",
-      "style_id": "rounded",
-      "name": "Curved / rounded",
-      "category": "eyebrow",
-      "source_reference_ids": [
-        "brow_A",
-        "brow_C"
-      ],
-      "source_observation_ids": [
-        "obs.brow.square.A",
-        "obs.brow.square.C"
-      ],
-      "source_geometry_status": "qualitative_shape_only",
-      "baseline": {
-        "source": "observed_brow_contour",
-        "fit": "robust_centerline_in_brow_local_frame",
-        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
-        "preserve_observed_head_and_tail": true
-      },
-      "anchors": {
-        "head": "observed_brow_head",
-        "arch": "observed_brow_arch",
-        "tail": "observed_brow_tail",
-        "formula_rays_optional": true,
-        "formula_failure_hides_valid_brow": false
-      },
-      "parameters": {
-        "arch_t": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_delta": {
-          "value": 0.012,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
-          "minimum": -0.04,
-          "maximum": 0.04
-        },
-        "tail_delta": {
-          "value": 0,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
-          "minimum": -0.03,
-          "maximum": 0.03
-        },
-        "length_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Pertahankan panjang yang diamati.",
-          "minimum": 0.9,
-          "maximum": 1.1
-        },
-        "max_displacement": {
-          "value": 0.0015,
-          "unit": "meter",
-          "basis": "face_local_metric",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
-          "minimum": 0,
-          "maximum": 0.003
-        },
-        "half_thickness_design": {
-          "value": 0.065,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
-          "minimum": 0.01,
-          "maximum": 0.08
-        },
-        "thickness_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "measured_or_explicit_design_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0.3,
-          "maximum": 1.5
-        },
-        "head_taper": {
-          "value": 0.65,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_taper": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "tail_taper": {
-          "value": 0.08,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "head_fade_extent": {
-          "value": 0.18,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "edge_feather": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "local_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "max_alpha": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "pigment_alpha",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        }
-      },
-      "centerline": {
-        "representation": "two_cubic_bezier_segments",
-        "control_point_rule_id": "formula.brow_bezier",
-        "displacement_rule_id": "formula.brow_adjustment",
-        "global_y_offset": "forbidden",
-        "width_and_thickness_are_independent": true,
-        "angular_style": "Smooth tangent at arch."
-      },
-      "asymmetry": {
-        "mode": "fit_each_observed_brow_in_one_face_frame",
-        "force_identical_height": false,
-        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
-      },
-      "surface_attachment_rule_id": "surface.barycentric",
-      "render_profile_id": "render.brow",
-      "required_landmarks": [
-        "observed_brow_contour",
-        "observed_brow_head",
-        "observed_brow_tail",
-        "brow_surface"
-      ],
-      "optional_landmarks": [
-        "observed_brow_arch",
-        "nose_boundary",
-        "pupil",
-        "inner_eye_corner",
-        "outer_eye_corner"
-      ],
-      "do_not_render_when": [
-        "missing_observed_brow_contour",
-        "surface_binding_failed",
-        "incompatible_saved_fit",
-        "occluded_region",
-        "stale_tracking"
-      ],
-      "validation_status": "proposed_initial",
-      "device_validated": false
-    },
-    {
-      "id": "brow.straight",
-      "style_id": "straight",
-      "name": "Straight",
-      "category": "eyebrow",
-      "source_reference_ids": [
-        "brow_B",
-        "brow_C"
-      ],
-      "source_observation_ids": [
-        "obs.brow.oblong.B",
-        "obs.brow.oblong.C"
-      ],
-      "source_geometry_status": "qualitative_shape_only",
-      "baseline": {
-        "source": "observed_brow_contour",
-        "fit": "robust_centerline_in_brow_local_frame",
-        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
-        "preserve_observed_head_and_tail": true
-      },
-      "anchors": {
-        "head": "observed_brow_head",
-        "arch": "observed_brow_arch",
-        "tail": "observed_brow_tail",
-        "formula_rays_optional": true,
-        "formula_failure_hides_valid_brow": false
-      },
-      "parameters": {
-        "arch_t": {
-          "value": 0.6,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_delta": {
-          "value": -0.02,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
-          "minimum": -0.04,
-          "maximum": 0.04
-        },
-        "tail_delta": {
-          "value": 0,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
-          "minimum": -0.03,
-          "maximum": 0.03
-        },
-        "length_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Pertahankan panjang yang diamati.",
-          "minimum": 0.9,
-          "maximum": 1.1
-        },
-        "max_displacement": {
-          "value": 0.0015,
-          "unit": "meter",
-          "basis": "face_local_metric",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
-          "minimum": 0,
-          "maximum": 0.003
-        },
-        "half_thickness_design": {
-          "value": 0.065,
-          "unit": "ratio",
-          "basis": "observed_brow_width",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
-          "minimum": 0.01,
-          "maximum": 0.08
-        },
-        "thickness_scale": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "measured_or_explicit_design_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0.3,
-          "maximum": 1.5
-        },
-        "head_taper": {
-          "value": 0.65,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "arch_taper": {
-          "value": 1,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "tail_taper": {
-          "value": 0.08,
-          "unit": "ratio",
-          "basis": "centerline_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "head_fade_extent": {
-          "value": 0.18,
-          "unit": "ratio",
-          "basis": "observed_brow_arc_length",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "edge_feather": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "local_half_thickness",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        },
-        "max_alpha": {
-          "value": 0.55,
-          "unit": "ratio",
-          "basis": "pigment_alpha",
-          "provenance": [
-            "engineering_proposal"
-          ],
-          "validation_status": "proposed_initial",
-          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
-          "minimum": 0,
-          "maximum": 1
-        }
-      },
-      "centerline": {
-        "representation": "two_cubic_bezier_segments",
-        "control_point_rule_id": "formula.brow_bezier",
-        "displacement_rule_id": "formula.brow_adjustment",
-        "global_y_offset": "forbidden",
-        "width_and_thickness_are_independent": true,
-        "angular_style": "Smooth tangent at arch."
-      },
-      "asymmetry": {
-        "mode": "fit_each_observed_brow_in_one_face_frame",
-        "force_identical_height": false,
-        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
-      },
-      "surface_attachment_rule_id": "surface.barycentric",
-      "render_profile_id": "render.brow",
-      "required_landmarks": [
-        "observed_brow_contour",
-        "observed_brow_head",
-        "observed_brow_tail",
-        "brow_surface"
-      ],
-      "optional_landmarks": [
-        "observed_brow_arch",
-        "nose_boundary",
-        "pupil",
-        "inner_eye_corner",
-        "outer_eye_corner"
-      ],
-      "do_not_render_when": [
-        "missing_observed_brow_contour",
-        "surface_binding_failed",
-        "incompatible_saved_fit",
-        "occluded_region",
-        "stale_tracking"
-      ],
-      "validation_status": "proposed_initial",
-      "device_validated": false
-    },
-    {
-      "id": "brow.low_arch",
-      "style_id": "low_arch",
-      "name": "Low arch",
-      "category": "eyebrow",
-      "source_reference_ids": [
-        "brow_B"
-      ],
-      "source_observation_ids": [
-        "obs.brow.heart.B"
-      ],
+      "source_observation_ids": [],
       "source_geometry_status": "qualitative_shape_only",
       "baseline": {
         "source": "observed_brow_contour",
@@ -3149,18 +1830,20 @@
           "unit": "ratio",
           "basis": "observed_brow_arc_length",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
+          "rationale": "Tebal, puncak tinggi sekitar 60%, ekor panjang turun.",
           "minimum": 0,
           "maximum": 1
         },
         "arch_delta": {
-          "value": -0.012,
+          "value": 0.03,
           "unit": "ratio",
           "basis": "observed_brow_width",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3169,10 +1852,11 @@
           "maximum": 0.04
         },
         "tail_delta": {
-          "value": 0,
+          "value": -0.01,
           "unit": "ratio",
           "basis": "observed_brow_width",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3193,10 +1877,11 @@
           "maximum": 1.1
         },
         "max_displacement": {
-          "value": 0.0015,
+          "value": 0.002,
           "unit": "meter",
           "basis": "face_local_metric",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3205,16 +1890,17 @@
           "maximum": 0.003
         },
         "half_thickness_design": {
-          "value": 0.065,
+          "value": 0.085,
           "unit": "ratio",
           "basis": "observed_brow_width",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
           "minimum": 0.01,
-          "maximum": 0.08
+          "maximum": 0.12
         },
         "thickness_scale": {
           "value": 1,
@@ -3229,10 +1915,11 @@
           "maximum": 1.5
         },
         "head_taper": {
-          "value": 0.65,
+          "value": 0.7,
           "unit": "ratio",
           "basis": "centerline_half_thickness",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3253,10 +1940,11 @@
           "maximum": 1
         },
         "tail_taper": {
-          "value": 0.08,
+          "value": 0.1,
           "unit": "ratio",
           "basis": "centerline_half_thickness",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3265,10 +1953,11 @@
           "maximum": 1
         },
         "head_fade_extent": {
-          "value": 0.18,
+          "value": 0.16,
           "unit": "ratio",
           "basis": "observed_brow_arc_length",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3277,10 +1966,11 @@
           "maximum": 1
         },
         "edge_feather": {
-          "value": 0.55,
+          "value": 0.5,
           "unit": "ratio",
           "basis": "local_half_thickness",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3289,10 +1979,11 @@
           "maximum": 1
         },
         "max_alpha": {
-          "value": 0.55,
+          "value": 0.6,
           "unit": "ratio",
           "basis": "pigment_alpha",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3340,16 +2031,14 @@
       "device_validated": false
     },
     {
-      "id": "brow.lifted",
-      "style_id": "lifted",
-      "name": "Lifted",
+      "id": "brow.slim_arch",
+      "style_id": "slimArch",
+      "name": "Slim arch",
       "category": "eyebrow",
       "source_reference_ids": [
-        "brow_A"
+        "brow_D"
       ],
-      "source_observation_ids": [
-        "obs.brow.oval.A"
-      ],
+      "source_observation_ids": [],
       "source_geometry_status": "qualitative_shape_only",
       "baseline": {
         "source": "observed_brow_contour",
@@ -3366,22 +2055,24 @@
       },
       "parameters": {
         "arch_t": {
-          "value": 0.64,
+          "value": 0.62,
           "unit": "ratio",
           "basis": "observed_brow_arc_length",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
-          "rationale": "Posisi puncak desain awal; bukan koordinat posterior terukur.",
+          "rationale": "Lebih tipis, lengkung lembut, panjang.",
           "minimum": 0,
           "maximum": 1
         },
         "arch_delta": {
-          "value": 0.005,
+          "value": 0.02,
           "unit": "ratio",
           "basis": "observed_brow_width",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3390,10 +2081,11 @@
           "maximum": 0.04
         },
         "tail_delta": {
-          "value": 0.015,
+          "value": -0.005,
           "unit": "ratio",
           "basis": "observed_brow_width",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3418,6 +2110,7 @@
           "unit": "meter",
           "basis": "face_local_metric",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3426,16 +2119,17 @@
           "maximum": 0.003
         },
         "half_thickness_design": {
-          "value": 0.065,
+          "value": 0.05,
           "unit": "ratio",
           "basis": "observed_brow_width",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
-          "rationale": "Revisi kalibrasi integration dari feedback pengguna: body lebih penuh, tetap mengikuti panjang kontur teramati; bukan ukuran ketebalan hasil deteksi.",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
           "minimum": 0.01,
-          "maximum": 0.08
+          "maximum": 0.12
         },
         "thickness_scale": {
           "value": 1,
@@ -3450,10 +2144,11 @@
           "maximum": 1.5
         },
         "head_taper": {
-          "value": 0.65,
+          "value": 0.6,
           "unit": "ratio",
           "basis": "centerline_half_thickness",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3478,6 +2173,7 @@
           "unit": "ratio",
           "basis": "centerline_half_thickness",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3490,6 +2186,7 @@
           "unit": "ratio",
           "basis": "observed_brow_arc_length",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3502,6 +2199,7 @@
           "unit": "ratio",
           "basis": "local_half_thickness",
           "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
@@ -3510,10 +2208,1614 @@
           "maximum": 1
         },
         "max_alpha": {
-          "value": 0.55,
+          "value": 0.52,
           "unit": "ratio",
           "basis": "pigment_alpha",
           "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "centerline": {
+        "representation": "two_cubic_bezier_segments",
+        "control_point_rule_id": "formula.brow_bezier",
+        "displacement_rule_id": "formula.brow_adjustment",
+        "global_y_offset": "forbidden",
+        "width_and_thickness_are_independent": true,
+        "angular_style": "Smooth tangent at arch."
+      },
+      "asymmetry": {
+        "mode": "fit_each_observed_brow_in_one_face_frame",
+        "force_identical_height": false,
+        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.brow",
+      "required_landmarks": [
+        "observed_brow_contour",
+        "observed_brow_head",
+        "observed_brow_tail",
+        "brow_surface"
+      ],
+      "optional_landmarks": [
+        "observed_brow_arch",
+        "nose_boundary",
+        "pupil",
+        "inner_eye_corner",
+        "outer_eye_corner"
+      ],
+      "do_not_render_when": [
+        "missing_observed_brow_contour",
+        "surface_binding_failed",
+        "incompatible_saved_fit",
+        "occluded_region",
+        "stale_tracking"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false
+    },
+    {
+      "id": "brow.soft_natural",
+      "style_id": "softNatural",
+      "name": "Soft natural",
+      "category": "eyebrow",
+      "source_reference_ids": [
+        "brow_D"
+      ],
+      "source_observation_ids": [],
+      "source_geometry_status": "qualitative_shape_only",
+      "baseline": {
+        "source": "observed_brow_contour",
+        "fit": "robust_centerline_in_brow_local_frame",
+        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
+        "preserve_observed_head_and_tail": true
+      },
+      "anchors": {
+        "head": "observed_brow_head",
+        "arch": "observed_brow_arch",
+        "tail": "observed_brow_tail",
+        "formula_rays_optional": true,
+        "formula_failure_hides_valid_brow": false
+      },
+      "parameters": {
+        "arch_t": {
+          "value": 0.58,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Kepala lembut berbulu, ketebalan sedang, lengkung landai.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_delta": {
+          "value": 0.008,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
+          "minimum": -0.04,
+          "maximum": 0.04
+        },
+        "tail_delta": {
+          "value": 0.0,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
+          "minimum": -0.03,
+          "maximum": 0.03
+        },
+        "length_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pertahankan panjang yang diamati.",
+          "minimum": 0.9,
+          "maximum": 1.1
+        },
+        "max_displacement": {
+          "value": 0.0015,
+          "unit": "meter",
+          "basis": "face_local_metric",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
+          "minimum": 0,
+          "maximum": 0.003
+        },
+        "half_thickness_design": {
+          "value": 0.07,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
+          "minimum": 0.01,
+          "maximum": 0.12
+        },
+        "thickness_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "measured_or_explicit_design_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.3,
+          "maximum": 1.5
+        },
+        "head_taper": {
+          "value": 0.75,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_taper": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tail_taper": {
+          "value": 0.12,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_fade_extent": {
+          "value": 0.28,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_feather": {
+          "value": 0.65,
+          "unit": "ratio",
+          "basis": "local_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_alpha": {
+          "value": 0.48,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "centerline": {
+        "representation": "two_cubic_bezier_segments",
+        "control_point_rule_id": "formula.brow_bezier",
+        "displacement_rule_id": "formula.brow_adjustment",
+        "global_y_offset": "forbidden",
+        "width_and_thickness_are_independent": true,
+        "angular_style": "Smooth tangent at arch."
+      },
+      "asymmetry": {
+        "mode": "fit_each_observed_brow_in_one_face_frame",
+        "force_identical_height": false,
+        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.brow",
+      "required_landmarks": [
+        "observed_brow_contour",
+        "observed_brow_head",
+        "observed_brow_tail",
+        "brow_surface"
+      ],
+      "optional_landmarks": [
+        "observed_brow_arch",
+        "nose_boundary",
+        "pupil",
+        "inner_eye_corner",
+        "outer_eye_corner"
+      ],
+      "do_not_render_when": [
+        "missing_observed_brow_contour",
+        "surface_binding_failed",
+        "incompatible_saved_fit",
+        "occluded_region",
+        "stale_tracking"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false
+    },
+    {
+      "id": "brow.flat_straight",
+      "style_id": "flatStraight",
+      "name": "Flat straight",
+      "category": "eyebrow",
+      "source_reference_ids": [
+        "brow_D"
+      ],
+      "source_observation_ids": [],
+      "source_geometry_status": "qualitative_shape_only",
+      "baseline": {
+        "source": "observed_brow_contour",
+        "fit": "robust_centerline_in_brow_local_frame",
+        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
+        "preserve_observed_head_and_tail": true
+      },
+      "anchors": {
+        "head": "observed_brow_head",
+        "arch": "observed_brow_arch",
+        "tail": "observed_brow_tail",
+        "formula_rays_optional": true,
+        "formula_failure_hides_valid_brow": false
+      },
+      "parameters": {
+        "arch_t": {
+          "value": 0.6,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Datar/paralel, kepala lembut, ekor sedikit turun.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_delta": {
+          "value": -0.018,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
+          "minimum": -0.04,
+          "maximum": 0.04
+        },
+        "tail_delta": {
+          "value": 0.0,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
+          "minimum": -0.03,
+          "maximum": 0.03
+        },
+        "length_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pertahankan panjang yang diamati.",
+          "minimum": 0.9,
+          "maximum": 1.1
+        },
+        "max_displacement": {
+          "value": 0.0015,
+          "unit": "meter",
+          "basis": "face_local_metric",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
+          "minimum": 0,
+          "maximum": 0.003
+        },
+        "half_thickness_design": {
+          "value": 0.058,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
+          "minimum": 0.01,
+          "maximum": 0.12
+        },
+        "thickness_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "measured_or_explicit_design_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.3,
+          "maximum": 1.5
+        },
+        "head_taper": {
+          "value": 0.8,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_taper": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tail_taper": {
+          "value": 0.15,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_fade_extent": {
+          "value": 0.24,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_feather": {
+          "value": 0.6,
+          "unit": "ratio",
+          "basis": "local_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_alpha": {
+          "value": 0.5,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "centerline": {
+        "representation": "two_cubic_bezier_segments",
+        "control_point_rule_id": "formula.brow_bezier",
+        "displacement_rule_id": "formula.brow_adjustment",
+        "global_y_offset": "forbidden",
+        "width_and_thickness_are_independent": true,
+        "angular_style": "Smooth tangent at arch."
+      },
+      "asymmetry": {
+        "mode": "fit_each_observed_brow_in_one_face_frame",
+        "force_identical_height": false,
+        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.brow",
+      "required_landmarks": [
+        "observed_brow_contour",
+        "observed_brow_head",
+        "observed_brow_tail",
+        "brow_surface"
+      ],
+      "optional_landmarks": [
+        "observed_brow_arch",
+        "nose_boundary",
+        "pupil",
+        "inner_eye_corner",
+        "outer_eye_corner"
+      ],
+      "do_not_render_when": [
+        "missing_observed_brow_contour",
+        "surface_binding_failed",
+        "incompatible_saved_fit",
+        "occluded_region",
+        "stale_tracking"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false
+    },
+    {
+      "id": "brow.curved_arch",
+      "style_id": "curvedArch",
+      "name": "Curved arch",
+      "category": "eyebrow",
+      "source_reference_ids": [
+        "brow_D"
+      ],
+      "source_observation_ids": [],
+      "source_geometry_status": "qualitative_shape_only",
+      "baseline": {
+        "source": "observed_brow_contour",
+        "fit": "robust_centerline_in_brow_local_frame",
+        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
+        "preserve_observed_head_and_tail": true
+      },
+      "anchors": {
+        "head": "observed_brow_head",
+        "arch": "observed_brow_arch",
+        "tail": "observed_brow_tail",
+        "formula_rays_optional": true,
+        "formula_failure_hides_valid_brow": false
+      },
+      "parameters": {
+        "arch_t": {
+          "value": 0.52,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Lengkung bulat tinggi, ekor turun tajam.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_delta": {
+          "value": 0.025,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
+          "minimum": -0.04,
+          "maximum": 0.04
+        },
+        "tail_delta": {
+          "value": -0.015,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
+          "minimum": -0.03,
+          "maximum": 0.03
+        },
+        "length_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pertahankan panjang yang diamati.",
+          "minimum": 0.9,
+          "maximum": 1.1
+        },
+        "max_displacement": {
+          "value": 0.002,
+          "unit": "meter",
+          "basis": "face_local_metric",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
+          "minimum": 0,
+          "maximum": 0.003
+        },
+        "half_thickness_design": {
+          "value": 0.072,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
+          "minimum": 0.01,
+          "maximum": 0.12
+        },
+        "thickness_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "measured_or_explicit_design_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.3,
+          "maximum": 1.5
+        },
+        "head_taper": {
+          "value": 0.65,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_taper": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tail_taper": {
+          "value": 0.08,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_fade_extent": {
+          "value": 0.18,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_feather": {
+          "value": 0.5,
+          "unit": "ratio",
+          "basis": "local_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_alpha": {
+          "value": 0.56,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "centerline": {
+        "representation": "two_cubic_bezier_segments",
+        "control_point_rule_id": "formula.brow_bezier",
+        "displacement_rule_id": "formula.brow_adjustment",
+        "global_y_offset": "forbidden",
+        "width_and_thickness_are_independent": true,
+        "angular_style": "Smooth tangent at arch."
+      },
+      "asymmetry": {
+        "mode": "fit_each_observed_brow_in_one_face_frame",
+        "force_identical_height": false,
+        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.brow",
+      "required_landmarks": [
+        "observed_brow_contour",
+        "observed_brow_head",
+        "observed_brow_tail",
+        "brow_surface"
+      ],
+      "optional_landmarks": [
+        "observed_brow_arch",
+        "nose_boundary",
+        "pupil",
+        "inner_eye_corner",
+        "outer_eye_corner"
+      ],
+      "do_not_render_when": [
+        "missing_observed_brow_contour",
+        "surface_binding_failed",
+        "incompatible_saved_fit",
+        "occluded_region",
+        "stale_tracking"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false
+    },
+    {
+      "id": "brow.peaked_angle",
+      "style_id": "peakedAngle",
+      "name": "Peaked angle",
+      "category": "eyebrow",
+      "source_reference_ids": [
+        "brow_D"
+      ],
+      "source_observation_ids": [],
+      "source_geometry_status": "qualitative_shape_only",
+      "baseline": {
+        "source": "observed_brow_contour",
+        "fit": "robust_centerline_in_brow_local_frame",
+        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
+        "preserve_observed_head_and_tail": true
+      },
+      "anchors": {
+        "head": "observed_brow_head",
+        "arch": "observed_brow_arch",
+        "tail": "observed_brow_tail",
+        "formula_rays_optional": true,
+        "formula_failure_hides_valid_brow": false
+      },
+      "parameters": {
+        "arch_t": {
+          "value": 0.72,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Tebal, puncak bersudut sekitar 72%, ekor pendek tajam.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_delta": {
+          "value": 0.028,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
+          "minimum": -0.04,
+          "maximum": 0.04
+        },
+        "tail_delta": {
+          "value": -0.012,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
+          "minimum": -0.03,
+          "maximum": 0.03
+        },
+        "length_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pertahankan panjang yang diamati.",
+          "minimum": 0.9,
+          "maximum": 1.1
+        },
+        "max_displacement": {
+          "value": 0.002,
+          "unit": "meter",
+          "basis": "face_local_metric",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
+          "minimum": 0,
+          "maximum": 0.003
+        },
+        "half_thickness_design": {
+          "value": 0.085,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
+          "minimum": 0.01,
+          "maximum": 0.12
+        },
+        "thickness_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "measured_or_explicit_design_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.3,
+          "maximum": 1.5
+        },
+        "head_taper": {
+          "value": 0.75,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_taper": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tail_taper": {
+          "value": 0.1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_fade_extent": {
+          "value": 0.14,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_feather": {
+          "value": 0.45,
+          "unit": "ratio",
+          "basis": "local_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_alpha": {
+          "value": 0.6,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "centerline": {
+        "representation": "two_cubic_bezier_segments",
+        "control_point_rule_id": "formula.brow_bezier",
+        "displacement_rule_id": "formula.brow_adjustment",
+        "global_y_offset": "forbidden",
+        "width_and_thickness_are_independent": true,
+        "angular_style": "Smooth tangent at arch."
+      },
+      "asymmetry": {
+        "mode": "fit_each_observed_brow_in_one_face_frame",
+        "force_identical_height": false,
+        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.brow",
+      "required_landmarks": [
+        "observed_brow_contour",
+        "observed_brow_head",
+        "observed_brow_tail",
+        "brow_surface"
+      ],
+      "optional_landmarks": [
+        "observed_brow_arch",
+        "nose_boundary",
+        "pupil",
+        "inner_eye_corner",
+        "outer_eye_corner"
+      ],
+      "do_not_render_when": [
+        "missing_observed_brow_contour",
+        "surface_binding_failed",
+        "incompatible_saved_fit",
+        "occluded_region",
+        "stale_tracking"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false
+    },
+    {
+      "id": "brow.slim_straight",
+      "style_id": "slimStraight",
+      "name": "Slim straight",
+      "category": "eyebrow",
+      "source_reference_ids": [
+        "brow_D"
+      ],
+      "source_observation_ids": [],
+      "source_geometry_status": "qualitative_shape_only",
+      "baseline": {
+        "source": "observed_brow_contour",
+        "fit": "robust_centerline_in_brow_local_frame",
+        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
+        "preserve_observed_head_and_tail": true
+      },
+      "anchors": {
+        "head": "observed_brow_head",
+        "arch": "observed_brow_arch",
+        "tail": "observed_brow_tail",
+        "formula_rays_optional": true,
+        "formula_failure_hides_valid_brow": false
+      },
+      "parameters": {
+        "arch_t": {
+          "value": 0.68,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Tipis-sedang, lurus, ekor sedikit menyudut.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_delta": {
+          "value": -0.01,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
+          "minimum": -0.04,
+          "maximum": 0.04
+        },
+        "tail_delta": {
+          "value": -0.004,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
+          "minimum": -0.03,
+          "maximum": 0.03
+        },
+        "length_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pertahankan panjang yang diamati.",
+          "minimum": 0.9,
+          "maximum": 1.1
+        },
+        "max_displacement": {
+          "value": 0.0015,
+          "unit": "meter",
+          "basis": "face_local_metric",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
+          "minimum": 0,
+          "maximum": 0.003
+        },
+        "half_thickness_design": {
+          "value": 0.052,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
+          "minimum": 0.01,
+          "maximum": 0.12
+        },
+        "thickness_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "measured_or_explicit_design_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.3,
+          "maximum": 1.5
+        },
+        "head_taper": {
+          "value": 0.7,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_taper": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tail_taper": {
+          "value": 0.1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_fade_extent": {
+          "value": 0.18,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_feather": {
+          "value": 0.5,
+          "unit": "ratio",
+          "basis": "local_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_alpha": {
+          "value": 0.52,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "centerline": {
+        "representation": "two_cubic_bezier_segments",
+        "control_point_rule_id": "formula.brow_bezier",
+        "displacement_rule_id": "formula.brow_adjustment",
+        "global_y_offset": "forbidden",
+        "width_and_thickness_are_independent": true,
+        "angular_style": "Smooth tangent at arch."
+      },
+      "asymmetry": {
+        "mode": "fit_each_observed_brow_in_one_face_frame",
+        "force_identical_height": false,
+        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.brow",
+      "required_landmarks": [
+        "observed_brow_contour",
+        "observed_brow_head",
+        "observed_brow_tail",
+        "brow_surface"
+      ],
+      "optional_landmarks": [
+        "observed_brow_arch",
+        "nose_boundary",
+        "pupil",
+        "inner_eye_corner",
+        "outer_eye_corner"
+      ],
+      "do_not_render_when": [
+        "missing_observed_brow_contour",
+        "surface_binding_failed",
+        "incompatible_saved_fit",
+        "occluded_region",
+        "stale_tracking"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false
+    },
+    {
+      "id": "brow.full_arch",
+      "style_id": "fullArch",
+      "name": "Full arch",
+      "category": "eyebrow",
+      "source_reference_ids": [
+        "brow_D"
+      ],
+      "source_observation_ids": [],
+      "source_geometry_status": "qualitative_shape_only",
+      "baseline": {
+        "source": "observed_brow_contour",
+        "fit": "robust_centerline_in_brow_local_frame",
+        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
+        "preserve_observed_head_and_tail": true
+      },
+      "anchors": {
+        "head": "observed_brow_head",
+        "arch": "observed_brow_arch",
+        "tail": "observed_brow_tail",
+        "formula_rays_optional": true,
+        "formula_failure_hides_valid_brow": false
+      },
+      "parameters": {
+        "arch_t": {
+          "value": 0.6,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Paling tebal, lengkung tinggi, kepala berbulu, ekor panjang turun.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_delta": {
+          "value": 0.038,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
+          "minimum": -0.04,
+          "maximum": 0.04
+        },
+        "tail_delta": {
+          "value": -0.015,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
+          "minimum": -0.03,
+          "maximum": 0.03
+        },
+        "length_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pertahankan panjang yang diamati.",
+          "minimum": 0.9,
+          "maximum": 1.1
+        },
+        "max_displacement": {
+          "value": 0.0025,
+          "unit": "meter",
+          "basis": "face_local_metric",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
+          "minimum": 0,
+          "maximum": 0.003
+        },
+        "half_thickness_design": {
+          "value": 0.095,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
+          "minimum": 0.01,
+          "maximum": 0.12
+        },
+        "thickness_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "measured_or_explicit_design_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.3,
+          "maximum": 1.5
+        },
+        "head_taper": {
+          "value": 0.7,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_taper": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tail_taper": {
+          "value": 0.1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_fade_extent": {
+          "value": 0.26,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_feather": {
+          "value": 0.55,
+          "unit": "ratio",
+          "basis": "local_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_alpha": {
+          "value": 0.6,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "centerline": {
+        "representation": "two_cubic_bezier_segments",
+        "control_point_rule_id": "formula.brow_bezier",
+        "displacement_rule_id": "formula.brow_adjustment",
+        "global_y_offset": "forbidden",
+        "width_and_thickness_are_independent": true,
+        "angular_style": "Smooth tangent at arch."
+      },
+      "asymmetry": {
+        "mode": "fit_each_observed_brow_in_one_face_frame",
+        "force_identical_height": false,
+        "regularization": "Only reduce detector noise; never erase anatomical asymmetry or change identity."
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.brow",
+      "required_landmarks": [
+        "observed_brow_contour",
+        "observed_brow_head",
+        "observed_brow_tail",
+        "brow_surface"
+      ],
+      "optional_landmarks": [
+        "observed_brow_arch",
+        "nose_boundary",
+        "pupil",
+        "inner_eye_corner",
+        "outer_eye_corner"
+      ],
+      "do_not_render_when": [
+        "missing_observed_brow_contour",
+        "surface_binding_failed",
+        "incompatible_saved_fit",
+        "occluded_region",
+        "stale_tracking"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false
+    },
+    {
+      "id": "brow.bold_straight",
+      "style_id": "boldStraight",
+      "name": "Bold straight",
+      "category": "eyebrow",
+      "source_reference_ids": [
+        "brow_D"
+      ],
+      "source_observation_ids": [],
+      "source_geometry_status": "qualitative_shape_only",
+      "baseline": {
+        "source": "observed_brow_contour",
+        "fit": "robust_centerline_in_brow_local_frame",
+        "single_open_contour": "Do not infer measured thickness from arch rise. Use a separately labelled design thickness or request calibration.",
+        "preserve_observed_head_and_tail": true
+      },
+      "anchors": {
+        "head": "observed_brow_head",
+        "arch": "observed_brow_arch",
+        "tail": "observed_brow_tail",
+        "formula_rays_optional": true,
+        "formula_failure_hides_valid_brow": false
+      },
+      "parameters": {
+        "arch_t": {
+          "value": 0.7,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Tebal, panjang, datar dengan ekor menyudut.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_delta": {
+          "value": -0.012,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Modifikasi lokal terhadap centerline alami; tidak menggeser seluruh alis.",
+          "minimum": -0.04,
+          "maximum": 0.04
+        },
+        "tail_delta": {
+          "value": -0.006,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Nudge tail awal; kepala alis tetap pada observasi.",
+          "minimum": -0.03,
+          "maximum": 0.03
+        },
+        "length_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pertahankan panjang yang diamati.",
+          "minimum": 0.9,
+          "maximum": 1.1
+        },
+        "max_displacement": {
+          "value": 0.0015,
+          "unit": "meter",
+          "basis": "face_local_metric",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Parameter awal implementasi; bukan ukuran dari poster.",
+          "minimum": 0,
+          "maximum": 0.003
+        },
+        "half_thickness_design": {
+          "value": 0.09,
+          "unit": "ratio",
+          "basis": "observed_brow_width",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Ketebalan desain bentuk ini, relatif terhadap lebar alis teramati; bukan ketebalan hasil deteksi.",
+          "minimum": 0.01,
+          "maximum": 0.12
+        },
+        "thickness_scale": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "measured_or_explicit_design_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.3,
+          "maximum": 1.5
+        },
+        "head_taper": {
+          "value": 0.85,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "arch_taper": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "tail_taper": {
+          "value": 0.12,
+          "unit": "ratio",
+          "basis": "centerline_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "head_fade_extent": {
+          "value": 0.16,
+          "unit": "ratio",
+          "basis": "observed_brow_arc_length",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "edge_feather": {
+          "value": 0.5,
+          "unit": "ratio",
+          "basis": "local_half_thickness",
+          "provenance": [
+            "user_supplied_shape_list",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_alpha": {
+          "value": 0.62,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_supplied_shape_list",
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",

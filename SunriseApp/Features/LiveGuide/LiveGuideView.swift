@@ -53,6 +53,7 @@ struct LiveGuideView: UIViewRepresentable {
         private var beauty:BeautyBlushEngine?
         @MainActor func installBeauty(_ engine:BeautyBlushEngine) {
             engine.onStatus={ [weak camera] message in Task { @MainActor in camera?.update(\.beautyStatus,message) } }
+            engine.onTracking={ [weak feed=camera.browTracking] snapshot in Task { @MainActor in feed?.snapshot=snapshot } }
             lock.lock();beauty=engine;lock.unlock()
             let s=snapshot().0;lock.lock();let active=sessionActive;lock.unlock();engine.configure(s.visible && active ? s.eyebrows:nil)
         }
@@ -297,7 +298,10 @@ struct LiveGuideView: UIViewRepresentable {
             face.depth.update(from:anchor.geometry)
             let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.needsBrow,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
             let vertices=Array(anchor.geometry.vertices)
-            face.eyebrowRenderer.update(guide:configuration.needsBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
+            // The Metal engine draws the brow, its guide and mapping lines from MediaPipe landmarks; the mesh guide is
+            // only the fallback when Metal is unavailable.
+            lock.lock();let metalBrow=beauty != nil;lock.unlock()
+            face.eyebrowRenderer.update(guide:configuration.needsBrow && !metalBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
             face.foreheadRenderer.update(guide:result.foreheadGuide,vertices:vertices,configuration:configuration)
             face.blushRenderer.update(blush:result.blushGuide,vertices:vertices,configuration:configuration)
             if face.triangles == nil { face.triangles=Array(anchor.geometry.triangleIndices) }
