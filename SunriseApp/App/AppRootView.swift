@@ -6,22 +6,15 @@ struct AppRootView: View {
     @StateObject private var faceShapeStore = FaceAnalysis.savedResults()
 
     var body: some View {
-        Group {
-            if navigator.launchScanComplete {
-                // Try On is the only screen: no tab bar.
-                NavigationStack(path: $navigator.tryOnPath) {
-                    TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
-                                  onProfile: { navigator.open(.profile, in: .tryOn) },
-                                  onTutorial: { handoff in
-                                      // -Nimah: Launch already prepared the result; tutorial navigation never opens a scanner.
-                                      // Eyeliner without a clear eye scan still opens the tutorial with the natural line.
-                                      navigator.open(.recommendedTutorial(handoff),in:.tryOn)
-                                  })
-                        .navigationDestination(for: AppRoute.self, destination: destination)
-                }
-            } else {
-                OnboardingView(store: faceShapeStore, showWelcome:!navigator.onboardingComplete, onFinish: navigator.completeOnboarding)
-            }
+        // Try On is the only screen: no tab bar, no launch scan.
+        NavigationStack(path: $navigator.tryOnPath) {
+            TryOnHomeView(store: faceShapeStore, assessment: studioAssessment, checker: container.faceTracking,
+                          onProfile: { navigator.open(.profile, in: .tryOn) },
+                          onTutorial: { handoff in
+                              // Eyeliner without a clear eye scan still opens the tutorial with the natural line.
+                              navigator.open(.recommendedTutorial(handoff),in:.tryOn)
+                          })
+                .navigationDestination(for: AppRoute.self, destination: destination)
         }
     }
 
@@ -50,15 +43,8 @@ struct AppRootView: View {
             EyebrowOverlayView(checker:container.faceTracking,assessment:studioAssessment)
         case .savedLookDetail(let look): SavedLookDetailView(look: look, store: container.savedLooks)
         case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
-        case .faceScan:
-            FaceAnalysis.scanScreen(store: faceShapeStore) { navigator.returnToRoot(of: .tryOn) }
-        // -Nimah: Keep scan results and rescan actions reachable after the single-camera redesign.
-        case .profile: ProfileView(store:faceShapeStore,onRetake:{ navigator.open(.fullScan,in:.tryOn) },
-            onTry:{ navigator.returnToRoot(of:.tryOn) })
-        case .fullScan: FullScanFlow(store:faceShapeStore) { navigator.returnToRoot(of:.tryOn) }
+        case .profile: ProfileView(store:faceShapeStore,onTry:{ navigator.returnToRoot(of:.tryOn) })
         case .tutorial: BlankPageView(title: "Tutorial")
-        case .eyeScan:
-            EyeAnalysis.scanScreen(store: faceShapeStore, continueTitle: "Back to my makeup") { navigator.returnToRoot(of: .tryOn) }
         }
     }
 }

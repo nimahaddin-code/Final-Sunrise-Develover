@@ -5,8 +5,6 @@ import SwiftUI
 /// kept from each scan; without one the circle shows an icon.
 struct ProfileView: View {
     @ObservedObject var store: FaceShapeStore
-    /// Starts the face scan followed by the eye scan.
-    var onRetake: () -> Void
     var onTry: () -> Void
     @State private var faceImage: UIImage?
     @State private var eyeImage: UIImage?
@@ -55,7 +53,7 @@ struct ProfileView: View {
                 tile("Eyeliner", symbol: "pencil.tip", detail: linerName.map { Text($0) })
             }
         } else {
-            empty("Scan your face to see your face shape and signature look.", action: "Scan my face and eyes", perform: onRetake)
+            empty("No saved face scan yet.")
         }
     }
 
@@ -84,7 +82,7 @@ struct ProfileView: View {
                 tile("Lashes", symbol: "eyelashes")
             }
         } else {
-            empty("Scan your eyes to get an eyeliner chosen for your eye shape.", action: "Scan my face and eyes", perform: onRetake)
+            empty("No saved eye scan yet.")
         }
     }
 
@@ -92,14 +90,6 @@ struct ProfileView: View {
 
     private var actions: some View {
         HStack(spacing: AppSpacing.medium) {
-            Button(action: onRetake) {
-                Image(systemName: "arrow.counterclockwise")
-                    .font(.title3.weight(.semibold))
-                    .frame(width: 52, height: 52)
-                    .background(AppColors.snow.opacity(0.35), in: Circle())
-                    .foregroundStyle(AppColors.wine)
-            }
-            .accessibilityLabel("Retake face and eye scan")
             Button(action: onTry) {
                 Text("Try My Signature Look").font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 52)
@@ -207,14 +197,9 @@ struct ProfileView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private func empty(_ message: LocalizedStringKey, action: LocalizedStringKey, perform: @escaping () -> Void) -> some View {
+    private func empty(_ message: LocalizedStringKey) -> some View {
         VStack(spacing: AppSpacing.medium) {
             Text(message).font(AppTypography.body).multilineTextAlignment(.center)
-            Button(action: perform) {
-                Text(action).font(.headline).padding(.horizontal, AppSpacing.large).frame(minHeight: 44)
-                    .background(AppColors.flamingo, in: Capsule())
-            }
-            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity)
         .padding(AppSpacing.large)
@@ -224,22 +209,6 @@ struct ProfileView: View {
     // Same adapter as `AppRootView.studioAssessment`.
     private static func makeupShape(_ shape: FaceShape) -> MakeupFaceShape {
         shape == .triangle ? .pear : MakeupFaceShape(rawValue: shape.rawValue) ?? .unknown
-    }
-}
-
-/// Face scan, then straight on to the eye scan; both finish at the Try On home. Back from either step leaves the flow.
-struct FullScanFlow: View {
-    private enum Step { case face, eyes }
-
-    @ObservedObject var store: FaceShapeStore
-    var onFinish: () -> Void
-    @State private var step = Step.face
-
-    var body: some View {
-        switch step {
-        case .face: FaceAnalysis.scanScreen(store: store, continueTitle: "Next: scan your eyes") { step = .eyes }
-        case .eyes: EyeAnalysis.scanScreen(store: store, continueTitle: "See my makeup", onFinish: onFinish)
-        }
     }
 }
 
@@ -276,6 +245,6 @@ private struct FaceOutline: Shape {
     return NavigationStack {
         ProfileView(store: FaceShapeStore(latest: face,
                                           eyes: EyeShapeClassifier().classify(EyeMeasurements(openness: 0.32, tilt: 5, spacing: 1.0, lidSpace: 0.7))),
-                    onRetake: {}, onTry: {})
+                    onTry: {})
     }
 }

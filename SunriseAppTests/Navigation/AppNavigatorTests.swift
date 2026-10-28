@@ -70,10 +70,10 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertTrue(navigator.tryOnPath.isEmpty)
         XCTAssertEqual(navigator.discoverPath, [.referenceImport])
     }
-    @MainActor func testRescanFromHomeReturnsToTryOnRoot() {
+    @MainActor func testProfileFromHomeReturnsToTryOnRoot() {
         let navigator = AppNavigator(defaults: defaults)
-        navigator.open(.faceScan, in: .tryOn)
-        XCTAssertEqual(navigator.tryOnPath, [.faceScan])
+        navigator.open(.profile, in: .tryOn)
+        XCTAssertEqual(navigator.tryOnPath, [.profile])
         navigator.returnToRoot(of: .tryOn)
         XCTAssertTrue(navigator.tryOnPath.isEmpty)
     }
