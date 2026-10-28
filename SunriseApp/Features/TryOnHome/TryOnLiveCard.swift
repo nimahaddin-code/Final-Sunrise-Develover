@@ -10,6 +10,8 @@ struct TryOnLiveCard: View {
     var isActive = true
     @ObservedObject var camera: FaceCameraState
     @ObservedObject var brow: EyebrowViewModel
+    @StateObject private var advisor = CameraAdvisor(context: .tryOn)
+    @StateObject private var light = ScreenLight()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
@@ -39,6 +41,11 @@ struct TryOnLiveCard: View {
         // Hold to see the bare face; VoiceOver users toggle it with the action below.
         .onLongPressGesture(minimumDuration: 60, maximumDistance: 60, perform: {},
                             onPressingChanged: { home.isComparing = $0 })
+        // The camera checks and the light run only while this card is on screen with the app in front.
+        .onChange(of: scenePhase == .active && isActive, initial: true) { _, running in
+            if running { advisor.start(); light.resume() } else { advisor.stop(); light.suspend() }
+        }
+        .onDisappear { advisor.stop(); light.turnOff() }
         .accessibilityElement(children: .contain)
         .accessibilityAction(named: "Compare without makeup") { home.isComparing.toggle() }
         .animation(.easeInOut(duration: 0.2), value: home.isComparing)
@@ -53,9 +60,9 @@ struct TryOnLiveCard: View {
                         message: "Live try-on needs an iPhone with a TrueDepth front camera.")
         case .supported:
             if camera.denied {
-                CardMessage(symbol: "camera", title: "Camera access needed",
-                            message: "Allow camera access in Settings to try on makeup. Nothing is saved or uploaded.",
-                            actionTitle: "Open Settings", action: openSettings)
+                CardMessage(symbol: "camera", title: "I need your camera to be your mirror.",
+                            message: "Nothing is saved or uploaded.",
+                            actionTitle: "Turn on camera", action: openSettings)
             } else if camera.failure != nil {
                 CardMessage(symbol: "exclamationmark.triangle", title: "Camera stopped",
                             message: "Face tracking stopped unexpectedly.")
@@ -70,19 +77,42 @@ struct TryOnLiveCard: View {
     private var live: some View {
         ZStack {
             ZStack {
-                LiveGuideView(camera: camera, referenceID: "eyebrows", active: scenePhase == .active && isActive,
+                LiveGuideView(camera: camera, referenceID: "eyebrows", active: scenePhase == .active && isActive && !advisor.pausesSession,
                               // Always a configuration, never nil: nil falls back to the old per-frame blush surface renderer.
                               // Without a launch fit the brow/blush pipeline returns at once (`followLaunchFit`).
-                              eyebrowConfiguration: home.liveConfiguration, onFrame: { [relay = home.relay] frame, face in
+                              eyebrowConfiguration: previewConfiguration, onFrame: { [relay = home.relay] frame, face in
                                   relay.deliver(frame, face)
-                              })
+                              }, reducedFrameRate: advisor.reducesLoad)
                 LinerOverlayView(model: home.liner, isVisible: !home.isComparing)
+                    .opacity(advisor.isDimmed ? Self.dimmedOpacity : 1)
+                    .animation(.easeInOut(duration: 0.25), value: advisor.isDimmed)
             }
             .cameraZoom()
+            ScreenLightGlow(light: light)
             if let status {
                 StatusPill(text: status)
             }
         }
+        .overlay(alignment: .leading) {
+            ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(.leading, AppSpacing.small)
+        }
+        .overlay(alignment: .bottom) {
+            CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
+                .padding(.bottom, AppSpacing.large)
+        }
+    }
+
+    static let dimmedOpacity = 0.3
+
+    /// The brow/blush preview, faded to 30% while a camera message shows.
+    private var previewConfiguration: EyebrowConfiguration {
+        var value = home.liveConfiguration
+        guard advisor.isDimmed else { return value }
+        let factor = Float(Self.dimmedOpacity)
+        value.previewIntensity *= factor
+        value.browLayer.intensity *= factor
+        value.blushLayer.intensity *= factor
+        return value
     }
 
     /// Tells the person what the face scan is waiting for, for the selected tool only. Eyeliner follows the eyes on its own,

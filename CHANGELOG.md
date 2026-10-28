@@ -5,6 +5,23 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Added — camera messages, light and the three-step eyeliner tutorial (dandan camera and tutorial UX spec)
+- New shared folder `Features/CameraGuidance/`, used by every tool: `CameraMessage` (the 11 lines and their priority/delays), `CameraMessageEngine`
+  (pure: show/clear delays plus hysteresis, unit tested), `CameraSignalSampler` (reads `ARSession.currentFrame`: light estimate, face-vs-frame
+  luma, distance, yaw/roll, speed; Vision face count and coverage about every 0.5 s), `CameraAdvisor` (10 Hz loop, CoreMotion tilt, thermal state),
+  `CameraCaption` (the 15 pt pill and STEP label) and `ScreenLight` (screen at full brightness plus a `#FFF4EA` ring; restored when leaving).
+  It never takes the ARKit session or its delegate.
+- Tutorial and Try On show one message at a time over the camera, fade the preview/guide to 30% and pause the step animation while it shows.
+  Serious heat runs the camera at 30 fps (`LiveGuideView.reducedFrameRate`); critical heat pauses it and shows "Your phone is warm".
+  "Face covered" is Try On only; "face lost" (2 s) replaces "no face" once a tutorial has tracked the face.
+- Eyeliner tutorial: three steps (`LinerTutorialStep`, `Features/Tutorial/LinerStepGuide.swift`): mark dots (inner, middle, outer, wing end; the
+  lower-line dot stays for puppy/foxy/arabian), connect them, fill. A drawn pen taps and moves; the loop is 3 s plus a 2 s pause; Reduce Motion
+  shows the last frame. The last step's button reads Done and goes to the photo step. Replaces the one-step "Follow the dots".
+- Camera denied card now reads "I need your camera to be your mirror." with "Turn on camera".
+- Brow and blush tutorial lessons are unchanged (long text); they only get the camera messages, the light and Done. While a message shows,
+  their guide is hidden rather than faded. Thresholds are the spec's suggestions, not tuned; nothing is checked on a real device (simulator build
+  and unit tests only).
+
 ### Changed — six eyeliner looks on Try On
 - `LinerLook` is now Classic, Cat, Puppy, Foxy, Arabian, Natural (was Liner only / With wing). Each is a fixed preset in
   `EyelinerPlanner.style(_:look:)` (the fitted style only supplies the shade); the picker on Try On scrolls sideways. Default is Classic;

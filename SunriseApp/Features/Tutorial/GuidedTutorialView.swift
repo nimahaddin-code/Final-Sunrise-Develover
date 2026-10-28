@@ -54,7 +54,6 @@ enum TutorialTab: CaseIterable, Identifiable {
     /// After the last step: the camera shows the whole assigned look, with no guide, for taking a photo.
     @Published private(set) var photoMode = false
     private let linerStyle: LinerStyle?
-    private let linerIsNeutral: Bool
     private var bag = Set<AnyCancellable>()
 
     init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment, plan: MakeupPlan, handoff: TutorialHandoff) {
@@ -64,7 +63,6 @@ enum TutorialTab: CaseIterable, Identifiable {
         if case .eyeliner(let style)? = plan.madeForYou.first(where: { $0.category == .eyeliner })?.style {
             linerStyle = EyelinerPlanner.style(style, look: handoff.linerLook)
         } else { linerStyle = nil }
-        linerIsNeutral = plan.eyeliner.isNeutral
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: start == .blush ? .blush : .eyebrows, startTutorial: true)
         relay = LinerFrameRelay(model: liner)
         // The guide points follow the skin when the person pulls the lid or the corner of the eye outward.
@@ -83,7 +81,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         guard hasGuide else {
             return [FaceGuideLesson(title: "No guide yet", instruction: "This face shape has no saved reference for this step. Scan your face again from your profile, or use the other tabs.")]
         }
-        if tab == .eyeliner, let linerStyle { return Self.linerLessons(linerStyle, look: handoff.linerLook, neutral: linerIsNeutral) }
+        if tab == .eyeliner { return Self.linerLessons }
         return brow.lessons
     }
 
@@ -185,25 +183,10 @@ enum TutorialTab: CaseIterable, Identifiable {
         liner.setStyle(linerStyle, shade: handoff.shades[.eyeliner], intensity: handoff.intensities[.eyeliner] ?? 1)
     }
 
-    /// One step: the guide shows only the key points of the liner, and the wording says how to join them.
-    static func linerLessons(_ style: LinerStyle, look: LinerLook, neutral: Bool) -> [FaceGuideLesson] {
-        let ending: String
-        switch look {
-        case .classic:
-            ending = "Join the dots along your upper lash line from the inner start to the outer corner, then flick out to the last dot to make the wing."
-        case .cat:
-            ending = "Start thin at the inner corner, thicken toward the outer corner, then sweep a long wing up and out to the last dot."
-        case .puppy:
-            ending = "Draw a soft, rounded line along the upper lash line and carry it past the outer corner, down along the shape of your eye to the last dot. Then smudge the lower dot lightly to deepen the droop."
-        case .foxy:
-            ending = "Start at the first dot, just past your inner corner toward your nose, follow the upper lash line to the outer corner, then pull a sharp wing up and out to the last dot. Join the lower dot to the wing."
-        case .arabian:
-            ending = "Outline your whole eye: the upper lash line from the inner corner to the outer corner, then the lower lash line from the lower dot back to the outer corner, and finish with a wing at the last dot."
-        case .natural:
-            ending = "Join the dots along your upper lash line from the inner start to the outer corner, ending at the last dot, with no wing."
-        }
-        let fitted = neutral && look == .classic ? " Scan your eyes from your profile for a line fitted to your eye shape." : ""
-        return [FaceGuideLesson(title: "Follow the dots", instruction: "\(ending) Keep it close to the lashes, then soften any hard edge with a cotton swab.\(fitted)")]
+    /// Three steps for every look (`LinerTutorialStep`). The screen takes its wording from the step, so these only count
+    /// the steps; where the dots sit is what changes with the look.
+    static let linerLessons: [FaceGuideLesson] = LinerTutorialStep.allCases.map {
+        FaceGuideLesson(title: "Step \($0.rawValue + 1)", instruction: "")
     }
 }
 
@@ -226,6 +209,8 @@ private struct TutorialScreen: View {
     @State private var flashOn = false
     @State private var flashing = false
     @State private var captured: UIImage?
+    @StateObject private var advisor = CameraAdvisor(context: .tutorial)
+    @StateObject private var light = ScreenLight()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -277,10 +262,15 @@ private struct TutorialScreen: View {
             await model.brow.prepare()
             if model.brow.availability == .supported { await camera.requestPermission() }
         }
-        .onAppear { visible = true; model.activate() }
-        .onDisappear { visible = false; model.deactivate() }
+        .onAppear { visible = true; model.activate(); advisor.start(); light.resume() }
+        .onDisappear { visible = false; model.deactivate(); advisor.stop(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active && visible { model.activate(); Task { await camera.requestPermission() } } else { model.deactivate() }
+            if phase == .active && visible {
+                model.activate(); advisor.start(); light.resume()
+                Task { await camera.requestPermission() }
+            } else {
+                model.deactivate(); advisor.stop(); light.suspend()
+            }
         }
     }
 
@@ -311,17 +301,18 @@ private struct TutorialScreen: View {
             if flashing { Color.white.ignoresSafeArea().allowsHitTesting(false) }
             VStack(spacing: AppSpacing.small) {
                 if !model.photoMode { header }
-                if !model.photoMode, model.brow.availability == .supported, camera.authorized, !camera.tracked {
-                    Text("Position your face in the frame")
-                        .font(AppTypography.body).multilineTextAlignment(.center)
-                        .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
-                        .background(AppColors.wine.opacity(0.85), in: Capsule())
-                        .accessibilityAddTraits(.updatesFrequently)
-                }
                 Spacer()
-                if !model.photoMode { wording }
+                if !model.photoMode { bottomCaption }
             }
             .padding(AppSpacing.small)
+            if !model.photoMode, model.brow.availability == .supported, camera.authorized {
+                ScreenLightGlow(light: light)
+            }
+        }
+        .overlay(alignment: .leading) {
+            if !model.photoMode, model.brow.availability == .supported, camera.authorized {
+                ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(.leading, AppSpacing.small)
+            }
         }
         .clipShape(RoundedRectangle(cornerRadius: model.photoMode ? 10 : AppSpacing.cornerRadius, style: .continuous))
     }
@@ -335,25 +326,27 @@ private struct TutorialScreen: View {
                     text: "The live guide needs an iPhone with a TrueDepth front camera.")
         case .supported:
             if camera.denied {
-                message(symbol: "camera", title: "Camera access needed",
-                        text: "Allow camera access in Settings to follow the tutorial. Nothing is saved or uploaded.",
-                        actionTitle: "Open Settings") {
+                message(symbol: "camera", title: "I need your camera to be your mirror.",
+                        text: "Nothing is saved or uploaded.",
+                        actionTitle: "Turn on camera") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
             } else if camera.failure != nil {
                 message(symbol: "exclamationmark.triangle", title: "Camera stopped", text: "Face tracking stopped unexpectedly.")
             } else if camera.authorized {
                 ZStack {
-                    LiveGuideView(camera: camera, referenceID: "eyebrows", active: visible && scenePhase == .active,
+                    LiveGuideView(camera: camera, referenceID: "eyebrows", active: visible && scenePhase == .active && !advisor.pausesSession,
                                   // Always a configuration, never nil: nil falls back to the old per-frame blush surface renderer.
-                                  eyebrowConfiguration: model.liveConfiguration, onFrame: { [relay = model.relay] frame, face in
+                                  eyebrowConfiguration: guideConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
-                                  })
+                                  }, reducedFrameRate: advisor.reducesLoad)
                     if model.photoMode {
                         LinerOverlayView(model: model.liner, isVisible: true)
                     } else if model.tab == .eyeliner && model.compare != .off {
                         ZStack {
-                            LinerGuideOutline(model: model.liner)
+                            LinerStepGuide(model: model.liner, step: LinerTutorialStep(rawValue: index) ?? .markDots,
+                                           paused: advisor.pausesAnimation, dimmed: advisor.isDimmed)
+                                .id(index)
                         }
                         .mask(alignment: .leading) { halfMask(left: true, half: model.compare == .split) }
                     }
@@ -417,16 +410,48 @@ private struct TutorialScreen: View {
                 Button {
                     if model.advance() { model.enterPhoto() }
                 } label: {
-                    Image(systemName: isLast ? "camera" : "arrow.right")
-                        .font(.title3.weight(.medium))
-                        .frame(width: 52, height: 52)
-                        .background(AppColors.flamingo, in: Circle())
-                        .foregroundStyle(AppColors.snow)
+                    if isLast {
+                        // Done goes on to the photo step.
+                        Text("Done")
+                            .font(.headline)
+                            .padding(.horizontal, AppSpacing.large)
+                            .frame(height: 52)
+                            .background(AppColors.flamingo, in: Capsule())
+                            .foregroundStyle(AppColors.snow)
+                    } else {
+                        Image(systemName: "arrow.right")
+                            .font(.title3.weight(.medium))
+                            .frame(width: 52, height: 52)
+                            .background(AppColors.flamingo, in: Circle())
+                            .foregroundStyle(AppColors.snow)
+                    }
                 }
-                .accessibilityLabel(isLast ? "Take a photo" : "Next step")
+                .accessibilityLabel(isLast ? "Done" : "Next step")
             }
         }
         .buttonStyle(.plain)
+    }
+
+    /// The brow/blush preview configuration, with the guide hidden while a camera message shows.
+    private var guideConfiguration: EyebrowConfiguration {
+        var value = model.liveConfiguration
+        if advisor.isDimmed && !model.photoMode && model.tab != .eyeliner { value.showGuide = false }
+        return value
+    }
+
+    /// Over the camera: a camera message when there is one; otherwise the eyeliner step caption, or (brows, blush) the
+    /// lesson card.
+    @ViewBuilder private var bottomCaption: some View {
+        if model.tab == .eyeliner, model.hasGuide {
+            let step = LinerTutorialStep(rawValue: index) ?? .markDots
+            CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: step.label, stepText: step.caption)
+                .padding(.bottom, AppSpacing.medium)
+        } else if advisor.message != nil {
+            CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
+                .padding(.bottom, AppSpacing.medium)
+        } else {
+            wording
+        }
     }
 
     private var wording: some View {
@@ -469,68 +494,6 @@ private struct TutorialScreen: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(selected ? .isSelected : [])
-            }
-        }
-    }
-}
-
-/// The key points of the eyeliner on each eye: where the line starts, where it ends and, when the look has a wing, the
-/// wing's tip. Drawn from the same geometry as the liner overlay; they are only marks to
-/// join with the product, so nothing covers the lid.
-private struct LinerGuideOutline: View {
-    @ObservedObject var model: LinerOverlayModel
-    @Environment(\.cameraZoom) private var zoom
-    private let pink = Color(red: 0.93, green: 0.38, blue: 0.68)
-
-    var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                canvas
-                if let reason = model.unavailableReason {
-                    // The eye detector could not start: say so instead of silently drawing nothing.
-                    Text(reason).font(.footnote).padding(8).background(.black.opacity(0.6), in: Capsule())
-                        .foregroundStyle(.white).frame(maxHeight: .infinity, alignment: .center)
-                }
-            }
-                // The overlay model builds the liner in this view's size, so it must be told before it can run.
-                .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }
-        }
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-
-    /// The key points: where the line starts, where it ends at the outer corner, where the lower line starts (when the
-    /// look has one) and, when the look has a wing, the wing's tip.
-    static func keyPoints(of guide: LinerGuide) -> [CGPoint] {
-        // `upperLiner` is the lash-line side followed by the outer edge reversed, so its first half is the lash line.
-        let lash = guide.upperLiner.prefix(guide.upperLiner.count / 2)
-        var points = [lash.first ?? guide.anchors.upperStart, lash.last ?? guide.anchors.outerCorner]
-        // A look with a lower line (puppy, foxy, arabian) gets a dot where that line starts.
-        if let lowerStart = guide.lowerLiner.prefix(guide.lowerLiner.count / 2).first { points.append(lowerStart) }
-        if let tip = guide.anchors.wingTip { points.append(tip) }
-        return points
-    }
-
-    private var canvas: some View {
-        Canvas { context, _ in
-            guard let frame = model.frame, CACurrentMediaTime() - frame.receivedAt <= LinerOverlayRenderer.maxAge else { return }
-            let thin = 1 / zoom
-            for eye in frame.eyes where eye.alpha > 0.05 {
-                // Dots scale with the eye on screen (zoomed out, the eye is small and so are the dots); the floor keeps
-                // them visible when the eye is tiny.
-                let inner = frame.mapping.map(eye.guide.anchors.innerCorner)
-                let outer = frame.mapping.map(eye.guide.anchors.outerCorner)
-                let eyeWidth = hypot(outer.x - inner.x, outer.y - inner.y)
-                let points = Self.keyPoints(of: eye.guide)
-                for (index, point) in points.enumerated() {
-                    let p = frame.mapping.map(point)
-                    // The wing tip, the last point of a winged look, is a little bigger.
-                    let isTip = eye.guide.anchors.wingTip != nil && index == points.count - 1
-                    let radius = max(eyeWidth * (isTip ? 0.034 : 0.025), (isTip ? 1.8 : 1.4) * thin)
-                    let dot = Path(ellipseIn: CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2))
-                    context.fill(dot, with: .color(pink))
-                    context.stroke(dot, with: .color(.white), style: StrokeStyle(lineWidth: max(radius * 0.3, 0.6 * thin)))
-                }
             }
         }
     }

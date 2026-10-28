@@ -1,5 +1,15 @@
 # AGENTS.md — read this first
 
+## Camera guidance — shared by every tool
+
+`Features/CameraGuidance/` holds what Try On and the tutorial share, for brows, blush and eyeliner alike: `CameraAdvisor(context:)` publishes
+the one `CameraMessage` to show (priority, delays and hysteresis live in `CameraMessageEngine`, thresholds in `CameraMessageEngine.Limits`);
+`CameraGuidanceCaption` draws it (or a tutorial step) as the spec's caption pill; `ScreenLight` + `ScreenLightGlow` + `ScreenLightButton`
+are the screen light. Screens start/stop the advisor and suspend/resume the light with their own lifecycle. The advisor reads
+`ARSession.currentFrame` only. While `advisor.message != nil` the preview/guide dims and `advisor.pausesAnimation` holds the step
+animation; `reducesLoad` and `pausesSession` follow the thermal state. Eyeliner steps: `LinerTutorialStep` and `LinerStepGuide`
+(`Features/Tutorial`). Spec thresholds are untuned guesses; not yet checked on a real device.
+
 ## Tutorial — scan-assigned
 
 `AppRoute.recommendedTutorial(TutorialHandoff)` opens `Features/Tutorial/GuidedTutorialView` (tabs Brows / Eyeliner / Blush, no settings;
