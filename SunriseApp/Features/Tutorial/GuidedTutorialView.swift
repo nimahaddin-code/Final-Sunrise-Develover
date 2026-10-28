@@ -83,7 +83,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         guard hasGuide else {
             return [FaceGuideLesson(title: "No guide yet", instruction: "This face shape has no saved reference for this step. Scan your face again from your profile, or use the other tabs.")]
         }
-        if tab == .eyeliner, let linerStyle { return Self.linerLessons(linerStyle, neutral: linerIsNeutral) }
+        if tab == .eyeliner, let linerStyle { return Self.linerLessons(linerStyle, look: handoff.linerLook, neutral: linerIsNeutral) }
         return brow.lessons
     }
 
@@ -186,11 +186,23 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     /// One step: the guide shows only the key points of the liner, and the wording says how to join them.
-    static func linerLessons(_ style: LinerStyle, neutral: Bool) -> [FaceGuideLesson] {
-        let ending = style.wingLength > 0.02
-            ? "Join the dots along your upper lash line from the inner start to the outer corner, then flick out to the last dot to make the wing."
-            : "Join the dots along your upper lash line from the inner start to the outer corner, ending at the last dot."
-        let fitted = neutral ? " This is a natural line; scan your eyes from your profile for a fitted style." : ""
+    static func linerLessons(_ style: LinerStyle, look: LinerLook, neutral: Bool) -> [FaceGuideLesson] {
+        let ending: String
+        switch look {
+        case .classic:
+            ending = "Join the dots along your upper lash line from the inner start to the outer corner, then flick out to the last dot to make the wing."
+        case .cat:
+            ending = "Start thin at the inner corner, thicken toward the outer corner, then sweep a long wing up and out to the last dot."
+        case .puppy:
+            ending = "Draw a soft, rounded line along the upper lash line and carry it past the outer corner, down along the shape of your eye to the last dot. Then smudge the lower dot lightly to deepen the droop."
+        case .foxy:
+            ending = "Start at the first dot, just past your inner corner toward your nose, follow the upper lash line to the outer corner, then pull a sharp wing up and out to the last dot. Join the lower dot to the wing."
+        case .arabian:
+            ending = "Outline your whole eye: the upper lash line from the inner corner to the outer corner, then the lower lash line from the lower dot back to the outer corner, and finish with a wing at the last dot."
+        case .natural:
+            ending = "Join the dots along your upper lash line from the inner start to the outer corner, ending at the last dot, with no wing."
+        }
+        let fitted = neutral && look == .classic ? " Scan your eyes from your profile for a line fitted to your eye shape." : ""
         return [FaceGuideLesson(title: "Follow the dots", instruction: "\(ending) Keep it close to the lashes, then soften any hard edge with a cotton swab.\(fitted)")]
     }
 }
@@ -487,12 +499,14 @@ private struct LinerGuideOutline: View {
         .accessibilityHidden(true)
     }
 
-    /// The three key points: where the line starts, where it ends at the outer corner and, when the look has a wing, the
-    /// wing's tip.
+    /// The key points: where the line starts, where it ends at the outer corner, where the lower line starts (when the
+    /// look has one) and, when the look has a wing, the wing's tip.
     static func keyPoints(of guide: LinerGuide) -> [CGPoint] {
         // `upperLiner` is the lash-line side followed by the outer edge reversed, so its first half is the lash line.
         let lash = guide.upperLiner.prefix(guide.upperLiner.count / 2)
         var points = [lash.first ?? guide.anchors.upperStart, lash.last ?? guide.anchors.outerCorner]
+        // A look with a lower line (puppy, foxy, arabian) gets a dot where that line starts.
+        if let lowerStart = guide.lowerLiner.prefix(guide.lowerLiner.count / 2).first { points.append(lowerStart) }
         if let tip = guide.anchors.wingTip { points.append(tip) }
         return points
     }
@@ -502,14 +516,20 @@ private struct LinerGuideOutline: View {
             guard let frame = model.frame, CACurrentMediaTime() - frame.receivedAt <= LinerOverlayRenderer.maxAge else { return }
             let thin = 1 / zoom
             for eye in frame.eyes where eye.alpha > 0.05 {
+                // Dots scale with the eye on screen (zoomed out, the eye is small and so are the dots); the floor keeps
+                // them visible when the eye is tiny.
+                let inner = frame.mapping.map(eye.guide.anchors.innerCorner)
+                let outer = frame.mapping.map(eye.guide.anchors.outerCorner)
+                let eyeWidth = hypot(outer.x - inner.x, outer.y - inner.y)
                 let points = Self.keyPoints(of: eye.guide)
                 for (index, point) in points.enumerated() {
                     let p = frame.mapping.map(point)
                     // The wing tip, the last point of a winged look, is a little bigger.
-                    let radius = (eye.guide.anchors.wingTip != nil && index == points.count - 1 ? 5.0 : 3.5) * thin
+                    let isTip = eye.guide.anchors.wingTip != nil && index == points.count - 1
+                    let radius = max(eyeWidth * (isTip ? 0.034 : 0.025), (isTip ? 1.8 : 1.4) * thin)
                     let dot = Path(ellipseIn: CGRect(x: p.x - radius, y: p.y - radius, width: radius * 2, height: radius * 2))
                     context.fill(dot, with: .color(pink))
-                    context.stroke(dot, with: .color(.white), style: StrokeStyle(lineWidth: 1.4 * thin))
+                    context.stroke(dot, with: .color(.white), style: StrokeStyle(lineWidth: max(radius * 0.3, 0.6 * thin)))
                 }
             }
         }
