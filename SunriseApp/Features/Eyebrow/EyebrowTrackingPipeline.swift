@@ -52,7 +52,7 @@ final class EyebrowTrackingPipeline: @unchecked Sendable {
         guard region==nil || guide?.style != style || blush?.style != blushStyle else { lock.unlock();return }
         let token=ticket;busy=true;lock.unlock()
         guard let fitted=cache.fittedRegion(anchorID:anchorID,vertices:vertices,triangles:triangles,timestamp:timestamp,eyeCenters:eyeCenters) else {
-            complete(token:token,id:anchorID,region:nil,guide:nil,errorMessage:"Launch fit unavailable")
+            complete(token:token,id:anchorID,region:nil,guide:nil,errorMessage:"Look straight at the camera to place your makeup")
             return
         }
         worker.async {
@@ -178,10 +178,14 @@ final class EyebrowTrackingPipeline: @unchecked Sendable {
     }
 }
 
-// -Nimah: Transient fitting from the launch scan. No photo or mesh is written to disk.
-// A new launch scan invalidates the old fit; try-on only reuses attachments on matching ARKit topology.
+// -Nimah: Transient brow/cheek fitting. No photo or mesh is written to disk.
+// The shared fit comes from live try-on/tutorial frames (`fitLive`), not a launch scan, and is memory-only;
+// try-on only reuses attachments on matching ARKit topology.
 final class LaunchMakeupFit: @unchecked Sendable {
-    static let shared=LaunchMakeupFit(defaults:.standard)
+    static let shared:LaunchMakeupFit={
+        // Sparse attachments saved by the removed launch scan are no longer used.
+        UserDefaults.standard.removeObject(forKey:key);return LaunchMakeupFit()
+    }()
     private let lock=NSLock()
     private var epoch=UUID()
     private var region:EyebrowRegion?
@@ -197,6 +201,9 @@ final class LaunchMakeupFit: @unchecked Sendable {
     private let defaults:UserDefaults?
     private var saved:SavedFit?
     private var lastStage="not_started"
+    private let liveWorker=DispatchQueue(label:"sunrise.live-makeup-fit",qos:.userInitiated)
+    private let liveProvider:any FaceLandmarkProviding=VisionFaceLandmarkProvider(requireEyeFormula:false)
+    private var liveBusy=false,lastLiveAttempt:TimeInterval = -.infinity
     var diagnostic:String { lock.lock();defer { lock.unlock() };return lastStage }
     init(defaults:UserDefaults? = nil) {
         self.defaults=defaults
@@ -204,7 +211,17 @@ final class LaunchMakeupFit: @unchecked Sendable {
         if saved?.brows.count != 2 { saved=nil }
     }
     var hasFit:Bool { lock.lock();defer { lock.unlock() };return region != nil || saved != nil }
-    func clear() { lock.lock();epoch=UUID();region=nil;saved=nil;defaults?.removeObject(forKey:Self.key);lock.unlock() }
+    func clear() { lock.lock();epoch=UUID();region=nil;saved=nil;lastLiveAttempt = -.infinity;defaults?.removeObject(forKey:Self.key);lock.unlock() }
+    // Fits from a live tracked frame until one succeeds: one Vision attempt at a time, at most every 0.4 s.
+    func fitLive(_ input:FaceLandmarkFrame) {
+        lock.lock()
+        guard region==nil,saved==nil,!liveBusy,input.timestamp-lastLiveAttempt>=0.4 else { lock.unlock();return }
+        liveBusy=true;lastLiveAttempt=input.timestamp;lock.unlock()
+        liveWorker.async { [self] in
+            _=prepare(input,provider:liveProvider)
+            lock.lock();liveBusy=false;lock.unlock()
+        }
+    }
     func prepare(_ input:FaceLandmarkFrame,provider:any FaceLandmarkProviding = VisionFaceLandmarkProvider(requireEyeFormula:false))->Bool {
         lock.lock();let token=epoch;lock.unlock()
         // -Nimah: Match the scan module's supported sensor orientations during enrollment only.
@@ -222,7 +239,7 @@ final class LaunchMakeupFit: @unchecked Sendable {
                 EyebrowRegionMapper.map(detection,projection:sample.projection,vertices:sample.vertices,triangles:sample.triangles,
                     leftEye:sample.leftEye,rightEye:sample.rightEye,timestamp:sample.timestamp,anchorID:sample.anchorID,requireFormula:false,diagnostic:{ stage=$0 })
             }.filter {
-                let valid=EyebrowGuideGenerator.make(region:$0,style:.natural) != nil
+                let valid=EyebrowGuideGenerator.make(region:$0,style:.softNatural) != nil
                 if !valid { stage="guide_generation" };return valid
             }
                 .max { $0.faceObservationConfidence < $1.faceObservationConfidence }

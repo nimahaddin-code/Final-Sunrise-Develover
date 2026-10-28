@@ -104,14 +104,19 @@ Data aktif dibaca sekali dari JSON lokal `Resources/makeup-reference.database.js
 untuk provenance, tanpa picker A/B/C. Pilihan JSON menggantikan default A sebelumnya. Semua parameter masih proposal kalibrasi,
 bukan hasil pengukuran poster atau klaim style universal.
 
+Sejak 2026-10-27 daftar bentuk alis diganti dengan sembilan bentuk baru (urutan picker): Bold arch, Slim arch,
+Soft natural, Flat straight, Curved arch, Peaked angle, Slim straight, Full arch, Bold straight. Kategori bentuknya
+mengikuti tangkapan layar efek TikTok dari pengguna (`brow_D` di `source_registry`); parameternya usulan engineering.
+Arah referensi per bentuk wajah dipetakan ke bentuk terdekat; tabel riwayat di bawah memakai nama lama.
+
 | Hasil wajah | Eyebrow | Blush |
 | --- | --- | --- |
-| Oval | C · natural | B · cheekbone |
-| Round | C · high arch | D · high cheekbone |
-| Square | C · rounded | B · apple |
-| Oblong | C · straight | D · horizontal |
-| Heart | B · low arch | B · center cheek |
-| Diamond | C · soft arch | A · temple sweep |
+| Oval | C · soft natural | B · cheekbone |
+| Round | C · bold arch | D · high cheekbone |
+| Square | C · curved arch | B · apple |
+| Oblong | C · flat straight | D · horizontal |
+| Heart | B · slim straight | B · center cheek |
+| Diamond | C · slim arch | A · temple sweep |
 | Triangle / pear, rectangle | Belum ada data | Belum ada data |
 
 Data kosong atau tanpa scan: overlay kategori tersebut mati dan tidak diganti style generik.

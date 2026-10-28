@@ -53,6 +53,7 @@ struct LiveGuideView: UIViewRepresentable {
         private var beauty:BeautyBlushEngine?
         @MainActor func installBeauty(_ engine:BeautyBlushEngine) {
             engine.onStatus={ [weak camera] message in Task { @MainActor in camera?.update(\.beautyStatus,message) } }
+            engine.onTracking={ [weak feed=camera.browTracking] snapshot in Task { @MainActor in feed?.snapshot=snapshot } }
             lock.lock();beauty=engine;lock.unlock()
             let s=snapshot().0;lock.lock();let active=sessionActive;lock.unlock();engine.configure(s.visible && active ? s.eyebrows:nil)
         }
@@ -169,6 +170,8 @@ struct LiveGuideView: UIViewRepresentable {
             view.session.delegate=self; view.session.delegateQueue=queue
             running=true
             eyebrowPipeline.reset()
+            // Each camera session fits the face in front of it.
+            LaunchMakeupFit.shared.clear()
             lock.lock(); generation=UUID(); pending=nil; pendingStyles=[:]; activeAnchorID=nil; sessionActive=true; tracked=false; fitAllowed=false; lock.unlock()
             camera.fitReady=false; camera.fitMessage="Look straight ahead with relaxed eyes and lips while the surface is fitted"
             queue.async { self.readiness.reset(); self.previousPosition=nil; self.previousRotation=nil; self.lastReport=0; self.fitStable=false }
@@ -295,7 +298,10 @@ struct LiveGuideView: UIViewRepresentable {
             face.depth.update(from:anchor.geometry)
             let result=eyebrowPipeline.snapshot(style:configuration.style,foreheadStyle:(configuration.region == .forehead || configuration.showAllRegions) ? configuration.foreheadStyle : nil,height:configuration.foreheadHeight,includeBrow:configuration.needsBrow,blushStyle:configuration.needsBlush ? configuration.blushStyle : nil)
             let vertices=Array(anchor.geometry.vertices)
-            face.eyebrowRenderer.update(guide:configuration.needsBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
+            // The Metal engine draws the brow, its guide and mapping lines from MediaPipe landmarks; the mesh guide is
+            // only the fallback when Metal is unavailable.
+            lock.lock();let metalBrow=beauty != nil;lock.unlock()
+            face.eyebrowRenderer.update(guide:configuration.needsBrow && !metalBrow ? result.guide : nil,vertices:vertices,configuration:configuration)
             face.foreheadRenderer.update(guide:result.foreheadGuide,vertices:vertices,configuration:configuration)
             face.blushRenderer.update(blush:result.blushGuide,vertices:vertices,configuration:configuration)
             if face.triangles == nil { face.triangles=Array(anchor.geometry.triangleIndices) }
@@ -306,14 +312,15 @@ struct LiveGuideView: UIViewRepresentable {
                 brow.previewIntensity=configuration.browLayer.intensity; brow.shadeTint=configuration.browLayer.tint
                 var blush=configuration; blush.region = .blush; blush.showMakeupPreview=configuration.blushLayer.on
                 blush.previewIntensity=configuration.blushLayer.intensity; blush.shadeTint=configuration.blushLayer.tint
-                face.previewRenderer.update(brow:result.guide,forehead:nil,vertices:vertices,triangles:triangles,configuration:brow)
                 lock.lock();let usesBeauty=beauty != nil;lock.unlock()
+                if usesBeauty {brow.showMakeupPreview=false}
+                face.previewRenderer.update(brow:result.guide,forehead:nil,vertices:vertices,triangles:triangles,configuration:brow)
                 if usesBeauty {blush.showMakeupPreview=false}
                 face.blushPreviewRenderer.update(brow:nil,forehead:nil,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:blush)
             } else {
                 var preview=configuration
                 lock.lock();let usesBeauty=beauty != nil;lock.unlock()
-                if usesBeauty && preview.region == .blush {preview.showMakeupPreview=false}
+                if usesBeauty && (preview.region == .blush || preview.region == .eyebrows) {preview.showMakeupPreview=false}
                 face.previewRenderer.update(brow:result.guide,forehead:result.foreheadGuide,blush:result.blushGuide,vertices:vertices,triangles:triangles,configuration:preview)
             }
             face.trackingDots.update(vertices:vertices,visible:configuration.showTrackingPoints)
@@ -442,7 +449,10 @@ struct LiveGuideView: UIViewRepresentable {
             if let configuration=options.eyebrows {
                 if isTracked,let face {
                     if configuration.usesLaunchFit {
-                        // -Nimah: Reattach the launch fit to this live mesh; never run a second scan in try-on.
+                        // Brow/cheek attachments are fitted from this live camera, then followed by ARKit tracking.
+                        if relaxed && abs(relative.columns.2.z)>0.94 && !LaunchMakeupFit.shared.hasFit {
+                            LaunchMakeupFit.shared.fitLive(FaceLandmarkFrame(frame:frame,anchor:face))
+                        }
                         eyebrowPipeline.followLaunchFit(anchorID:face.identifier,vertices:Array(face.geometry.vertices),
                             triangles:Array(face.geometry.triangleIndices),timestamp:frame.timestamp,style:configuration.style,
                             blushStyle:configuration.needsBlush ? configuration.blushStyle : nil,

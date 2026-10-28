@@ -124,20 +124,20 @@ final class EyebrowTests:XCTestCase {
             let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:style))
             XCTAssertEqual(guide.curves.count,2)
             peaks[style]=guide.curves.flatMap(\.samples).compactMap { $0?.position(in:f.vertices)?.y }.max()
-            if style == .feathered { XCTAssertGreaterThan(guide.curves[0].strokes.count,0) }
+            if style == .softNatural { XCTAssertGreaterThan(guide.curves[0].strokes.count,0) }
             else { XCTAssertTrue(guide.curves[0].strokes.isEmpty) }
         }
-        XCTAssertGreaterThan(peaks[.highArch]!,peaks[.softArch]!)
-        XCTAssertGreaterThan(peaks[.softArch]!,peaks[.straight]!)
+        XCTAssertGreaterThan(peaks[.boldArch]!,peaks[.softNatural]!)
+        XCTAssertGreaterThan(peaks[.softNatural]!,peaks[.flatStraight]!)
     }
     func testGuideRendererModesAndTrackingLossHideNodes() throws {
-        let f=BrowFixture(),guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:try f.region(),style:.straight))
+        let f=BrowFixture(),guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:try f.region(),style:.flatStraight))
         let renderer=EyebrowSceneRenderer()
-        renderer.update(guide:guide,vertices:f.vertices,configuration:.init(style:.straight,mode:.dots))
+        renderer.update(guide:guide,vertices:f.vertices,configuration:.init(style:.flatStraight,mode:.dots))
         XCTAssertFalse(renderer.root.isHidden)
         XCTAssertTrue(renderer.root.childNodes.filter { $0.geometry is SCNCapsule }.allSatisfy(\.isHidden))
         XCTAssertTrue(renderer.root.childNodes.filter { $0.geometry is SCNSphere && !$0.isHidden }.allSatisfy { $0.position.y>0.05 })
-        renderer.update(guide:guide,vertices:f.vertices,configuration:.init(style:.straight,mode:.dashed))
+        renderer.update(guide:guide,vertices:f.vertices,configuration:.init(style:.flatStraight,mode:.dashed))
         XCTAssertTrue(renderer.root.childNodes.filter { $0.geometry is SCNSphere }.allSatisfy(\.isHidden))
         XCTAssertTrue(renderer.root.childNodes.contains { $0.geometry is SCNCapsule && !$0.isHidden })
         renderer.update(guide:nil,vertices:f.vertices,configuration:.init()); XCTAssertTrue(renderer.root.isHidden)
@@ -145,19 +145,19 @@ final class EyebrowTests:XCTestCase {
     func testPipelineProducesGuidesAndRejectsResultsAfterLoss() async throws {
         let f=BrowFixture(),provider=DelayedLandmarks([f.detection()])
         let pipeline=EyebrowTrackingPipeline(provider:provider,requiredScanSamples:1)
-        pipeline.reset(anchorID:f.anchor); pipeline.calibrate(input:try f.input(),style:.straight)
+        pipeline.reset(anchorID:f.anchor); pipeline.calibrate(input:try f.input(),style:.flatStraight)
         XCTAssertEqual(provider.started.wait(timeout:.now()+1),.success)
         pipeline.trackingLost(); provider.resume.signal()
         try await Task.sleep(for:.milliseconds(250))
-        XCTAssertNil(pipeline.snapshot(style:.straight).guide)
+        XCTAssertNil(pipeline.snapshot(style:.flatStraight).guide)
         let working=EyebrowTrackingPipeline(provider:FixtureLandmarks(result:[f.detection()]),requiredScanSamples:1)
-        working.reset(anchorID:f.anchor); working.calibrate(input:try f.input(),style:.straight)
+        working.reset(anchorID:f.anchor); working.calibrate(input:try f.input(),style:.flatStraight)
         for _ in 0..<30 {
-            if working.snapshot(style:.straight).guide != nil { break }
+            if working.snapshot(style:.flatStraight).guide != nil { break }
             try await Task.sleep(for:.milliseconds(30))
         }
-        XCTAssertNotNil(working.snapshot(style:.straight).guide)
-        working.reset(anchorID:UUID()); XCTAssertNil(working.snapshot(style:.straight).guide)
+        XCTAssertNotNil(working.snapshot(style:.flatStraight).guide)
+        working.reset(anchorID:UUID()); XCTAssertNil(working.snapshot(style:.flatStraight).guide)
     }
     @MainActor func testSessionLeasePreventsOldModuleFromPausingNewOwner() {
         let manager=ARFaceTrackingManager(),first=UUID(),second=UUID()
@@ -200,16 +200,16 @@ extension EyebrowTests {
             func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] { throw NSError(domain:"VisionFixture",code:9) }
         }
         let f=BrowFixture(),pipeline=EyebrowTrackingPipeline(provider:FailingProvider())
-        pipeline.reset(anchorID:f.anchor); pipeline.calibrate(input:try f.input(),style:.straight)
+        pipeline.reset(anchorID:f.anchor); pipeline.calibrate(input:try f.input(),style:.flatStraight)
         for _ in 0..<20 {
-            if pipeline.snapshot(style:.straight).message.contains("unavailable") { break }
+            if pipeline.snapshot(style:.flatStraight).message.contains("unavailable") { break }
             try await Task.sleep(for:.milliseconds(20))
         }
-        XCTAssertNil(pipeline.snapshot(style:.straight).guide)
-        XCTAssertTrue(pipeline.snapshot(style:.straight).message.contains("unavailable"))
+        XCTAssertNil(pipeline.snapshot(style:.flatStraight).guide)
+        XCTAssertTrue(pipeline.snapshot(style:.flatStraight).message.contains("unavailable"))
     }
     func testRenderedGuideFollowsCurrentMeshDeformation() throws {
-        let f=BrowFixture(),guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:try f.region(),style:.straight))
+        let f=BrowFixture(),guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:try f.region(),style:.flatStraight))
         let renderer=EyebrowSceneRenderer()
         renderer.update(guide:guide,vertices:f.vertices,configuration:.init(mode:.dots))
         let dot=try XCTUnwrap(renderer.root.childNodes.first(where:{ $0.geometry is SCNSphere && !$0.isHidden }))
@@ -251,7 +251,7 @@ extension EyebrowTests {
             let tail=try XCTUnwrap(BrowMappingFormula.intersection(nose:.init(m.ala.x,m.ala.y),through:.init(m.outerEye.x,m.outerEye.y),level:m.tail.y))
             XCTAssertLessThan(simd_distance(arch,m.arch),0.00001); XCTAssertLessThan(simd_distance(tail,m.tail),0.00001)
         }
-        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.softArch))
+        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.softNatural))
         for curve in guide.curves {
             XCTAssertEqual(curve.keyPoints.count,3); XCTAssertEqual(curve.mappingLines.count,3)
             let m=try XCTUnwrap(region.brows.first(where:{ $0.side==curve.side })?.mapping)
@@ -271,16 +271,16 @@ extension EyebrowTests {
         let f=BrowFixture(),pipeline=EyebrowTrackingPipeline(provider:FixtureLandmarks(result:[f.detection()]))
         pipeline.reset(anchorID:f.anchor)
         for i in 1...3 {
-            pipeline.calibrate(input:try f.input(timestamp:Double(i)),style:.straight)
+            pipeline.calibrate(input:try f.input(timestamp:Double(i)),style:.flatStraight)
             for _ in 0..<100 {
-                let state=pipeline.snapshot(style:.straight)
+                let state=pipeline.snapshot(style:.flatStraight)
                 if state.ready || state.message.contains("Eye scan \(i)/3") { break }
                 try await Task.sleep(for:.milliseconds(20))
             }
-            if i<3 { XCTAssertFalse(pipeline.snapshot(style:.straight).ready) }
+            if i<3 { XCTAssertFalse(pipeline.snapshot(style:.flatStraight).ready) }
         }
-        XCTAssertTrue(pipeline.snapshot(style:.straight).ready)
-        pipeline.trackingLost(); XCTAssertFalse(pipeline.snapshot(style:.straight).ready)
+        XCTAssertTrue(pipeline.snapshot(style:.flatStraight).ready)
+        pipeline.trackingLost(); XCTAssertFalse(pipeline.snapshot(style:.flatStraight).ready)
     }
 }
 
@@ -295,7 +295,7 @@ extension EyebrowTests {
                 let peak=try XCTUnwrap(curve.keyPoints[1].position(in:f.vertices))
                 XCTAssertLessThanOrEqual(peak.y,mapping.arch.y+0.00101)
                 XCTAssertGreaterThanOrEqual(peak.y,mapping.arch.y-0.00151)
-                if style == .softArch { XCTAssertEqual(peak.y,mapping.arch.y,accuracy:0.00001) }
+                if style == .softNatural { XCTAssertEqual(peak.y,mapping.arch.y,accuracy:0.00001) }
                 for sample in curve.samples.compactMap({ $0?.position(in:f.vertices) }) {
                     XCTAssertLessThanOrEqual(sample.y,mapping.arch.y+0.00101)
                 }
@@ -328,7 +328,7 @@ extension EyebrowTests {
     }
     func testLiveOutlineUsesObservedSpanEvenWhenFormulaTailExtendsFurther() throws {
         let f=BrowFixture(),region=try f.region()
-        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.softArch))
+        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.softNatural))
         for curve in guide.curves {
             let observed=try XCTUnwrap(region.brows.first(where:{ $0.side==curve.side }))
             let points=observed.landmarks.compactMap { $0.position(in:f.vertices) }

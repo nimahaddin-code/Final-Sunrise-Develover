@@ -17,28 +17,15 @@ final class AppNavigatorTests: XCTestCase {
         super.tearDown()
     }
 
-    @MainActor func testOnboardingLandsOnTryOnHomeWithoutCreatingAPath() {
-        let navigator = AppNavigator(defaults: defaults)
-        navigator.selectedTab = .discover
-        XCTAssertFalse(navigator.onboardingComplete)
-        navigator.completeOnboarding()
-        XCTAssertTrue(navigator.onboardingComplete)
-        XCTAssertTrue(navigator.launchScanComplete)
+    @MainActor func testOpensOnTryOnHomeWithoutAPath() {
+        let navigator = AppNavigator()
         XCTAssertEqual(navigator.selectedTab, .tryOn)
         XCTAssertTrue(navigator.tryOnPath.isEmpty)
         XCTAssertTrue(navigator.discoverPath.isEmpty)
         XCTAssertTrue(navigator.savedPath.isEmpty)
     }
-    @MainActor func testCompletedOnboardingIsRememberedAcrossLaunches() {
-        AppNavigator(defaults: defaults).completeOnboarding()
-        let relaunched = AppNavigator(defaults: defaults)
-        XCTAssertTrue(relaunched.onboardingComplete)
-        // -Nimah: Reopening uses saved results; Profile owns explicit retakes.
-        XCTAssertTrue(relaunched.launchScanComplete)
-        XCTAssertEqual(relaunched.selectedTab, .tryOn)
-    }
     @MainActor func testFinishingDiscoverFlowPreservesSavedTabHistory() {
-        let navigator = AppNavigator(defaults: defaults)
+        let navigator = AppNavigator()
         let savedRoute = AppRoute.savedLookDetail(SampleData.savedLook)
         navigator.open(savedRoute, in: .myLooks)
         navigator.open(.referenceDetail(SampleData.references[0]), in: .discover)
@@ -50,7 +37,7 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertEqual(navigator.savedPath, [savedRoute])
     }
     @MainActor func testOpeningSavedDetailSelectsItsTabAndPreservesDiscoverPath() {
-        let navigator = AppNavigator(defaults: defaults)
+        let navigator = AppNavigator()
         navigator.open(.referenceImport, in: .discover)
         let route = AppRoute.savedLookDetail(SampleData.savedLook)
         navigator.open(route, in: .myLooks)
@@ -59,7 +46,7 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertEqual(navigator.discoverPath, [.referenceImport])
     }
     @MainActor func testReturningToTryOnRootSelectsTabAndClearsOnlyItsPath() {
-        let navigator = AppNavigator(defaults: defaults)
+        let navigator = AppNavigator()
         navigator.open(.referenceImport, in: .discover)
         let plan = MakeupPlan(shape: .oval)
         let route = AppRoute.makeupTryOn(plan: plan, applied: plan.madeForYou)
@@ -69,30 +56,6 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertEqual(navigator.selectedTab, .tryOn)
         XCTAssertTrue(navigator.tryOnPath.isEmpty)
         XCTAssertEqual(navigator.discoverPath, [.referenceImport])
-    }
-    @MainActor func testProfileRetakeKeepsProfileUntilCompletedOrCancelled() {
-        let navigator=AppNavigator(defaults:defaults)
-        navigator.open(.profile,in:.tryOn)
-        navigator.beginRetake()
-        XCTAssertTrue(navigator.retakePresented)
-        XCTAssertEqual(navigator.tryOnPath,[.profile])
-        navigator.cancelRetake()
-        navigator.retakeDismissed()
-        XCTAssertFalse(navigator.retakePresented)
-        XCTAssertEqual(navigator.tryOnPath,[.profile])
-        navigator.beginRetake()
-        navigator.finishRetake()
-        XCTAssertFalse(navigator.retakePresented)
-        XCTAssertEqual(navigator.tryOnPath,[.profile],"Wait for cover dismissal before activating home")
-        navigator.retakeDismissed()
-        XCTAssertTrue(navigator.tryOnPath.isEmpty)
-    }
-    @MainActor func testRescanFromHomeReturnsToTryOnRoot() {
-        let navigator = AppNavigator(defaults: defaults)
-        navigator.open(.faceScan, in: .tryOn)
-        XCTAssertEqual(navigator.tryOnPath, [.faceScan])
-        navigator.returnToRoot(of: .tryOn)
-        XCTAssertTrue(navigator.tryOnPath.isEmpty)
     }
     @MainActor func testFaceShapeResultIsRestoredAcrossLaunches() {
         let classifier = FaceShapeClassifier(reference: FaceProportions(length: 1.2, forehead: 0.85, jaw: 0.8, chin: 0.5))

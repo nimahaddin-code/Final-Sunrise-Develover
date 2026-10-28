@@ -1,26 +1,18 @@
 import SwiftUI
-import Combine
-// -Nimah: Saved scan outputs select the single assigned style on the shared camera.
 
-/// The app's first screen once onboarding is done: header, live camera card, the three tools, a shade row and an
-/// intensity bar. The arrow opens the tutorial, the profile button the profile page.
+/// The app's first screen: header, live camera card, the three tools, a shade row and an intensity bar.
+/// The arrow opens the tutorial. Every tool uses the standard look; there is no face or eye scan.
 struct TryOnHomeView: View {
     @StateObject private var home: TryOnHomeModel
-    var onProfile: () -> Void
     var onTutorial: (TutorialHandoff) -> Void
-    @ObservedObject private var store: FaceShapeStore
     @AppStorage(DeveloperTools.key) private var developerTools = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible=false
     @State private var showColours=false
 
-    init(store: FaceShapeStore, assessment: FaceShapeAssessment?, checker: any FaceTrackingAvailabilityChecking,
-         onProfile: @escaping () -> Void, onTutorial: @escaping (TutorialHandoff) -> Void) {
-        let plan = store.latest.map { MakeupPlan(scan: $0, eyeScan: store.eyes) } ?? MakeupPlan(shape: .oval, eyeScan: store.eyes)
-        _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment ?? FaceShapeAssessment(shape: .unknown),
-                                                         checker: checker))
-        self.store = store
-        self.onProfile = onProfile
+    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
+         onTutorial: @escaping (TutorialHandoff) -> Void) {
+        _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment, checker: checker))
         self.onTutorial = onTutorial
     }
 
@@ -33,14 +25,24 @@ struct TryOnHomeView: View {
                     .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
             } else {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
+                    .overlay(alignment: .topLeading) {
+                        if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small) }
+                    }
             }
             toolStrip
-            // -Nimah: Old installs may have analysis but no persisted fit; never silently show an empty tool.
+            if home.tool == .eyebrow && home.canTry(.eyebrow) {
+                BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
+            }
+            if home.tool == .eyebrow && home.canTry(.eyebrow) && EyebrowConfiguration.showsBrowTracking {
+                browTrackingToggles
+            }
+            if home.tool == .eyebrow && home.canTry(.eyebrow) && !EyebrowConfiguration.showsBrowTracking {
+                BrowStylePicker(styles: home.brow.browStyleChoices, selected: home.brow.configuration.style,
+                                onSelect: home.brow.chooseBrowStyle)
+            }
+            // -Nimah: Never silently show an empty tool.
             if !home.canTry(home.tool) {
                 Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
-                if !home.hasLaunchFit && home.tool != .eyeliner {
-                    Button("Open Profile to retake") { onProfile() }
-                }
             }
             shadeRow.disabled(!home.canTry(home.tool))
             IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
@@ -49,20 +51,16 @@ struct TryOnHomeView: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.wine.ignoresSafeArea())
+        .background(AppColors.screen.ignoresSafeArea())
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: home.tool)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
-        .onReceive(store.$latest.combineLatest(store.$eyes)) { face,eyes in
-            home.updateRecommendations(face:face,eyes:eyes)
-        }
         .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
             PaletteColorPicker(initial:home.currentShade ?? home.swatches[0]) { home.choose(shade:$0) }
         }
         .onAppear {
-            // -Nimah: Fitting can finish after the final analysis publisher; refresh even when classifications match.
-            isVisible=true;home.updateRecommendations(face:store.latest,eyes:store.eyes)
+            isVisible=true
             if !showColours { home.activate() }
         }
         .onDisappear { isVisible=false; home.deactivate() }
@@ -85,14 +83,6 @@ struct TryOnHomeView: View {
                 .onLongPressGesture(minimumDuration: 1.2) { developerTools.toggle() }
                 .sensoryFeedback(.impact, trigger: developerTools)
             HStack {
-                Button(action: onProfile) {
-                    Image(systemName: "person.fill")
-                        .font(.title2)
-                        .frame(width: 60, height: 60)
-                        .background(AppColors.snow.opacity(0.35), in: Circle())
-                        .foregroundStyle(AppColors.wine)
-                }
-                .accessibilityLabel("Profile")
                 Spacer()
                 Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities)) } label: {
                     Image(systemName: "arrow.right")
@@ -131,6 +121,28 @@ struct TryOnHomeView: View {
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+    }
+
+    /// Test toggles under the eyebrow tool for the MediaPipe tracking view.
+    private var browTrackingToggles: some View {
+        HStack(spacing: AppSpacing.small) {
+            Spacer()
+            trackingToggle("Landmarks", symbol: "circle.grid.3x3", isOn: $home.browLandmarksVisible)
+            trackingToggle("Natural brow", symbol: "eyebrow", isOn: $home.naturalBrowVisible)
+        }
+    }
+
+    private func trackingToggle(_ title: LocalizedStringKey, symbol: String, isOn: Binding<Bool>) -> some View {
+        Button { isOn.wrappedValue.toggle() } label: {
+            Label(title, systemImage: symbol)
+                .font(AppTypography.caption.weight(.semibold))
+                .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
+                .background(AppColors.flamingo.opacity(isOn.wrappedValue ? 0.32 : 0.12), in: Capsule())
+                .overlay { Capsule().strokeBorder(AppColors.snow, lineWidth: isOn.wrappedValue ? 1.5 : 0) }
+                .foregroundStyle(AppColors.snow.opacity(isOn.wrappedValue ? 1 : 0.6))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
     }
 
     // MARK: Shades

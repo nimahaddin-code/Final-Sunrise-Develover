@@ -23,6 +23,8 @@ import ImageIO
     @Published var renderMessage = "Preview not started"
     @Published var debugMessage = ""
     @Published var beautyStatus:String?
+    /// MediaPipe brow tracking for the tracking view; a separate object so per-frame updates redraw only that overlay.
+    let browTracking=BrowTrackingFeed()
     @Published var previewStrength: Float = 0.8
     // -Nimah: Shared session + eyebrow module status; tidak menyimpan gambar atau landmark ke disk.
     let trackingManager=ARFaceTrackingManager.shared

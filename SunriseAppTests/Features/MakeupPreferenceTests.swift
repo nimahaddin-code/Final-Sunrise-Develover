@@ -7,6 +7,53 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
+    @MainActor func testCancelledMakeupPreparationDoesNotLatchUnavailable() async throws {
+        let error=try await BeautyBlushEngine.cancelledPreparationFixture()
+        XCTAssertNil(error,"Navigation cancellation must not become a persistent makeup failure")
+        let model=HandOcclusionSegmenter(faceSkinOnly:true)
+        try await model.start();XCTAssertTrue(model.isAvailable)
+        model.stop();XCTAssertFalse(model.isAvailable)
+        try await model.start();XCTAssertTrue(model.isAvailable)
+        model.stop()
+    }
+    func testSameBlushStyleAdaptsToIndividualCheekAndMidfaceProportions() throws {
+        let region=try BrowFixture().region()
+        let base=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.centerCheek))
+        let altered=region.restVertices.map { p -> SIMD3<Float> in
+            var q=p
+            if q.x>0 && q.y<0.025 {q.x *= 0.80}
+            return q
+        }
+        let personal=EyebrowRegion(brows:region.brows,faceObservationConfidence:region.faceObservationConfidence,
+            timestamp:region.timestamp,anchorID:region.anchorID,restVertices:altered,triangles:region.triangles,eyeCenters:region.eyeCenters)
+        let adapted=try XCTUnwrap(BlushPlacementGenerator.make(region:personal,style:.centerCheek))
+        let before=try XCTUnwrap(base.pigmentFields.first(where:{$0.side>0}))
+        let after=try XCTUnwrap(adapted.pigmentFields.first(where:{$0.side>0}))
+        XCTAssertLessThan(after.radius.x,before.radius.x)
+        XCTAssertLessThan(after.outerLimit,before.outerLimit)
+        XCTAssertLessThan(after.center.x,before.center.x)
+        let unchanged=try XCTUnwrap(adapted.pigmentFields.first(where:{$0.side<0}))
+        XCTAssertEqual(unchanged.radius.x,try XCTUnwrap(base.pigmentFields.first(where:{$0.side<0})).radius.x,accuracy:0.0001)
+        let changedBrows=region.brows.map { b -> EyebrowRegion.Brow in
+            guard let m=b.mapping else {return b}
+            var ala=m.ala;ala.y -= 0.01
+            return .init(side:b.side,landmarks:b.landmarks,mapping:.init(ala:ala,pupil:m.pupil,outerEye:m.outerEye,start:m.start,arch:m.arch,tail:m.tail))
+        }
+        let taller=EyebrowRegion(brows:changedBrows,faceObservationConfidence:region.faceObservationConfidence,
+            timestamp:region.timestamp,anchorID:region.anchorID,restVertices:region.restVertices,triangles:region.triangles,eyeCenters:region.eyeCenters)
+        let vertical=try XCTUnwrap(BlushPlacementGenerator.make(region:taller,style:.centerCheek)?.pigmentFields.first)
+        XCTAssertGreaterThan(vertical.radius.y,try XCTUnwrap(base.pigmentFields.first).radius.y)
+    }
+    func testBlushPersonalizationRejectsInvalidConfiguration() throws {
+        let url=try XCTUnwrap(Bundle.main.url(forResource:"makeup-reference.database",withExtension:"json"))
+        var root=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:url)) as? [String:Any])
+        var fitting=try XCTUnwrap(root["runtime_fitting_rules"] as? [String:Any])
+        var parameters=try XCTUnwrap(fitting["parameters"] as? [String:Any])
+        var strength=try XCTUnwrap(parameters["blush_personalization_strength"] as? [String:Any])
+        strength["value"]=99;parameters["blush_personalization_strength"]=strength
+        fitting["parameters"]=parameters;root["runtime_fitting_rules"]=fitting
+        XCTAssertThrowsError(try MakeupRuleDatabase.decode(JSONSerialization.data(withJSONObject:root)))
+    }
     func testFaceSkinOcclusionModelInitializesFromBundledLabels() async throws {
         let model=HandOcclusionSegmenter(faceSkinOnly:true)
         try await model.start()
@@ -89,14 +136,14 @@ final class MakeupPreferenceTests:XCTestCase {
         }
     }
     @MainActor func testBlushIntensityUsesUpdatedJSONWithoutChangingBrowOrLiner() {
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         XCTAssertEqual(home.intensities[.blush] ?? -1,0.72,accuracy:0.00001)
-        XCTAssertEqual(home.intensities[.eyebrow] ?? -1,0.65,accuracy:0.00001)
+        XCTAssertEqual(home.intensities[.eyebrow] ?? -1,BrowOverlay.defaultIntensity,accuracy:0.00001)
         home.deactivate()
     }
     func testBrowBodyHasUsableThicknessWithoutShorteningObservedContour() throws {
         let region=try BrowFixture().region()
-        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.lowArch))
+        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.softNatural))
         for curve in guide.curves {
             let observed=curve.landmarks.compactMap { $0.position(in:region.restVertices) }
             let width=observed.map(\.x).max()!-observed.map(\.x).min()!
@@ -110,7 +157,7 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     func testMissingBrowOutlineSampleClipsOnlyThatStripInsteadOfErasingBothBrows() throws {
         let region=try BrowFixture().region()
-        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.lowArch))
+        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.slimStraight))
         let original=try XCTUnwrap(guide.curves.first)
         var outline=original.outline
         outline[20]=nil
@@ -124,7 +171,7 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     func testBundledDatabaseAssignmentsAndFullWidthGeometry() throws {
         let rules=try XCTUnwrap(MakeupRuleDatabase.shared)
-        let expected:[MakeupFaceShape:(String,String)]=[.oval:("brow.natural","blush.cheekbone"),.round:("brow.high_arch","blush.high_cheekbone"),.square:("brow.rounded","blush.apple"),.oblong:("brow.straight","blush.horizontal"),.heart:("brow.low_arch","blush.center_cheek"),.diamond:("brow.soft_arch","blush.temple_sweep")]
+        let expected:[MakeupFaceShape:(String,String)]=[.oval:("brow.soft_natural","blush.cheekbone"),.round:("brow.bold_arch","blush.high_cheekbone"),.square:("brow.curved_arch","blush.apple"),.oblong:("brow.flat_straight","blush.horizontal"),.heart:("brow.slim_straight","blush.center_cheek"),.diamond:("brow.slim_arch","blush.temple_sweep")]
         for (shape,ids) in expected {
             XCTAssertEqual(MakeupPreferenceCatalog.assignedBrow(for:shape)?.id,ids.0)
             XCTAssertEqual(MakeupPreferenceCatalog.assignedBlush(for:shape)?.id,ids.1)
@@ -134,7 +181,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.cheekbone))
         XCTAssertEqual(guide.pigmentFields.count,2)
         for f in guide.pigmentFields {
-            XCTAssertEqual(f.radius.x,0.16*0.210,accuracy:0.000001)
+            XCTAssertTrue((0.16*0.210*0.83...0.16*0.210*1.2125).contains(f.radius.x),"Personal fitting must stay inside declared adaptation bounds")
             XCTAssertEqual(f.radius.y,0.16*0.130,accuracy:0.000001)
             XCTAssertEqual(f.angle,15*Float.pi/180,accuracy:0.000001)
             XCTAssertGreaterThan(f.coverage(f.center),0.99)
@@ -181,7 +228,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let reopened=LaunchMakeupFit(defaults:defaults)
         XCTAssertTrue(reopened.hasFit)
         let region=try XCTUnwrap(reopened.fittedRegion(anchorID:UUID(),vertices:input.vertices,triangles:input.triangles,timestamp:1))
-        XCTAssertNotNil(EyebrowGuideGenerator.make(region:region,style:.natural))
+        XCTAssertNotNil(EyebrowGuideGenerator.make(region:region,style:.softNatural))
         reopened.clear()
         XCTAssertFalse(LaunchMakeupFit(defaults:defaults).hasFit)
     }
@@ -277,7 +324,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertNil(PalettePhoto.decode(Data([0,1,2])))
     }
     @MainActor func testCustomColourKeepsPlacementAndTransfersToTutorial() throws {
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         let assigned=try XCTUnwrap(home.brow.selectedBlush).id
         let shade=MakeupShade(id:"custom.test",name:"Custom colour",red:0.8,green:0.2,blue:0.4,opacity:0.36)
         home.choose(shade:shade);home.setIntensity(0.8)
@@ -325,14 +372,14 @@ final class MakeupPreferenceTests:XCTestCase {
         }
         let f=BrowFixture(),pipeline=EyebrowTrackingPipeline(provider:Provider(result:f.detection()),requiredScanSamples:1)
         pipeline.reset(anchorID:f.anchor)
-        pipeline.calibrate(input:try f.input(),style:.softArch,blushStyle:.apple)
+        pipeline.calibrate(input:try f.input(),style:.softNatural,blushStyle:.apple)
         for _ in 0..<100 {
-            if pipeline.snapshot(style:.softArch,includeBrow:true,blushStyle:.apple).ready { break }
+            if pipeline.snapshot(style:.softNatural,includeBrow:true,blushStyle:.apple).ready { break }
             try await Task.sleep(for:.milliseconds(25))
         }
         var configuration=EyebrowConfiguration();configuration.layered=true;configuration.showGuide=false
         configuration.browLayer.on=true;configuration.blushLayer.on=true
-        let snapshot=pipeline.snapshot(style:.softArch,includeBrow:configuration.needsBrow,blushStyle:configuration.needsBlush ? .apple : nil)
+        let snapshot=pipeline.snapshot(style:.softNatural,includeBrow:configuration.needsBrow,blushStyle:configuration.needsBlush ? .apple : nil)
         XCTAssertNotNil(snapshot.guide);XCTAssertNotNil(snapshot.blushGuide)
         let renderer=FaceRegionPreviewRenderer()
         configuration.region = .blush;configuration.showMakeupPreview=true
@@ -391,12 +438,12 @@ final class MakeupPreferenceTests:XCTestCase {
         for anchor in [f.anchor,UUID()] {
             pipeline.reset(anchorID:anchor)
             pipeline.followLaunchFit(anchorID:anchor,vertices:input.vertices,triangles:input.triangles,
-                timestamp:input.timestamp,style:.softArch,blushStyle:.apple,cache:cache)
+                timestamp:input.timestamp,style:.softNatural,blushStyle:.apple,cache:cache)
             for _ in 0..<100 {
-                if pipeline.snapshot(style:.softArch,includeBrow:true,blushStyle:.apple).guide != nil { break }
+                if pipeline.snapshot(style:.softNatural,includeBrow:true,blushStyle:.apple).guide != nil { break }
                 try await Task.sleep(for:.milliseconds(25))
             }
-            let snapshot=pipeline.snapshot(style:.softArch,includeBrow:true,blushStyle:.apple)
+            let snapshot=pipeline.snapshot(style:.softNatural,includeBrow:true,blushStyle:.apple)
             XCTAssertNotNil(snapshot.guide);XCTAssertNotNil(snapshot.blushGuide)
         }
         XCTAssertNil(cache.fittedRegion(anchorID:f.anchor,vertices:[],triangles:[],timestamp:0))
@@ -408,7 +455,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
         let plan=MakeupPlan(shape:.heart,eyeScan:eyes)
         let assessment=FaceShapeAssessment(shape:.heart,origin:.analysis)
-        let home=TryOnHomeModel(plan:plan,assessment:assessment,checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:plan,assessment:assessment,checker:MockFaceTrackingChecker())
         home.choose(.eyeliner)
         XCTAssertTrue(home.canTry(.eyeliner))
         XCTAssertFalse(home.liner.hasLiner)
@@ -421,7 +468,7 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     @MainActor func testTryOnShowsOnlySelectedToolAndUsesLaunchFitting() {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:true)
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         XCTAssertEqual(home.enabled,[.blush])
         XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
         XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on)
@@ -446,7 +493,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertTrue(cache.prepare(input,provider:Provider(result:detected)))
         let region=try XCTUnwrap(cache.fittedRegion(anchorID:fixture.anchor,vertices:input.vertices,triangles:input.triangles,timestamp:0))
         XCTAssertTrue(region.brows.allSatisfy { $0.mapping == nil })
-        XCTAssertNotNil(EyebrowGuideGenerator.make(region:region,style:.natural))
+        XCTAssertNotNil(EyebrowGuideGenerator.make(region:region,style:.softNatural))
         struct Empty:FaceLandmarkProviding { func detectEyebrows(in frame:FaceLandmarkFrame) throws -> [DetectedEyebrows] { [] } }
         XCTAssertFalse(cache.prepare(input,provider:Empty()))
         XCTAssertTrue(cache.hasFit,"A later bad frame must not erase the successful initial fit")
@@ -472,11 +519,11 @@ final class MakeupPreferenceTests:XCTestCase {
         let second=await collector.finish();XCTAssertTrue(second)
         XCTAssertTrue(cache.hasFit)
     }
-    @MainActor func testMissingFitDisablesOnlyUnavailablePigment() {
-        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker(),hasLaunchFit:false)
-        XCTAssertFalse(home.canTry(.eyebrow));XCTAssertFalse(home.canTry(.blush))
-        XCTAssertTrue(home.canTry(.eyeliner))
+    // Without a scan, the standard look offers every tool; brows/blush wait for the live-camera fit.
+    @MainActor func testStandardLookOffersEveryToolWithoutAScan() {
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.oval),assessment:.standardLook,checker:MockFaceTrackingChecker())
+        XCTAssertTrue(home.canTry(.eyebrow));XCTAssertTrue(home.canTry(.blush));XCTAssertTrue(home.canTry(.eyeliner))
+        XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
         home.deactivate()
     }
     // -Nimah: The heart-face tutorial V must render as filled cheek pigment, not a chevron.
@@ -486,7 +533,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertEqual(guide.pigmentFields.count,2)
         for field in guide.pigmentFields {
             XCTAssertGreaterThan(field.coverage(field.center),0.99)
-            XCTAssertEqual(field.radius.x,0.16*0.09,accuracy:0.00001)
+            XCTAssertTrue((0.16*0.09*0.83...0.16*0.09*1.2125).contains(field.radius.x))
             XCTAssertEqual(field.radius.y,0.16*0.075,accuracy:0.00001)
         }
     }
@@ -525,7 +572,7 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     func testHiddenGuidesDoNotConstructSceneNodes() throws {
         let f=BrowFixture(),region=try f.region()
-        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.natural))
+        let guide=try XCTUnwrap(EyebrowGuideGenerator.make(region:region,style:.softNatural))
         let blush=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.apple))
         let browRenderer=EyebrowSceneRenderer(),areaRenderer=ForeheadSceneRenderer()
         var config=EyebrowConfiguration();config.showGuide=false
@@ -559,15 +606,15 @@ final class MakeupPreferenceTests:XCTestCase {
         }
         let f=BrowFixture(),pipeline=EyebrowTrackingPipeline(provider:Provider(result:f.detection()),requiredScanSamples:1)
         pipeline.reset(anchorID:f.anchor)
-        pipeline.calibrate(input:try f.input(),style:.softArch,blushStyle:.apple)
+        pipeline.calibrate(input:try f.input(),style:.softNatural,blushStyle:.apple)
         for _ in 0..<100 {
-            if pipeline.snapshot(style:.softArch,blushStyle:.apple).ready { break }
+            if pipeline.snapshot(style:.softNatural,blushStyle:.apple).ready { break }
             try await Task.sleep(for:.milliseconds(25))
         }
-        let snapshot=pipeline.snapshot(style:.softArch,blushStyle:.apple)
+        let snapshot=pipeline.snapshot(style:.softNatural,blushStyle:.apple)
         XCTAssertNotNil(snapshot.blushGuide);XCTAssertNil(snapshot.guide);XCTAssertNil(snapshot.foreheadGuide)
-        XCTAssertFalse(pipeline.snapshot(style:.softArch,blushStyle:.templeSweep).ready)
-        pipeline.trackingLost();XCTAssertFalse(pipeline.snapshot(style:.softArch,blushStyle:.apple).ready)
+        XCTAssertFalse(pipeline.snapshot(style:.softNatural,blushStyle:.templeSweep).ready)
+        pipeline.trackingLost();XCTAssertFalse(pipeline.snapshot(style:.softNatural,blushStyle:.apple).ready)
     }
     // -Nimah: Repeated mapping must recover after loss/reset, not just the first successful scan.
     func testRepeatedScanAfterLossAndRefit() async throws {
@@ -578,20 +625,20 @@ final class MakeupPreferenceTests:XCTestCase {
         let f=BrowFixture(),pipeline=EyebrowTrackingPipeline(provider:Provider(result:f.detection()),requiredScanSamples:1)
         for style in [BlushPlacementStyle.apple,.cheekbone,.templeSweep,.apple] {
             pipeline.reset(anchorID:f.anchor)
-            pipeline.calibrate(input:try f.input(),style:.natural,blushStyle:style)
+            pipeline.calibrate(input:try f.input(),style:.softNatural,blushStyle:style)
             for _ in 0..<100 {
-                if pipeline.snapshot(style:.natural,blushStyle:style).ready { break }
+                if pipeline.snapshot(style:.softNatural,blushStyle:style).ready { break }
                 try await Task.sleep(for:.milliseconds(25))
             }
-            XCTAssertNotNil(pipeline.snapshot(style:.natural,blushStyle:style).blushGuide)
+            XCTAssertNotNil(pipeline.snapshot(style:.softNatural,blushStyle:style).blushGuide)
             pipeline.trackingLost(timestamp:10)
-            XCTAssertFalse(pipeline.snapshot(style:.natural,blushStyle:style).ready)
+            XCTAssertFalse(pipeline.snapshot(style:.softNatural,blushStyle:style).ready)
             pipeline.resumeTracking(anchorID:f.anchor)
-            XCTAssertTrue(pipeline.snapshot(style:.natural,blushStyle:style).ready, "Brief dropout must resume without a new scan")
+            XCTAssertTrue(pipeline.snapshot(style:.softNatural,blushStyle:style).ready, "Brief dropout must resume without a new scan")
             pipeline.trackingLost(timestamp:20)
             pipeline.trackingLost(timestamp:21.1)
             pipeline.resumeTracking(anchorID:f.anchor)
-            XCTAssertFalse(pipeline.snapshot(style:.natural,blushStyle:style).ready, "Long loss must require fresh mapping")
+            XCTAssertFalse(pipeline.snapshot(style:.softNatural,blushStyle:style).ready, "Long loss must require fresh mapping")
         }
     }
     @MainActor func testScanInstructionsExplainDistanceAndMissingFace() {
@@ -618,7 +665,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertTrue(model.liveConfiguration.showMakeupPreview)
         XCTAssertTrue(model.liveConfiguration.showGuide)
         model.configuration.previewAfter=false
-        model.explore(EyebrowStyle.natural);model.select(.eyebrows)
+        model.explore(EyebrowStyle.softNatural);model.select(.eyebrows)
         XCTAssertTrue(model.liveConfiguration.showMakeupPreview)
     }
 

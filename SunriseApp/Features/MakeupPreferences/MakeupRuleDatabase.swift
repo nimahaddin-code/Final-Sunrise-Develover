@@ -60,6 +60,15 @@ struct MakeupRuleDatabase: Decodable, Sendable {
                 }
             }
         }
+        let adaptiveBounds:[String:ClosedRange<Float>]=[
+            "blush_personalization_strength":0...1,"blush_personal_scale_min":0.6...1,
+            "blush_personal_scale_max":1...1.5,"blush_contour_band":0.015...0.1,
+            "blush_nominal_interocular_ratio":0.25...0.55,"blush_mouth_clearance":0.01...0.08]
+        for (key,bounds) in adaptiveBounds {
+            if let p=rules.runtime_fitting_rules.parameters[key] {
+                guard p.unit=="ratio",p.value.isFinite,bounds.contains(p.value) else {throw RuleError.invalid}
+            }
+        }
         guard Set(rules.recommendation_assignments.map(\.face_shape)).count==rules.recommendation_assignments.count else { throw RuleError.invalid }
         for a in rules.recommendation_assignments where a.supported {
             guard rules.eyebrow_presets.contains(where:{$0.id==a.eyebrow_preset_id}),
@@ -73,15 +82,15 @@ struct MakeupRuleDatabase: Decodable, Sendable {
     }
     static func browID(_ style: EyebrowStyle) -> String? {
         switch style {
-        case .natural:return "brow.natural"
-        case .softArch:return "brow.soft_arch"
-        case .highArch:return "brow.high_arch"
-        case .angular:return "brow.angular"
-        case .rounded:return "brow.rounded"
-        case .straight:return "brow.straight"
-        case .lowArch:return "brow.low_arch"
-        case .lifted:return "brow.lifted"
-        case .thin,.feathered:return nil // Legacy studio modifiers are not assigned research presets.
+        case .boldArch:return "brow.bold_arch"
+        case .slimArch:return "brow.slim_arch"
+        case .softNatural:return "brow.soft_natural"
+        case .flatStraight:return "brow.flat_straight"
+        case .curvedArch:return "brow.curved_arch"
+        case .peakedAngle:return "brow.peaked_angle"
+        case .slimStraight:return "brow.slim_straight"
+        case .fullArch:return "brow.full_arch"
+        case .boldStraight:return "brow.bold_straight"
         }
     }
     static func blushID(_ style: BlushPlacementStyle) -> String {

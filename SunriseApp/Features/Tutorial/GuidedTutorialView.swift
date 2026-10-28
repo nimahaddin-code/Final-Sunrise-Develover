@@ -70,12 +70,12 @@ enum TutorialTab: CaseIterable, Identifiable {
 
     var stepIndex: Int { tab == .eyeliner ? linerStep : brow.stepIndex }
 
-    /// False when this face shape has no saved reference for the tab (nothing is drawn rather than a default).
+    /// False when the tab has no reference (nothing is drawn rather than a default).
     var hasGuide: Bool { tab == .eyeliner ? linerStyle != nil : brow.hasRecommendation }
 
     var lessons: [FaceGuideLesson] {
         guard hasGuide else {
-            return [FaceGuideLesson(title: "No guide yet", instruction: "This face shape has no saved reference for this step. Scan your face again from your profile, or use the other tabs.")]
+            return [FaceGuideLesson(title: "No guide yet", instruction: "This step has no reference yet. Use the other tabs.")]
         }
         if tab == .eyeliner, let linerStyle { return Self.linerLessons(linerStyle, neutral: linerIsNeutral) }
         return brow.lessons
@@ -88,6 +88,14 @@ enum TutorialTab: CaseIterable, Identifiable {
     var liveConfiguration: EyebrowConfiguration {
         var value = brow.liveConfiguration
         value.showMappingFormula = tab == .brows
+        // The split comparison is intended to show the applied pigment against the
+        // unfiltered camera. Keep the pigment on the filtered half, but suppress
+        // the placement outline (which reads as a box around the brow at this
+        // scale). The guide remains available in the full-filter tutorial mode.
+        if tab == .brows && compare == .split {
+            value.showGuide = false
+            value.showMappingFormula = false
+        }
         if tab == .eyeliner || !hasGuide || compare == .off { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
         return value
     }
@@ -168,7 +176,7 @@ enum TutorialTab: CaseIterable, Identifiable {
             lessons.append(FaceGuideLesson(title: "Add the lower line",
                                            instruction: "Draw a thin line under the lower lashes from the outer corner inward, about \(Int((style.lowerLine.extent * 100).rounded()))% of the way. Keep it lighter than the top line."))
         }
-        let fitted = neutral ? " This is a natural line; scan your eyes from your profile for a fitted style." : ""
+        let fitted = neutral ? " This is a natural line." : ""
         lessons.append(FaceGuideLesson(title: "Check both eyes",
                                        instruction: "Look straight ahead and compare both eyes, then soften any hard edge with a cotton swab. The guide follows your eyes but does not judge your application.\(fitted)"))
         return lessons
@@ -210,7 +218,7 @@ private struct TutorialScreen: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.wine.ignoresSafeArea())
+        .background(AppColors.screen.ignoresSafeArea())
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden()
@@ -273,6 +281,9 @@ private struct TutorialScreen: View {
                                   eyebrowConfiguration: model.liveConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   })
+                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .off {
+                        BrowTrackingOverlayView(feed: camera.browTracking)
+                    }
                     if model.tab == .eyeliner && model.compare != .off {
                         ZStack {
                             LinerOverlayView(model: model.liner, isVisible: true)

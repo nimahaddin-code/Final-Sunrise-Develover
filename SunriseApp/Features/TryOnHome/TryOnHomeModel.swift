@@ -1,4 +1,5 @@
 import ARKit
+import Combine
 import SwiftUI
 
 /// The three makeup tools on the Try On home screen.
@@ -91,14 +92,18 @@ final class LinerFrameRelay: @unchecked Sendable {
     @Published private(set) var intensities: [TryOnTool: Double]
     /// Held down on the camera card to see the bare face.
     @Published var isComparing = false
+    /// Test toggles under the eyebrow tool: the MediaPipe tracking overlay, and the user's own eyebrow.
+    /// Both start off: the user's own brow is hidden and the chosen overlay picture is drawn in its place.
+    @Published var browLandmarksVisible = false
+    @Published var naturalBrowVisible = false
+    /// The brow picture drawn over the hidden natural brow; nil draws none (hiding the natural brow is the separate toggle).
+    @Published private(set) var browOverlay: BrowOverlay? = .standard
 
     /// Blush/eyebrow style choices and availability; its configuration is only used as the base for the live preview.
     let brow: EyebrowViewModel
     let camera = FaceCameraState()
     let liner = LinerOverlayModel()
     let relay: LinerFrameRelay
-    // -Nimah: Refresh assignments after a rescan; no camera/model recreation is needed.
-    @Published private(set) var hasLaunchFit:Bool
     private var linerStyle: LinerStyle?
     private var linerIsNeutral = true
     @Published private(set) var linerRecommendation: MakeupRecommendation?
@@ -107,43 +112,47 @@ final class LinerFrameRelay: @unchecked Sendable {
     private var hasAppliedAnalysis=false
     private var appliedFace:FaceShapeResult?
     private var appliedEyes:EyeShapeResult?
+    private var observationBag = Set<AnyCancellable>()
 
-    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,hasLaunchFit:Bool? = nil) {
-        self.hasLaunchFit=hasLaunchFit ?? LaunchMakeupFit.shared.hasFit
+    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
-        // A thin natural line is used when the eye scan is missing or unclear, so the colour can still be tried.
+        // A thin natural line is used without an eye scan, so the colour can still be tried.
         linerIsNeutral = plan.eyeliner.isNeutral
         if case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: .blush)
         relay = LinerFrameRelay(model: liner)
         shades = [.blush: MakeupPalette.shades(for:.blush).first ?? MakeupPalette.pink, .eyebrow: MakeupPalette.shades(for:.eyebrow).first ?? MakeupPalette.referenceBrown,
                   .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
-        intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="eyebrow"})?.intensity.default.value ?? 0.65),
+        intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: BrowOverlay.defaultIntensity,
                        .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
+        // The style picker mutates the nested brow model. Forward those
+        // changes so the live camera representable receives a new
+        // configuration immediately instead of waiting for another home-level
+        // control to redraw it.
+        brow.objectWillChange
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &observationBag)
     }
 
     // -Nimah: Database/catalog selection is automatic; tools only switch category, never placement style.
     func canTry(_ tool: TryOnTool)->Bool {
         switch tool {
-        case .eyebrow:return hasLaunchFit && brow.selectedBrow != nil
-        case .blush:return hasLaunchFit && brow.selectedBlush != nil
+        case .eyebrow:return brow.selectedBrow != nil
+        case .blush:return brow.selectedBlush != nil
         case .eyeliner:return linerStyle != nil
         }
     }
     var recommendationTitle: String {
-        if tool != .eyeliner && !hasLaunchFit { return String(localized:"Brow and blush unavailable: initial contour fitting was not captured") }
         switch tool {
-        case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"No saved recommendation for this face shape")
-        case .blush:return brow.selectedBlush?.title ?? String(localized:"No saved recommendation for this face shape")
-        case .eyeliner:return linerIsNeutral ? String(localized:"Natural line · scan your eyes for a fitted style") : String(localized:"Eyeliner fitted to your eye scan")
+        case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"Eyebrow unavailable")
+        case .blush:return brow.selectedBlush?.title ?? String(localized:"Blush unavailable")
+        case .eyeliner:return linerIsNeutral ? String(localized:"Natural line") : String(localized:"Eyeliner fitted to your eye scan")
         }
     }
     func updateRecommendations(face: FaceShapeResult?, eyes: EyeShapeResult?) {
         // -Nimah: SwiftUI can resubscribe to @Published outputs; identical scans must not republish/reset the entire home.
-        let prepared=LaunchMakeupFit.shared.hasFit
-        guard !hasAppliedAnalysis || appliedFace != face || appliedEyes != eyes || prepared != hasLaunchFit else { return }
+        guard !hasAppliedAnalysis || appliedFace != face || appliedEyes != eyes else { return }
         hasAppliedAnalysis=true;appliedFace=face;appliedEyes=eyes
-        hasLaunchFit=prepared
         let shape=face.map { $0.shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:$0.shape.rawValue) ?? .unknown } ?? .unknown
         brow.applyAssessment(FaceShapeAssessment(shape:shape,origin:.analysis,confidence:face.map { Float($0.confidence) }))
         let plan=face.map { MakeupPlan(scan:$0,eyeScan:eyes) } ?? MakeupPlan(shape:.oval,eyeScan:eyes)
@@ -176,6 +185,9 @@ final class LinerFrameRelay: @unchecked Sendable {
         configuration.previewAfter = !isComparing
         configuration.browLayer = layer(.eyebrow)
         configuration.blushLayer = layer(.blush)
+        configuration.browTrackingOverlay = EyebrowConfiguration.showsBrowTracking && browLandmarksVisible
+        configuration.hideNaturalBrow = !naturalBrowVisible
+        configuration.browOverlay = browOverlay
         return configuration
     }
 
@@ -198,6 +210,12 @@ final class LinerFrameRelay: @unchecked Sendable {
         shades[tool] = shade
         enabled=[tool]
         if tool == .eyeliner { syncLiner() }
+    }
+
+    func choose(browOverlay overlay: BrowOverlay?) {
+        guard canTry(.eyebrow) else { return }
+        browOverlay = overlay
+        if tool == .eyebrow { enabled = [.eyebrow] }
     }
 
     func turnOff() {
@@ -243,7 +261,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     // -Nimah: Local state flags only; no frames or landmark coordinates in diagnostics.
     private func recordLiveState() {
-        UserDefaults.standard.set("active=\(active);tool=\(tool);fit=\(hasLaunchFit);enabled=\(enabled.contains(tool));overlay=\(camera.overlay);tracked=\(camera.tracked);guide=\(camera.eyebrowGuideReady);liner=\(liner.hasLiner);linerFrame=\(liner.frame != nil)",forKey:"makeupLiveDiagnostic.v1")
+        UserDefaults.standard.set("active=\(active);tool=\(tool);fit=\(LaunchMakeupFit.shared.hasFit);enabled=\(enabled.contains(tool));overlay=\(camera.overlay);tracked=\(camera.tracked);guide=\(camera.eyebrowGuideReady);liner=\(liner.hasLiner);linerFrame=\(liner.frame != nil)",forKey:"makeupLiveDiagnostic.v1")
     }
 
     private func layer(_ tool: TryOnTool) -> PreviewLayer {

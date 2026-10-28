@@ -1,3 +1,145 @@
+## ARKit pose for the brow, and the 3D hair brow — Khalish (2026-10-28)
+
+Details in `Docs/Decisions/0015-arkit-brow-pose.md`. `BrowFaceStabilizer` lifts MediaPipe's brow landmarks onto ARKit's face
+mesh (same frame's anchor), smooths them in face-local metres and projects them back (fallback: the image-space smoother when
+ARKit has no face or disagrees). "Brow 3D" (`BrowOverlay.is3D`) draws `brow-hair-3d.obj` ribbons on ARKit's pose with a depth-only
+face mesh pass, 1.5 px minimum hair width, ambient-light shading and the hand mask; it falls back to its picture without a tracked
+face. New shader code is only checked at runtime: compile `BeautyBlush.metal.txt` with `MTLDevice.makeLibrary(source:)` (a build
+does not) and run the tests, which fail every engine test if it does not compile. Device check pending.
+
+## Brow overlay pictures — Khalish (2026-10-28)
+
+The eyebrow tool draws a chosen PNG brow (`BrowOverlay.all`, image sets `brow-overlay-N` in `Assets.xcassets`, head left,
+tail right, alpha) over the hidden natural brow. `BrowOverlayPicker` lists them horizontally under the tool strip, after a "no overlay" tile (`browOverlay == nil`: no picture, natural-brow hiding unchanged). Try On
+now starts with "Landmarks" off and "Natural brow" off (hidden); both toggles stay as test switches. `BrowSpriteBaker` bakes
+a picture off the render queue into the existing brow-space texture (u 0...1 = its head-to-tail span, one picture width =
+one brow width, drawn in chord space: `BrowGeometry.chordOffset` adds the user's own brow rise when the strip samples it, so the
+picture keeps its own arch; strands stay visible through the shade via the texture's alpha channel = relative luminance).
+`EyebrowConfiguration.browOverlay` (nil in the tutorial, which still shows tracking only) turns on the shape pass
+(`browPigment` is gone; it follows the overlay). Initial eyebrow intensity is 0.9. To add a brow: add an image set and a
+`BrowOverlay` entry. The older `BrowStylePicker`/`BrowDesign` shapes stay, unused while `showsBrowTracking` is on.
+Simulator tests only; device look pending.
+
+## Black screen background — Khalish (2026-10-28)
+
+`AppColors.screen` (black) is the full-screen background of Try On, the tutorial, the palette sheet and placeholder
+pages; `AppColors.wine` stays for pills and accents.
+
+## Brow tracking view — Khalish (2026-10-27)
+
+`EyebrowConfiguration.showsBrowTracking` (currently `true`) hides the brow shapes and the shape picker; the eyebrow
+tool and the tutorial Brows tab show MediaPipe's tracking instead. The Metal engine draws, on the same frame as the
+landmarks: all 478 face points (dim white), raw brow points before smoothing (grey), smoothed upper (red) and lower
+(orange) brow contours, the fitted centerline (yellow), the brow frame where a shape would be drawn (cyan, green ticks
+at head/middle/tail) and eye corners, iris, alae and nose bridge. `BrowTrackingOverlayView` labels each point with
+its MediaPipe index and shows yaw/pitch/roll, landmark latency and rate (English-only developer view, fed by
+`FaceCameraState.browTracking`). Set the flag to `false` to bring the shapes and picker back. Device check pending.
+Test toggles under the eyebrow tool (`TryOnHomeModel.browLandmarksVisible` / `naturalBrowVisible`): "Landmarks"
+shows/hides the whole tracking overlay (points, contours, lines, labels, readout). "Natural brow" off hides the user's
+own eyebrow (`EyebrowConfiguration.hideNaturalBrow`) through `BrowEraser` (ADR 0014): each brow is unwrapped into a
+brow-space texture array (`browUnwrapFragment`), a blurred skin estimate is pulled from mip level 4 up, pixels around
+the brow clearly darker than it are the real brow edge (`browHairFragment`, beyond MediaPipe's rows, never past the
+eyelid bound) and join the hide mask, then the brow is filled by push-pull without them, given full-resolution
+forehead texture (`browFillFragment`, always on), blended frame to frame, and laid back by the brow strip. `BrowInpainter` adds MI-GAN (Core ML, bundled `Resources/MIGANFace256.mlpackage`, MIT, notice in
+`Resources/MI-GAN-LICENSE.txt`, reproduce with `Tools/MIGAN/convert_migan_coreml.py`) on an upright face crop every
+0.12 s, cached in brow space and faded over the push-pull fill. Area: `concealUpper` /
+`concealLower` (lower end ≤85% of the way to the eyelid row `BrowEyeMarks.lid`), long head/tail fades. Hands stay in
+front (face-skin mask). This is the only place the
+natural brow is erased, and only while that toggle is off; it is a test, not checked on a device. The readout's yaw/pitch/roll are turned to
+the screen (`BeautyBlushEngine.screenPose`): MediaPipe's matrix follows the sensor, which read roll near -90° in portrait.
+
+## New brow shape list — Khalish (2026-10-27)
+
+The old eight brow presets (natural, soft/high/low arch, angular, rounded, straight, lifted) and the thin/feathered
+modifiers are gone. `EyebrowStyle` is now nine shapes in picker order, following the user's TikTok effect screenshot
+(shape categories only, no assets copied): boldArch, slimArch, softNatural, flatStraight, curvedArch, peakedAngle,
+slimStraight, fullArch, boldStraight, each a `brow.*` preset in makeup-reference.database.json (source `brow_D`).
+Default/oval look is softNatural. Face-shape assignments map to the nearest new shape (round bold arch, square curved
+arch, oblong flat straight, heart slim straight, diamond slim arch). Picker thumbnails draw the real `BrowDesign`.
+Parameters are engineering proposals; device look acceptance pending.
+
+## Eyebrow on MediaPipe — Khalish (2026-10-27)
+
+The eyebrow try-on/tutorial no longer uses the ARKit mesh or Vision. `MediaPipeBrowTracker` (Face Landmarker, live
+stream, transformation matrix on) runs on the shared ARKit camera frames; `BeautyBlushEngine` draws each frame with
+its own landmarks (`submitBrow`/`renderBrow`). `BrowObservation` holds brow contours, eye/nose points and
+`BrowHeadPose`; `BrowObservationSmoother` filters them; `BrowGeometry` lays a brow-local strip over each brow;
+`BrowDesign` turns the style's rule fields into a brow-space curve, baked into a mipmapped texture. Overlay only, same
+face-skin occlusion. Original brow pixels are segmented in the shader ("Original brow mask" debug view), not erased.
+Tutorial guide outline and nose-eye mapping lines are drawn in Metal; the SceneKit brow guide is only the fallback.
+Blush is unchanged (ARKit mesh + Vision fit). `MediaPipeBrowTracker.swift` is a fourth file importing MediaPipe.
+See `Docs/Decisions/0013-mediapipe-eyebrow.md`. Simulator tests only; device QA pending. Sections below that
+describe the brow on the ARKit mesh, `BeautyBrowStabilizer` or the brow UV atlas predate this.
+
+## Eyebrow switching and tutorial comparison — 2026-10-27
+
+Style changes retain the last committed brow atlas while the new native UV bake is prepared. Failed bind attempts are throttled, while a new requested style resets that throttle and is attempted on the next frame. In the tutorial Brows split comparison, hide placement and mapping outlines so the filtered half compares pigment with the real brow cleanly; the full-filter tutorial still exposes its guide.
+
+## Brow overlay only, anti-blink, debug views — Khalish (2026-10-27)
+
+Per `eyebrow_filter_rendering_fix.md` (Option B): the brow is an overlay, the natural brow is NOT erased. The earlier erase/inpaint
+(vertical skin bridge) made horizontal bands and a soft rectangular patch over the brow area and was removed. Composite is straight
+alpha, `result = mix(camera, hair, browAlpha)`; browAlpha is zero outside the baked brow, so other pixels are the camera pixel
+(fixture test checks this). Strand density floor .35 so skin shows between strands. Each brow is fitted per side from its own
+Vision points (`EyebrowGuideGenerator`); camera/mesh mirroring is the existing paired displayTransform/projection.
+Anti-blink: brow keeps the last face-skin mask for up to `browMaskGraceSeconds` (0.3 s) instead of dropping out at 150 ms;
+brow pixels count as occluded only when skin 9 mm above or below is too (the segmenter often rejects brow hair). Blush unchanged.
+Debug: with developer tools on (long-press the logo) and eyebrow selected, a ladybug menu on the camera card picks
+`BrowDebugView` (`beautyBrow.debugView`): final, original, landmarks (brow points + eye centers), fit contours (design edge cyan,
+observed centerline yellow), alpha mask (white on black), texture only (on grey). English-only, like Scan Debug. Device QA pending.
+
+## Brow style picker — Khalish (2026-10-27)
+
+With the eyebrow tool selected, `TryOnHomeView` shows `BrowStylePicker`: all 8 database brow styles (`EyebrowViewModel.browStyleChoices`,
+database order) in one horizontal row under the tool strip. `chooseBrowStyle` sets `configuration.style`, which the live pipeline already
+re-fits and re-bakes. Default stays natural. Not carried into the tutorial handoff. Checked on Simulator UI only; live render needs a device.
+
+## Face/eye scan removed from the flow — Khalish (2026-10-27)
+
+The app opens straight on `TryOnHomeView`: no welcome, onboarding, face scan, eye scan, Profile, Retake or
+Scan Debug tab. Routes `faceScan`, `eyeScan`, `fullScan`, `profile`, `scanDebug` and `AppTab.scanDebug` are gone,
+as are `AppNavigator` onboarding/launch-scan/retake state. No face or eye shape is shown anywhere. Everyone gets
+`FaceShapeAssessment.standardLook` (oval assignment: natural brow, cheekbone blush) and the natural eyeliner.
+Brow/blush attachments are fitted from live try-on/tutorial frames (`LaunchMakeupFit.fitLive`, one Vision
+attempt at most every 0.4 s, frontal and relaxed face) and then followed by ARKit; `LaunchMakeupFit.shared` is
+memory-only, cleared on each camera session start, and deletes the old `savedMakeupAttachments.v1` key.
+FaceShape/EyeShape/Onboarding/ProfileView/ScanDebug code stays in the repo, unreferenced, so it can return.
+Sections below that describe the launch scan, saved fit or Profile predate this. Not yet checked on a device.
+
+## Brow stability — -Nimah (2026-10-27)
+
+User reports eyebrow jitter after availability recovery. Native brow residuals now use metre-space 2 Hz /
+80 Hz-per-metre-second One Euro filtering plus 0.12 mm output hold; gaps >150 ms reset. Rigid face/camera pose
+remains unsmoothed. Brow-only UV atlas gets mipmaps and anisotropic trilinear sampling to reduce strand
+minification shimmer. Blush keeps its prior filter and non-mipmapped atlas. Physical acceptance pending.
+
+## Makeup visibility recovery — -Nimah (2026-10-27)
+
+Device scalar metrics showed segmentation_unavailable: CancellationError() despite segmenter_available=true;
+mask age 223 ms exceeded the 150 ms freshness guard. Native beauty engine now owns/cancels preparation task,
+ignores expected navigation cancellation, clears recovered segmentation/fitting errors and resets status on
+pause. Opt-in faceSkinOnly preprocessing uses 256 long side for the bundled 256 model; Hanum default stays512.
+Do not remove stale-mask occlusion protection or claim all visibility delays are fixed without device checks.
+
+## Personal blush v0.4.0 — -Nimah (2026-10-27)
+
+Face shape picks artistic style; per-side cheek corridor and observed mouth/nose-to-eye spacing adapt
+center and radii. Uses stored native geometry, independent sides, explicit bounded JSON controls and
+conservative exclusions; no second scan/tracker or semantic cheekbone claim. Shared native mouth-boundary
+helper now lives in BlushPlacementGenerator. Keep Metal and tutorial using the same fields. Preserve all
+pending eyebrow edits and existing eyeliner. See Docs/Decisions/0012-personal-cheek-placement.md.
+
+## Native UV strand eyebrow — -Nimah (2026-10-27)
+
+Eyebrow After uses the shared BeautyBlushEngine ARKit/Metal pipeline, one selected category at a time.
+A native UV atlas bakes 80 measured/JSON-shaped centerline segments (40 per side); procedural stable strands,
+head fade, taper, feather and max alpha. Brow fragment uses separate hair pigment shading, not blush tint.
+Preserve observed head/tail, existing face-shape assignments and saved scan flow. No extra scan or tracker.
+Category mode is part of atlas cache identity; hide old layer and epoch-guard GPU completions on switching.
+SceneKit pigment disabled when Metal owns that category; guides/fallback retained. Metrics beautyBrow.metrics.
+Natural hair is not erased: a lighter shade cannot bleach dark brows. Face-skin segmenter is shared, not a
+specialized eyebrow/hair matting model. Physical device quality and segmentation need acceptance.
+
 ## Blush camera parity — -Nimah (2026-10-27)
 
 Removed the extra horizontal reflection from both Metal camera sampling and mesh projection.
@@ -378,8 +520,10 @@ Keep their placeholder labels until a real implementation is tested (see `Docs/P
 
 - **Adding files:** create them in `Features/<Feature>/` and add them to the matching group **and** target in
   `project.pbxproj` (PBXFileReference, PBXGroup child, PBXBuildFile, Sources phase). Then build to confirm.
-- **Third-party code:** MediaPipe is the only dependency. `import MediaPipeTasksVision` appears in one file,
-  `Features/EyeShape/MediaPipeEyeDetector.swift`; everything else works on plain landmark arrays. A new dependency needs an ADR in `Docs/Decisions/`.
+- **Third-party code:** MediaPipe is the only package dependency; the MI-GAN Core ML model (ADR 0014) is the only bundled
+  third-party model besides MediaPipe's own, and its MIT notice must stay in `Resources/MI-GAN-LICENSE.txt`. `import MediaPipeTasksVision` is limited to the detector wrappers
+  (`MediaPipeEyeDetector`, `MediaPipeEyeLandmarkProvider`, `HandOcclusionSegmenter`, `MediaPipeBrowTracker`); everything else
+  works on plain landmark arrays. A new dependency needs an ADR in `Docs/Decisions/`.
 - **Dependencies:** inject them through initializers. `AppContainer` is used only in `AppRootView`; features never reach into it.
 - **Shared files** (`AppRootView`, `AppRoute`, `AppNavigator`, `AppContainer`, `project.pbxproj`, Core contracts,
   design tokens, strings): keep edits small and mention them in the PR. Change contracts in their own PR (see `Docs/IntegrationContracts.md`).

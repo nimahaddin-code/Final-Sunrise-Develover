@@ -1,3 +1,27 @@
+## Brow stability revision — -Nimah · 27 October 2026
+
+45 selected makeup tests passed, zero failures (/tmp/sunrise-brow-stability-tests.log). Includes local jitter
+attenuation, 3 mm expression step response and gap reset plus actual GPU atlas/pixel/occlusion tests.
+Signed Release build succeeded (/tmp/sunrise-brow-stability-build.log). Device jitter acceptance pending;
+no measured visual jitter reduction or brow FPS improvement claimed from synthetic results.
+
+## Makeup unavailable recovery — -Nimah · 27 October 2026
+
+Physical metrics identified segmentation_unavailable: CancellationError() with segmenter_available=true and
+223 ms mask age; shader error none. Expected cancellation no longer latches unavailable; recovered model/fit
+clears prior errors. Face-skin-only conversion uses 256 long side; default eyeliner path unchanged. Freshness
+limit remains 150 ms. Selected makeup suite passes (including real model stop/start and canceled preparation
+regression), signed Release build succeeds and installs. User recheck and post-change mask latency pending.
+Logs: /tmp/sunrise-unavailable-recovery-tests.log, /tmp/sunrise-unavailable-recovery-build.log.
+
+## Personal cheek placement v0.4.0 — -Nimah · 27 October 2026
+
+Full simulator suite: 332 executed, 4 skipped, zero failures; log /tmp/sunrise-personal-blush-full-tests.log.
+Tests exercise same style with unilateral cheek-width change (other side unchanged), changed measured
+midface spacing, invalid configuration, plus existing GPU, category/navigation and persistence regressions.
+Signed Release build succeeded (/tmp/sunrise-personal-blush-release.log). Device aesthetic acceptance pending.
+Existing staged/unstaged eyebrow upgrade retained. No staging/main merge or push in this task.
+
 ## Blush camera parity correction — -Nimah (27 October 2026)
 
 Removed paired extra horizontal reflections from Metal background and face projection after user reported

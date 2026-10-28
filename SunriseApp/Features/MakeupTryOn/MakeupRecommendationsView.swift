@@ -26,8 +26,8 @@ struct MakeupRecommendationsView:View {
                 if allowsRescan { Button("View eye result / scan again",action:onScanEyes) }
             }
             Section("Eyebrow & Blush") {
-                NavigationLink(value:store.latest == nil ? AppRoute.faceScan : AppRoute.browBlush(.eyebrows)) { Label("Eyebrow",systemImage:"eyebrow") }
-                NavigationLink(value:store.latest == nil ? AppRoute.faceScan : AppRoute.browBlush(.blush)) { Label("Blush",systemImage:"paintbrush.pointed") }
+                NavigationLink(value:AppRoute.browBlush(.eyebrows)) { Label("Eyebrow",systemImage:"eyebrow") }
+                NavigationLink(value:AppRoute.browBlush(.blush)) { Label("Blush",systemImage:"paintbrush.pointed") }
                 if let shape=store.latest?.shape {
                     let mapped=shape == .triangle ? MakeupFaceShape.pear : MakeupFaceShape(rawValue:shape.rawValue) ?? .unknown
                     if let brow=MakeupPreferenceCatalog.assignedBrow(for:mapped) { Text("Eyebrow starting style: \(brow.title)").font(.caption) }

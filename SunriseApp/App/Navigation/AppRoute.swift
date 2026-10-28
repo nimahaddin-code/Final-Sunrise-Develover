@@ -1,7 +1,6 @@
-enum AppTab: Hashable { case tryOn, discover, myLooks, scanDebug }
+enum AppTab: Hashable { case tryOn, discover, myLooks }
 
 enum AppRoute: Hashable {
-    case scanDebug
     case referenceDetail(MakeupReference)
     // -Nimah: Eyebrow module memakai sesi AR foundation aplikasi yang sama.
     case eyebrowGuide
@@ -13,10 +12,5 @@ enum AppRoute: Hashable {
     case session(MakeupReference)
     case savedLookDetail(SavedLookMetadata)
     case makeupTryOn(plan: MakeupPlan, applied: [MakeupRecommendation])
-    case faceScan
-    case eyeScan
-    /// Face scan followed straight by the eye scan, as in onboarding.
-    case fullScan
-    case profile
     case tutorial
 }
