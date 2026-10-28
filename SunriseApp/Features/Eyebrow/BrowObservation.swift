@@ -170,6 +170,17 @@ struct BrowGeometry: Sendable {
         return c.point + normal * (w * across)
     }
 
+    /// How far the centerline at `u` lies above the straight head-to-tail line (the chord), in brow widths, so a picture
+    /// drawn relative to its own chord can be laid on this brow: a point at `w` from the centerline is at
+    /// `w + chordOffset(u)` from the chord. Zero for a straight brow.
+    func chordOffset(_ u: Float) -> Float {
+        let a = centerline(0).point, b = centerline(1).point, chord = b - a, length = simd_length(chord)
+        guard length > 1e-4 else { return 0 }
+        var normal = SIMD2(-chord.y, chord.x) / length
+        if simd_dot(normal, point(u: 0.5, w: 1) - point(u: 0.5, w: 0)) < 0 { normal = -normal }
+        return simd_dot(centerline(u).point - (a + chord * u), normal) / across
+    }
+
     /// How far `p` lies from the centerline at `u`, across the brow, in brow widths (positive upwards).
     func offset(of p: SIMD2<Float>, at u: Float) -> Float {
         let c = centerline(u), length = simd_length(c.tangent)

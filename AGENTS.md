@@ -1,3 +1,25 @@
+## ARKit pose for the brow, and the 3D hair brow — Khalish (2026-10-28)
+
+Details in `Docs/Decisions/0015-arkit-brow-pose.md`. `BrowFaceStabilizer` lifts MediaPipe's brow landmarks onto ARKit's face
+mesh (same frame's anchor), smooths them in face-local metres and projects them back (fallback: the image-space smoother when
+ARKit has no face or disagrees). "Brow 3D" (`BrowOverlay.is3D`) draws `brow-hair-3d.obj` ribbons on ARKit's pose with a depth-only
+face mesh pass, 1.5 px minimum hair width, ambient-light shading and the hand mask; it falls back to its picture without a tracked
+face. New shader code is only checked at runtime: compile `BeautyBlush.metal.txt` with `MTLDevice.makeLibrary(source:)` (a build
+does not) and run the tests, which fail every engine test if it does not compile. Device check pending.
+
+## Brow overlay pictures — Khalish (2026-10-28)
+
+The eyebrow tool draws a chosen PNG brow (`BrowOverlay.all`, image sets `brow-overlay-N` in `Assets.xcassets`, head left,
+tail right, alpha) over the hidden natural brow. `BrowOverlayPicker` lists them horizontally under the tool strip, after a "no overlay" tile (`browOverlay == nil`: no picture, natural-brow hiding unchanged). Try On
+now starts with "Landmarks" off and "Natural brow" off (hidden); both toggles stay as test switches. `BrowSpriteBaker` bakes
+a picture off the render queue into the existing brow-space texture (u 0...1 = its head-to-tail span, one picture width =
+one brow width, drawn in chord space: `BrowGeometry.chordOffset` adds the user's own brow rise when the strip samples it, so the
+picture keeps its own arch; strands stay visible through the shade via the texture's alpha channel = relative luminance).
+`EyebrowConfiguration.browOverlay` (nil in the tutorial, which still shows tracking only) turns on the shape pass
+(`browPigment` is gone; it follows the overlay). Initial eyebrow intensity is 0.9. To add a brow: add an image set and a
+`BrowOverlay` entry. The older `BrowStylePicker`/`BrowDesign` shapes stay, unused while `showsBrowTracking` is on.
+Simulator tests only; device look pending.
+
 ## Black screen background — Khalish (2026-10-28)
 
 `AppColors.screen` (black) is the full-screen background of Try On, the tutorial, the palette sheet and placeholder
@@ -21,7 +43,7 @@ eyelid bound) and join the hide mask, then the brow is filled by push-pull witho
 forehead texture (`browFillFragment`, always on), blended frame to frame, and laid back by the brow strip. `BrowInpainter` adds MI-GAN (Core ML, bundled `Resources/MIGANFace256.mlpackage`, MIT, notice in
 `Resources/MI-GAN-LICENSE.txt`, reproduce with `Tools/MIGAN/convert_migan_coreml.py`) on an upright face crop every
 0.12 s, cached in brow space and faded over the push-pull fill. Area: `concealUpper` /
-`concealLower` (lower end ≤70% of the way to the eyelid row `BrowEyeMarks.lid`), long head/tail fades. Hands stay in
+`concealLower` (lower end ≤85% of the way to the eyelid row `BrowEyeMarks.lid`), long head/tail fades. Hands stay in
 front (face-skin mask). This is the only place the
 natural brow is erased, and only while that toggle is off; it is a test, not checked on a device. The readout's yaw/pitch/roll are turned to
 the screen (`BeautyBlushEngine.screenPose`): MediaPipe's matrix follows the sensor, which read roll near -90° in portrait.

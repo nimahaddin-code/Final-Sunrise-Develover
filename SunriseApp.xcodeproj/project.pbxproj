@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B5A0C0DE00000000000F000A /* BrowHairMeshTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */; };
+		B5A0C0DE00000000000F0008 /* BrowHairMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */; };
+		B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */; };
+		B5A0C0DE00000000000F0004 /* BrowFaceStabilizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */; };
+		B5A0C0DE00000000000F0002 /* BrowFaceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */; };
+		B5A0C0DE00000000000E0006 /* BrowOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */; };
+		B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */; };
+		B5A0C0DE00000000000E0002 /* BrowOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0001 /* BrowOverlay.swift */; };
 		B5A0C0DE00000000000D0002 /* MIGANFace256.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */; };
 		B5A0C0DE00000000000D0004 /* MI-GAN-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */; };
 		B5A0C0DE00000000000C000E /* BrowInpainter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C000D /* BrowInpainter.swift */; };
@@ -250,6 +258,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMeshTests.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMesh.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */ = {isa = PBXFileReference; lastKnownFileType = file; path = "brow-hair-3d.obj"; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizerTests.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizer.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayTests.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayPicker.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000E0001 /* BrowOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlay.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = MIGANFace256.mlpackage; sourceTree = "<group>"; };
 		B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MI-GAN-LICENSE.txt"; sourceTree = "<group>"; };
 		B5A0C0DE00000000000C000D /* BrowInpainter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowInpainter.swift; sourceTree = "<group>"; };
@@ -497,6 +513,7 @@
 				133DCD5B481F352F758A1E3F /* Assets.xcassets */,
 				DA7ABA5E0000000000000004 /* makeup-reference.database.json */,
 				9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */,
+				B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */,
 				BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */,
 				98F393F180238C7106FB99C0 /* Localizable.xcstrings */,
 				CD73965C5395C3CFB4F69902 /* face_landmarker.task */,
@@ -738,6 +755,9 @@
 				880B8ADAAD4B4CCC9E778686 /* ForeheadGuideTests.swift */,
 				BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */,
 				B5A0C0DE00000000000C0007 /* MediaPipeBrowTests.swift */,
+				B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */,
+				B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */,
+				B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */,
 				832873944F90986F04549D21 /* LidFlowTests.swift */,
 				CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */,
 				CDB5CA9113E7F4195FFDBCA1 /* EyeShapeClassifierTests.swift */,
@@ -900,6 +920,9 @@
 				B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */,
 				B5A0C0DE00000000000C0003 /* BrowObservation.swift */,
 				B5A0C0DE00000000000C0001 /* BrowDesign.swift */,
+				B5A0C0DE00000000000E0001 /* BrowOverlay.swift */,
+				B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */,
+				B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */,
 				929EC20AE526B170AB21CE88 /* EyebrowOverlayView.swift */,
 				FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */,
 				CF9C7F6F108DEC6A46AC8A21 /* EyebrowSceneRenderer.swift */,
@@ -1010,6 +1033,7 @@
 				9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */,
 				FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */,
 				B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */,
+				B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */,
 				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
 				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
 				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
@@ -1131,6 +1155,7 @@
 				DA7ABA5E0000000000000003 /* makeup-reference.database.json in Resources */,
 				8BBA5B983D53C01D8867678A /* BeautyBlush.metal.txt in Resources */,
 				E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */,
+				B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */,
 				72410046D68478AB147FADEC /* blush-rendering.json in Resources */,
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
 				CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */,
@@ -1177,6 +1202,9 @@
 				4FB931EDE051A5976AE56A63 /* ForeheadGuideTests.swift in Sources */,
 				256F015F65C61FE4DD9B6591 /* MakeupPreferenceTests.swift in Sources */,
 				B5A0C0DE00000000000C0008 /* MediaPipeBrowTests.swift in Sources */,
+				B5A0C0DE00000000000E0006 /* BrowOverlayTests.swift in Sources */,
+				B5A0C0DE00000000000F0004 /* BrowFaceStabilizerTests.swift in Sources */,
+				B5A0C0DE00000000000F000A /* BrowHairMeshTests.swift in Sources */,
 				4A61AA654852436A57B4838B /* LidFlowTests.swift in Sources */,
 				1ABF13B48BB7A217862917C2 /* EyeMeasurerTests.swift in Sources */,
 				1A5307ED011AADB5879ED95C /* EyeShapeClassifierTests.swift in Sources */,
@@ -1228,6 +1256,7 @@
 				65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */,
 				5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */,
 				B5A0C0DE00000000000B0002 /* BrowStylePicker.swift in Sources */,
+				B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */,
 				EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */,
 				E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */,
 				B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */,
@@ -1310,6 +1339,9 @@
 				B5A0C0DE00000000000C0006 /* MediaPipeBrowTracker.swift in Sources */,
 				B5A0C0DE00000000000C0004 /* BrowObservation.swift in Sources */,
 				B5A0C0DE00000000000C0002 /* BrowDesign.swift in Sources */,
+				B5A0C0DE00000000000E0002 /* BrowOverlay.swift in Sources */,
+				B5A0C0DE00000000000F0002 /* BrowFaceStabilizer.swift in Sources */,
+				B5A0C0DE00000000000F0008 /* BrowHairMesh.swift in Sources */,
 				AC0A6723DBB80D2189C985C6 /* EyebrowOverlayView.swift in Sources */,
 				AECE21EC64B858B3E9302E8D /* EyebrowRegionMapper.swift in Sources */,
 				39F7DA4E369F5B9BE83ECE6D /* EyebrowSceneRenderer.swift in Sources */,

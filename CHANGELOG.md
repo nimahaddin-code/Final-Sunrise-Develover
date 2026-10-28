@@ -1,3 +1,31 @@
+## ARKit-pose brow stabilizer and 3D hair brow — Khalish (2026-10-28)
+
+- `BrowFaceStabilizer`: brow landmarks lifted onto ARKit's face mesh, smoothed in face-local metres, projected back; falls
+  back to the image smoother without a tracked face or when ARKit and MediaPipe disagree. Metric `brow_stabilized`.
+- New "Brow 3D" tile (`BrowOverlay.is3D`): the OBJ's hair ribbons on ARKit's face pose, depth-tested against the face mesh,
+  hand-masked, widened to 1.5 px so thin hairs do not flicker; shows its picture when ARKit has no face. ADR 0015.
+- Tests: stabilizer on a synthetic moving head with noise; placement; GPU fixtures for depth hiding, hand mask and intensity.
+  Device check pending.
+
+## Brow overlay pictures — Khalish (2026-10-28)
+
+- The eyebrow tool now offers two PNG brows in a horizontal picker; the chosen one is drawn over the hidden natural brow,
+  keeps its own arch and strands, and follows the tracked brow (head/tail anchored to the landmarks).
+- Try On starts with Landmarks off and Natural brow off (hidden). Initial eyebrow intensity 0.9.
+- New: `BrowOverlay`, `BrowSpriteBaker`/`BrowSpriteStore`, `BrowOverlayPicker`, `BrowGeometry.chordOffset`; shader samples
+  an overlay in chord space. Tests: `BrowOverlayTests`. Device check pending.
+- Device feedback (tilted face): faint natural brow hair and glitter. Hair detection threshold lowered (0.06/0.16 to 0.035/0.11), the
+  hidden area now reaches 85% of the way to the eyelid (was 70%), and the overlay is lit by the smooth fill under it instead of
+  the camera pixel, sampled with a mip bias, with softer strand detail. Device check pending.
+- Recording review: the natural brow tail showed past the overlay and strands vanished on dark shades. The picture now runs
+  u -0.04...1.06 (MediaPipe's rows end short of the hair), the brow-space area is wider (-0.3...1.35) with a later, longer tail
+  fade, and strand detail also adds a little light. Device check pending.
+- The brow picker starts with a "no overlay" tile (`BrowOverlayPicker`, `TryOnHomeModel.browOverlay` is optional): it removes the picture
+  only; the natural brow stays hidden or shown as the "Natural brow" toggle has it.
+- Brow 3: hair-strand brow rendered from `eyebrows_3d.obj` (right brow, ribbons as 4 px lines; `Tools/BrowOverlay/render_obj_brow.py`).
+- Brow redraw is capped at 30 fps (`BeautyBlushEngine.browMaxFramesPerSecond`) to see whether it calms the wobble; the camera picture
+  in the eyebrow tool follows the same rate. Device check pending.
+
 ## Natural brow: real edge detection, sharper fill — Khalish (2026-10-28)
 
 - Device feedback: brow not fully covered and the fill looked hazy. The eraser now detects the actual brow edge

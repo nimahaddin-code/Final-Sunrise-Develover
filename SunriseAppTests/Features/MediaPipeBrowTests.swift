@@ -155,8 +155,8 @@ final class MediaPipeBrowTests: XCTestCase {
         let lid = try XCTUnwrap(g.depth(of: try XCTUnwrap(close.eyes[.subjectRight]).lid, at: 0.5))
         XCTAssertLessThan(lid, 0, "The eyelid is below the brow")
         let bound = BeautyBlushEngine.concealLower(half: 0.06, lidDepth: lid)
-        XCTAssertEqual(bound.end, -lid * 0.7, accuracy: 0.0001, "Ends at most 70% of the way to the eyelid")
-        XCTAssertLessThanOrEqual(bound.core, bound.end * 0.45 + 0.0001, "The fade keeps at least the lower 55%")
+        XCTAssertEqual(bound.end, -lid * 0.85, accuracy: 0.0001, "Ends at most 85% of the way to the eyelid")
+        XCTAssertLessThanOrEqual(bound.core, bound.end * 0.6 + 0.0001, "The fade keeps at least the lower 40%")
         XCTAssertEqual(BeautyBlushEngine.concealLower(half: 0.06, lidDepth: nil).end, 0.06 * 2.0 + 0.10, accuracy: 0.0001)
     }
 

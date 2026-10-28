@@ -30,6 +30,9 @@ struct TryOnHomeView: View {
                     }
             }
             toolStrip
+            if home.tool == .eyebrow && home.canTry(.eyebrow) {
+                BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
+            }
             if home.tool == .eyebrow && home.canTry(.eyebrow) && EyebrowConfiguration.showsBrowTracking {
                 browTrackingToggles
             }

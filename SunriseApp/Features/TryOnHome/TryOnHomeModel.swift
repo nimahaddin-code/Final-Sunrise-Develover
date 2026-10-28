@@ -93,8 +93,11 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// Held down on the camera card to see the bare face.
     @Published var isComparing = false
     /// Test toggles under the eyebrow tool: the MediaPipe tracking overlay, and the user's own eyebrow.
-    @Published var browLandmarksVisible = true
-    @Published var naturalBrowVisible = true
+    /// Both start off: the user's own brow is hidden and the chosen overlay picture is drawn in its place.
+    @Published var browLandmarksVisible = false
+    @Published var naturalBrowVisible = false
+    /// The brow picture drawn over the hidden natural brow; nil draws none (hiding the natural brow is the separate toggle).
+    @Published private(set) var browOverlay: BrowOverlay? = .standard
 
     /// Blush/eyebrow style choices and availability; its configuration is only used as the base for the live preview.
     let brow: EyebrowViewModel
@@ -120,7 +123,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         relay = LinerFrameRelay(model: liner)
         shades = [.blush: MakeupPalette.shades(for:.blush).first ?? MakeupPalette.pink, .eyebrow: MakeupPalette.shades(for:.eyebrow).first ?? MakeupPalette.referenceBrown,
                   .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
-        intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="eyebrow"})?.intensity.default.value ?? 0.65),
+        intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: BrowOverlay.defaultIntensity,
                        .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
         // The style picker mutates the nested brow model. Forward those
         // changes so the live camera representable receives a new
@@ -184,6 +187,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         configuration.blushLayer = layer(.blush)
         configuration.browTrackingOverlay = EyebrowConfiguration.showsBrowTracking && browLandmarksVisible
         configuration.hideNaturalBrow = !naturalBrowVisible
+        configuration.browOverlay = browOverlay
         return configuration
     }
 
@@ -206,6 +210,12 @@ final class LinerFrameRelay: @unchecked Sendable {
         shades[tool] = shade
         enabled=[tool]
         if tool == .eyeliner { syncLiner() }
+    }
+
+    func choose(browOverlay overlay: BrowOverlay?) {
+        guard canTry(.eyebrow) else { return }
+        browOverlay = overlay
+        if tool == .eyebrow { enabled = [.eyebrow] }
     }
 
     func turnOff() {

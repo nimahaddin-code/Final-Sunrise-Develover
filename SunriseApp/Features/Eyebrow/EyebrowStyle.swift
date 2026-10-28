@@ -75,4 +75,6 @@ struct EyebrowConfiguration: Equatable, Sendable {
     var browTrackingOverlay = EyebrowConfiguration.showsBrowTracking
     /// Hides the user's own eyebrow: hair between the tracked upper and lower brow contours is replaced by skin.
     var hideNaturalBrow = false
+    /// A brow picture drawn over the (hidden) natural brow; nil draws no brow shape at all.
+    var browOverlay: BrowOverlay? = nil
 }

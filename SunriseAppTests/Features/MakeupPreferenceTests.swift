@@ -138,7 +138,7 @@ final class MakeupPreferenceTests:XCTestCase {
     @MainActor func testBlushIntensityUsesUpdatedJSONWithoutChangingBrowOrLiner() {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         XCTAssertEqual(home.intensities[.blush] ?? -1,0.72,accuracy:0.00001)
-        XCTAssertEqual(home.intensities[.eyebrow] ?? -1,0.65,accuracy:0.00001)
+        XCTAssertEqual(home.intensities[.eyebrow] ?? -1,BrowOverlay.defaultIntensity,accuracy:0.00001)
         home.deactivate()
     }
     func testBrowBodyHasUsableThicknessWithoutShorteningObservedContour() throws {

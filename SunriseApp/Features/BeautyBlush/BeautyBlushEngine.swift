@@ -29,11 +29,14 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private struct BrowVertex {var position:SIMD4<Float>;var brow:SIMD4<Float>;var probes:SIMD4<Float>;var skin:SIMD4<Float>;var conceal:SIMD4<Float>}
     private struct BrowStrip {var vertices:[BrowVertex];var unwrap:[BrowUnwrapVertex];var cropToRaw:simd_float4x4?}
     private struct MarkVertex {var position:SIMD4<Float>;var color:SIMD4<Float>}
-    private struct BrowFrame:@unchecked Sendable {let frame:ARFrame;let epoch:UUID}
+    private struct HairUniforms {var clipFromModel:simd_float4x4;var view:SIMD4<Float>;var look:SIMD4<Float>;var probe:SIMD4<Float>}
+    /// One brow's hair mesh on the face: model to face-local, its scale and the raw-image offset for the hand check.
+    private struct HairDraw {var matrix:simd_float4x4;var scale:Float;var probe:SIMD2<Float>}
+    private struct BrowFrame:@unchecked Sendable {let frame:ARFrame;let epoch:UUID;let face:BrowFaceFrame?}
     private struct Field {var ellipse:SIMD4<Float>;var shape:SIMD4<Float>;var limits:SIMD4<Float>}
     private struct Bake {var left:Field;var right:Field;var options=SIMD4<Float>.zero;var mouth=SIMD4<Float>.zero}
     private struct Settings {
-        var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
+        var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
     /// Developer brow view (`BrowDebugView` raw value), read each frame so the developer picker applies live.
     static let browDebugKey="beautyBrow.debugView"
     /// How long the brow keeps using the last face-skin mask. The segmenter often lags past `mask_max_age_seconds`
@@ -43,7 +46,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private let lock=NSLock(),queue=DispatchQueue(label:"dandan.blush.metal",qos:.userInteractive)
     private let device:MTLDevice,commands:MTLCommandQueue
     private let config:BeautyBlushConfiguration
-    private let background,face,depth,atlasPipeline,browTexturePipeline,browStripPipeline,browMarkPipeline:MTLRenderPipelineState
+    private let background,face,depth,atlasPipeline,browTexturePipeline,browStripPipeline,browMarkPipeline,browHairPipeline:MTLRenderPipelineState
     private let depthWrite,depthRead,noDepth:MTLDepthStencilState
     private let brush:MTLTexture
     private var textureCache:CVMetalTextureCache?
@@ -62,8 +65,22 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private var browTrackerTask:Task<Void,Never>?
     private var browTrackerStarting=false
     private var browToken:UInt64=0,browFrames:[UInt64:BrowFrame]=[:]
+    /// The brow (camera picture and brow together) is redrawn at most this often, so it is not redrawn on every 60 Hz camera frame.
+    static let browMaxFramesPerSecond:Double=30
+    private var lastBrowSubmit:Double = -.infinity
+    /// Whether a camera frame at `timestamp` is due, given the last one handed to MediaPipe. A little under the full interval is
+    /// enough, so frames from a 60 Hz camera alternate instead of occasionally slipping to every third.
+    static func browFrameDue(timestamp:Double,last:Double,maxFPS:Double=browMaxFramesPerSecond)->Bool {timestamp-last>=0.9/maxFPS}
     private var browSmoother=BrowObservationSmoother()
-    private var browTexture:MTLTexture?,browTextureStyle:EyebrowStyle?
+    /// Steadies the brow in ARKit's face space when ARKit tracks the face in the same frame; the image-space smoother is the fallback.
+    private var browStabilizer=BrowFaceStabilizer()
+    private var browStabilized=false
+    /// The 3D hair brow: its mesh on the GPU, and the ARKit face mesh drawn as depth only so far hairs hide behind the face.
+    private var hairBuffer:MTLBuffer?,hairVertexCount=0
+    private var faceMeshVertices:[MTLBuffer]=[],faceMeshIndices:MTLBuffer?,faceMeshIndexCount=0
+    private var browLight:Float=1
+    private var browFaceTriangles:[UInt16]=[]
+    private var browTexture:MTLTexture?,browTextureKey:String?
     private var browVertices:[MTLBuffer]=[],browIndices:MTLBuffer?
     /// Stands in for the face-skin mask until one arrives: nothing occluded.
     private var emptyMask:MTLTexture?
@@ -119,6 +136,12 @@ final class BeautyBlushEngine:@unchecked Sendable {
         marks.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha;marks.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
         marks.colorAttachments[0].sourceAlphaBlendFactor = .one;marks.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
         browMarkPipeline=try d.makeRenderPipelineState(descriptor:marks)
+        let hair=MTLRenderPipelineDescriptor();hair.vertexFunction=lib.makeFunction(name:"browRibbonVertex");hair.fragmentFunction=lib.makeFunction(name:"browRibbonFragment")
+        hair.colorAttachments[0].pixelFormat = .bgra8Unorm_srgb;hair.depthAttachmentPixelFormat = .depth32Float
+        hair.colorAttachments[0].isBlendingEnabled=true
+        hair.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha;hair.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+        hair.colorAttachments[0].sourceAlphaBlendFactor = .one;hair.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
+        browHairPipeline=try d.makeRenderPipelineState(descriptor:hair)
         func state(_ compare:MTLCompareFunction,_ write:Bool)->MTLDepthStencilState? {let p=MTLDepthStencilDescriptor();p.depthCompareFunction=compare;p.isDepthWriteEnabled=write;return d.makeDepthStencilState(descriptor:p)}
         guard let dw=state(.less,true),let dr=state(.lessEqual,false),let nd=state(.always,false),
               let url=Bundle.main.url(forResource:config.mask_asset,withExtension:nil) else {throw CocoaError(.featureUnsupported)}
@@ -163,8 +186,9 @@ final class BeautyBlushEngine:@unchecked Sendable {
             lastBindAttempt = -.infinity
         }
         settings.enabled=enabled
-        if let c {settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
+        if let c {settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
         if !enabled {layer?.isHidden=true}
+        if enabled && nextBrow,let overlay=settings.browOverlay {BrowSpriteStore.shared.prepare(overlay);if overlay.is3D {BrowHairStore.shared.prepare()}}
         let start=enabled && !segmenter.isAvailable && !segmentationStarting
         if start {segmentationStarting=true}
         let startTracker=enabled && nextBrow && !browTracker.isAvailable && !browTrackerStarting
@@ -215,7 +239,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         segmenter.stop();browTracker.stop()
         queue.async { [self] in
             visibility=BeautyBlushVisibility();frameTime=0;anchorID=nil;style=nil;lastError=nil;lastSegment=0
-            browSmoother.reset();browStatus = .none
+            browSmoother.reset();browStabilizer.reset();browStatus = .none
             lock.lock()
             attemptedBlushStyle=nil;lastBindAttempt = -.infinity;atlas=nil
             lock.unlock()
@@ -428,22 +452,20 @@ final class BeautyBlushEngine:@unchecked Sendable {
 
     /// Brow-space extent of the baked brow texture and of the strip laid over each brow: u from just before the head
     /// to just past the tail, and up to `z` brow widths either side of the observed centerline.
-    static let browExtent=SIMD4<Float>(-0.25,1.2,0.5,0)
+    static let browExtent=SIMD4<Float>(-0.3,1.35,0.5,0)
     /// The area hiding the natural brow above the centerline, in brow widths: full cover to `core`, gone by `end`. It
     /// reaches well past MediaPipe's upper brow row, which sits inside the hair, and fades over several millimetres so
     /// no edge shows. Matches `browStripFragment`.
     static func concealUpper(half h:Float)->(core:Float,end:Float) {(h*1.15+0.02,h*2.2+0.10)}
-    /// The same below the centerline. It covers the lower brow edge MediaPipe's row also misses and ends at most 70%
-    /// of the way down to the upper eyelid. The fade always takes at least the lower 55% of that depth: a short fade
+    /// The same below the centerline. It covers the lower brow edge MediaPipe's row also misses and ends at most 85%
+    /// of the way down to the upper eyelid. The fade always takes at least the lower 40% of that depth: a short fade
     /// near the eye reads as a hard line, which is worse than a faint trace of lower brow hair.
     static func concealLower(half h:Float,lidDepth:Float?)->(core:Float,end:Float) {
         var core=h*1.1+0.02,end=h*2.0+0.10
-        if let lidDepth,lidDepth<0 {end=min(end,-lidDepth*0.7)}
-        core=min(core,end*0.45)
+        if let lidDepth,lidDepth<0 {end=min(end,-lidDepth*0.85)}
+        core=min(core,end*0.6)
         return (core,end)
     }
-    /// Brow shapes are drawn only while the tracking view is not what the eyebrow tool shows.
-    static var browPigment:Bool {!EyebrowConfiguration.showsBrowTracking}
     private static let browColumns=48,browRows=14
     static var browVertexCount:Int {(browColumns+1)*(browRows+1)}
     private static var browIndexCount:Int {browColumns*browRows*12}
@@ -459,9 +481,82 @@ final class BeautyBlushEngine:@unchecked Sendable {
         }
         return out
     }
+    /// The 3D brow mesh once it has loaded (loading starts here); nil until then, and the brow's picture is drawn meanwhile.
+    private func hairMeshIfReady()->BrowHairMesh? {
+        guard let mesh=BrowHairStore.shared.mesh else {BrowHairStore.shared.prepare();return nil}
+        installHairMesh(mesh)
+        return hairBuffer==nil ? nil:mesh
+    }
+    private func installHairMesh(_ mesh:BrowHairMesh) {
+        guard hairBuffer==nil else {return}
+        let vertices=mesh.vertices
+        hairBuffer=vertices.withUnsafeBytes {device.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}
+        hairVertexCount=vertices.count
+    }
+    /// Where the hair mesh goes on each tracked brow: head and tail, the mesh normal between them and the way to the forehead,
+    /// all lifted onto ARKit's face mesh from the brow's (steadied) landmarks.
+    private static func hairPlacements(_ o:BrowObservation,face:BrowFaceFrame,mesh:BrowHairMesh)->[HairDraw] {
+        let image=SIMD2(Float(o.imageSize.width),Float(o.imageSize.height))
+        var out:[HairDraw]=[]
+        for side in [EyeSide.subjectRight,.subjectLeft] {
+            guard let contour=o.brows[side],let g=BrowGeometry(contour:contour) else {continue}
+            let headPixel=g.centerline(0).point,tailPixel=g.centerline(1).point,midPixel=g.point(u:0.5,w:0)
+            guard let head=face.faceLocal(at:headPixel),let tail=face.faceLocal(at:tailPixel),let mid=face.faceLocal(at:midPixel),
+                  let top=face.faceLocal(at:g.point(u:0.5,w:0.5)),
+                  let frame=BrowHairPlacement.frame(mesh:mesh,head:head,tail:tail,normal:face.normal(near:mid),forehead:top-mid) else {continue}
+            out.append(HairDraw(matrix:frame.matrix,scale:frame.scale,probe:(g.point(u:0.5,w:0.25)-midPixel)/image))
+        }
+        return out
+    }
+    /// ARKit's face mesh for this frame, in a ring of GPU buffers (for the depth pass).
+    private func uploadFaceMesh(_ face:BrowFaceFrame,slot:Int)->Bool {
+        let count=face.vertices.count,stride=MemoryLayout<Vertex>.stride
+        guard count>0,slot<3 else {return false}
+        if faceMeshVertices.count != 3 || faceMeshVertices[0].length != count*stride {
+            faceMeshVertices=(0..<3).compactMap {_ in device.makeBuffer(length:count*stride,options:.storageModeShared)}
+        }
+        guard faceMeshVertices.count==3 else {return false}
+        if faceMeshIndices==nil || faceMeshIndexCount != face.triangles.count {
+            faceMeshIndices=face.triangles.withUnsafeBytes {device.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}
+            faceMeshIndexCount=face.triangles.count
+        }
+        guard faceMeshIndices != nil else {return false}
+        let target=faceMeshVertices[slot].contents().bindMemory(to:Vertex.self,capacity:count)
+        for (i,v) in face.vertices.enumerated() {target[i]=Vertex(position:SIMD4(v,1),rest:SIMD4(v,1),uv:.zero)}
+        return true
+    }
+    /// Draws the face mesh into the depth buffer only, then every hair of each brow against it. `mvp` is projection * view * face.
+    private func encodeHair(_ e:MTLRenderCommandEncoder,draws:[HairDraw],mvp:simd_float4x4,projectionScaleY:Float,size:CGSize,light:Float,uniforms u:Uniforms,obstruction:MTLTexture?,slot:Int) {
+        guard let hairBuffer,let indices=faceMeshIndices,slot<faceMeshVertices.count,let obstruction else {return}
+        var meshUniforms=u;meshUniforms.mvp=mvp
+        e.setCullMode(.none)
+        e.setRenderPipelineState(depth);e.setDepthStencilState(depthWrite)
+        e.setVertexBuffer(faceMeshVertices[slot],offset:0,index:0);e.setVertexBytes(&meshUniforms,length:MemoryLayout<Uniforms>.stride,index:1)
+        e.drawIndexedPrimitives(type:.triangle,indexCount:faceMeshIndexCount,indexType:.uint16,indexBuffer:indices,indexBufferOffset:0)
+        e.setRenderPipelineState(browHairPipeline);e.setDepthStencilState(depthRead)
+        var fragmentUniforms=u
+        e.setFragmentBytes(&fragmentUniforms,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(obstruction,index:3)
+        e.setVertexBuffer(hairBuffer,offset:0,index:0)
+        for draw in draws {
+            var h=HairUniforms(clipFromModel:mvp*draw.matrix,view:SIMD4(Float(size.width),Float(size.height),0.5*Float(size.height)*projectionScaleY,draw.scale),
+                               look:SIMD4(light,1.5,0.04,0),probe:SIMD4(draw.probe.x,draw.probe.y,0,0))
+            e.setVertexBytes(&h,length:MemoryLayout<HairUniforms>.stride,index:1);e.setFragmentBytes(&h,length:MemoryLayout<HairUniforms>.stride,index:1)
+            e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:hairVertexCount)
+        }
+        e.setDepthStencilState(noDepth)
+    }
+    /// The face ARKit tracked in this very frame, for steadying the brow in face space; nil when ARKit has none.
+    private func browFaceFrame(_ frame:ARFrame)->BrowFaceFrame? {
+        guard case .normal=frame.camera.trackingState,let anchor=frame.anchors.compactMap({$0 as? ARFaceAnchor}).first(where:{$0.isTracked}) else {return nil}
+        let geometry=anchor.geometry
+        if browFaceTriangles.count != geometry.triangleIndices.count {browFaceTriangles=geometry.triangleIndices.map {UInt16(bitPattern:$0)}}
+        let resolution=frame.camera.imageResolution
+        return BrowFaceFrame(anchorID:anchor.identifier,vertices:geometry.vertices,triangles:browFaceTriangles,intrinsics:frame.camera.intrinsics,
+                             imageSize:SIMD2(Float(resolution.width),Float(resolution.height)),faceToWorld:anchor.transform,cameraToWorld:frame.camera.transform)
+    }
     /// Hands this frame to MediaPipe unless one is still being processed; it is drawn when its landmarks return.
     private func submitBrow(_ frame:ARFrame,settings s:Settings) {
-        guard browTracker.isAvailable,!browTracker.isBusy else {return}
+        guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit) else {return}
         let buffer=frame.capturedImage
         let raw=CGSize(width:CVPixelBufferGetWidth(buffer),height:CVPixelBufferGetHeight(buffer))
         // The screen's up and across directions in the captured image pick the detector's rotation; no face tracker.
@@ -471,9 +566,9 @@ final class BeautyBlushEngine:@unchecked Sendable {
             return CGPoint(x:(q.x-p.x)*raw.width,y:(q.y-p.y)*raw.height)
         }
         let up=direction(CGPoint(x:0.5,y:0.6),CGPoint(x:0.5,y:0.4)),across=direction(CGPoint(x:0.4,y:0.5),CGPoint(x:0.6,y:0.5))
-        let entry=BrowFrame(frame:frame,epoch:s.epoch)
+        let entry=BrowFrame(frame:frame,epoch:s.epoch,face:browFaceFrame(frame))
         lock.lock()
-        browToken += 1;let token=browToken
+        browToken += 1;let token=browToken;lastBrowSubmit=frame.timestamp
         browFrames=browFrames.filter {token-$0.key<2};browFrames[token]=entry
         lock.unlock()
         if !browTracker.submit(BrowTrackerInput(pixelBuffer:SendablePixelBuffer(buffer:buffer),timestamp:frame.timestamp,headUp:up,headAcross:across,token:token)) {
@@ -482,7 +577,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         queue.async { [self] in
             // Hand/fringe occlusion uses the same face-skin mask as blush, at the same 15 Hz. Only the brow shape and the
             // hidden natural brow draw over the face, so only they need it.
-            guard Self.browPigment || s.hideNatural,entry.frame.timestamp-lastSegment>=1/15,!segmenter.isBusy,segmenter.isAvailable else {return}
+            guard s.browOverlay != nil || s.hideNatural,entry.frame.timestamp-lastSegment>=1/15,!segmenter.isBusy,segmenter.isAvailable else {return}
             lastSegment=entry.frame.timestamp
             segmenter.submit(.init(pixelBuffer:SendablePixelBuffer(buffer:entry.frame.capturedImage),timestamp:entry.frame.timestamp,headUp:up,headAnchors:[]))
         }
@@ -490,7 +585,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private func renderBrow(_ result:BrowTrackerResult) {
         lock.lock();let entry=browFrames.removeValue(forKey:result.token);let s=settings;lock.unlock()
         guard let entry,s.enabled,s.isBrow,s.epoch==entry.epoch,s.viewport.width>0,s.viewport.height>0 else {return}
-        autoreleasepool {drawBrow(entry.frame,observation:result.observation,settings:s)}
+        autoreleasepool {drawBrow(entry.frame,observation:result.observation,face:entry.face,settings:s)}
     }
     private func bakeBrowTexture(_ style:EyebrowStyle,command:MTLCommandBuffer)throws {
         guard let design=BrowDesign.make(style:style) else {throw CocoaError(.coderInvalidValue)}
@@ -501,7 +596,17 @@ final class BeautyBlushEngine:@unchecked Sendable {
         // Mipmaps and anisotropic sampling keep minified strands from shimmering.
         guard let mip=command.makeBlitCommandEncoder() else {throw CocoaError(.featureUnsupported)}
         mip.generateMipmaps(for:target);mip.endEncoding()
-        browTexture=target;browTextureStyle=style
+        browTexture=target;browTextureKey="style:\(style.rawValue)"
+    }
+    /// Uploads a baked overlay picture as the brow texture (mipmapped like the designs).
+    private func uploadBrowOverlay(_ baked:BakedBrowSprite,id:String,command:MTLCommandBuffer)throws {
+        let desc=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.rgba16Float,width:baked.width,height:baked.height,mipmapped:true)
+        desc.usage=[.shaderRead,.renderTarget];desc.storageMode = .shared
+        guard let target=device.makeTexture(descriptor:desc) else {throw CocoaError(.featureUnsupported)}
+        baked.texels.withUnsafeBytes {target.replace(region:MTLRegionMake2D(0,0,baked.width,baked.height),mipmapLevel:0,withBytes:$0.baseAddress!,bytesPerRow:baked.width*8)}
+        guard let mip=command.makeBlitCommandEncoder() else {throw CocoaError(.featureUnsupported)}
+        mip.generateMipmaps(for:target);mip.endEncoding()
+        browTexture=target;browTextureKey="overlay:\(id)"
     }
     private func encodeBrowTexture(_ design:BrowDesign,into target:MTLTexture,command:MTLCommandBuffer)throws {
         let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=target;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
@@ -512,7 +617,9 @@ final class BeautyBlushEngine:@unchecked Sendable {
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3);e.endEncoding()
     }
     /// The strip over both brows for one observation, in clip space; nil when a brow cannot be framed.
-    private static func browStrip(_ o:BrowObservation,display:CGAffineTransform)->BrowStrip? {
+    /// With `chord`, each vertex also carries how far the observed centerline lies above the brow's head-to-tail chord, so
+    /// an overlay picture (drawn in chord space) keeps its own arch.
+    private static func browStrip(_ o:BrowObservation,display:CGAffineTransform,chord:Bool=false)->BrowStrip? {
         guard let right=o.brows[.subjectRight],let left=o.brows[.subjectLeft],
               let r0=BrowGeometry(contour:right),let l0=BrowGeometry(contour:left) else {return nil}
         let across=max(r0.width,l0.width)
@@ -534,16 +641,16 @@ final class BeautyBlushEngine:@unchecked Sendable {
             // A brow much shorter than the other is turned away: fade it rather than squeeze its strands.
             let ratio=g.width/across,fade=max(0,min(1,(ratio-0.35)/0.25))
             let index:Float=side == .subjectRight ? 0:1
-            let columns=(0...browColumns).map {column->(u:Float,half:Float,lower:(core:Float,end:Float)) in
+            let columns=(0...browColumns).map {column->(u:Float,half:Float,lower:(core:Float,end:Float),bow:Float) in
                 let u=browExtent.x+(browExtent.y-browExtent.x)*Float(column)/Float(browColumns)
-                return (u,g.observedHalf(u),lower(u))
+                return (u,g.observedHalf(u),lower(u),chord ? g.chordOffset(u):0)
             }
             for row in 0...browRows {
                 let w=browExtent.z*(2*Float(row)/Float(browRows)-1)
                 for c in columns {
                     let above=g.point(u:c.u,w:w+0.2)/image,below=g.point(u:c.u,w:w-0.2)/image
                     out.append(BrowVertex(position:clip(g.point(u:c.u,w:w)),brow:SIMD4(c.u,w,c.half,fade*fade*(3-2*fade)),
-                                          probes:SIMD4(above.x,above.y,below.x,below.y),skin:SIMD4(blur.x,blur.y,0,0),
+                                          probes:SIMD4(above.x,above.y,below.x,below.y),skin:SIMD4(blur.x,blur.y,c.bow,0),
                                           conceal:SIMD4(c.lower.core,c.lower.end,index,0)))
                 }
             }
@@ -701,7 +808,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         if case .some(let current)=browStatus,current==next {return}
         browStatus = .some(next);onStatus?(next)
     }
-    private func drawBrow(_ frame:ARFrame,observation detected:BrowObservation?,settings s:Settings) {
+    private func drawBrow(_ frame:ARFrame,observation detected:BrowObservation?,face:BrowFaceFrame?,settings s:Settings) {
         guard inFlight.wait(timeout:.now()) == .success else{return}
         var committed=false
         defer {if !committed {inFlight.signal()}}
@@ -711,20 +818,37 @@ final class BeautyBlushEngine:@unchecked Sendable {
         let frameSlot=slot%3;slot += 1
         let size=CGSize(width:drawable.texture.width,height:drawable.texture.height)
         ensureDepth(for:drawable)
-        if browTexture==nil || browTextureStyle != s.browStyle {
+        if let overlay=s.browOverlay {
+            // The picture is baked off this queue; until it is ready the previous texture stays (or none: nothing is drawn).
+            if browTextureKey != "overlay:\(overlay.id)" {
+                if let baked=BrowSpriteStore.shared.baked(overlay) {
+                    do {try uploadBrowOverlay(baked,id:overlay.id,command:command);if lastError?.hasPrefix("brow_texture_unavailable:")==true {lastError=nil}}
+                    catch {lastError="brow_texture_unavailable: \(error)"}
+                } else if BrowSpriteStore.shared.hasFailed(overlay) {lastError="brow_texture_unavailable: overlay \(overlay.id)"}
+                else {BrowSpriteStore.shared.prepare(overlay)}
+            }
+        } else if browTexture==nil || browTextureKey != "style:\(s.browStyle.rawValue)" {
             do {try bakeBrowTexture(s.browStyle,command:command);if lastError?.hasPrefix("brow_texture_unavailable:")==true {lastError=nil}}
             catch {lastError="brow_texture_unavailable: \(error)"}
         }
         let display=frame.displayTransform(for:s.orientation,viewportSize:s.viewport)
         var observation:BrowObservation?
-        if let detected {observation=browSmoother.smooth(detected)} else {browSmoother.reset()}
+        if let detected {
+            if let face,let steady=browStabilizer.stabilize(detected,face:face) {observation=steady;browSmoother.reset();browStabilized=true}
+            else {browStabilizer.reset();observation=browSmoother.smooth(detected);browStabilized=false}
+        } else {browSmoother.reset();browStabilizer.reset();browStabilized=false}
         let tracked=observation.map {abs($0.pose.yaw)<config.max_yaw_degrees && abs($0.pose.pitch)<config.max_yaw_degrees} ?? false
-        let pigment=Self.browPigment
-        let strip=tracked && (pigment || s.hideNatural) ? observation.flatMap {Self.browStrip($0,display:display)}:nil
+        // A 3D brow needs ARKit's face in this frame (browStabilized) and its mesh; otherwise its picture is drawn instead.
+        let hairMesh=s.browOverlay?.is3D==true && browStabilized && tracked ? hairMeshIfReady():nil
+        var hairDraws:[HairDraw]=[]
+        if let hairMesh,let observation,let face {hairDraws=Self.hairPlacements(observation,face:face,mesh:hairMesh)}
+        let hair3D = !hairDraws.isEmpty
+        let pigment=s.browOverlay != nil && !hair3D
+        let strip=tracked && (pigment || s.hideNatural) ? observation.flatMap {Self.browStrip($0,display:display,chord:pigment)}:nil
         let (frameMask,maskTransform,fresh)=uploadMask(slot:frameSlot,capturedImage:buffer,maxAge:max(config.mask_max_age_seconds,Self.browMaskGraceSeconds))
         // Hiding the natural brow does not wait for the mask; a hand only starts to protect it once one arrives.
-        let ready=fresh || !pigment
-        let visible=visibility.update(timestamp:frame.timestamp,visible:strip != nil && ready && browTexture != nil,tau:config.visibility_tau_seconds)
+        let ready=fresh || !(pigment || hair3D)
+        let visible=visibility.update(timestamp:frame.timestamp,visible:(strip != nil || hair3D) && ready && (browTexture != nil || hair3D),tau:config.visibility_tau_seconds)
         let debugView=UserDefaults.standard.bool(forKey:DeveloperTools.key) ? UserDefaults.standard.integer(forKey:Self.browDebugKey):0
         let matrixAttachment=CVBufferCopyAttachment(buffer,kCVImageBufferYCbCrMatrixKey,nil) as? String
         let transfer=CVBufferCopyAttachment(buffer,kCVImageBufferTransferFunctionKey,nil) as? String
@@ -734,7 +858,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             controls:SIMD4(config.coverage,config.absorption,config.saturation,config.pigment_mix),tracking:SIMD4(ready ? Float(visible):0,s.guide && pigment ? 1:0,1/Float(size.width),1/Float(size.height)),
             camera:SIMD4(matrixAttachment==(kCVImageBufferYCbCrMatrix_ITU_R_709_2 as String) ? 1:0,full ? 1:0,transfer==(kCVImageBufferTransferFunction_ITU_R_709_2 as String) ? 1:0,1),
             stretch:SIMD4(config.stretch_fade[0],config.stretch_fade[1],config.stretch_fade[2],config.stretch_fade[3]),
-            debug:SIMD4(Float(debugView),s.hideNatural && eraser != nil ? 1:0,pigment ? 1:0,0))
+            debug:SIMD4(Float(debugView),s.hideNatural && eraser != nil ? 1:0,pigment ? 1:0,pigment ? 1:0))
         // Hiding the natural brow: this frame's brow-space fill; restarted after the brow was not drawn.
         if let strip,s.hideNatural,let eraser {
             eraser.encode(vertices:strip.unwrap,cropToRaw:strip.cropToRaw,uniforms:withUnsafeBytes(of:&u) {Array($0)},y:y,cb:cb,timestamp:frame.timestamp,command:command)
@@ -755,6 +879,11 @@ final class BeautyBlushEngine:@unchecked Sendable {
             var space=BrowEraser.space;e.setFragmentBytes(&space,length:MemoryLayout<SIMD4<Float>>.stride,index:2)
             e.setFragmentTexture(fill,index:4);e.setFragmentTexture(s.hideNatural ? eraser?.hide ?? emptyFill:emptyFill,index:5)
             e.drawIndexedPrimitives(type:.triangle,indexCount:Self.browIndexCount,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0)
+        }
+        if hair3D,let face,uploadFaceMesh(face,slot:frameSlot) {
+            if let estimate=frame.lightEstimate {browLight += (Float(max(0.55,min(1.4,(estimate.ambientIntensity/1000).squareRoot())))-browLight)*0.1}
+            let view=frame.camera.viewMatrix(for:s.orientation),projection=frame.camera.projectionMatrix(for:s.orientation,viewportSize:s.viewport,zNear:0.001,zFar:10)
+            encodeHair(e,draws:hairDraws,mvp:projection*view*face.faceToWorld,projectionScaleY:projection.columns.1.y,size:size,light:browLight,uniforms:u,obstruction:frameMask ?? emptyMask,slot:frameSlot)
         }
         var marks:[MarkVertex]=[]
         if s.tracking,let observation {marks=Self.browTrackingMarks(observation,raw:detected,display:display,size:size,tracked:tracked)}
@@ -804,7 +933,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         guard now-reportStart>=2 else{return}
         let sorted=ages.sorted(),p95=sorted[min(sorted.count-1,Int(Double(sorted.count)*0.95))]
         var report:[String:Any]=["engine":isBrow ? "mediapipe_metal":"arkit_metal_uv","category":isBrow ? "eyebrow":"blush","fps_completed":Double(reportFrames)/(now-reportStart),"fps_presented":Double(presentedFrames)/(now-reportStart),"pigment_frames":pigmentFrames,"projection_error_pixels":projectionErrorPixels,"gpu_ms_mean":gpuTimes.reduce(0,+)/Double(gpuTimes.count),"frame_age_ms_p95":p95,"thermal_state":ProcessInfo.processInfo.thermalState.rawValue,"mask_fresh":maskFresh,"mask_age_ms":maskAgeMilliseconds,"segmenter_available":segmenter.isAvailable,"visibility":visibility,"error":lastError ?? "none","shader_error":cb.error?.localizedDescription ?? "none"]
-        if isBrow {report["landmark_latency_ms"]=browTracker.lastLatencyMs;report["brow_tracker_available"]=browTracker.isAvailable}
+        if isBrow {report["landmark_latency_ms"]=browTracker.lastLatencyMs;report["brow_tracker_available"]=browTracker.isAvailable;report["brow_stabilized"]=browStabilized}
         // The brow publishes its own status as soon as it changes (a face found or lost cannot wait two seconds).
         if !isBrow {onStatus?(lastError != nil || cb.error != nil ? String(localized:"Makeup is temporarily unavailable") : (!maskFresh ? String(localized:"Preparing makeup visibility"):nil))}
         if let data=try? JSONSerialization.data(withJSONObject:report) {UserDefaults.standard.set(data,forKey:isBrow ? "beautyBrow.metrics":"beautyBlush.metrics")}
@@ -939,6 +1068,47 @@ final class BeautyBlushEngine:@unchecked Sendable {
         e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1);e.setFragmentTexture(brow,index:2);e.setFragmentTexture(mask,index:3)
         e.drawIndexedPrimitives(type:.triangle,indexCount:tris.count,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0);e.endEncoding()
         command.commit();command.waitUntilCompleted()
+        if let error=command.error{throw error}
+        var data=Data(count:n*n*4);data.withUnsafeMutableBytes {target.getBytes($0.baseAddress!,bytesPerRow:n*4,from:MTLRegionMake2D(0,0,n,n),mipmapLevel:0)}
+        return data
+    }
+    /// The production 3D hair pipeline over a flat face 30 cm from the camera: the brow mesh on it, an occluding patch of the face
+    /// nearer to the camera when `occluderInFront`, and the face-skin mask covering everything when `handCovers`. Returns the
+    /// target's BGRA pixels (128 x 128) over a mid-grey frame.
+    static func renderBrowHairFixture(intensity:Float=1,occluderInFront:Bool=false,handCovers:Bool=false)throws->Data {
+        let engine=try BeautyBlushEngine(),d=engine.device,n=128
+        guard let mesh=BrowHairMesh.load() else {throw CocoaError(.fileNoSuchFile)}
+        engine.installHairMesh(mesh)
+        func texture(_ format:MTLPixelFormat,_ bytes:[UInt8],_ row:Int)throws->MTLTexture {
+            let desc=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:format,width:n,height:n,mipmapped:false)
+            desc.usage=[.shaderRead,.renderTarget];desc.storageMode = .shared
+            guard let t=d.makeTexture(descriptor:desc) else{throw CocoaError(.featureUnsupported)}
+            bytes.withUnsafeBytes {t.replace(region:MTLRegionMake2D(0,0,n,n),mipmapLevel:0,withBytes:$0.baseAddress!,bytesPerRow:row)}
+            return t
+        }
+        let mask=try texture(.r8Unorm,Array(repeating:handCovers ? 255:0,count:n*n),n)
+        let target=try texture(.bgra8Unorm_srgb,Array(repeating:0,count:n*n*4),n*4)
+        let dd=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.depth32Float,width:n,height:n,mipmapped:false);dd.storageMode = .private;dd.usage = .renderTarget
+        guard let z=d.makeTexture(descriptor:dd),let command=engine.commands.makeCommandBuffer() else{throw CocoaError(.featureUnsupported)}
+        // The face: a flat patch at the head's depth, or in front of the brow by 2 cm.
+        let depth:Float=occluderInFront ? 0.02:-0.01
+        let patch:[SIMD3<Float>]=[.init(-0.06,-0.02,depth),.init(0.06,-0.02,depth),.init(0.06,0.07,depth),.init(-0.06,0.07,depth)]
+        var faceToWorld=matrix_identity_float4x4;faceToWorld.columns.3=SIMD4(0,0,-0.3,1)
+        let face=BrowFaceFrame(anchorID:UUID(),vertices:patch,triangles:[0,1,2,0,2,3],intrinsics:matrix_identity_float3x3,imageSize:SIMD2(1,1),faceToWorld:faceToWorld,cameraToWorld:matrix_identity_float4x4)
+        guard engine.uploadFaceMesh(face,slot:0) else {throw CocoaError(.featureUnsupported)}
+        guard let placement=BrowHairPlacement.frame(mesh:mesh,head:SIMD3(-0.027,0.02,0),tail:SIMD3(0.027,0.02,0),normal:SIMD3(0,0,1),forehead:SIMD3(0,1,0)) else {throw CocoaError(.coderInvalidValue)}
+        // A Metal-style perspective: 0.05 m either side of the axis at 0.3 m fills the frame.
+        let (near,far,scale):(Float,Float,Float)=(0.001,10,6)
+        let projection=simd_float4x4(columns:(SIMD4(scale,0,0,0),SIMD4(0,scale,0,0),SIMD4(0,0,far/(near-far),-1),SIMD4(0,0,far*near/(near-far),0)))
+        var u=Uniforms(mvp:matrix_identity_float4x4,rawFromClip:matrix_identity_float4x4,maskFromRaw:matrix_identity_float4x4,shade:SIMD4(0.05,0.03,0.02,intensity),controls:.zero,
+                       tracking:SIMD4(1,0,1/Float(n),1/Float(n)),camera:SIMD4(1,1,0,1),stretch:.zero)
+        let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=target;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
+        pass.colorAttachments[0].clearColor=MTLClearColorMake(0.5,0.5,0.5,1)
+        pass.depthAttachment.texture=z;pass.depthAttachment.loadAction = .clear;pass.depthAttachment.storeAction = .dontCare;pass.depthAttachment.clearDepth=1
+        guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{throw CocoaError(.featureUnsupported)}
+        engine.encodeHair(e,draws:[HairDraw(matrix:placement.matrix,scale:placement.scale,probe:SIMD2(0,0.02))],mvp:projection*faceToWorld,projectionScaleY:scale,
+                          size:CGSize(width:n,height:n),light:1,uniforms:u,obstruction:mask,slot:0)
+        e.endEncoding();command.commit();command.waitUntilCompleted()
         if let error=command.error{throw error}
         var data=Data(count:n*n*4);data.withUnsafeMutableBytes {target.getBytes($0.baseAddress!,bytesPerRow:n*4,from:MTLRegionMake2D(0,0,n,n),mipmapLevel:0)}
         return data
