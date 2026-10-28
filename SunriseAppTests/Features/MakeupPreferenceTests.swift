@@ -1,5 +1,6 @@
 // -Nimah: Preference provenance, missing coverage and real mesh binding regression, not on-face acceptance.
 import XCTest
+import ARKit
 import SceneKit
 import UIKit
 import ImageIO
@@ -7,6 +8,32 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
+    @MainActor func testTutorialRetainsBrowAndUsesSingleCameraSplit() {
+        let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.standardLook,
+            plan:MakeupPlan(shape:.oval),handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true))
+        XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
+        XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
+        model.cycleCompare()
+        XCTAssertTrue(model.liveConfiguration.comparisonSplit)
+        XCTAssertFalse(model.liveConfiguration.showGuide)
+        model.cycleCompare()
+        XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
+        XCTAssertFalse(model.liveConfiguration.showMakeupPreview)
+        model.select(.blush)
+        XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
+        model.deactivate()
+    }
+    @MainActor func testDetachingOldCameraDoesNotDetachNewCameraView() {
+        let camera=FaceCameraState(),manager=ARFaceTrackingManager.shared
+        let old=ARSCNView(),current=ARSCNView()
+        old.session=manager.session;current.session=manager.session
+        let coordinator=LiveGuideView.Coordinator(camera:camera,referenceID:"eyebrows",manager:manager)
+        coordinator.detach(old)
+        XCTAssertFalse(old.session === manager.session)
+        XCTAssertTrue(current.session === manager.session)
+        coordinator.detach(current)
+    }
+
     func testMaskDeliveryCadenceDoesNotHardFlashAtFreshnessBoundary() {
         let fresh=0.15,fade=0.10
         let before=BeautyMaskContinuity.weight(age:0.149,freshAge:fresh,fadeSeconds:fade)

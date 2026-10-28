@@ -1,3 +1,20 @@
+## Tutorial camera handoff and welcome revision — 2026-10-29
+
+Try On deactivates before pushing tutorial. Paused/revoked/dismantled ARSCNViews detach
+from the shared ARSession; resume reattaches before acquiring the delegate. This avoids
+retained navigation views remaining attached while the new screen owns the camera.
+Tutorial split comparison uses the same Metal camera pass, with pigment scissored to
+the left half, instead of attaching a second ARSCNView to the shared session. Tutorial
+handoff carries brow overlay/hiding settings; Filter Off also disables natural-brow hiding.
+Welcome version 2 migrates devices that already dismissed revision 1, without resetting
+saved data. Verified device preference was revision 1 before install.
+
+381 Simulator tests executed, 4 skipped, 0 failures, including lease/detachment,
+tutorial configuration and welcome migration regressions. Signed Release build and
+installation on Nimah New succeeded. Physical tutorial camera/compare acceptance pending.
+Logs: /tmp/sunrise-tutorial-camera-tests.log and /tmp/sunrise-tutorial-camera-release.log.
+Existing local Xcode project/signing and strings edits preserved. No push or main change.
+
 ## Staging integration merge — 2026-10-28
 
 Merged integration blush v0.5, mask continuity and hi-fi welcome with staging's latest

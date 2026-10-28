@@ -11,6 +11,8 @@ struct TutorialHandoff: Hashable {
     var shades: [TryOnTool: MakeupShade]
     var intensities: [TryOnTool: Double]
     var blushStyle:BlushPlacementStyle? = nil
+    var browOverlay:BrowOverlay? = nil
+    var hideNaturalBrow=false
 }
 
 /// What the bottom-left button shows: the full filter, half filter / half real camera, or no filter.
@@ -88,6 +90,10 @@ enum TutorialTab: CaseIterable, Identifiable {
     /// guide is off on that tab.
     var liveConfiguration: EyebrowConfiguration {
         var value = brow.liveConfiguration
+        value.comparisonSplit = compare == .split
+        value.browOverlay = handoff.browOverlay
+        value.hideNaturalBrow = tab == .brows && compare != .off && handoff.hideNaturalBrow
+        value.browTrackingOverlay = false
         value.showMappingFormula = tab == .brows
         // The split comparison is intended to show the applied pigment against the
         // unfiltered camera. Keep the pigment on the filtered half, but suppress
@@ -295,8 +301,6 @@ private struct TutorialScreen: View {
                     }
                     if model.compare == .split {
                         // The same camera without the filter, covering the right half.
-                        RealCameraView(session: camera.trackingManager.session)
-                            .mask(alignment: .trailing) { halfMask(left: false) }
                         Rectangle().fill(AppColors.snow.opacity(0.85)).frame(width: 1.5).allowsHitTesting(false)
                     }
                 }
@@ -423,20 +427,4 @@ private struct LinerGuideOutline: View {
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
-}
-
-/// Plain camera picture from the shared face session, with no content: the "real" side of the comparison.
-private struct RealCameraView: UIViewRepresentable {
-    let session: ARSession
-
-    func makeUIView(context: Context) -> ARSCNView {
-        let view = ARSCNView(frame: .zero)
-        view.session = session
-        view.scene = SCNScene()
-        view.automaticallyUpdatesLighting = false
-        view.isUserInteractionEnabled = false
-        return view
-    }
-
-    func updateUIView(_ view: ARSCNView, context: Context) {}
 }

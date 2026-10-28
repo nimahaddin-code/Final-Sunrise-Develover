@@ -36,7 +36,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private struct Field {var ellipse:SIMD4<Float>;var shape:SIMD4<Float>;var limits:SIMD4<Float>}
     private struct Bake {var left:Field;var right:Field;var bridge=Field(ellipse:.zero,shape:.zero,limits:.zero);var paint=SIMD4<Float>.zero;var options=SIMD4<Float>.zero;var mouth=SIMD4<Float>.zero}
     private struct Settings {
-        var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
+        var comparisonSplit=false;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
     /// Developer brow view (`BrowDebugView` raw value), read each frame so the developer picker applies live.
     static let browDebugKey="beautyBrow.debugView"
     /// How long the brow keeps using the last face-skin mask. The segmenter often lags past `mask_max_age_seconds`
@@ -186,7 +186,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             lastBindAttempt = -.infinity
         }
         settings.enabled=enabled
-        if let c {settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
+        if let c {settings.comparisonSplit=c.comparisonSplit;settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
         if !enabled {layer?.isHidden=true}
         if enabled && nextBrow,let overlay=settings.browOverlay {BrowSpriteStore.shared.prepare(overlay);if overlay.is3D {BrowHairStore.shared.prepare()}}
         let start=enabled && !segmenter.isAvailable && !segmentationStarting
@@ -406,6 +406,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
         e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
+        if s.comparisonSplit {e.setScissorRect(MTLScissorRect(x:0,y:0,width:max(1,drawable.texture.width/2),height:drawable.texture.height))}
         if let anchor,anchorID==anchor.identifier,style==s.style,let atlas,let ib=indices,let obstruction=frameMask,!vertices.isEmpty {
             let buffer=vertices[frameSlot]
             let pointer=buffer.contents().bindMemory(to:Vertex.self,capacity:rest.count)
@@ -910,6 +911,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
         e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
+        if s.comparisonSplit {e.setScissorRect(MTLScissorRect(x:0,y:0,width:max(1,drawable.texture.width/2),height:drawable.texture.height))}
         if let strip,let browTexture,let obstruction=frameMask ?? emptyMask,let fill=s.hideNatural ? eraser?.fill ?? emptyFill:emptyFill,
            strip.vertices.count==Self.browVertexCount*2 {
             let vb=browVertices[frameSlot]

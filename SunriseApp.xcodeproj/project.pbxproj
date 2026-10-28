@@ -7,23 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B5A0C0DE00000000000F000A /* BrowHairMeshTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */; };
-		B5A0C0DE00000000000F0008 /* BrowHairMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */; };
-		B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */; };
-		B5A0C0DE00000000000F0004 /* BrowFaceStabilizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */; };
-		B5A0C0DE00000000000F0002 /* BrowFaceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */; };
-		B5A0C0DE00000000000E0006 /* BrowOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */; };
-		B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */; };
-		B5A0C0DE00000000000E0002 /* BrowOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0001 /* BrowOverlay.swift */; };
-		B5A0C0DE00000000000D0002 /* MIGANFace256.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */; };
-		B5A0C0DE00000000000D0004 /* MI-GAN-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */; };
-		B5A0C0DE00000000000C000E /* BrowInpainter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C000D /* BrowInpainter.swift */; };
-		B5A0C0DE00000000000C000C /* BrowEraser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C000B /* BrowEraser.swift */; };
-		B5A0C0DE00000000000C000A /* BrowTrackingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */; };
-		B5A0C0DE00000000000C0008 /* MediaPipeBrowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0007 /* MediaPipeBrowTests.swift */; };
-		B5A0C0DE00000000000C0006 /* MediaPipeBrowTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */; };
-		B5A0C0DE00000000000C0004 /* BrowObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0003 /* BrowObservation.swift */; };
-		B5A0C0DE00000000000C0002 /* BrowDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0001 /* BrowDesign.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		033A5C6F22B5AC3CD0D490DB /* LiveGuideDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */; };
 		07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */; };
@@ -170,6 +153,23 @@
 		B3C5787F1841D0350274F90E /* FaceLandmarkProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */; };
 		B4A68F2B3FF0993A80DC8193 /* EyeShapeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */; };
 		B5A0C0DE00000000000B0002 /* BrowStylePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */; };
+		B5A0C0DE00000000000C0002 /* BrowDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0001 /* BrowDesign.swift */; };
+		B5A0C0DE00000000000C0004 /* BrowObservation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0003 /* BrowObservation.swift */; };
+		B5A0C0DE00000000000C0006 /* MediaPipeBrowTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */; };
+		B5A0C0DE00000000000C0008 /* MediaPipeBrowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0007 /* MediaPipeBrowTests.swift */; };
+		B5A0C0DE00000000000C000A /* BrowTrackingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */; };
+		B5A0C0DE00000000000C000C /* BrowEraser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C000B /* BrowEraser.swift */; };
+		B5A0C0DE00000000000C000E /* BrowInpainter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C000D /* BrowInpainter.swift */; };
+		B5A0C0DE00000000000D0002 /* MIGANFace256.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */; };
+		B5A0C0DE00000000000D0004 /* MI-GAN-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */; };
+		B5A0C0DE00000000000E0002 /* BrowOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0001 /* BrowOverlay.swift */; };
+		B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */; };
+		B5A0C0DE00000000000E0006 /* BrowOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */; };
+		B5A0C0DE00000000000F0002 /* BrowFaceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */; };
+		B5A0C0DE00000000000F0004 /* BrowFaceStabilizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */; };
+		B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */; };
+		B5A0C0DE00000000000F0008 /* BrowHairMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */; };
+		B5A0C0DE00000000000F000A /* BrowHairMeshTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */; };
 		B82426BCCB6209B4DC3E2179 /* FaceSnapshotter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7512B62F7A8614E0911E45 /* FaceSnapshotter.swift */; };
 		B8EAE5AAE0A46180B2B92BC2 /* LocalSavedLooksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */; };
 		B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */; };
@@ -258,23 +258,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMeshTests.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMesh.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */ = {isa = PBXFileReference; lastKnownFileType = file; path = "brow-hair-3d.obj"; sourceTree = "<group>"; };
-		B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizerTests.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizer.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayTests.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayPicker.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000E0001 /* BrowOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlay.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = MIGANFace256.mlpackage; sourceTree = "<group>"; };
-		B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MI-GAN-LICENSE.txt"; sourceTree = "<group>"; };
-		B5A0C0DE00000000000C000D /* BrowInpainter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowInpainter.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000C000B /* BrowEraser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowEraser.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowTrackingOverlay.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000C0007 /* MediaPipeBrowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeBrowTests.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeBrowTracker.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000C0003 /* BrowObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowObservation.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000000C0001 /* BrowDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowDesign.swift; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
 		01F40072E3CF347862554017 /* face_landmarker.task */ = {isa = PBXFileReference; lastKnownFileType = file; path = face_landmarker.task; sourceTree = "<group>"; };
 		045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSavedLooksStore.swift; sourceTree = "<group>"; };
@@ -411,6 +394,23 @@
 		B37236A944DF5013746B587B /* ReferenceCatalogProviding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReferenceCatalogProviding.swift; sourceTree = "<group>"; };
 		B4BCF3A0D2A9C2618147EA0C /* MakeupTextureGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupTextureGeometryTests.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowStylePicker.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000C0001 /* BrowDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowDesign.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000C0003 /* BrowObservation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowObservation.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeBrowTracker.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000C0007 /* MediaPipeBrowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeBrowTests.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowTrackingOverlay.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000C000B /* BrowEraser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowEraser.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000C000D /* BrowInpainter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowInpainter.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = MIGANFace256.mlpackage; sourceTree = "<group>"; };
+		B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MI-GAN-LICENSE.txt"; sourceTree = "<group>"; };
+		B5A0C0DE00000000000E0001 /* BrowOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlay.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayPicker.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayTests.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizer.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizerTests.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */ = {isa = PBXFileReference; lastKnownFileType = text; path = "brow-hair-3d.obj"; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMesh.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMeshTests.swift; sourceTree = "<group>"; };
 		B8A0C7629D5BE6A59E2A595E /* TrackingReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingReadinessTests.swift; sourceTree = "<group>"; };
 		BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPreferenceTests.swift; sourceTree = "<group>"; };
 		BC38DE15F5318E7DBE6A6A6A /* BlushMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlushMask.swift; sourceTree = "<group>"; };
@@ -1419,7 +1419,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1441,7 +1441,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1483,7 +1483,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1538,7 +1538,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseLiveActivity/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

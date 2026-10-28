@@ -38,7 +38,11 @@ struct LiveGuideView: UIViewRepresentable {
         if active && camera.authorized && camera.failure == nil { context.coordinator.start(view) }
         else { context.coordinator.pause(view) }
     }
-    static func dismantleUIView(_ view: ARSCNView, coordinator: Coordinator) { coordinator.pause(view); view.delegate=nil }
+    static func dismantleUIView(_ view: ARSCNView, coordinator: Coordinator) {
+        coordinator.pause(view)
+        coordinator.detach(view)
+        view.delegate=nil
+    }
 
     final class Coordinator: NSObject, ARSCNViewDelegate, ARSessionDelegate, @unchecked Sendable {
         let queue=DispatchQueue(label:"sunrise.face-session")
@@ -166,7 +170,9 @@ struct LiveGuideView: UIViewRepresentable {
             manager.acquire(owner:leaseID) { [weak self] in
                 guard let self else { return }
                 self.desiredRunning=false; self.running=false; self.invalidateSession(); self.camera.suspend()
+                if let oldView=self.camera.view {self.detach(oldView)}
             }
+            if view.session !== manager.session {view.session=manager.session}
             view.session.delegate=self; view.session.delegateQueue=queue
             running=true
             eyebrowPipeline.reset()
@@ -178,13 +184,18 @@ struct LiveGuideView: UIViewRepresentable {
             let configuration=ARFaceTrackingConfiguration(); configuration.maximumNumberOfTrackedFaces=1
             view.session.run(configuration,options:[.resetTracking,.removeExistingAnchors])
         }
+        // A retained navigation screen must not keep an ARSCNView attached to another screen's session.
+        @MainActor func detach(_ view:ARSCNView) {
+            if view.session === manager.session {view.session=ARSession()}
+        }
         @MainActor func pause(_ view:ARSCNView) {
             lock.lock();let engine=beauty;lock.unlock();engine?.pause()
             desiredRunning=false; setTracking(false,canFit:false)
             lock.lock(); generation=UUID(); pending=nil; pendingStyles=[:]; activeAnchorID=nil; sessionActive=false; lock.unlock()
             eyebrowPipeline.reset()
-            guard running || manager.owns(leaseID) else { return }
+            guard running || manager.owns(leaseID) else { detach(view); return }
             manager.release(owner:leaseID); running=false; camera.suspend()
+            detach(view)
         }
         func renderer(_ renderer:SCNSceneRenderer,nodeFor anchor:ARAnchor) -> SCNNode? {
             guard anchor is ARFaceAnchor,let device=renderer.device,let face=RenderFace(device:device) else { return nil }

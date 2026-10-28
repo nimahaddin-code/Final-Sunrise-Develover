@@ -6,7 +6,7 @@ import UIKit
 import simd
 
 /// A brow picture the user can choose in the eyebrow tool.
-struct BrowOverlay: Identifiable, Equatable, Sendable {
+struct BrowOverlay: Identifiable, Hashable, Sendable {
     let id: String
     let title: String
     /// Image set in `Assets.xcassets`.

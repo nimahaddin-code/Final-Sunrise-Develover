@@ -86,7 +86,7 @@ struct TryOnHomeView: View {
                 .sensoryFeedback(.impact, trigger: developerTools)
             HStack {
                 Spacer()
-                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,blushStyle:home.blushLook)) } label: {
+                Button { home.deactivate(); onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,blushStyle:home.blushLook,browOverlay:home.browOverlay,hideNaturalBrow:!home.naturalBrowVisible)) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)

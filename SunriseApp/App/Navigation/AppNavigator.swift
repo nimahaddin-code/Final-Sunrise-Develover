@@ -3,7 +3,7 @@ import Foundation
 
 @MainActor final class AppNavigator: ObservableObject {
     static let welcomeVersionKey="dandan.welcome.version"
-    static let currentWelcomeVersion=1
+    static let currentWelcomeVersion=2
     @Published private(set) var needsWelcome:Bool
     @Published var selectedTab: AppTab = .tryOn
     @Published var discoverPath: [AppRoute] = []
