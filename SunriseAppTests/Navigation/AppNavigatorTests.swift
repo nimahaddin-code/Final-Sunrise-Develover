@@ -17,6 +17,21 @@ final class AppNavigatorTests: XCTestCase {
         super.tearDown()
     }
 
+    @MainActor func testPreviousWelcomeRevisionMigratesOnce() {
+        defaults.set(1,forKey:AppNavigator.welcomeVersionKey)
+        let navigator=AppNavigator(defaults:defaults)
+        XCTAssertTrue(navigator.needsWelcome)
+        navigator.dismissWelcome()
+        XCTAssertFalse(AppNavigator(defaults:defaults).needsWelcome)
+    }
+    @MainActor func testWelcomeAppearsOnceAndKeepsNavigationAtHome() {
+        let navigator=AppNavigator(defaults:defaults)
+        XCTAssertTrue(navigator.needsWelcome)
+        navigator.dismissWelcome()
+        XCTAssertFalse(navigator.needsWelcome)
+        XCTAssertFalse(AppNavigator(defaults:defaults).needsWelcome)
+        XCTAssertTrue(navigator.tryOnPath.isEmpty)
+    }
     @MainActor func testOpensOnTryOnHomeWithoutAPath() {
         let navigator = AppNavigator()
         XCTAssertEqual(navigator.selectedTab, .tryOn)

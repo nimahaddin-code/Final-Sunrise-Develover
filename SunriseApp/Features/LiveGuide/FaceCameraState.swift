@@ -25,6 +25,8 @@ import ImageIO
     @Published var beautyStatus:String?
     /// MediaPipe brow tracking for the tracking view; a separate object so per-frame updates redraw only that overlay.
     let browTracking=BrowTrackingFeed()
+    /// The blush tutorial's cheek outlines, updated about 30 times a second apart from this object so the screen is not redrawn.
+    let blushGuide=BlushGuideFeed()
     @Published var previewStrength: Float = 0.8
     // -Nimah: Shared session + eyebrow module status; tidak menyimpan gambar atau landmark ke disk.
     let trackingManager=ARFaceTrackingManager.shared
@@ -89,4 +91,19 @@ import ImageIO
         guard let rendered = imageContext.createCGImage(image, from: image.extent) else { return nil }
         return UIImage(cgImage: rendered)
     }
+}
+
+/// The blush tutorial's outlines on each cheek this frame, in the camera view's points (origin top left).
+struct BlushGuideSnapshot:Equatable,Sendable {
+    struct Cheek:Equatable,Sendable {
+        /// The small circle the first dab goes in, and the outer line the colour is blended out to.
+        var inner:[CGPoint];var outer:[CGPoint]
+        var center:CGPoint
+        /// A point outward along the look's direction (toward the face edge, up toward the temple for Lifted).
+        var outward:CGPoint
+    }
+    var cheeks:[Cheek]
+}
+@MainActor final class BlushGuideFeed: ObservableObject {
+    @Published var snapshot: BlushGuideSnapshot?
 }

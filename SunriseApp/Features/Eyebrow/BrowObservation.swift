@@ -164,10 +164,17 @@ struct BrowGeometry: Sendable {
     }
 
     func point(u: Float, w: Float) -> SIMD2<Float> {
+        let s = section(u)
+        return s.point + s.across * w
+    }
+
+    /// The centerline point at `u` and one brow width across it, upwards: `point(u:w:)` is `point + across * w`. For
+    /// placing many points at one `u` without evaluating the centerline again.
+    func section(_ u: Float) -> (point: SIMD2<Float>, across: SIMD2<Float>) {
         let c = centerline(u)
         let length = simd_length(c.tangent)
         let normal = length > 1e-4 ? SIMD2(-c.tangent.y, c.tangent.x) / length * upSign : SIMD2(0, 0)
-        return c.point + normal * (w * across)
+        return (c.point, normal * across)
     }
 
     /// How far the centerline at `u` lies above the straight head-to-tail line (the chord), in brow widths, so a picture

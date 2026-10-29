@@ -1,3 +1,93 @@
+## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
+
+`GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it
+into your skin.", with their own `blushStep` (the brow model's three blush lessons are no longer used here). Caption is
+`stepCaption` (spec 1.1: STEP n OF 2 at 70%, 4 pt gap, `AppColors.captionFill` #370B21, radius 18, 22 x 4 padding, max
+300 pt). `BlushTutorialOverlay` draws, anchored to each cheek: step 1 the inner dotted circle (0.38 of the pigment field)
+with a fingertip dabbing three times and a pink tap ring; step 2 also the outer dotted line (0.82), the ring between them
+pulsing 20%-50% every 2 s, the fingertip dabbing outward along the look's direction. 3 s animation, 2 s rest, repeat;
+Reduce Motion shows the last frame and a still 40% ring; thermal `.serious` pauses the loop. Outlines are bound to the
+mesh at bake (`BeautyBlushEngine.guideOutline`), projected with the pigment's own filtered vertices and `mvp`
+(`projectGuide`) at 30 Hz, and published through `FaceCameraState.blushGuide` (`BlushGuideFeed`). The blush shader
+contour is off (`tracking.y = 0`); Try On never used it. Camera messages (spec 1-2) are not implemented. Device check pending.
+
+## Blush cheek fit from MediaPipe landmarks, wide natural wash — -Nimah (2026-10-29)
+
+Device feedback: blush too small and not shaped to the face. For Youthful/Sunkissed/Lifted, `BeautyBlushEngine` now runs
+the shared MediaPipe tracker while blush is selected, only until the cheek fit is measured: 17 landmarks per frame
+(`BlushCheekLandmarks.pairs`: eye corners, lower lid, nostril wing, mouth corner, cheekbone, apple, face edge) are lifted
+onto the same frame's ARKit mesh (`BrowFaceFrame.faceLocal`), frontal frames only (|yaw|,|pitch| < 15), median of 10,
+once per face anchor. `BlushPlacementGenerator.landmarkField` places each cheek in that person's corridor (nostril wing
+to face edge, mouth corner to lower lid) with new preset fields `landmark_*` (fractions of the corridor) and a
+flat-topped `wash` profile (1 - smoothstep(r), atlas `paint.z`), cut softly by nose/lid/face-edge feathers. Pigment is
+still drawn on the ARKit mesh with ARKit UVs. Until the fit arrives, or when it is implausible, the ARKit-only fit is
+drawn (one re-bake when it arrives, no crossfade). Look `max_alpha` 0.48 -> 0.34. Other blush styles are unchanged.
+Synthetic tests only; device look pending.
+
+## Skin-preserving blush compositing and blush lab — -Nimah (2026-10-29)
+
+Blush stays a UV atlas on the native ARKit mesh; placement/silhouettes are unchanged. Fixed in
+`BeautyBlush.metal.txt`: camera decode is now the exact inverse of the sRGB drawable (the BT.709 decode
+lifted shadows 0.10 -> 0.16 for every Metal camera pixel, brow included); default blend colours low-frequency skin
+(`detail_radius_px`, new required JSON field, 2...16 camera px) and puts back each pixel's luminance ratio and chroma
+residual, keeping pores, highlights and freckles; out-of-gamut colours move towards their own luminance instead of
+per-channel clamping; tutorial contour is an antialiased isoline. Alpha 0 is exactly the camera pixel.
+Developer tools + Blush: `BlushDebugMenu` picks blend (pigment, previous, linear alpha, multiply, soft light) and
+diagnostics (neutral, UV checker, mask, boundaries, visibility, wireframe). No MediaPipe blush renderer, Banuba or
+BytePlus exists; the orphan `Features/BeautyBlush/Comparison/` files are not in the project. See ADR 0017 and
+`Docs/blush-rendering.schema.json`. Synthetic Simulator tests only; device look pending.
+
+## Tutorial camera handoff and welcome revision — 2026-10-29
+
+Try On deactivates before pushing tutorial. Paused/revoked/dismantled ARSCNViews detach
+from the shared ARSession; resume reattaches before acquiring the delegate. This avoids
+retained navigation views remaining attached while the new screen owns the camera.
+Tutorial split comparison uses the same Metal camera pass, with pigment scissored to
+the left half, instead of attaching a second ARSCNView to the shared session. Tutorial
+handoff carries brow overlay/hiding settings; Filter Off also disables natural-brow hiding.
+Welcome version 2 migrates devices that already dismissed revision 1, without resetting
+saved data. Verified device preference was revision 1 before install.
+
+381 Simulator tests executed, 4 skipped, 0 failures, including lease/detachment,
+tutorial configuration and welcome migration regressions. Signed Release build and
+installation on Nimah New succeeded. Physical tutorial camera/compare acceptance pending.
+Logs: /tmp/sunrise-tutorial-camera-tests.log and /tmp/sunrise-tutorial-camera-release.log.
+Existing local Xcode project/signing and strings edits preserved. No push or main change.
+
+## Staging integration merge — 2026-10-28
+
+Merged integration blush v0.5, mask continuity and hi-fi welcome with staging's latest
+MediaPipe/ARKit-pose brow, overlays and MI-GAN work. Staging's scan-free home remains:
+the versioned welcome dismisses directly to Try On; historical scan/Profile migration
+notes below describe the integration parent, not this merged flow. Brow tracking,
+overlay selection, erasing and 3D rendering remain from staging. Blush retains its
+native UV pipeline, three looks, palette and tutorial handoff. Device QA is pending.
+## Archive app icon configuration — 2026-10-29
+
+- Wired the `AppIcon` asset catalog into the app target for Debug and Release archives and removed the obsolete Live Activities plist flag.
+
+## Tutorial bar, screen light and uncapped brow — Khalish (2026-10-29)
+
+- Tutorial: wine background like Try On; bottom bar with compare on the left, Blush / Brows / Eyeliner, and a screen light
+  on the right (`ScreenLight`, `ScreenLightGlow`, `CameraBarButton`, `AppColors.ringLight`).
+- Brow frame caps removed at nominal and fair thermal state (drawing and MediaPipe run as fast as frames are free); hot
+  phones keep 15 / 30 fps. Split view's real half at 60 fps.
+- Simulator tests only; device check pending.
+
+## Brow frame rate — Khalish (2026-10-29)
+
+- MediaPipe gets at most 30 camera frames a second again (`browMaxFramesPerSecond`; fair 24, hot 15); the brow is still drawn
+  on every 60 Hz frame (`BrowLoad.drawFPS`, 30 when hot), moved by ARKit's pose between answers. Running the landmarker at 60
+  fps took GPU and Neural Engine time from drawing.
+- `BrowFaceFrame.faceLocal(at:projected:)` skips mesh triangles whose image cannot contain the landmark (same result, far
+  fewer ray tests per MediaPipe answer on the render queue). `browStrip` evaluates the centerline once per column
+  (`BrowGeometry.section`) instead of three times per vertex.
+- Simulator tests only; frame rate not measured on a device.
+
+## Remove scan Live Activity — 2026-10-29
+
+- Removed the unused `SunriseLiveActivity` extension and ActivityKit scan feedback. Face and eye scans keep their in-app progress and completion badge.
+
 ## ARKit-pose brow stabilizer and 3D hair brow — Khalish (2026-10-28)
 
 - `BrowFaceStabilizer`: brow landmarks lifted onto ARKit's face mesh, smoothed in face-local metres, projected back; falls
@@ -124,6 +214,34 @@ attempt at most every 0.4 s, frontal and relaxed face) and then followed by ARKi
 memory-only, cleared on each camera session start, and deletes the old `savedMakeupAttachments.v1` key.
 FaceShape/EyeShape/Onboarding/ProfileView/ScanDebug code stays in the repo, unreferenced, so it can return.
 Sections below that describe the launch scan, saved fit or Profile predate this. Not yet checked on a device.
+
+## Mask continuity and welcome migration — -Nimah (2026-10-28)
+
+Device screenshot showed Preparing makeup visibility; scalar report error=none, GPU about1ms, ~60FPS.
+Fix actual hard freshness gate: reprojection uses three native head anchors; 150ms fresh window plus bounded
+100ms smooth opacity fade (new consumed mask_fade_seconds). Never show after250ms; no unlimited old mask.
+Opacity target is continuous and capped by mask weight, not hard fresh ? alpha : 0. Stale/mismatched dimensions
+and implausible reprojection remain excluded. Status waits for low effective visibility. This permits brief
+stale-mask fading, not perfect new-hand occlusion: validate on device.
+Welcome revision gate dandan.welcome.version shows new hi-fi welcome once on upgrade. Get Started dismisses
+welcome; users with completed face/eye results go to try-on, fresh users enter face then eyes. No scan erasure.
+
+## Hi-fi welcome onboarding — -Nimah (2026-10-28)
+
+Welcome uses OnboardingWelcomeScreen, static generated onboarding-silk asset and native logo/copy/CTA.
+Match supplied burgundy silk reference. Responsive scroll fallback, Dynamic Type-scaled text, light status
+appearance and four progress dots (welcome/face/eyes/preparing). Get Started still enters face scan then eyes.
+Preserve saved-scan bypass and Retake routing. No fake system status bar or rasterized controls; no animation,
+second camera or model added. Existing in-flight blush look changes stay intact. No merge/push requested.
+
+## Three reference blush looks v0.5.0 — -Nimah (2026-10-28)
+
+User requested Youthful / Sunkissed / Lifted options, overriding prior no-style-picker for blush only.
+JSON presets drive the three shapes; same per-cheek anatomical fitting. Sunkissed alone adds upper-nose
+bridge channel. Curved Lifted mask, continuous soft falloff, mipmapped pigment atlases, capped 0.25 mm blush
+mesh residual and blush-only mask-confidence threshold. No retouch/morph/scan/extra tracker. Five new colors
+(total nine), design approximations only. Selected look handed to tutorial; shade/intensity stay independent.
+See Docs/Decisions/0013-three-reference-blush-looks.md. Do not merge staging/main without new instruction.
 
 ## Brow stability — -Nimah (2026-10-27)
 

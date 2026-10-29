@@ -159,8 +159,12 @@ final class BrowOverlayTests: XCTestCase {
             let t = Double(i) / 60
             if BeautyBlushEngine.browFrameDue(timestamp: t, last: last, maxFPS: 24) { last = t; kept += 1 }
         }
-        XCTAssertEqual(kept, 20, "at 24 fps on a 60 Hz camera frames come every 50 ms")
+        XCTAssertEqual(kept, 24, "one frame per 1/24 s slot, not one per whole 50 ms of 60 Hz frames")
         XCTAssertTrue(BeautyBlushEngine.browFrameDue(timestamp: 0, last: -.infinity))
-        XCTAssertLessThanOrEqual(BeautyBlushEngine.browMaxFramesPerSecond, 30)
+        XCTAssertTrue(BeautyBlushEngine.browFrameDue(timestamp: 1.001, last: 1, maxFPS: nil), "no cap: every frame is due")
+        // Uncapped until the phone is hot; then drawing and MediaPipe slow down.
+        XCTAssertNil(BeautyBlushEngine.BrowLoad.current(.nominal).drawFPS)
+        XCTAssertNil(BeautyBlushEngine.BrowLoad.current(.nominal).trackerFPS)
+        XCTAssertEqual(BeautyBlushEngine.BrowLoad.current(.serious).drawFPS, 30)
     }
 }

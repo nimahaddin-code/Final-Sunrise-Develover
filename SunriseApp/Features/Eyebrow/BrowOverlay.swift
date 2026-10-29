@@ -6,7 +6,7 @@ import UIKit
 import simd
 
 /// A brow picture the user can choose in the eyebrow tool.
-struct BrowOverlay: Identifiable, Equatable, Sendable {
+struct BrowOverlay: Identifiable, Hashable, Sendable {
     let id: String
     let title: String
     /// Image set in `Assets.xcassets`.
@@ -17,8 +17,6 @@ struct BrowOverlay: Identifiable, Equatable, Sendable {
     static let all: [BrowOverlay] = [
         BrowOverlay(id: "overlay.1", title: String(localized: "Brow 1"), assetName: "brow-overlay-1"),
         BrowOverlay(id: "overlay.2", title: String(localized: "Brow 2"), assetName: "brow-overlay-2"),
-        BrowOverlay(id: "overlay.3", title: String(localized: "Brow 3"), assetName: "brow-overlay-3"),
-        BrowOverlay(id: "overlay.3d", title: String(localized: "Brow 3D"), assetName: "brow-overlay-3", is3D: true),
     ]
     static let standard = all[0]
     /// A picture is nearly opaque, so the eyebrow starts higher than the 0.65 of the shape designs.

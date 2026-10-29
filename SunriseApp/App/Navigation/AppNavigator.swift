@@ -2,11 +2,22 @@ import Combine
 import Foundation
 
 @MainActor final class AppNavigator: ObservableObject {
-    /// Try On is the home screen; the app opens on it with no onboarding or scan.
+    static let welcomeVersionKey="dandan.welcome.version"
+    static let currentWelcomeVersion=2
+    @Published private(set) var needsWelcome:Bool
     @Published var selectedTab: AppTab = .tryOn
     @Published var discoverPath: [AppRoute] = []
     @Published var savedPath: [AppRoute] = []
     @Published var tryOnPath: [AppRoute] = []
+    private let defaults: UserDefaults
+    init(defaults:UserDefaults = .standard) {
+        self.defaults=defaults
+        needsWelcome=defaults.integer(forKey:Self.welcomeVersionKey)<Self.currentWelcomeVersion
+    }
+    func dismissWelcome() {
+        defaults.set(Self.currentWelcomeVersion,forKey:Self.welcomeVersionKey)
+        needsWelcome=false
+    }
 
     func open(_ route: AppRoute, in tab: AppTab) {
         selectedTab = tab

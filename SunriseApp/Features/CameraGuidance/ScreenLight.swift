@@ -92,3 +92,28 @@ struct ScreenLightButton: View {
         }
     }
 }
+
+/// The round, raised wine button of the camera screens' bottom bar (compare, light).
+struct CameraBarButton: View {
+    var symbol: String
+    var action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.title2)
+                .foregroundStyle(AppColors.snow.opacity(0.9))
+                .frame(width: 56, height: 56)
+                .background {
+                    Circle()
+                        .fill(LinearGradient(colors: [AppColors.snow.opacity(0.14), AppColors.snow.opacity(0.04)],
+                                             startPoint: .top, endPoint: .bottom))
+                        .background(AppColors.wine, in: Circle())
+                        .shadow(color: .black.opacity(0.35), radius: 6, y: 3)
+                }
+                .overlay(Circle().strokeBorder(AppColors.snow.opacity(0.12), lineWidth: 1))
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .buttonStyle(.plain)
+    }
+}

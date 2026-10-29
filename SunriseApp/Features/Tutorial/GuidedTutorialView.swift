@@ -5,13 +5,17 @@ import Combine
 import SceneKit
 import SwiftUI
 
-/// What the Try On screen hands to the tutorial: the tool that was open, and every tool's shade and strength.
+/// What the Try On screen hands to the tutorial: the tool that was open, every tool's shade and strength, and the
+/// brow picture the user chose (nil: none) with whether their own brow was hidden under it.
 struct TutorialHandoff: Hashable {
     var tool: TryOnTool
     var shades: [TryOnTool: MakeupShade]
     var intensities: [TryOnTool: Double]
     /// Which eyeliner look the person was trying: the tutorial guides that same shape.
     var linerLook: LinerLook = .classic
+    var blushStyle: BlushPlacementStyle? = nil
+    var browOverlay: BrowOverlay? = nil
+    var hideNaturalBrow = false
 }
 
 /// What one half of the camera shows in the comparison.
@@ -63,7 +67,8 @@ enum TutorialCompare: CaseIterable {
 }
 
 enum TutorialTab: CaseIterable, Identifiable {
-    case brows, eyeliner, blush
+    /// In the bottom bar's order.
+    case blush, brows, eyeliner
     var id: Self { self }
     var title: LocalizedStringKey {
         switch self { case .brows: "Brows"; case .eyeliner: "Eyeliner"; case .blush: "Blush" }
@@ -84,6 +89,9 @@ enum TutorialTab: CaseIterable, Identifiable {
     let handoff: TutorialHandoff
     @Published private(set) var tab: TutorialTab
     @Published private(set) var linerStep = 0
+    /// The Brows tab's own step (its five steps are the tutorial's, not the brow model's).
+    @Published private(set) var browStep = 0
+    @Published private(set) var blushStep = 0
     @Published private(set) var compare = TutorialCompare.tryOnGuide
     /// After the last step: the camera shows the whole assigned look, with no guide, for taking a photo.
     @Published private(set) var photoMode = false
@@ -104,11 +112,40 @@ enum TutorialTab: CaseIterable, Identifiable {
         // The guide points follow the skin when the person pulls the lid or the corner of the eye outward.
         liner.followsPulledLid = true
         applyShade(for: start == .blush ? .blush : .eyebrow)
+        // Bake the chosen brow picture (and the 3D hair) now, so it is ready by the first drawn frame.
+        if let overlay = handoff.browOverlay {
+            BrowSpriteStore.shared.prepare(overlay)
+            if overlay.is3D { BrowHairStore.shared.prepare() }
+        }
         // The brow model owns the step index for brows/blush; forward its changes so the screen redraws.
         brow.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
 
-    var stepIndex: Int { tab == .eyeliner ? linerStep : brow.stepIndex }
+    var stepIndex: Int {
+        switch tab { case .eyeliner: linerStep; case .brows: browStep; case .blush: blushStep }
+    }
+
+    /// The Blush tab's two steps (UX spec 3.5). "Dab" works for cream and powder alike; the caption is the whole instruction.
+    static let blushLessons = [
+        FaceGuideLesson(title: String(localized: "Dab a little blush inside the small circle."), instruction: ""),
+        FaceGuideLesson(title: String(localized: "Dab outward to blend it into your skin."), instruction: ""),
+    ]
+
+    /// The Brows tab's steps, as a brow is drawn with a pencil after brow mapping.
+    static let browLessons = [
+        FaceGuideLesson(title: String(localized: "Brush your brows up with a spoolie"),
+                        instruction: String(localized: "Brush every hair upward and a little outward, so the real edge of your brow shows.")),
+        FaceGuideLesson(title: String(localized: "Mark three dots along the guide"),
+                        instruction: String(localized: "Make a small dot where each dashed line meets your brow: where it starts, its arch and where it ends.")),
+        FaceGuideLesson(title: String(localized: "Connect the dots into an outline"),
+                        instruction: String(localized: "Draw a light line from the start through the arch to the end along the top edge, then along the bottom.")),
+        FaceGuideLesson(title: String(localized: "Fill in with short, hair-like strokes"),
+                        instruction: String(localized: "Start at the arch and work toward the end, then go lighter toward the start.")),
+        FaceGuideLesson(title: String(localized: "Brush through to soften"),
+                        instruction: String(localized: "Brush the start upward with the spoolie so the front stays soft, then check that both brows match.")),
+    ]
+    /// The brow steps that show the mapping lines: marking the dots and outlining between them.
+    static let browMappingSteps = 1...2
 
     /// False when the tab has no reference (nothing is drawn rather than a default).
     var hasGuide: Bool { tab == .eyeliner ? linerStyle != nil : brow.hasRecommendation }
@@ -118,6 +155,8 @@ enum TutorialTab: CaseIterable, Identifiable {
             return [FaceGuideLesson(title: "No guide yet", instruction: "This step has no reference yet. Use the other tabs.")]
         }
         if tab == .eyeliner { return Self.linerLessons }
+        if tab == .brows { return Self.browLessons }
+        if tab == .blush { return Self.blushLessons }
         return brow.lessons
     }
 
@@ -128,7 +167,16 @@ enum TutorialTab: CaseIterable, Identifiable {
     var liveConfiguration: EyebrowConfiguration {
         if photoMode { return photoConfiguration }
         var value = brow.liveConfiguration
-        value.showMappingFormula = tab == .brows
+        // Brows and blush draw on one face mesh: a look beside the plain camera is the renderer's own left-half split.
+        value.comparisonSplit = tab != .eyeliner && compare.plainBesideLook != nil
+        value.showMappingFormula = tab == .brows && Self.browMappingSteps.contains(browStep)
+        // The tutorial shows dashed nose-to-brow lines, not MediaPipe's landmark view.
+        value.browTrackingOverlay = false
+        // The filter the user picked on Try On, with its shade and strength (`applyShade`), is what the tutorial shows.
+        if tab == .brows {
+            value.browOverlay = handoff.browOverlay
+            value.hideNaturalBrow = compare != .plain && handoff.hideNaturalBrow
+        }
         // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
         // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
         if tab == .eyeliner {
@@ -137,9 +185,8 @@ enum TutorialTab: CaseIterable, Identifiable {
             return value
         }
         if !hasGuide || compare == .plain { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
-        // Brow and blush are drawn on the face mesh, one configuration for the whole view, so the guide and the look cannot
-        // share the screen: the guide wins when it is in the layout, otherwise the look (beside the plain camera).
-        else if !compare.showsGuide { return photoConfiguration }
+        // A look beside the plain camera has no guide outline over it.
+        else if compare.plainBesideLook != nil { value.showGuide = false; value.showMappingFormula = false }
         return value
     }
 
@@ -179,6 +226,8 @@ enum TutorialTab: CaseIterable, Identifiable {
         guard new != tab else { return }
         tab = new
         linerStep = 0
+        browStep = 0
+        blushStep = 0
         if new != .eyeliner {
             brow.select(new == .blush ? .blush : .eyebrows)
             applyShade(for: new.tool)
@@ -190,14 +239,14 @@ enum TutorialTab: CaseIterable, Identifiable {
     /// Next step. Returns true when the last step was already showing, so the screen should close.
     func advance() -> Bool {
         guard stepIndex + 1 < lessons.count else { return true }
-        if tab == .eyeliner { linerStep += 1 } else { brow.nextStep() }
+        switch tab { case .eyeliner: linerStep += 1; case .brows: browStep += 1; case .blush: blushStep += 1 }
         return false
     }
 
     /// Previous step. Returns true when already on the first step, so the screen should close.
     func retreat() -> Bool {
         guard stepIndex > 0 else { return true }
-        if tab == .eyeliner { linerStep -= 1 } else { brow.previousStep() }
+        switch tab { case .eyeliner: linerStep -= 1; case .brows: browStep -= 1; case .blush: blushStep -= 1 }
         return false
     }
 
@@ -212,6 +261,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     private func applyShade(for tool: TryOnTool) {
+        if tool == .blush,let style=handoff.blushStyle {brow.configuration.blushStyle=style}
         brow.configuration.shadeTint = handoff.shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) }
         let strength = handoff.intensities[tool] ?? TryOnHomeModel.defaultIntensity
         brow.configuration.previewIntensity = Float(min(max(strength, 0), 1))
@@ -302,6 +352,7 @@ private struct TutorialScreen: View {
         .sensoryFeedback(.selection, trigger: model.tab)
         .sensoryFeedback(.selection, trigger: model.stepIndex)
         .sensoryFeedback(.selection, trigger: model.compare)
+        .sensoryFeedback(.selection, trigger: light.isOn)
         .task {
             await model.brow.prepare()
             if model.brow.availability == .supported { await camera.requestPermission() }
@@ -353,11 +404,6 @@ private struct TutorialScreen: View {
                 ScreenLightGlow(light: light)
             }
         }
-        .overlay(alignment: .leading) {
-            if !model.photoMode, model.brow.availability == .supported, camera.authorized {
-                ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(.leading, AppSpacing.small)
-            }
-        }
         .clipShape(RoundedRectangle(cornerRadius: model.photoMode ? 10 : AppSpacing.cornerRadius, style: .continuous))
     }
 
@@ -384,8 +430,9 @@ private struct TutorialScreen: View {
                                   eyebrowConfiguration: guideConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   }, reducedFrameRate: advisor.reducesLoad)
-                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .plain && !model.photoMode {
-                        BrowTrackingOverlayView(feed: camera.browTracking)
+                    if model.tab == .blush && model.compare != .plain && model.hasGuide && !model.photoMode {
+                        BlushTutorialOverlay(feed: camera.blushGuide, step: index)
+                            .mask(alignment: .leading) { halfMask(left: model.compare.plainBesideLook != nil) }
                     }
                     if model.photoMode {
                         LinerOverlayView(model: model.liner, isVisible: true)
@@ -399,12 +446,14 @@ private struct TutorialScreen: View {
                                            paused: advisor.pausesAnimation, dimmed: advisor.isDimmed, side: side)
                                 .id(index)
                         }
-                    } else if model.tab != .eyeliner, let side = model.compare.plainBesideLook {
+                    } else if model.tab != .eyeliner, model.compare.plainBesideLook != nil {
                         // The same camera without the look, covering its half.
                         RealCameraView(session: camera.trackingManager.session)
-                            .mask(alignment: side == .leading ? .leading : .trailing) { halfMask(left: side == .leading) }
+                            .mask(alignment: .trailing) { halfMask(left: false) }
+                            .transition(.opacity)
                     }
                 }
+                .animation(.easeInOut(duration: 0.25), value: model.compare)
                 // The photo is taken from the unzoomed camera, so zoom is off while framing it.
                 .cameraZoom(!model.photoMode)
             } else {
@@ -435,6 +484,7 @@ private struct TutorialScreen: View {
         .background(AppColors.cocoa)
     }
 
+    /// Frosted round back button, and a frosted "Next" capsule that turns into a pink "Done" on the last step.
     private var header: some View {
         ZStack {
             Image("logo-burgundy")
@@ -482,7 +532,26 @@ private struct TutorialScreen: View {
                 }
                 .accessibilityLabel(isLast ? "Done" : "Next step")
             }
+            .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
+            Spacer()
+            Button {
+                if model.advance() { dismiss() }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(isLast ? "Done" : "Next")
+                    if !isLast { Image(systemName: "chevron.right").fontWeight(.medium) }
+                }
+                .font(.body)
+                .padding(.horizontal, isLast ? 24 : 18)
+                .frame(height: 44)
+                .background(isLast ? AnyShapeStyle(AppColors.flamingo) : AnyShapeStyle(AppColors.snow.opacity(0.8)), in: Capsule())
+                .overlay(Capsule().strokeBorder(AppColors.snow.opacity(isLast ? 0.25 : 0.6), lineWidth: 1))
+                .foregroundStyle(isLast ? AppColors.snow : Color.black)
+            }
+            .accessibilityLabel(isLast ? "Finish tutorial" : "Next step")
         }
+        .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
+        .animation(.easeInOut(duration: 0.2), value: isLast)
         .buttonStyle(.plain)
     }
 
@@ -508,7 +577,71 @@ private struct TutorialScreen: View {
         }
     }
 
-    private var wording: some View {
+    /// Brows: a small spaced "STEP 1 OF 5" over one short instruction in a pill, like a camera effect's caption.
+    @ViewBuilder private var wording: some View {
+        switch model.tab {
+        case .brows: browCaption
+        case .blush: stepCaption
+        case .eyeliner: lessonCard
+        }
+    }
+
+    private var browCaption: some View {
+        VStack(spacing: AppSpacing.small) {
+            Text("Step \(index + 1) of \(lessons.count)")
+                .textCase(.uppercase)
+                .font(.subheadline.weight(.medium))
+                .tracking(3)
+                .foregroundStyle(AppColors.snow.opacity(0.8))
+                .monospacedDigit()
+            Text(lessons[index].title)
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(AppColors.snow)
+                .padding(.horizontal, AppSpacing.large).padding(.vertical, AppSpacing.small)
+                .background(AppColors.wine.opacity(0.55), in: Capsule())
+        }
+        .shadow(color: .black.opacity(0.35), radius: 3)
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, AppSpacing.medium)
+        .animation(.easeInOut(duration: 0.2), value: index)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
+        .accessibilityValue(Text(lessons[index].title + ". " + lessons[index].instruction))
+    }
+
+    /// UX spec 1.1: "STEP 1 OF 2" (17 pt, 2 pt tracking, 70%, drop shadow), 4 pt gap, then the caption in a #370B21 rounded
+    /// rectangle (15 pt, -0.43 tracking, 22 pt lines, radius 18, padding 22 x 4, hugging the text up to 300 pt wide).
+    private var stepCaption: some View {
+        VStack(spacing: 4) {
+            Text("Step \(index + 1) of \(lessons.count)")
+                .textCase(.uppercase)
+                .font(.body)
+                .tracking(2)
+                .monospacedDigit()
+                .foregroundStyle(AppColors.snow.opacity(0.7))
+                .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
+            Text(lessons[index].title)
+                .font(.subheadline)
+                .tracking(-0.43)
+                .lineSpacing(2)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(AppColors.snow)
+                .padding(.horizontal, 22).padding(.vertical, 4)
+                .background(AppColors.captionFill, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .frame(maxWidth: 300)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, AppSpacing.medium)
+        .animation(.easeInOut(duration: 0.2), value: index)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
+        .accessibilityValue(Text(lessons[index].title))
+    }
+
+    private var lessonCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(lessons[index].title).font(.headline)
@@ -525,30 +658,27 @@ private struct TutorialScreen: View {
 
     // MARK: Tabs
 
+    /// Compare on the left, the three tabs, the screen light on the right (as on Try On).
     private var tabBar: some View {
         HStack(spacing: AppSpacing.small) {
-            Button { model.cycleCompare() } label: {
-                Image(systemName: model.compare.symbol)
-                    .font(.title3)
-                    .foregroundStyle(AppColors.snow)
-                    .frame(width: 52, height: 52)
-                    .background(LinearGradient(colors: [AppColors.flamingo, AppColors.wine], startPoint: .topLeading, endPoint: .bottomTrailing), in: Circle())
-                    .overlay(Circle().strokeBorder(AppColors.snow.opacity(0.8), lineWidth: 2))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Compare")
-            .accessibilityValue(model.compare.label)
+            CameraBarButton(symbol: model.compare.symbol) { model.cycleCompare() }
+                .accessibilityLabel("Compare")
+                .accessibilityValue(model.compare.label)
             ForEach(TutorialTab.allCases) { tab in
                 let selected = tab == model.tab
                 Button { model.select(tab) } label: {
                     Text(tab.title)
-                        .font(.headline.weight(selected ? .semibold : .regular))
+                        .font(.title3.weight(selected ? .semibold : .regular))
                         .foregroundStyle(AppColors.snow.opacity(selected ? 1 : 0.55))
-                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .lineLimit(1).minimumScaleFactor(0.8)
+                        .frame(maxWidth: .infinity, minHeight: 56)
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
+            CameraBarButton(symbol: light.isOn ? "bolt.fill" : "bolt.slash.fill") { light.toggle() }
+                .accessibilityLabel("Light")
+                .accessibilityValue(light.isOn ? Text("On") : Text("Off"))
         }
     }
 }
@@ -559,7 +689,14 @@ private struct RealCameraView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> ARSCNView {
         let view = ARSCNView(frame: .zero)
+        // Giving a view the session makes the view its delegate. The filtered camera's coordinator is the delegate that
+        // feeds the brow, blush and eyeliner frames, so it is put back: otherwise the filter stops updating in split view.
+        let delegate = session.delegate
+        let delegateQueue = session.delegateQueue
         view.session = session
+        session.delegate = delegate
+        session.delegateQueue = delegateQueue
+        view.preferredFramesPerSecond = 60
         view.scene = SCNScene()
         view.automaticallyUpdatesLighting = false
         view.isUserInteractionEnabled = false
@@ -568,3 +705,109 @@ private struct RealCameraView: UIViewRepresentable {
 
     func updateUIView(_ view: ARSCNView, context: Context) {}
 }
+
+/// Blush tutorial overlay (UX spec 3.2 and 3.5), anchored to each cheek through `BlushGuideFeed`.
+/// Step 1: the inner dotted circle, and a fingertip dabbing inside it with a pink tap ring.
+/// Step 2: the outer dotted line too, the ring between them pulsing 20%-50% every 2 s, and the fingertip dabbing outward.
+/// The dab animation runs 3 s, rests 2 s and repeats. Reduce Motion shows its last frame and a still 40% highlight.
+private struct BlushTutorialOverlay: View {
+    @ObservedObject var feed: BlushGuideFeed
+    let step: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var thermal = ProcessInfo.processInfo.thermalState
+
+    static let cycle: Double = 5, animation: Double = 3, pulsePeriod: Double = 2
+    /// Three dabs start at these times within the cycle, each `dab` seconds long.
+    static let dabStarts: [Double] = [0.25, 1.15, 2.05], dab: Double = 0.8
+
+    var body: some View {
+        // Only a critical phone pauses the loop: AR plus MediaPipe reach `.serious` quickly, and a still guide reads as
+        // broken. The overlay itself stays.
+        let paused = reduceMotion || thermal == .critical
+        TimelineView(.animation(paused: paused)) { context in
+            let t = paused ? Self.animation - 0.001 : context.date.timeIntervalSinceReferenceDate
+            ZStack {
+                Canvas { g, _ in draw(&g, time: t, still: paused) }
+                if let cheeks = feed.snapshot?.cheeks {
+                    ForEach(cheeks.indices, id: \.self) { i in fingertip(cheeks[i], time: t, still: paused) }
+                }
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+        .animation(.easeInOut(duration: 0.25), value: step)
+        .onReceive(NotificationCenter.default.publisher(for: ProcessInfo.thermalStateDidChangeNotification)) { _ in
+            thermal = ProcessInfo.processInfo.thermalState
+        }
+    }
+
+    private func path(_ points: [CGPoint]) -> Path {
+        var p = Path()
+        guard let first = points.first else { return p }
+        p.move(to: first)
+        for q in points.dropFirst() { p.addLine(to: q) }
+        p.closeSubpath()
+        return p
+    }
+    private var dotted: StrokeStyle { StrokeStyle(lineWidth: 2.2, lineCap: .round, dash: [0.1, 7]) }
+
+    private func draw(_ g: inout GraphicsContext, time t: Double, still: Bool) {
+        guard let cheeks = feed.snapshot?.cheeks else { return }
+        for c in cheeks {
+            let inner = path(c.inner), outer = path(c.outer)
+            if step >= 1 {
+                // The ring between the two lines: 20% to 50% and back every 2 s, or a still 40%.
+                let wave = 0.5 - 0.5 * cos(2 * .pi * t / Self.pulsePeriod)
+                var ring = outer; ring.addPath(inner)
+                g.fill(ring, with: .color(AppColors.flamingo.opacity(still ? 0.4 : 0.2 + 0.3 * wave)), style: FillStyle(eoFill: true))
+                g.stroke(outer, with: .color(AppColors.snow.opacity(0.95)), style: dotted)
+            }
+            g.stroke(inner, with: .color(AppColors.snow.opacity(step >= 1 ? 0.7 : 0.95)), style: dotted)
+        }
+    }
+
+    /// Where each of the three dabs lands: around the centre of the small circle, or stepping outward to the outer line.
+    private func targets(_ c: BlushGuideSnapshot.Cheek) -> [CGPoint] {
+        let d = CGPoint(x: c.outward.x - c.center.x, y: c.outward.y - c.center.y)
+        func along(_ k: CGFloat, _ side: CGFloat = 0) -> CGPoint {
+            CGPoint(x: c.center.x + d.x * k - d.y * side, y: c.center.y + d.y * k + d.x * side)
+        }
+        return step == 0 ? [along(0), along(0.25, 0.2), along(-0.2, -0.15)] : [along(0.65), along(0.95, 0.15), along(1.25, -0.1)]
+    }
+
+    static func fingerPosition(_ points: [CGPoint], local: Double, index: Int, u: Double) -> CGPoint {
+        func lerp(_ a: CGPoint, _ b: CGPoint, _ k: Double) -> CGPoint { CGPoint(x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k) }
+        if local < dabStarts[0] { return lerp(points[points.count - 1], points[0], local / dabStarts[0]) }
+        return lerp(index > 0 ? points[index - 1] : points[0], points[index], min(1, u * 3))
+    }
+
+    @ViewBuilder private func fingertip(_ c: BlushGuideSnapshot.Cheek, time t: Double, still: Bool) -> some View {
+        let points = targets(c)
+        let local = still ? Self.animation - 0.001 : t.truncatingRemainder(dividingBy: Self.cycle)
+        // Which dab, how far into it (0...1), and how hard the finger presses (0 up, 1 on the skin).
+        let index = Self.dabStarts.lastIndex { $0 <= local } ?? 0
+        let u = max(0, min(1, (local - Self.dabStarts[index]) / Self.dab))
+        let press = local < Self.dabStarts[0] ? 0 : sin(Double.pi * min(1, u * 1.25))
+        // Before the first dab the finger glides back from where the last cycle ended; it never disappears, and it rests on
+        // the last dab through the 2 s pause.
+        let target = Self.fingerPosition(points, local: local, index: index, u: u)
+        let visible: Double = 1
+        let ringProgress = still ? 0.6 : max(0, min(1, (u - 0.35) / 0.65))
+        ZStack {
+            Circle()
+                .stroke(AppColors.flamingo, lineWidth: 2.5)
+                .frame(width: 10 + 30 * ringProgress, height: 10 + 30 * ringProgress)
+                .opacity((still ? 0.6 : (u > 0.35 && local < Self.animation ? 1 - ringProgress : 0)) * visible)
+                .position(points[index])
+            Image(systemName: "hand.point.up.left.fill")
+                .font(.system(size: 34))
+                .foregroundStyle(AppColors.snow)
+                .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
+                .scaleEffect(1 - 0.08 * press)
+                // The symbol's fingertip is near its top left: put that point on the cheek, lifted while not pressing.
+                .position(x: target.x + 9, y: target.y + 15 - 14 * (1 - press))
+                .opacity(visible)
+        }
+    }
+}
+

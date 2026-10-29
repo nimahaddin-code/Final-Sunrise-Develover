@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "blush-rendering.json (consumed by BeautyBlushConfiguration.decode)",
+  "description": "Rendering and tracking only. Placement, silhouettes and pigment distribution live in makeup-reference.database.json. Every key is required and validated in Swift; unknown keys are rejected.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "mask_asset",
+    "atlas_size",
+    "paint_feather",
+    "coverage",
+    "absorption",
+    "saturation",
+    "pigment_mix",
+    "detail_radius_px",
+    "min_cutoff_hz",
+    "velocity_beta",
+    "visibility_tau_seconds",
+    "mask_max_age_seconds",
+    "mask_fade_seconds",
+    "max_yaw_degrees",
+    "stretch_fade",
+    "target_fps",
+    "thermal_fps"
+  ],
+  "properties": {
+    "mask_asset": {
+      "description": "Bundled brush mask sampled by non-reference looks (BeautyBlush.metal blushAtlasFragment).",
+      "default": "blush-wash-mask.png",
+      "type": "string",
+      "enum": [
+        "blush-wash-mask.png"
+      ]
+    },
+    "atlas_size": {
+      "description": "Square native-UV pigment atlas, pixels.",
+      "default": 1024,
+      "type": "integer",
+      "enum": [
+        512,
+        1024
+      ]
+    },
+    "paint_feather": {
+      "description": "Width of the brush-mask threshold ramp in non-reference looks. Unit: fraction of the mask range.",
+      "default": 0.9,
+      "type": "number",
+      "minimum": 0.2,
+      "maximum": 1
+    },
+    "coverage": {
+      "description": "Global multiplier on pigment alpha. Unit: ratio.",
+      "default": 0.9,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "absorption": {
+      "description": "Optical density of the absorbing layer: per-channel transmittance exp(-absorption*(1-shade/max(shade))). Unit: unitless density.",
+      "default": 0.65,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 2
+    },
+    "saturation": {
+      "description": "How much of the shade's own colour (at the skin's luminance) replaces the low-frequency skin colour in the body term. Unit: ratio.",
+      "default": 0.85,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "pigment_mix": {
+      "description": "Balance between the absorbing layer (0) and the pigment body (1). Unit: ratio.",
+      "default": 0.68,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "detail_radius_px": {
+      "description": "Radius of the low-frequency skin the pigment colours; pores, fine texture and highlights finer than this are kept from the camera. Unit: camera pixels.",
+      "default": 6,
+      "type": "number",
+      "minimum": 2,
+      "maximum": 16
+    },
+    "min_cutoff_hz": {
+      "description": "One Euro minimum cutoff for per-vertex mesh residual smoothing (rigid pose is not filtered). Unit: Hz.",
+      "default": 6,
+      "type": "number",
+      "minimum": 2,
+      "maximum": 30
+    },
+    "velocity_beta": {
+      "description": "One Euro speed coefficient for the same smoothing. Unit: per metre/second.",
+      "default": 80,
+      "type": "number",
+      "minimum": 0,
+      "maximum": 200
+    },
+    "visibility_tau_seconds": {
+      "description": "Time constant of the pigment fade in/out. Unit: seconds.",
+      "default": 0.055,
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 0.2
+    },
+    "mask_max_age_seconds": {
+      "description": "Face-skin mask age still treated as fresh. Unit: seconds.",
+      "default": 0.15,
+      "type": "number",
+      "minimum": 0.03,
+      "maximum": 0.3
+    },
+    "mask_fade_seconds": {
+      "description": "Fade after a mask stops being fresh. Unit: seconds.",
+      "default": 0.1,
+      "type": "number",
+      "minimum": 0.03,
+      "maximum": 0.15
+    },
+    "max_yaw_degrees": {
+      "description": "Face angle to the camera beyond which pigment hides. Unit: degrees.",
+      "default": 72,
+      "type": "number",
+      "minimum": 30,
+      "maximum": 85
+    },
+    "stretch_fade": {
+      "description": "Surface area ratio current/rest of the mesh: fade in from [0] to [1], fade out from [2] to [3]. Strictly increasing.",
+      "default": [
+        0.45,
+        0.7,
+        1.45,
+        1.85
+      ],
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0,
+        "maximum": 3
+      }
+    },
+    "target_fps": {
+      "description": "Render cap at nominal temperature. Unit: frames per second.",
+      "default": 60,
+      "type": "integer",
+      "minimum": 30,
+      "maximum": 60
+    },
+    "thermal_fps": {
+      "description": "Render cap at serious or critical thermal state. Unit: frames per second.",
+      "default": 30,
+      "type": "integer",
+      "minimum": 15,
+      "maximum": 30
+    }
+  }
+}

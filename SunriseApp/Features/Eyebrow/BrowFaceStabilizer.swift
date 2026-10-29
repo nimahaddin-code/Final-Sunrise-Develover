@@ -40,32 +40,50 @@ struct BrowFaceFrame: Sendable {
         return (SIMD3(o.x, o.y, o.z), simd_normalize(SIMD3(d.x, d.y, d.z)))
     }
 
+    /// Where each mesh vertex lands in the image (NaN behind the camera). Passed to `faceLocal(at:projected:)` when many
+    /// pixels are lifted from one frame, so each one skips the triangles it cannot be inside.
+    func projectedVertices() -> [SIMD2<Float>] {
+        vertices.map { pixel(of: $0) ?? SIMD2(.nan, .nan) }
+    }
+
     /// The point of the face mesh seen at `pixel`. A ray that misses the mesh (a brow tail past the face's edge) takes the plane
-    /// of the nearest triangle, so every landmark gets a place on the face.
-    func faceLocal(at pixel: SIMD2<Float>) -> SIMD3<Float>? {
+    /// of the nearest triangle, so every landmark gets a place on the face. `projected` (from `projectedVertices()`) only
+    /// makes it faster: a ray can only hit a triangle whose image contains the pixel.
+    func faceLocal(at pixel: SIMD2<Float>, projected: [SIMD2<Float>]? = nil) -> SIMD3<Float>? {
         guard pixel.x.isFinite, pixel.y.isFinite, triangles.count >= 3 else { return nil }
         let (origin, direction) = ray(through: pixel)
+        let projected = projected?.count == vertices.count ? projected : nil
         var bestT = Float.infinity
+        for t in 0..<triangles.count / 3 {
+            let ia = Int(triangles[t * 3]), ib = Int(triangles[t * 3 + 1]), ic = Int(triangles[t * 3 + 2])
+            if let projected {
+                let pa = projected[ia], pb = projected[ib], pc = projected[ic]
+                // One pixel of margin; a vertex behind the camera (NaN) keeps the triangle in.
+                if pa.x.isFinite, pb.x.isFinite, pc.x.isFinite,
+                   pixel.x < min(pa.x, pb.x, pc.x) - 1 || pixel.x > max(pa.x, pb.x, pc.x) + 1
+                    || pixel.y < min(pa.y, pb.y, pc.y) - 1 || pixel.y > max(pa.y, pb.y, pc.y) + 1 { continue }
+            }
+            let a = vertices[ia], b = vertices[ib], c = vertices[ic]
+            // Moller-Trumbore, two-sided.
+            let e1 = b - a, e2 = c - a, p = simd_cross(direction, e2), det = simd_dot(e1, p)
+            guard abs(det) > 1e-12 else { continue }
+            let inv = 1 / det, s = origin - a
+            let u = simd_dot(s, p) * inv
+            let q = simd_cross(s, e1), v = simd_dot(direction, q) * inv
+            if u >= 0, v >= 0, u + v <= 1 {
+                let hit = simd_dot(e2, q) * inv
+                if hit > 0, hit < bestT { bestT = hit }
+            }
+        }
+        if bestT.isFinite { return origin + direction * bestT }
+        // No hit: every triangle missed, so the nearest is searched among all of them.
         var nearest: (distance: Float, triangle: Int)?
         for t in 0..<triangles.count / 3 {
             let a = vertices[Int(triangles[t * 3])], b = vertices[Int(triangles[t * 3 + 1])], c = vertices[Int(triangles[t * 3 + 2])]
-            // Moller-Trumbore, two-sided.
-            let e1 = b - a, e2 = c - a, p = simd_cross(direction, e2), det = simd_dot(e1, p)
-            if abs(det) > 1e-12 {
-                let inv = 1 / det, s = origin - a
-                let u = simd_dot(s, p) * inv
-                let q = simd_cross(s, e1), v = simd_dot(direction, q) * inv
-                if u >= 0, v >= 0, u + v <= 1 {
-                    let hit = simd_dot(e2, q) * inv
-                    if hit > 0, hit < bestT { bestT = hit }
-                    continue
-                }
-            }
             let centre = (a + b + c) / 3, toCentre = centre - origin
             let distance = simd_length(toCentre - direction * simd_dot(toCentre, direction))
             if nearest == nil || distance < nearest!.distance { nearest = (distance, t) }
         }
-        if bestT.isFinite { return origin + direction * bestT }
         guard let nearest else { return nil }
         let t = nearest.triangle
         let a = vertices[Int(triangles[t * 3])], b = vertices[Int(triangles[t * 3 + 1])], c = vertices[Int(triangles[t * 3 + 2])]
@@ -132,8 +150,9 @@ struct BrowFaceStabilizer {
         let points = observation.flattened
         var lifted: [SIMD3<Float>] = []
         lifted.reserveCapacity(points.count)
+        let projected = face.projectedVertices()
         for p in points {
-            guard let q = face.faceLocal(at: p) else { return nil }
+            guard let q = face.faceLocal(at: p, projected: projected) else { return nil }
             lifted.append(q)
         }
         if filters.count != points.count {
@@ -159,10 +178,25 @@ struct BrowFaceStabilizer {
         return observation.replacing(out)
     }
 
+    /// The last steadied brow (`steady`, as `stabilize` returned it) moved onto a later camera frame of the same face: its
+    /// face-local points are projected with that frame's pose and camera. This is how the brow follows the head on every
+    /// ARKit frame while MediaPipe answers less often. Nil when there is nothing to move or the face changed.
+    func reproject(_ steady: BrowObservation, onto face: BrowFaceFrame) -> BrowObservation? {
+        guard face.anchorID == anchorID, held.count == steady.flattened.count else { return nil }
+        var out: [SIMD2<Float>] = []
+        out.reserveCapacity(held.count)
+        for p in held {
+            guard let q = face.pixel(of: p) else { return nil }
+            out.append(q)
+        }
+        return steady.replacing(out)
+    }
+
     /// The smoothed landmarks lifted onto the face of this frame, for placing 3D geometry (nil when one cannot be placed).
     static func lift(_ observation: BrowObservation, face: BrowFaceFrame) -> [SIMD3<Float>]? {
         let points = observation.flattened
-        let lifted = points.compactMap { face.faceLocal(at: $0) }
+        let projected = face.projectedVertices()
+        let lifted = points.compactMap { face.faceLocal(at: $0, projected: projected) }
         return lifted.count == points.count ? lifted : nil
     }
 }

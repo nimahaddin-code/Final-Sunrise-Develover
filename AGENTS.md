@@ -1,10 +1,137 @@
+## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
+
+`GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it
+into your skin.", with their own `blushStep` (the brow model's three blush lessons are no longer used here). Caption is
+`stepCaption` (spec 1.1: STEP n OF 2 at 70%, 4 pt gap, `AppColors.captionFill` #370B21, radius 18, 22 x 4 padding, max
+300 pt). `BlushTutorialOverlay` draws, anchored to each cheek: step 1 the inner dotted circle (0.38 of the pigment field)
+with a fingertip dabbing three times and a pink tap ring; step 2 also the outer dotted line (0.82), the ring between them
+pulsing 20%-50% every 2 s, the fingertip dabbing outward along the look's direction. 3 s animation, 2 s rest, repeat;
+Reduce Motion shows the last frame and a still 40% ring; thermal `.serious` pauses the loop. Outlines are bound to the
+mesh at bake (`BeautyBlushEngine.guideOutline`), projected with the pigment's own filtered vertices and `mvp`
+(`projectGuide`) at 30 Hz, and published through `FaceCameraState.blushGuide` (`BlushGuideFeed`). The blush shader
+contour is off (`tracking.y = 0`); Try On never used it. Camera messages (spec 1-2) are not implemented. Device check pending.
+
+## Blush cheek fit from MediaPipe landmarks, wide natural wash — -Nimah (2026-10-29)
+
+Device feedback: blush too small and not shaped to the face. For Youthful/Sunkissed/Lifted, `BeautyBlushEngine` now runs
+the shared MediaPipe tracker while blush is selected, only until the cheek fit is measured: 17 landmarks per frame
+(`BlushCheekLandmarks.pairs`: eye corners, lower lid, nostril wing, mouth corner, cheekbone, apple, face edge) are lifted
+onto the same frame's ARKit mesh (`BrowFaceFrame.faceLocal`), frontal frames only (|yaw|,|pitch| < 15), median of 10,
+once per face anchor. `BlushPlacementGenerator.landmarkField` places each cheek in that person's corridor (nostril wing
+to face edge, mouth corner to lower lid) with new preset fields `landmark_*` (fractions of the corridor) and a
+flat-topped `wash` profile (1 - smoothstep(r), atlas `paint.z`), cut softly by nose/lid/face-edge feathers. Pigment is
+still drawn on the ARKit mesh with ARKit UVs. Until the fit arrives, or when it is implausible, the ARKit-only fit is
+drawn (one re-bake when it arrives, no crossfade). Look `max_alpha` 0.48 -> 0.34. Other blush styles are unchanged.
+Synthetic tests only; device look pending.
+
+## Skin-preserving blush compositing and blush lab — -Nimah (2026-10-29)
+
+Blush stays a UV atlas on the native ARKit mesh; placement/silhouettes are unchanged. Fixed in
+`BeautyBlush.metal.txt`: camera decode is now the exact inverse of the sRGB drawable (the BT.709 decode
+lifted shadows 0.10 -> 0.16 for every Metal camera pixel, brow included); default blend colours low-frequency skin
+(`detail_radius_px`, new required JSON field, 2...16 camera px) and puts back each pixel's luminance ratio and chroma
+residual, keeping pores, highlights and freckles; out-of-gamut colours move towards their own luminance instead of
+per-channel clamping; tutorial contour is an antialiased isoline. Alpha 0 is exactly the camera pixel.
+Developer tools + Blush: `BlushDebugMenu` picks blend (pigment, previous, linear alpha, multiply, soft light) and
+diagnostics (neutral, UV checker, mask, boundaries, visibility, wireframe). No MediaPipe blush renderer, Banuba or
+BytePlus exists; the orphan `Features/BeautyBlush/Comparison/` files are not in the project. See ADR 0017 and
+`Docs/blush-rendering.schema.json`. Synthetic Simulator tests only; device look pending.
+
+## Tutorial camera handoff and welcome revision — 2026-10-29
+
+Try On deactivates before pushing tutorial. Paused/revoked/dismantled ARSCNViews detach
+from the shared ARSession; resume reattaches before acquiring the delegate. This avoids
+retained navigation views remaining attached while the new screen owns the camera.
+Tutorial split comparison uses the same Metal camera pass, with pigment scissored to
+the left half, instead of attaching a second ARSCNView to the shared session. Tutorial
+handoff carries brow overlay/hiding settings; Filter Off also disables natural-brow hiding.
+Welcome version 2 migrates devices that already dismissed revision 1, without resetting
+saved data. Verified device preference was revision 1 before install.
+
+381 Simulator tests executed, 4 skipped, 0 failures, including lease/detachment,
+tutorial configuration and welcome migration regressions. Signed Release build and
+installation on Nimah New succeeded. Physical tutorial camera/compare acceptance pending.
+Logs: /tmp/sunrise-tutorial-camera-tests.log and /tmp/sunrise-tutorial-camera-release.log.
+Existing local Xcode project/signing and strings edits preserved. No push or main change.
+
+## Staging integration merge — 2026-10-28
+
+Merged integration blush v0.5, mask continuity and hi-fi welcome with staging's latest
+MediaPipe/ARKit-pose brow, overlays and MI-GAN work. Staging's scan-free home remains:
+the versioned welcome dismisses directly to Try On; historical scan/Profile migration
+notes below describe the integration parent, not this merged flow. Brow tracking,
+overlay selection, erasing and 3D rendering remain from staging. Blush retains its
+native UV pipeline, three looks, palette and tutorial handoff. Device QA is pending.
+## Brow frame rate — Khalish (2026-10-29)
+
+No frame cap until the phone is hot: `BrowLoad.trackerFPS`/`drawFPS` are nil at nominal and fair thermal state, so every
+camera frame is drawn unless the previous one is still queued, and MediaPipe takes every frame it is free for (`isBusy`).
+Serious and critical: 15 fps tracker / 30 fps draw. Lifting landmarks onto the face mesh (`BrowFaceStabilizer`) passes
+`projectedVertices()` so each ray tests only triangles around its pixel; `browStrip` evaluates the centerline once per
+column (`BrowGeometry.section`). Device check pending.
+
+## Tutorial bottom bar and screen light — Khalish (2026-10-29)
+
+The tutorial's background is `AppColors.wine`, like Try On. Its bottom bar is compare (`CameraBarButton`, left), the tabs
+Blush / Brows / Eyeliner, and the screen light (right). `ScreenLight` (DesignSystem/Components) sets brightness to 1 and
+`ScreenLightGlow` draws a 24 pt `AppColors.ringLight` (#FFF4EA) frame round the camera; leaving restores the brightness,
+backgrounding suspends it and returning turns it back on. The split view's real half runs at 60 fps. Try On has no light
+button yet. Simulator build only; device look pending.
+
+## Brow drawn on every ARKit frame — Khalish (2026-10-29)
+
+Like blush, the brow now draws each ARKit camera frame (`drawLiveBrow`, up to `BrowLoad.trackerFPS`, skipping frames while one
+is still queued) instead of only when MediaPipe answers. A MediaPipe answer only updates `browLatest` (steadied on that frame's
+face by `BrowFaceStabilizer`); each live frame moves it onto its own face pose (`BrowFaceStabilizer.reproject`), or draws it
+where it was seen when ARKit had no face, and drops it after 0.5 s without a new answer. The camera picture no longer waits for
+MediaPipe. Device check pending.
+
+## Brow code split out of BeautyBlush — Khalish (2026-10-29)
+
+There is still one makeup engine, `BeautyBlushEngine` (blush and brow share its camera session, Metal layer, hand mask and
+shader library). Its brow-only parts now live in `Features/Eyebrow/Engine/` as extensions: `BrowEngine+Tracking` (fps cap,
+`BrowLoad`, handing frames to MediaPipe), `BrowEngine+Draw` (brow strip, texture/picture, `drawBrow`), `BrowEngine+Hair`
+(3D hair), `BrowEngine+Marks` (tutorial mapping, tracking view), `BrowEngine+Fixtures` (DEBUG test helpers), plus
+`BrowEraser`/`BrowInpainter` and the brow shaders `Brow.metal.txt`. `BeautyBlushEngine.swift` keeps stored state, setup,
+configure/pause/submit, camera decoding, the mask and blush. Engine members are internal (not private) so the extensions
+in other files can reach them. `BeautyBlushShaders.sources` joins `BeautyBlush.metal.txt` then `Brow.metal.txt` into one
+library (brow shaders use the shared helpers defined first); shader changes are only checked at runtime, by the tests.
+No behaviour change.
+
+## Brow load: SceneKit, fill model, temperature — Khalish (2026-10-29)
+
+The `ARSCNView` under the brow's Metal layer stays at 60 fps: slowing it to 10 (tried 2026-10-29) also slowed the ARKit
+frames the brow is drawn from, and the brow lagged and dropped out. MI-GAN (`BrowEraser.modelDue`) is asked again only after the face crop moved more than 6% of its size or
+1 s passed (never sooner than 0.12 s); its answer stays mapped in brow space between requests. `BeautyBlushEngine.BrowLoad`
+follows `ProcessInfo.thermalState`: nominal 40 fps tracker / 15 Hz mask / model; fair 30 fps / 10 Hz / model ≥0.5 s;
+serious and critical 20 fps / 8 Hz / no model (push-pull fill only). Not measured on a device.
+
+## Tutorial follows the Try On brow filter — Khalish (2026-10-29)
+
+`TutorialHandoff` now carries `browOverlay` and `hideNaturalBrow` besides tool, shades and intensities; the Brows tab draws that
+picture with the chosen shade and strength (`GuidedTutorialModel.liveConfiguration`). The tutorial no longer shows the landmark
+view: brow mapping as with a pencil: dashed magenta lines from each side's nostril wing (MediaPipe 129/358, as an offset
+from the steadied ala 98/327) through the inner eye corner (Start), the iris ring's outer edge (Arch; 469-472/474-477, else
+iris centre + 0.2 eye width) and the outer eye corner (End), with cyan dots and labels where they cross the brow
+(`BeautyBlushEngine.mappingMarks`, full-filter mode only). The mapping is drawn as soft white dashes with small pink
+dots ringed in white, no labels. The Brows tab has its own five steps (`GuidedTutorialModel.browLessons`: brush up, mark three
+dots, outline, fill, brush through; its own `browStep`, not the brow model's step) shown as a spaced "STEP 1 OF 5" over one
+instruction in a wine pill; the mapping shows only on the dot and outline steps (`browMappingSteps`). The guide and the brow no longer wait for
+the face-skin mask: a mask up to 0.6 s old keeps hands in front, an older one draws the brow without occlusion instead of
+fading it out (the brow used to vanish whenever the segmenter fell behind). Brow tracking runs at up to 40 fps (`browMaxFramesPerSecond`, one frame per 1/40 s slot: two of every
+three 60 Hz camera frames), still skipped while MediaPipe is busy. Try On → tutorial no longer hangs: `LiveGuideView` keeps a screen whose camera
+lease was taken (`revoked`) from taking it back until it is paused. The split
+button's "real" half (`RealCameraView`) restores the ARSession delegate, because assigning a session to an `ARSCNView` makes the
+view the delegate and would stop the filter's frames. Simulator tests only; split and smoothness need a device check.
+
 ## ARKit pose for the brow, and the 3D hair brow — Khalish (2026-10-28)
 
 Details in `Docs/Decisions/0015-arkit-brow-pose.md`. `BrowFaceStabilizer` lifts MediaPipe's brow landmarks onto ARKit's face
 mesh (same frame's anchor), smooths them in face-local metres and projects them back (fallback: the image-space smoother when
 ARKit has no face or disagrees). "Brow 3D" (`BrowOverlay.is3D`) draws `brow-hair-3d.obj` ribbons on ARKit's pose with a depth-only
 face mesh pass, 1.5 px minimum hair width, ambient-light shading and the hand mask; it falls back to its picture without a tracked
-face. New shader code is only checked at runtime: compile `BeautyBlush.metal.txt` with `MTLDevice.makeLibrary(source:)` (a build
+face. Removed from the picker list (`BrowOverlay.all`) on 2026-10-29, with Brow 3 (its image set `brow-overlay-3` stays in the assets, unused); the 3D renderer stays, add an `is3D: true` entry
+to bring it back. New shader code is only checked at runtime: compile the shader sources (`BeautyBlushShaders.sources`) with `MTLDevice.makeLibrary(source:)` (a build
 does not) and run the tests, which fail every engine test if it does not compile. Device check pending.
 
 ## Brow overlay pictures — Khalish (2026-10-28)
@@ -22,8 +149,8 @@ Simulator tests only; device look pending.
 
 ## Black screen background — Khalish (2026-10-28)
 
-`AppColors.screen` (black) is the full-screen background of Try On, the tutorial, the palette sheet and placeholder
-pages; `AppColors.wine` stays for pills and accents.
+`AppColors.screen` (black) is the full-screen background of the tutorial, the palette sheet and placeholder pages;
+`AppColors.wine` stays for pills and accents. Try On's background is `AppColors.wine` (#660033) again (2026-10-29).
 
 ## Brow tracking view — Khalish (2026-10-27)
 
@@ -105,6 +232,34 @@ attempt at most every 0.4 s, frontal and relaxed face) and then followed by ARKi
 memory-only, cleared on each camera session start, and deletes the old `savedMakeupAttachments.v1` key.
 FaceShape/EyeShape/Onboarding/ProfileView/ScanDebug code stays in the repo, unreferenced, so it can return.
 Sections below that describe the launch scan, saved fit or Profile predate this. Not yet checked on a device.
+
+## Mask continuity and welcome migration — -Nimah (2026-10-28)
+
+Device screenshot showed Preparing makeup visibility; scalar report error=none, GPU about1ms, ~60FPS.
+Fix actual hard freshness gate: reprojection uses three native head anchors; 150ms fresh window plus bounded
+100ms smooth opacity fade (new consumed mask_fade_seconds). Never show after250ms; no unlimited old mask.
+Opacity target is continuous and capped by mask weight, not hard fresh ? alpha : 0. Stale/mismatched dimensions
+and implausible reprojection remain excluded. Status waits for low effective visibility. This permits brief
+stale-mask fading, not perfect new-hand occlusion: validate on device.
+Welcome revision gate dandan.welcome.version shows new hi-fi welcome once on upgrade. Get Started dismisses
+welcome; users with completed face/eye results go to try-on, fresh users enter face then eyes. No scan erasure.
+
+## Hi-fi welcome onboarding — -Nimah (2026-10-28)
+
+Welcome uses OnboardingWelcomeScreen, static generated onboarding-silk asset and native logo/copy/CTA.
+Match supplied burgundy silk reference. Responsive scroll fallback, Dynamic Type-scaled text, light status
+appearance and four progress dots (welcome/face/eyes/preparing). Get Started still enters face scan then eyes.
+Preserve saved-scan bypass and Retake routing. No fake system status bar or rasterized controls; no animation,
+second camera or model added. Existing in-flight blush look changes stay intact. No merge/push requested.
+
+## Three reference blush looks v0.5.0 — -Nimah (2026-10-28)
+
+User requested Youthful / Sunkissed / Lifted options, overriding prior no-style-picker for blush only.
+JSON presets drive the three shapes; same per-cheek anatomical fitting. Sunkissed alone adds upper-nose
+bridge channel. Curved Lifted mask, continuous soft falloff, mipmapped pigment atlases, capped 0.25 mm blush
+mesh residual and blush-only mask-confidence threshold. No retouch/morph/scan/extra tracker. Five new colors
+(total nine), design approximations only. Selected look handed to tutorial; shade/intensity stay independent.
+See Docs/Decisions/0013-three-reference-blush-looks.md. Do not merge staging/main without new instruction.
 
 ## Brow stability — -Nimah (2026-10-27)
 
@@ -358,7 +513,7 @@ file and adds a `CHANGELOG.md` entry in the same PR.
   and lets you try them on live with AR.
 - SwiftUI, iOS 17+, iPhone portrait. Swift 5 language mode with `SWIFT_STRICT_CONCURRENCY = complete`.
 - One third-party dependency: **MediaPipe Tasks Vision** (Swift Package from `google-ai-edge/mediapipe`, pinned to the `v1.1.1` commit `50505c8`; it must be pinned by revision, see ADR 0002), used only by the
-  eye scan in `Features/EyeShape`. One app target (`SunriseApp`), one unit test target (`SunriseAppTests`) and one app extension (`SunriseLiveActivity`, the scan's Dynamic Island).
+  eye scan in `Features/EyeShape`. One app target (`SunriseApp`) and one unit test target (`SunriseAppTests`).
   Why and how: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
 - Light MVVM: ViewModels are `@MainActor final class … : ObservableObject` with `@Published`. Stateless views have no ViewModel.
 - Apple frameworks, plus MediaPipe for the eye scan: ARKit + SceneKit (face tracking and makeup rendering), Vision (landmarks and face outline), AVFoundation (camera permission and the eye-scan camera), MediaPipe (eye and iris landmarks).
@@ -397,7 +552,7 @@ SunriseApp/
     Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
-    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge, DynamicIslandConfirmation
+    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge
   Features/
     FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
     MakeupTryOn/          makeup recommendations and live AR try-on
@@ -410,7 +565,6 @@ SunriseApp/
   PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
   Configuration/          Info.plist (camera + photo-library-add usage strings)
-SunriseLiveActivity/      app extension: the scan's Live Activity (Dynamic Island). `ScanActivityAttributes` (Core/Models) is shared with the app; keep it free of app-only imports
 SunriseDebugMac/          separate Mac-only Xcode project: edits scans exported from the Scan Debug tab (see below and its README)
 SunriseAppTests/
   Features/               face shape, head pose, photo measurer, makeup recommender/personalization/texture tests

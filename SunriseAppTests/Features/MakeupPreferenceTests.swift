@@ -1,5 +1,6 @@
 // -Nimah: Preference provenance, missing coverage and real mesh binding regression, not on-face acceptance.
 import XCTest
+import ARKit
 import SceneKit
 import UIKit
 import ImageIO
@@ -7,6 +8,107 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
+    @MainActor func testTutorialRetainsBrowAndUsesSingleCameraSplit() {
+        let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.standardLook,
+            plan:MakeupPlan(shape:.oval),handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true))
+        XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
+        XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
+        model.cycleCompare()
+        XCTAssertTrue(model.liveConfiguration.comparisonSplit)
+        XCTAssertFalse(model.liveConfiguration.showGuide)
+        model.cycleCompare()
+        XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
+        XCTAssertFalse(model.liveConfiguration.showMakeupPreview)
+        model.select(.blush)
+        XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
+        model.deactivate()
+    }
+    @MainActor func testDetachingOldCameraDoesNotDetachNewCameraView() {
+        let camera=FaceCameraState(),manager=ARFaceTrackingManager.shared
+        let old=ARSCNView(),current=ARSCNView()
+        old.session=manager.session;current.session=manager.session
+        let coordinator=LiveGuideView.Coordinator(camera:camera,referenceID:"eyebrows",manager:manager)
+        coordinator.detach(old)
+        XCTAssertFalse(old.session === manager.session)
+        XCTAssertTrue(current.session === manager.session)
+        coordinator.detach(current)
+    }
+
+    func testMaskDeliveryCadenceDoesNotHardFlashAtFreshnessBoundary() {
+        let fresh=0.15,fade=0.10
+        let before=BeautyMaskContinuity.weight(age:0.149,freshAge:fresh,fadeSeconds:fade)
+        let after=BeautyMaskContinuity.weight(age:0.151,freshAge:fresh,fadeSeconds:fade)
+        XCTAssertLessThan(abs(before-after),0.001)
+        var visibility=BeautyBlushVisibility(),last:Double=0,minimum:Double=1
+        for i in 0..<180 {
+            let t=Double(i)/60
+            let age=0.11+t.truncatingRemainder(dividingBy:0.09)
+            let weight=BeautyMaskContinuity.weight(age:age,freshAge:fresh,fadeSeconds:fade)
+            let filtered=visibility.update(timestamp:t,target:weight,tau:0.055)
+            let output=BeautyMaskContinuity.opacity(filtered:filtered,age:age,freshAge:fresh,fadeSeconds:fade)
+            if i>30 {minimum=min(minimum,output);XCTAssertLessThan(abs(output-last),0.25)}
+            last=output
+        }
+        XCTAssertGreaterThan(minimum,0.5,"Normal delayed delivery must not alternate between full pigment and zero")
+        XCTAssertEqual(BeautyMaskContinuity.opacity(filtered:1,age:0.25,freshAge:fresh,fadeSeconds:fade),0)
+        XCTAssertEqual(BeautyMaskContinuity.weight(age:0.25,freshAge:fresh,fadeSeconds:fade),0)
+        XCTAssertEqual(BeautyMaskContinuity.weight(age:1,freshAge:fresh,fadeSeconds:fade),0)
+        XCTAssertEqual(BeautyMaskContinuity.weight(age:-0.1,freshAge:fresh,fadeSeconds:fade),0)
+    }
+    func testThreeReferenceBlushLooksHaveDifferentGeometryAndBridgeOnlyForSunkissed() throws {
+        let region=try BrowFixture().region()
+        let youth=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.youthful))
+        let sun=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.sunkissed))
+        let lift=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.lifted))
+        XCTAssertNil(youth.noseBridge);XCTAssertNil(lift.noseBridge)
+        let bridge=try XCTUnwrap(sun.noseBridge)
+        XCTAssertGreaterThan(bridge.coverage(bridge.center),0.9)
+        XCTAssertEqual(bridge.coverage(SIMD2(0,region.eyeCenters[0].y)),0)
+        XCTAssertLessThan(youth.pigmentFields[0].center.y,lift.pigmentFields[0].center.y)
+        XCTAssertLessThan(youth.pigmentFields[0].radius.x,lift.pigmentFields[0].radius.x)
+        XCTAssertGreaterThan(lift.pigmentFields[0].curvature,0)
+        for placement in [youth,sun,lift] {
+            let pixels=try BeautyBlushEngine.renderAtlasFixture(placement:placement)
+            let blue=(0..<(256*256)).map {pixels[$0*4+2]}.max() ?? 0
+            if placement.style == .sunkissed {XCTAssertGreaterThan(blue,0.15)}else{XCTAssertEqual(blue,0)}
+            XCTAssertGreaterThan((0..<(256*256)).map {pixels[$0*4]}.max() ?? 0,0.2)
+        }
+    }
+    @MainActor func testCreativeBlushChoiceRetainsShadeAndTutorialStyle() {
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        let shade=home.currentShade,intensity=home.intensity
+        home.choose(blush:.sunkissed)
+        XCTAssertEqual(home.liveConfiguration.blushStyle,.sunkissed)
+        XCTAssertEqual(home.enabled,[.blush]);XCTAssertEqual(home.currentShade,shade);XCTAssertEqual(home.intensity,intensity)
+        home.choose(.eyebrow);home.choose(.blush)
+        XCTAssertEqual(home.blushLook,.sunkissed)
+        let handoff=TutorialHandoff(tool:.blush,shades:home.shades,intensities:home.intensities,blushStyle:home.blushLook)
+        XCTAssertEqual(handoff.blushStyle,.sunkissed)
+        home.deactivate()
+    }
+    func testBlushResidualLimitKeepsExpressionAttached() {
+        let current=SIMD3<Float>(0.03,-0.01,0.04)
+        let filtered=current+SIMD3<Float>(0.003,0.002,0)
+        let output=BeautyBlushConfiguration.limitResidual(filtered:filtered,current:current)
+        XCTAssertLessThanOrEqual(simd_distance(output,current),0.000251)
+        let tiny=current+SIMD3<Float>(0.00001,0,0)
+        XCTAssertEqual(BeautyBlushConfiguration.limitResidual(filtered:tiny,current:current),tiny)
+    }
+    func testBrowLocalStabilizerRejectsMicroJitterWithoutFreezingExpression() {
+        var stabilizer=BeautyBrowStabilizer(),samples:[Float]=[]
+        for i in 0..<120 {
+            let input=SIMD3<Float>(i%2==0 ? 0.0003:-0.0003,0.05,0.04)
+            let output=stabilizer.update(input,timestamp:Double(i)/60)
+            if i>30 {samples.append(output.x)}
+        }
+        let amplitude=(samples.max() ?? 1)-(samples.min() ?? 0)
+        XCTAssertLessThan(amplitude,0.0002,"Still local mesh noise must be substantially attenuated")
+        var moved=SIMD3<Float>.zero
+        for i in 120..<132 {moved=stabilizer.update(SIMD3(0.003,0.05,0.04),timestamp:Double(i)/60)}
+        XCTAssertGreaterThan(moved.x,0.0025,"Real brow movement must remain responsive")
+        let recovered=stabilizer.update(SIMD3(-0.003,0.05,0.04),timestamp:3)
+        XCTAssertEqual(recovered.x,-0.003,accuracy:0.00001,"Tracking gaps must reset stale residuals")
+    }
     @MainActor func testCancelledMakeupPreparationDoesNotLatchUnavailable() async throws {
         let error=try await BeautyBlushEngine.cancelledPreparationFixture()
         XCTAssertNil(error,"Navigation cancellation must not become a persistent makeup failure")
@@ -345,12 +447,12 @@ final class MakeupPreferenceTests:XCTestCase {
         var footprints:[BlushPlacementStyle:[SIMD3<Float>]]=[:]
         for style in BlushPlacementStyle.allCases {
             let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:style),style.title)
-            XCTAssertEqual(guide.areas.count,2)
+            XCTAssertEqual(guide.areas.filter {$0.id != "nose-bridge"}.count,2)
             for area in guide.areas {
                 let points=area.boundary.compactMap { $0.position(in:region.restVertices) }
                 XCTAssertEqual(points.count,area.boundary.count)
                 XCTAssertLessThan(simd_distance(points.first!,points.last!),0.00001)
-                XCTAssertTrue(points.allSatisfy { abs($0.x)>0.019 && $0.y<0.024 })
+                XCTAssertTrue(points.allSatisfy { $0.y<0.024 && (area.id=="nose-bridge" || abs($0.x)>0.019) })
                 let moved=region.restVertices.map { $0+SIMD3<Float>(0.001,0.002,0.003) }
                 let before=try XCTUnwrap(area.boundary[0].position(in:region.restVertices))
                 let after=try XCTUnwrap(area.boundary[0].position(in:moved))
@@ -669,4 +771,187 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertTrue(model.liveConfiguration.showMakeupPreview)
     }
 
+
+    // MARK: Skin-preserving blush compositing (production shader, synthetic camera planes)
+
+    /// Synthetic full-range NV12-like planes (chroma at full size, as the fixture expects): a soft cheek gradient,
+    /// per-pixel pore noise, a bright highlight and warm skin chroma. Not a real skin tone.
+    private func syntheticSkin(_ n:Int)->(luma:[UInt8],chroma:[UInt8]) {
+        var luma=[UInt8](repeating:0,count:n*n),chroma=[UInt8](repeating:0,count:n*n*2)
+        for y in 0..<n {for x in 0..<n {
+            let fx=Float(x)/Float(n),fy=Float(y)/Float(n)
+            var v=120+60*fx-20*fy
+            let h=UInt32(truncatingIfNeeded:(x*73856093)^(y*19349663))
+            v+=Float(Int(h%25))-12
+            let d=simd_distance(SIMD2(fx,fy),SIMD2(0.7,0.35));v+=max(0,1-d/0.08)*70
+            luma[y*n+x]=UInt8(max(0,min(255,v)))
+            chroma[(y*n+x)*2]=112;chroma[(y*n+x)*2+1]=UInt8(141+Int((h>>8)%15))
+        }}
+        return(luma,chroma)
+    }
+    private func linearLuminance(_ data:Data,_ i:Int)->Float {
+        func lin(_ b:UInt8)->Float {let c=Float(b)/255;return c<=0.04045 ? c/12.92:pow((c+0.055)/1.055,2.4)}
+        return 0.0722*lin(data[i])+0.7152*lin(data[i+1])+0.2126*lin(data[i+2])
+    }
+    func testBlushCameraRoundTripIsIdentityWhateverTheTransferTag() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
+        let n=64,(luma,chroma)=syntheticSkin(n)
+        for tag in [false,true] {
+            let bare=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:Array(repeating:128,count:n*n*2),transfer709:tag,size:n)
+            for (x,y) in [(2,2),(32,32),(44,22),(60,60)] {
+                let i=(y*n+x)*4
+                XCTAssertEqual(Int(bare[i+1]),Int(luma[y*n+x]),accuracy:1,"untouched camera must reach the screen unchanged (709 tag \(tag))")
+            }
+            let warm=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,transfer709:tag,size:n)
+            let reference=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,blend:.legacy,size:n)
+            XCTAssertEqual(warm,reference,"intensity 0 must give the camera pixel in every blend")
+        }
+    }
+    func testSkinPreservingPigmentKeepsTextureLuminanceAndHighlights() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
+        let n=64,(luma,chroma)=syntheticSkin(n)
+        let pink=SIMD3<Float>(BeautyBlushConfiguration.linear(0.913),BeautyBlushConfiguration.linear(0.357),BeautyBlushConfiguration.linear(0.471))
+        let bare=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,shade:pink,size:n)
+        let made=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0.9,luma:luma,chroma:chroma,shade:pink,size:n)
+        let legacy=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0.9,luma:luma,chroma:chroma,blend:.legacy,shade:pink,size:n)
+        // Interior of the face quad, away from the highlight.
+        let region=(14..<34).flatMap {y in (10..<30).map {x in (y*n+x)*4}}
+        func detail(_ d:Data)->Float {
+            let l=region.map {linearLuminance(d,$0)},m=l.reduce(0,+)/Float(l.count)
+            return (l.map {($0-m)*($0-m)}.reduce(0,+)/Float(l.count)).squareRoot()/m
+        }
+        func redness(_ d:Data)->Float {region.map {Float(d[$0+2])-Float(d[$0+1])}.reduce(0,+)/Float(region.count)}
+        // Local chroma variation (freckles, redness): spread of R-G between neighbouring pixels.
+        func chromaDetail(_ d:Data)->Float {region.map {i in let a=Float(d[i+2])-Float(d[i+1]),b=Float(d[i+6])-Float(d[i+5]);return abs(a-b)}.reduce(0,+)/Float(region.count)}
+        XCTAssertGreaterThan(redness(made)-redness(bare),15,"pigment must be visible")
+        XCTAssertGreaterThan(detail(made),detail(bare)*0.85,"pores and fine texture must survive the pigment")
+        XCTAssertGreaterThan(chromaDetail(made),chromaDetail(bare)*0.7,"the skin's own colour variation must show through")
+        XCTAssertGreaterThan(chromaDetail(made),chromaDetail(legacy)*1.2,"the previous blend replaced it with flat shade colour")
+        let lumBare=region.map {linearLuminance(bare,$0)}.reduce(0,+),lumMade=region.map {linearLuminance(made,$0)}.reduce(0,+)
+        XCTAssertGreaterThan(lumMade/lumBare,0.75);XCTAssertLessThan(lumMade/lumBare,1.05,"blush must not glow or go muddy")
+        // Highlight centre (0.7, 0.35): stays the brightest, least tinted point; no channel clipped to a flat 255.
+        let h=(Int(0.35*Float(n))*n+Int(0.7*Float(n)))*4
+        XCTAssertGreaterThan(linearLuminance(made,h),linearLuminance(bare,h)*0.85)
+        XCTAssertLessThan(Float(made[h+2])-Float(made[h+1]),redness(made),"highlight keeps its shine instead of turning flat pink")
+        print("blush metrics: detail bare \(detail(bare)) pigment \(detail(made)) previous \(detail(legacy)); chroma detail bare \(chromaDetail(bare)) pigment \(chromaDetail(made)) previous \(chromaDetail(legacy)); redness bare \(redness(bare)) pigment \(redness(made)) previous \(redness(legacy))")
+    }
+    func testBlushDetailRadiusIsValidated() throws {
+        let url=try XCTUnwrap(Bundle.main.url(forResource:"blush-rendering",withExtension:"json"))
+        var json=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:url)) as? [String:Any])
+        XCTAssertEqual(try BeautyBlushConfiguration.load().detail_radius_px,6)
+        json["detail_radius_px"]=40
+        XCTAssertThrowsError(try BeautyBlushConfiguration.decode(JSONSerialization.data(withJSONObject:json)))
+        json["detail_radius_px"]=nil
+        XCTAssertThrowsError(try BeautyBlushConfiguration.decode(JSONSerialization.data(withJSONObject:json)),"the field is required")
+    }
+    /// Contact sheet: bare, then every blend, on the identical synthetic frame. Written to the test's temp folder.
+    func testBlushBlendContactSheet() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
+        let n=128,(luma,chroma)=syntheticSkin(n)
+        let pink=SIMD3<Float>(BeautyBlushConfiguration.linear(0.913),BeautyBlushConfiguration.linear(0.357),BeautyBlushConfiguration.linear(0.471))
+        var tiles=[try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,shade:pink,size:n)]
+        for blend in BlushBlend.allCases {tiles.append(try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0.9,luma:luma,chroma:chroma,blend:blend,shade:pink,size:n))}
+        var sheet=Data(count:n*n*4*tiles.count)
+        for (t,tile) in tiles.enumerated() {for y in 0..<n {
+            let target:Int=(y*tiles.count+t)*n*4,source:Int=y*n*4
+            sheet.replaceSubrange(target..<(target+n*4),with:tile[source..<(source+n*4)])
+        }}
+        let provider=try XCTUnwrap(CGDataProvider(data:sheet as CFData))
+        let image=try XCTUnwrap(CGImage(width:n*tiles.count,height:n,bitsPerComponent:8,bitsPerPixel:32,bytesPerRow:n*4*tiles.count,space:CGColorSpace(name:CGColorSpace.sRGB)!,
+                                        bitmapInfo:CGBitmapInfo(rawValue:CGImageAlphaInfo.noneSkipFirst.rawValue|CGBitmapInfo.byteOrder32Little.rawValue),provider:provider,decode:nil,shouldInterpolate:false,intent:.defaultIntent))
+        let url=FileManager.default.temporaryDirectory.appendingPathComponent("sunrise-blush-blend-sheet.png")
+        let dest=try XCTUnwrap(CGImageDestinationCreateWithURL(url as CFURL,"public.png" as CFString,1,nil))
+        CGImageDestinationAddImage(dest,image,nil);XCTAssertTrue(CGImageDestinationFinalize(dest))
+        print("blush contact sheet (bare, \(BlushBlend.allCases.map(\.title).joined(separator:", "))): \(url.path)")
+    }
+
+
+    // MARK: MediaPipe cheek landmarks on the ARKit mesh
+
+    /// Plausible lifted landmarks on `BrowFixture`'s face plane (eyes at y 0.03, x ±0.032), in `BlushCheekLandmarks.indices` order.
+    private func cheekPoints(edge:Float=0.072,mouthY:Float = -0.04)->[SIMD3<Float>] {
+        func cheek(_ s:Float)->[SIMD3<Float>] {
+            [SIMD3(s*0.045,0.03,0.04),SIMD3(s*0.018,0.03,0.04),SIMD3(s*0.032,0.022,0.04),SIMD3(s*0.017,-0.01,0.04),
+             SIMD3(s*0.024,mouthY,0.04),SIMD3(s*0.05,0.015,0.04),SIMD3(s*0.035,-0.005,0.04),SIMD3(s*edge,0,0.04)]
+        }
+        let right=cheek(-1),left=cheek(1)
+        return (0..<right.count).flatMap {[right[$0],left[$0]]}
+    }
+    func testLandmarkCheekFitIsWideSoftAndInsideEachPersonsCheek() throws {
+        let region=try BrowFixture().region()
+        let cheeks=try XCTUnwrap(BlushCheekLandmarks(points:cheekPoints()))
+        for look in BlushPlacementStyle.referenceLooks {
+            let fitted=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:look,cheeks:cheeks))
+            let before=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:look))
+            XCTAssertEqual(fitted.pigmentFields.count,2)
+            for (field,old) in zip(fitted.pigmentFields,before.pigmentFields) {
+                XCTAssertTrue(field.wash,"\(look)")
+                XCTAssertEqual(field.nasalLimit,0.017,accuracy:1e-5,"stops at the nostril wing")
+                XCTAssertLessThan(field.eyeLimit,0.022,"stays under the lower lid")
+                XCTAssertGreaterThan(field.center.x*field.side,field.nasalLimit);XCTAssertLessThan(field.center.x*field.side,field.outerLimit)
+                XCTAssertGreaterThan(field.radius.x*field.radius.y,old.radius.x*old.radius.y*1.3,"\(look) must cover a wider cheek than the ARKit-only fit")
+                XCTAssertEqual(field.coverage(SIMD2(field.side*0.012,-0.01)),0,"never on the nose")
+                XCTAssertEqual(field.coverage(SIMD2(field.side*0.032,0.026)),0,"never on the eye")
+                // Walking out from the centre, coverage fades with no visible step (1 mm samples).
+                var previous=field.coverage(field.center),largestStep:Float=0
+                for i in 1...60 {
+                    let c=field.coverage(field.center+SIMD2(field.side*Float(i)*0.001,0))
+                    largestStep=max(largestStep,abs(c-previous));previous=c
+                }
+                XCTAssertEqual(previous,0,accuracy:1e-6)
+                // `coverage` peaks at 1 (opacity is applied in the atlas): at most 10% of the peak per millimetre.
+                XCTAssertLessThan(largestStep,0.1,"\(look): no hard edge")
+            }
+        }
+    }
+    func testLandmarkCheekFitFollowsTheMeasuredFaceAndFallsBackWhenUnusable() throws {
+        let region=try BrowFixture().region()
+        let narrow=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.youthful,cheeks:BlushCheekLandmarks(points:cheekPoints(edge:0.06))))
+        let wide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.youthful,cheeks:BlushCheekLandmarks(points:cheekPoints(edge:0.078))))
+        XCTAssertGreaterThan(wide.pigmentFields[0].radius.x,narrow.pigmentFields[0].radius.x,"a wider face gets a wider blush")
+        let tiny=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.youthful,cheeks:BlushCheekLandmarks(points:cheekPoints(edge:0.03))))
+        XCTAssertFalse(tiny.pigmentFields.contains(where:\.wash),"an implausible cheek uses the ARKit-only fit")
+        var sameSide=cheekPoints();for i in sameSide.indices {sameSide[i].x=abs(sameSide[i].x)}
+        XCTAssertNil(BlushCheekLandmarks(points:sameSide))
+        XCTAssertNil(BlushPlacementGenerator.make(region:region,style:.cheekbone,cheeks:BlushCheekLandmarks(points:cheekPoints()))?.pigmentFields.first(where:\.wash),
+                     "only the reference looks are refitted")
+        let m=try XCTUnwrap(BlushCheekLandmarks.median([[SIMD3(0,0,0)],[SIMD3(1,5,2)],[SIMD3(9,1,1)]]))
+        XCTAssertEqual(m[0],SIMD3(1,1,1))
+    }
+    func testWashAtlasMatchesTheFieldOnTheGPU() throws {
+        guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
+        let region=try BrowFixture().region()
+        let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.youthful,cheeks:BlushCheekLandmarks(points:cheekPoints())))
+        let pixels=try BeautyBlushEngine.renderAtlasFixture(placement:guide)
+        XCTAssertGreaterThan(pixels.max() ?? 0,0.1,"the wash is baked into the atlas")
+    }
+
+
+    // MARK: Blush tutorial outlines
+
+    func testBlushTutorialOutlinesSitOnEachCheekAndProjectToTheView() throws {
+        let fixture=BrowFixture(),region=try fixture.region()
+        let guide=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.lifted,cheeks:BlushCheekLandmarks(points:cheekPoints())))
+        let outlines=guide.pigmentFields.compactMap {BeautyBlushEngine.guideOutline($0,vertices:region.restVertices,triangles:region.triangles,minimumZ:0)}
+        XCTAssertEqual(outlines.count,2)
+        // Orthographic view: face-local x,y in -0.1...0.1 m fill a 200 x 200 pt view.
+        var mvp=matrix_identity_float4x4;mvp.columns.0.x=10;mvp.columns.1.y=10
+        let snapshot=try XCTUnwrap(BeautyBlushEngine.projectGuide(outlines,vertices:region.restVertices,mvp:mvp,viewport:CGSize(width:200,height:200)))
+        for (cheek,field) in zip(snapshot.cheeks,guide.pigmentFields) {
+            func spread(_ p:[CGPoint])->CGFloat {(p.map(\.x).max()!-p.map(\.x).min()!)*(p.map(\.y).max()!-p.map(\.y).min()!)}
+            XCTAssertGreaterThan(spread(cheek.outer),spread(cheek.inner)*2,"the outer line surrounds the small circle")
+            XCTAssertEqual(cheek.center.x,CGFloat(field.center.x+0.1)*1000,accuracy:0.5)
+            XCTAssertEqual(cheek.center.y,CGFloat(0.1-field.center.y)*1000,accuracy:0.5)
+            XCTAssertLessThan(cheek.outward.y,cheek.center.y,"Lifted blends up toward the temple (view y grows down)")
+            XCTAssertGreaterThan((cheek.outward.x-cheek.center.x)*CGFloat(field.side),0,"and out toward the face edge")
+            for p in cheek.inner+cheek.outer {XCTAssertLessThanOrEqual(CGFloat(0.1)*1000-p.y,CGFloat(field.eyeLimit+0.1)*1000+0.5,"never above the eye limit")}
+        }
+        var behind=mvp;behind.columns.3.w = -1
+        XCTAssertNil(BeautyBlushEngine.projectGuide(outlines,vertices:region.restVertices,mvp:behind,viewport:CGSize(width:200,height:200)))
+    }
+    func testBlushTutorialHasTheTwoSpecSteps() {
+        XCTAssertEqual(GuidedTutorialModel.blushLessons.map(\.title),["Dab a little blush inside the small circle.","Dab outward to blend it into your skin."])
+    }
+
 }
+

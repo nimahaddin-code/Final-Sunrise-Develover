@@ -60,7 +60,7 @@
     "blush_visual_target_sha256": "0dc0a8b1a6c9b18120da9b1409027d6c8d5a76f6b8672a3b54e7b1dee6a01fc5",
     "blush_calibration_status": "new_renderer_technical_tests_in_progress_device_acceptance_pending",
     "blush_engine": "arkit_metal_uv",
-    "personalized_blush_revision": "0.4.0"
+    "personalized_blush_revision": "0.5.0"
   },
   "source_registry": [
     {
@@ -6831,6 +6831,1024 @@
       ],
       "validation_status": "proposed_initial",
       "device_validated": false
+    },
+    {
+      "id": "blush.look.youthful",
+      "placement_id": "placement.youthful",
+      "name": "Youthful",
+      "category": "blush",
+      "source_reference_ids": [
+        "user-tiktok-placement-2026-10-28"
+      ],
+      "source_observation_ids": [],
+      "parameters": {
+        "center_outward_offset": {
+          "value": 0.015,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -0.1,
+          "maximum": 0.15
+        },
+        "center_vertical_offset": {
+          "value": -0.22,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -0.35,
+          "maximum": -0.04
+        },
+        "major_radius": {
+          "value": 0.13,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Kalibrasi v0.2.1 dari feedback iPhone: cakupan v0.2.0 masih terlalu kecil; radius diperlebar tanpa mengecilkan bentuk saat clipping.",
+          "minimum": 0.03,
+          "maximum": 0.24
+        },
+        "minor_radius": {
+          "value": 0.115,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Kalibrasi v0.2.1 dari feedback iPhone: cakupan v0.2.0 masih terlalu kecil; radius diperlebar tanpa mengecilkan bentuk saat clipping.",
+          "minimum": 0.025,
+          "maximum": 0.16
+        },
+        "outward_up_angle": {
+          "value": 0,
+          "unit": "degree",
+          "basis": "face_lateral_superior_frame",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -45,
+          "maximum": 60
+        },
+        "blend_distance": {
+          "value": 0.08,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": 0,
+          "maximum": 0.15
+        },
+        "eye_margin": {
+          "value": 0.08,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Margin dari kontur kelopak bawah teramati. Jangan mengklaim eye center sebagai lower eyelid; gunakan kebijakan adapter yang dideklarasikan jika kontur tidak tersedia.",
+          "minimum": 0.005,
+          "maximum": 0.12
+        },
+        "nose_margin": {
+          "value": 0.015,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.005,
+          "maximum": 0.04
+        },
+        "fallback_midline_exclusion_half_width": {
+          "value": 0.1,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Mask proksi konservatif, bukan klaim batas hidung yang terdeteksi.",
+          "minimum": 0.05,
+          "maximum": 0.16
+        },
+        "face_edge_margin": {
+          "value": 0.015,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 0.04
+        },
+        "max_alpha": {
+          "value": 0.55,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Feedback iPhone 2026-10-29: 0.34 terlalu samar di slider penuh; area lebar dengan tepi lembut, jadi inti boleh lebih pekat.",
+          "minimum": 0,
+          "maximum": 0.8
+        },
+        "radial_power": {
+          "value": 1.2,
+          "unit": "count",
+          "basis": "falloff_exponent",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "mask_edge_feather": {
+          "value": 0.03,
+          "unit": "ratio",
+          "basis": "face_width",
+          "minimum": 0,
+          "maximum": 0.04,
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Transisi halus ke dalam dari batas aman mata/hidung/tepi wajah; tidak menyebar keluar mask."
+        },
+        "falloff_smoothstep_mix": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "radial_alpha",
+          "minimum": 0,
+          "maximum": 1,
+          "provenance": [
+            "user_feedback_and_engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Smoothstep pada alpha radial agar pusat warna lebih merata dan gradien berhenti halus pada tepi."
+        },
+        "curvature": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "User screenshot design calibration; native face-local geometry",
+          "minimum": 0,
+          "maximum": 0.6
+        },
+        "landmark_center_across": {
+          "value": 0.45,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sayap hidung (0) ke tepi wajah (1) pada pipi yang diukur MediaPipe.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_center_up": {
+          "value": 0.5,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sudut bibir (0) ke kelopak bawah (1).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_radius_across": {
+          "value": 0.62,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius horizontal relatif lebar koridor pipi; lebar ala filter TikTok, dipotong lembut oleh batas hidung/mata/tepi wajah.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_radius_up": {
+          "value": 0.58,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius vertikal relatif tinggi koridor pipi.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_edge_feather": {
+          "value": 0.35,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Lebar pudar di batas hidung, kelopak bawah dan tepi wajah, relatif lebar koridor pipi; tanpa tepi yang terlihat.",
+          "minimum": 0.05,
+          "maximum": 0.6
+        },
+        "landmark_eye_clearance": {
+          "value": 0.06,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Jarak aman di bawah kelopak bawah, relatif tinggi koridor pipi.",
+          "minimum": 0,
+          "maximum": 0.3
+        }
+      },
+      "center_rule_id": "formula.blush_center",
+      "orientation_rule_id": "formula.blush_rotation",
+      "pigment_region": {
+        "geometry": "surface_projected_ellipse",
+        "one_connected_field_per_cheek": true,
+        "do_not_bridge_across_nose": true,
+        "radial_falloff_rule_id": "formula.blush_alpha",
+        "clip_masks": [
+          "lower_eyelid_exclusion",
+          "nose_or_conservative_midline_exclusion",
+          "face_edge_exclusion",
+          "hair_hijab_and_hand_occlusion"
+        ],
+        "boundary_feather": "smoothstep_radial_alpha_and_independent_smooth_exclusion_masks",
+        "render_application_marks": false,
+        "never_shrink_radius_to_avoid_clipping": true,
+        "clipping_behavior": "Keep original radius; mask unsafe skin and feather inward at exclusion boundaries. Reject if safe visible fraction below threshold."
+      },
+      "application_guide": {
+        "geometry": "dots",
+        "purpose": "tutorial_only",
+        "is_pigment_silhouette": false,
+        "blend_direction": "outward",
+        "notes": "Dots indicate deposit sites; V and arrows indicate application area/direction. Final color remains a filled soft field."
+      },
+      "cheek_region": "central_to_outer",
+      "pose_handling": {
+        "shared_frame": "face.anatomical_metric",
+        "left_right": "same rule in each anatomical half; preserve measured asymmetry",
+        "screen_height_equalization": false
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.blush",
+      "required_landmarks": [
+        "left_eye_center",
+        "right_eye_center",
+        "lower_eyelid_contour",
+        "cheek_surface",
+        "face_boundary"
+      ],
+      "optional_landmarks": [
+        "nose_boundary",
+        "cheekbone_curve"
+      ],
+      "missing_nose_behavior": "Use the explicitly labelled conservative midline mask; do not invent an ala point.",
+      "do_not_render_when": [
+        "missing_eye_anchors",
+        "missing_cheek_surface",
+        "surface_binding_failed",
+        "occluded_region",
+        "stale_tracking",
+        "unsafe_clipped_area"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false,
+      "visual_target": "User-supplied youthful screenshot; adapted to each cheek, not a calibrated TikTok reproduction"
+    },
+    {
+      "id": "blush.look.sunkissed",
+      "placement_id": "placement.sunkissed",
+      "name": "Sunkissed",
+      "category": "blush",
+      "source_reference_ids": [
+        "user-tiktok-placement-2026-10-28"
+      ],
+      "source_observation_ids": [],
+      "parameters": {
+        "center_outward_offset": {
+          "value": -0.005,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -0.1,
+          "maximum": 0.15
+        },
+        "center_vertical_offset": {
+          "value": -0.19,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -0.35,
+          "maximum": -0.04
+        },
+        "major_radius": {
+          "value": 0.165,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Kalibrasi v0.2.1 dari feedback iPhone: cakupan v0.2.0 masih terlalu kecil; radius diperlebar tanpa mengecilkan bentuk saat clipping.",
+          "minimum": 0.03,
+          "maximum": 0.24
+        },
+        "minor_radius": {
+          "value": 0.085,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Kalibrasi v0.2.1 dari feedback iPhone: cakupan v0.2.0 masih terlalu kecil; radius diperlebar tanpa mengecilkan bentuk saat clipping.",
+          "minimum": 0.025,
+          "maximum": 0.16
+        },
+        "outward_up_angle": {
+          "value": 0,
+          "unit": "degree",
+          "basis": "face_lateral_superior_frame",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -45,
+          "maximum": 60
+        },
+        "blend_distance": {
+          "value": 0.08,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": 0,
+          "maximum": 0.15
+        },
+        "eye_margin": {
+          "value": 0.08,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Margin dari kontur kelopak bawah teramati. Jangan mengklaim eye center sebagai lower eyelid; gunakan kebijakan adapter yang dideklarasikan jika kontur tidak tersedia.",
+          "minimum": 0.005,
+          "maximum": 0.12
+        },
+        "nose_margin": {
+          "value": 0.015,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.005,
+          "maximum": 0.04
+        },
+        "fallback_midline_exclusion_half_width": {
+          "value": 0.1,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Mask proksi konservatif, bukan klaim batas hidung yang terdeteksi.",
+          "minimum": 0.05,
+          "maximum": 0.16
+        },
+        "face_edge_margin": {
+          "value": 0.015,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 0.04
+        },
+        "max_alpha": {
+          "value": 0.55,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Feedback iPhone 2026-10-29: 0.34 terlalu samar di slider penuh; area lebar dengan tepi lembut, jadi inti boleh lebih pekat.",
+          "minimum": 0,
+          "maximum": 0.8
+        },
+        "radial_power": {
+          "value": 1.2,
+          "unit": "count",
+          "basis": "falloff_exponent",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "mask_edge_feather": {
+          "value": 0.03,
+          "unit": "ratio",
+          "basis": "face_width",
+          "minimum": 0,
+          "maximum": 0.04,
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Transisi halus ke dalam dari batas aman mata/hidung/tepi wajah; tidak menyebar keluar mask."
+        },
+        "falloff_smoothstep_mix": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "radial_alpha",
+          "minimum": 0,
+          "maximum": 1,
+          "provenance": [
+            "user_feedback_and_engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Smoothstep pada alpha radial agar pusat warna lebih merata dan gradien berhenti halus pada tepi."
+        },
+        "curvature": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "User screenshot design calibration; native face-local geometry",
+          "minimum": 0,
+          "maximum": 0.6
+        },
+        "bridge_radius_x": {
+          "value": 0.145,
+          "unit": "ratio",
+          "basis": "User screenshot design calibration; native face-local geometry",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bridge_radius_y": {
+          "value": 0.045,
+          "unit": "ratio",
+          "basis": "User screenshot design calibration; native face-local geometry",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "bridge_vertical_offset": {
+          "value": -0.19,
+          "unit": "ratio",
+          "basis": "User screenshot design calibration; native face-local geometry",
+          "minimum": -0.3,
+          "maximum": 1
+        },
+        "bridge_strength": {
+          "value": 0.55,
+          "unit": "ratio",
+          "basis": "User screenshot design calibration; native face-local geometry",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_center_across": {
+          "value": 0.36,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sayap hidung (0) ke tepi wajah (1) pada pipi yang diukur MediaPipe.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_center_up": {
+          "value": 0.66,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sudut bibir (0) ke kelopak bawah (1).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_radius_across": {
+          "value": 0.72,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius horizontal relatif lebar koridor pipi; lebar ala filter TikTok, dipotong lembut oleh batas hidung/mata/tepi wajah.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_radius_up": {
+          "value": 0.42,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius vertikal relatif tinggi koridor pipi.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_edge_feather": {
+          "value": 0.35,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Lebar pudar di batas hidung, kelopak bawah dan tepi wajah, relatif lebar koridor pipi; tanpa tepi yang terlihat.",
+          "minimum": 0.05,
+          "maximum": 0.6
+        },
+        "landmark_eye_clearance": {
+          "value": 0.06,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Jarak aman di bawah kelopak bawah, relatif tinggi koridor pipi.",
+          "minimum": 0,
+          "maximum": 0.3
+        }
+      },
+      "center_rule_id": "formula.blush_center",
+      "orientation_rule_id": "formula.blush_rotation",
+      "pigment_region": {
+        "geometry": "surface_projected_ellipse",
+        "one_connected_field_per_cheek": true,
+        "do_not_bridge_across_nose": true,
+        "radial_falloff_rule_id": "formula.blush_alpha",
+        "clip_masks": [
+          "lower_eyelid_exclusion",
+          "nose_or_conservative_midline_exclusion",
+          "face_edge_exclusion",
+          "hair_hijab_and_hand_occlusion"
+        ],
+        "boundary_feather": "smoothstep_radial_alpha_and_independent_smooth_exclusion_masks",
+        "render_application_marks": false,
+        "never_shrink_radius_to_avoid_clipping": true,
+        "clipping_behavior": "Keep original radius; mask unsafe skin and feather inward at exclusion boundaries. Reject if safe visible fraction below threshold."
+      },
+      "application_guide": {
+        "geometry": "dots",
+        "purpose": "tutorial_only",
+        "is_pigment_silhouette": false,
+        "blend_direction": "outward",
+        "notes": "Dots indicate deposit sites; V and arrows indicate application area/direction. Final color remains a filled soft field."
+      },
+      "cheek_region": "central_to_outer",
+      "pose_handling": {
+        "shared_frame": "face.anatomical_metric",
+        "left_right": "same rule in each anatomical half; preserve measured asymmetry",
+        "screen_height_equalization": false
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.blush",
+      "required_landmarks": [
+        "left_eye_center",
+        "right_eye_center",
+        "lower_eyelid_contour",
+        "cheek_surface",
+        "face_boundary"
+      ],
+      "optional_landmarks": [
+        "nose_boundary",
+        "cheekbone_curve"
+      ],
+      "missing_nose_behavior": "Use the explicitly labelled conservative midline mask; do not invent an ala point.",
+      "do_not_render_when": [
+        "missing_eye_anchors",
+        "missing_cheek_surface",
+        "surface_binding_failed",
+        "occluded_region",
+        "stale_tracking",
+        "unsafe_clipped_area"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false,
+      "visual_target": "User-supplied sunkissed screenshot; adapted to each cheek, not a calibrated TikTok reproduction"
+    },
+    {
+      "id": "blush.look.lifted",
+      "placement_id": "placement.lifted",
+      "name": "Lifted",
+      "category": "blush",
+      "source_reference_ids": [
+        "user-tiktok-placement-2026-10-28"
+      ],
+      "source_observation_ids": [],
+      "parameters": {
+        "center_outward_offset": {
+          "value": 0.065,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -0.1,
+          "maximum": 0.15
+        },
+        "center_vertical_offset": {
+          "value": -0.16,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -0.35,
+          "maximum": -0.04
+        },
+        "major_radius": {
+          "value": 0.2,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Kalibrasi v0.2.1 dari feedback iPhone: cakupan v0.2.0 masih terlalu kecil; radius diperlebar tanpa mengecilkan bentuk saat clipping.",
+          "minimum": 0.03,
+          "maximum": 0.24
+        },
+        "minor_radius": {
+          "value": 0.085,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Kalibrasi v0.2.1 dari feedback iPhone: cakupan v0.2.0 masih terlalu kecil; radius diperlebar tanpa mengecilkan bentuk saat clipping.",
+          "minimum": 0.025,
+          "maximum": 0.16
+        },
+        "outward_up_angle": {
+          "value": 28,
+          "unit": "degree",
+          "basis": "face_lateral_superior_frame",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": -45,
+          "maximum": 60
+        },
+        "blend_distance": {
+          "value": 0.08,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": 0,
+          "maximum": 0.15
+        },
+        "eye_margin": {
+          "value": 0.08,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Margin dari kontur kelopak bawah teramati. Jangan mengklaim eye center sebagai lower eyelid; gunakan kebijakan adapter yang dideklarasikan jika kontur tidak tersedia.",
+          "minimum": 0.005,
+          "maximum": 0.12
+        },
+        "nose_margin": {
+          "value": 0.015,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0.005,
+          "maximum": 0.04
+        },
+        "fallback_midline_exclusion_half_width": {
+          "value": 0.1,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Mask proksi konservatif, bukan klaim batas hidung yang terdeteksi.",
+          "minimum": 0.05,
+          "maximum": 0.16
+        },
+        "face_edge_margin": {
+          "value": 0.015,
+          "unit": "ratio",
+          "basis": "face_width",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 0.04
+        },
+        "max_alpha": {
+          "value": 0.55,
+          "unit": "ratio",
+          "basis": "pigment_alpha",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Feedback iPhone 2026-10-29: 0.34 terlalu samar di slider penuh; area lebar dengan tepi lembut, jadi inti boleh lebih pekat.",
+          "minimum": 0,
+          "maximum": 0.8
+        },
+        "radial_power": {
+          "value": 1.2,
+          "unit": "count",
+          "basis": "falloff_exponent",
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "minimum": 1,
+          "maximum": 4
+        },
+        "mask_edge_feather": {
+          "value": 0.03,
+          "unit": "ratio",
+          "basis": "face_width",
+          "minimum": 0,
+          "maximum": 0.04,
+          "provenance": [
+            "user_approved_generated_visual",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Transisi halus ke dalam dari batas aman mata/hidung/tepi wajah; tidak menyebar keluar mask."
+        },
+        "falloff_smoothstep_mix": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "radial_alpha",
+          "minimum": 0,
+          "maximum": 1,
+          "provenance": [
+            "user_feedback_and_engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Smoothstep pada alpha radial agar pusat warna lebih merata dan gradien berhenti halus pada tepi."
+        },
+        "curvature": {
+          "value": 0.28,
+          "unit": "ratio",
+          "basis": "User screenshot design calibration; native face-local geometry",
+          "minimum": 0,
+          "maximum": 0.6
+        },
+        "landmark_center_across": {
+          "value": 0.6,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sayap hidung (0) ke tepi wajah (1) pada pipi yang diukur MediaPipe.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_center_up": {
+          "value": 0.66,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sudut bibir (0) ke kelopak bawah (1).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_radius_across": {
+          "value": 0.74,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius horizontal relatif lebar koridor pipi; lebar ala filter TikTok, dipotong lembut oleh batas hidung/mata/tepi wajah.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_radius_up": {
+          "value": 0.4,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius vertikal relatif tinggi koridor pipi.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_edge_feather": {
+          "value": 0.35,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Lebar pudar di batas hidung, kelopak bawah dan tepi wajah, relatif lebar koridor pipi; tanpa tepi yang terlihat.",
+          "minimum": 0.05,
+          "maximum": 0.6
+        },
+        "landmark_eye_clearance": {
+          "value": 0.06,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Jarak aman di bawah kelopak bawah, relatif tinggi koridor pipi.",
+          "minimum": 0,
+          "maximum": 0.3
+        }
+      },
+      "center_rule_id": "formula.blush_center",
+      "orientation_rule_id": "formula.blush_rotation",
+      "pigment_region": {
+        "geometry": "surface_projected_ellipse",
+        "one_connected_field_per_cheek": true,
+        "do_not_bridge_across_nose": true,
+        "radial_falloff_rule_id": "formula.blush_alpha",
+        "clip_masks": [
+          "lower_eyelid_exclusion",
+          "nose_or_conservative_midline_exclusion",
+          "face_edge_exclusion",
+          "hair_hijab_and_hand_occlusion"
+        ],
+        "boundary_feather": "smoothstep_radial_alpha_and_independent_smooth_exclusion_masks",
+        "render_application_marks": false,
+        "never_shrink_radius_to_avoid_clipping": true,
+        "clipping_behavior": "Keep original radius; mask unsafe skin and feather inward at exclusion boundaries. Reject if safe visible fraction below threshold."
+      },
+      "application_guide": {
+        "geometry": "dots",
+        "purpose": "tutorial_only",
+        "is_pigment_silhouette": false,
+        "blend_direction": "outward",
+        "notes": "Dots indicate deposit sites; V and arrows indicate application area/direction. Final color remains a filled soft field."
+      },
+      "cheek_region": "central_to_outer",
+      "pose_handling": {
+        "shared_frame": "face.anatomical_metric",
+        "left_right": "same rule in each anatomical half; preserve measured asymmetry",
+        "screen_height_equalization": false
+      },
+      "surface_attachment_rule_id": "surface.barycentric",
+      "render_profile_id": "render.blush",
+      "required_landmarks": [
+        "left_eye_center",
+        "right_eye_center",
+        "lower_eyelid_contour",
+        "cheek_surface",
+        "face_boundary"
+      ],
+      "optional_landmarks": [
+        "nose_boundary",
+        "cheekbone_curve"
+      ],
+      "missing_nose_behavior": "Use the explicitly labelled conservative midline mask; do not invent an ala point.",
+      "do_not_render_when": [
+        "missing_eye_anchors",
+        "missing_cheek_surface",
+        "surface_binding_failed",
+        "occluded_region",
+        "stale_tracking",
+        "unsafe_clipped_area"
+      ],
+      "validation_status": "proposed_initial",
+      "device_validated": false,
+      "visual_target": "User-supplied lifted screenshot; adapted to each cheek, not a calibrated TikTok reproduction"
     }
   ],
   "palettes": [
@@ -7402,6 +8420,331 @@
         },
         "default": {
           "value": 0.65,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "placement_changes_color": false,
+      "color_changes_placement": false,
+      "brand_match_verified": false,
+      "color_space": "sRGB_encoded_D65",
+      "render_conversion": "Decode chosen and camera RGB into declared linear working space before compositing; re-encode once."
+    },
+    {
+      "id": "blush.ref.baby_pink",
+      "name": "Baby pink",
+      "category": "blush",
+      "hex_srgb": "#EF9BBB",
+      "color": {
+        "value": [
+          0.9372549019607843,
+          0.6078431372549019,
+          0.7333333333333333
+        ],
+        "unit": "srgb_channel",
+        "basis": "encoded_srgb",
+        "provenance": [
+          "product_requirement_and_engineering_palette"
+        ],
+        "validation_status": "proposed_initial",
+        "rationale": "Art-directed approximation inspired by supplied filter screenshots; not calibrated to a branded product.",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "intensity": {
+        "minimum": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maximum": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "default": {
+          "value": 0.72,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "placement_changes_color": false,
+      "color_changes_placement": false,
+      "brand_match_verified": false,
+      "color_space": "sRGB_encoded_D65",
+      "render_conversion": "Decode chosen and camera RGB into declared linear working space before compositing; re-encode once."
+    },
+    {
+      "id": "blush.ref.cool_pink",
+      "name": "Cool pink",
+      "category": "blush",
+      "hex_srgb": "#DA4C87",
+      "color": {
+        "value": [
+          0.8549019607843137,
+          0.2980392156862745,
+          0.5294117647058824
+        ],
+        "unit": "srgb_channel",
+        "basis": "encoded_srgb",
+        "provenance": [
+          "product_requirement_and_engineering_palette"
+        ],
+        "validation_status": "proposed_initial",
+        "rationale": "Art-directed approximation inspired by supplied filter screenshots; not calibrated to a branded product.",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "intensity": {
+        "minimum": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maximum": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "default": {
+          "value": 0.72,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "placement_changes_color": false,
+      "color_changes_placement": false,
+      "brand_match_verified": false,
+      "color_space": "sRGB_encoded_D65",
+      "render_conversion": "Decode chosen and camera RGB into declared linear working space before compositing; re-encode once."
+    },
+    {
+      "id": "blush.ref.berry",
+      "name": "Berry",
+      "category": "blush",
+      "hex_srgb": "#AF3E62",
+      "color": {
+        "value": [
+          0.6862745098039216,
+          0.24313725490196078,
+          0.3843137254901961
+        ],
+        "unit": "srgb_channel",
+        "basis": "encoded_srgb",
+        "provenance": [
+          "product_requirement_and_engineering_palette"
+        ],
+        "validation_status": "proposed_initial",
+        "rationale": "Art-directed approximation inspired by supplied filter screenshots; not calibrated to a branded product.",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "intensity": {
+        "minimum": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maximum": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "default": {
+          "value": 0.72,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "placement_changes_color": false,
+      "color_changes_placement": false,
+      "brand_match_verified": false,
+      "color_space": "sRGB_encoded_D65",
+      "render_conversion": "Decode chosen and camera RGB into declared linear working space before compositing; re-encode once."
+    },
+    {
+      "id": "blush.ref.soft_nude",
+      "name": "Soft nude",
+      "category": "blush",
+      "hex_srgb": "#C98C83",
+      "color": {
+        "value": [
+          0.788235294117647,
+          0.5490196078431373,
+          0.5137254901960784
+        ],
+        "unit": "srgb_channel",
+        "basis": "encoded_srgb",
+        "provenance": [
+          "product_requirement_and_engineering_palette"
+        ],
+        "validation_status": "proposed_initial",
+        "rationale": "Art-directed approximation inspired by supplied filter screenshots; not calibrated to a branded product.",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "intensity": {
+        "minimum": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maximum": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "default": {
+          "value": 0.72,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "placement_changes_color": false,
+      "color_changes_placement": false,
+      "brand_match_verified": false,
+      "color_space": "sRGB_encoded_D65",
+      "render_conversion": "Decode chosen and camera RGB into declared linear working space before compositing; re-encode once."
+    },
+    {
+      "id": "blush.ref.terracotta",
+      "name": "Terracotta",
+      "category": "blush",
+      "hex_srgb": "#C57158",
+      "color": {
+        "value": [
+          0.7725490196078432,
+          0.44313725490196076,
+          0.34509803921568627
+        ],
+        "unit": "srgb_channel",
+        "basis": "encoded_srgb",
+        "provenance": [
+          "product_requirement_and_engineering_palette"
+        ],
+        "validation_status": "proposed_initial",
+        "rationale": "Art-directed approximation inspired by supplied filter screenshots; not calibrated to a branded product.",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "intensity": {
+        "minimum": {
+          "value": 0,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "maximum": {
+          "value": 1,
+          "unit": "ratio",
+          "basis": "user_control",
+          "provenance": [
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Skala relatif terhadap wajah pengguna; perlu kalibrasi perangkat.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "default": {
+          "value": 0.72,
           "unit": "ratio",
           "basis": "user_control",
           "provenance": [

@@ -41,6 +41,7 @@ struct PreviewLayer: Equatable, Sendable {
 }
 
 struct EyebrowConfiguration: Equatable, Sendable {
+    var comparisonSplit=false
     // -Nimah: Region/style selection untuk dua modul pada shared tracking pipeline.
     var region:FaceGuideRegion = .eyebrows
     var foreheadStyle:ForeheadStyle = .hairline

@@ -60,6 +60,11 @@ struct MakeupRuleDatabase: Decodable, Sendable {
                 }
             }
         }
+        let lookBounds:[String:ClosedRange<Float>]=["curvature":0...0.6,"bridge_radius_x":0.05...0.2,"bridge_radius_y":0.02...0.08,"bridge_vertical_offset":(-0.3)...(-0.12),"bridge_strength":0...0.8]
+        for preset in rules.blush_presets where preset.id.hasPrefix("blush.look.") {
+            let keys=preset.id=="blush.look.sunkissed" ? Array(lookBounds.keys):["curvature"]
+            for key in keys {guard let p=preset.parameters[key],let range=lookBounds[key],range.contains(p.value) else {throw RuleError.invalid}}
+        }
         let adaptiveBounds:[String:ClosedRange<Float>]=[
             "blush_personalization_strength":0...1,"blush_personal_scale_min":0.6...1,
             "blush_personal_scale_max":1...1.5,"blush_contour_band":0.015...0.1,
@@ -95,6 +100,9 @@ struct MakeupRuleDatabase: Decodable, Sendable {
     }
     static func blushID(_ style: BlushPlacementStyle) -> String {
         switch style {
+        case .youthful:return "blush.look.youthful"
+        case .sunkissed:return "blush.look.sunkissed"
+        case .lifted:return "blush.look.lifted"
         case .apple:return "blush.apple"
         case .cheekbone:return "blush.cheekbone"
         case .outerSweep:return "blush.outer_sweep"
