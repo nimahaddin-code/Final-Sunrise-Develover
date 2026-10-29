@@ -62,6 +62,31 @@ the versioned welcome dismisses directly to Try On; historical scan/Profile migr
 notes below describe the integration parent, not this merged flow. Brow tracking,
 overlay selection, erasing and 3D rendering remain from staging. Blush retains its
 native UV pipeline, three looks, palette and tutorial handoff. Device QA is pending.
+## Archive app icon configuration — 2026-10-29
+
+- Wired the `AppIcon` asset catalog into the app target for Debug and Release archives and removed the obsolete Live Activities plist flag.
+
+## Tutorial bar, screen light and uncapped brow — Khalish (2026-10-29)
+
+- Tutorial: wine background like Try On; bottom bar with compare on the left, Blush / Brows / Eyeliner, and a screen light
+  on the right (`ScreenLight`, `ScreenLightGlow`, `CameraBarButton`, `AppColors.ringLight`).
+- Brow frame caps removed at nominal and fair thermal state (drawing and MediaPipe run as fast as frames are free); hot
+  phones keep 15 / 30 fps. Split view's real half at 60 fps.
+- Simulator tests only; device check pending.
+
+## Brow frame rate — Khalish (2026-10-29)
+
+- MediaPipe gets at most 30 camera frames a second again (`browMaxFramesPerSecond`; fair 24, hot 15); the brow is still drawn
+  on every 60 Hz frame (`BrowLoad.drawFPS`, 30 when hot), moved by ARKit's pose between answers. Running the landmarker at 60
+  fps took GPU and Neural Engine time from drawing.
+- `BrowFaceFrame.faceLocal(at:projected:)` skips mesh triangles whose image cannot contain the landmark (same result, far
+  fewer ray tests per MediaPipe answer on the render queue). `browStrip` evaluates the centerline once per column
+  (`BrowGeometry.section`) instead of three times per vertex.
+- Simulator tests only; frame rate not measured on a device.
+
+## Remove scan Live Activity — 2026-10-29
+
+- Removed the unused `SunriseLiveActivity` extension and ActivityKit scan feedback. Face and eye scans keep their in-app progress and completion badge.
 
 ## ARKit-pose brow stabilizer and 3D hair brow — Khalish (2026-10-28)
 

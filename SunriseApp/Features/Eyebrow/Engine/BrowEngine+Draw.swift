@@ -92,15 +92,17 @@ extension BeautyBlushEngine {
             // A brow much shorter than the other is turned away: fade it rather than squeeze its strands.
             let ratio=g.width/across,fade=max(0,min(1,(ratio-0.35)/0.25))
             let index:Float=side == .subjectRight ? 0:1
-            let columns=(0...browColumns).map {column->(u:Float,half:Float,lower:(core:Float,end:Float),bow:Float) in
+            // The centerline is evaluated once per column; every row of both grids is a step across it.
+            let columns=(0...browColumns).map {column->(u:Float,half:Float,lower:(core:Float,end:Float),bow:Float,section:(point:SIMD2<Float>,across:SIMD2<Float>)) in
                 let u=browExtent.x+(browExtent.y-browExtent.x)*Float(column)/Float(browColumns)
-                return (u,g.observedHalf(u),lower(u),chord ? g.chordOffset(u):0)
+                return (u,g.observedHalf(u),lower(u),chord ? g.chordOffset(u):0,g.section(u))
             }
             for row in 0...browRows {
                 let w=browExtent.z*(2*Float(row)/Float(browRows)-1)
                 for c in columns {
-                    let above=g.point(u:c.u,w:w+0.2)/image,below=g.point(u:c.u,w:w-0.2)/image
-                    out.append(BrowVertex(position:clip(g.point(u:c.u,w:w)),brow:SIMD4(c.u,w,c.half,fade*fade*(3-2*fade)),
+                    let p=c.section.point+c.section.across*w,step=c.section.across*0.2
+                    let above=(p+step)/image,below=(p-step)/image
+                    out.append(BrowVertex(position:clip(p),brow:SIMD4(c.u,w,c.half,fade*fade*(3-2*fade)),
                                           probes:SIMD4(above.x,above.y,below.x,below.y),skin:SIMD4(blur.x,blur.y,c.bow,0),
                                           conceal:SIMD4(c.lower.core,c.lower.end,index,0)))
                 }
@@ -110,7 +112,7 @@ extension BeautyBlushEngine {
             for row in 0...BrowEraser.rows {
                 let w=space.z+(space.w-space.z)*Float(row)/Float(BrowEraser.rows)
                 for c in columns {
-                    let p=g.point(u:c.u,w:w)
+                    let p=c.section.point+c.section.across*w
                     let crop=cropToRaw.map {BrowEraser.cropPoint(p,imageSize:o.imageSize,cropToRaw:$0)} ?? SIMD2(-2,-2)
                     unwrap.append(BrowUnwrapVertex(brow:SIMD4(c.u,w,c.half,index),raw:SIMD4(p.x/image.x,p.y/image.y,crop.x*2-1,1-crop.y*2),
                                                    conceal:SIMD4(c.lower.core,c.lower.end,0,0)))

@@ -5,30 +5,31 @@
 import SwiftUI
 
 extension BeautyBlushEngine {
-    /// The brow (camera picture and brow together) is redrawn at most this often, so it is not redrawn on every 60 Hz camera frame.
-    static let browMaxFramesPerSecond:Double=60
     /// How much brow work the phone's temperature allows. The brow tracker, the hand mask and the fill model share the GPU and
     /// Neural Engine; as the phone warms each is asked less often, and when it is hot the fill model stops (the push-pull fill
     /// still hides the natural brow).
+    /// Frame caps are nil (uncapped) until the phone is hot: every camera frame is drawn unless the previous one is still
+    /// queued, and MediaPipe takes every frame it is free for.
     struct BrowLoad:Equatable {
-        var trackerFPS:Double
+        var trackerFPS:Double?
+        var drawFPS:Double?
         var maskInterval:Double
         /// Shortest time between fill-model requests; nil turns the model off.
         var modelInterval:Double?
         static func current(_ state:ProcessInfo.ThermalState)->BrowLoad {
             switch state {
-            case .nominal:return BrowLoad(trackerFPS:browMaxFramesPerSecond,maskInterval:1.0/15,modelInterval:BrowEraser.modelInterval)
-            case .fair:return BrowLoad(trackerFPS:40,maskInterval:1.0/10,modelInterval:0.5)
-            default:return BrowLoad(trackerFPS:20,maskInterval:1.0/8,modelInterval:nil)
+            case .nominal:return BrowLoad(trackerFPS:nil,drawFPS:nil,maskInterval:1.0/15,modelInterval:BrowEraser.modelInterval)
+            case .fair:return BrowLoad(trackerFPS:nil,drawFPS:nil,maskInterval:1.0/10,modelInterval:0.5)
+            default:return BrowLoad(trackerFPS:15,drawFPS:30,maskInterval:1.0/8,modelInterval:nil)
             }
         }
     }
-    /// Whether a camera frame at `timestamp` is due, given the last one handed to MediaPipe: time is cut into 1/maxFPS slots and
+    /// Whether a camera frame at `timestamp` is due, given the last one taken (always, with no cap): time is cut into 1/maxFPS slots and
     /// one frame is taken per slot, so a 60 Hz camera gives 40 fps at a 40 cap (two frames of every three), not the 30 a minimum
     /// interval would round down to. A frame almost a whole interval after the last is also due, so camera timing jitter at a
     /// 60 cap does not drop frames that land in the same slot.
-    static func browFrameDue(timestamp:Double,last:Double,maxFPS:Double=browMaxFramesPerSecond)->Bool {
-        guard last.isFinite else {return true}
+    static func browFrameDue(timestamp:Double,last:Double,maxFPS:Double?=nil)->Bool {
+        guard let maxFPS,last.isFinite else {return true}
         return (timestamp*maxFPS+1e-6).rounded(.down)>(last*maxFPS+1e-6).rounded(.down) || timestamp-last>=0.9/maxFPS
     }
     /// The face ARKit tracked in this very frame, for steadying the brow in face space; nil when ARKit has none.
@@ -45,7 +46,7 @@ extension BeautyBlushEngine {
     func submitBrow(_ frame:ARFrame,settings s:Settings) {
         let load=BrowLoad.current(ProcessInfo.processInfo.thermalState)
         let face=browFaceFrame(frame)
-        drawLiveBrow(frame,face:face,settings:s,maxFPS:load.trackerFPS)
+        drawLiveBrow(frame,face:face,settings:s,maxFPS:load.drawFPS)
         guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit,maxFPS:load.trackerFPS) else {return}
         let (entry,up,_)=submitToBrowTracker(frame,face:face,settings:s)
         queue.async { [self] in
@@ -97,7 +98,7 @@ extension BeautyBlushEngine {
     static let browLatestMaxAge:Double=0.5
     /// Draws one live camera frame on the render queue with the latest brow. Skipped while a frame is still waiting there, and
     /// limited to `maxFPS`, so a slow GPU drops frames instead of falling behind the camera.
-    func drawLiveBrow(_ frame:ARFrame,face:BrowFaceFrame?,settings s:Settings,maxFPS:Double) {
+    func drawLiveBrow(_ frame:ARFrame,face:BrowFaceFrame?,settings s:Settings,maxFPS:Double?) {
         lock.lock()
         guard !browDrawPending,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowDraw,maxFPS:maxFPS) else {lock.unlock();return}
         browDrawPending=true;lastBrowDraw=frame.timestamp

@@ -14,6 +14,8 @@ enum AppColors {
     static let snow = Color.white
     /// Camera and tutorial caption fill (UX spec 1.1), #370B21.
     static let captionFill = Color(red: 0x37 / 255, green: 0x0B / 255, blue: 0x21 / 255)
+    /// Warm white of the screen light's glow around the camera (#FFF4EA).
+    static let ringLight = Color(red: 0xFF / 255, green: 0xF4 / 255, blue: 0xEA / 255)
     /// Full-screen background of the Try On, tutorial and palette screens (black; wine stays for pills and accents).
     static let screen = Color.black
 }
