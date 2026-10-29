@@ -22,7 +22,7 @@ enum TutorialCompare: CaseIterable {
         switch self { case .filter: .split; case .split: .off; case .off: .filter }
     }
     var symbol: String {
-        switch self { case .filter: "circle.fill"; case .split: "circle.lefthalf.filled"; case .off: "circle" }
+        switch self { case .filter: "circle.fill"; case .split: "circle.lefthalf.striped.horizontal"; case .off: "circle" }
     }
     var label: LocalizedStringKey {
         switch self { case .filter: "Filter on"; case .split: "Half filter, half real"; case .off: "Filter off" }
@@ -30,7 +30,8 @@ enum TutorialCompare: CaseIterable {
 }
 
 enum TutorialTab: CaseIterable, Identifiable {
-    case brows, eyeliner, blush
+    /// In the bottom bar's order.
+    case blush, brows, eyeliner
     var id: Self { self }
     var title: LocalizedStringKey {
         switch self { case .brows: "Brows"; case .eyeliner: "Eyeliner"; case .blush: "Blush" }
@@ -234,6 +235,7 @@ struct GuidedTutorialView: View {
 private struct TutorialScreen: View {
     @ObservedObject var model: GuidedTutorialModel
     @ObservedObject private var camera: FaceCameraState
+    @StateObject private var light = ScreenLight()
     @State private var visible = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
@@ -255,21 +257,24 @@ private struct TutorialScreen: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.screen.ignoresSafeArea())
+        .background(AppColors.wine.ignoresSafeArea())
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden()
         .sensoryFeedback(.selection, trigger: model.tab)
         .sensoryFeedback(.selection, trigger: model.stepIndex)
         .sensoryFeedback(.selection, trigger: model.compare)
+        .sensoryFeedback(.selection, trigger: light.isOn)
         .task {
             await model.brow.prepare()
             if model.brow.availability == .supported { await camera.requestPermission() }
         }
         .onAppear { visible = true; model.activate() }
-        .onDisappear { visible = false; model.deactivate() }
+        .onDisappear { visible = false; model.deactivate(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active && visible { model.activate(); Task { await camera.requestPermission() } } else { model.deactivate() }
+            if phase == .active && visible {
+                model.activate(); light.resume(); Task { await camera.requestPermission() }
+            } else { model.deactivate(); light.suspend() }
         }
     }
 
@@ -293,6 +298,8 @@ private struct TutorialScreen: View {
             }
             .padding(AppSpacing.small)
         }
+        .overlay { if light.isOn { ScreenLightGlow(cornerRadius: AppSpacing.cornerRadius).transition(.opacity) } }
+        .animation(.easeInOut(duration: 0.2), value: light.isOn)
         .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous))
     }
 
@@ -443,30 +450,27 @@ private struct TutorialScreen: View {
 
     // MARK: Tabs
 
+    /// Compare on the left, the three tabs, the screen light on the right (as on Try On).
     private var tabBar: some View {
         HStack(spacing: AppSpacing.small) {
-            Button { model.cycleCompare() } label: {
-                Image(systemName: model.compare.symbol)
-                    .font(.title3)
-                    .foregroundStyle(AppColors.snow)
-                    .frame(width: 52, height: 52)
-                    .background(LinearGradient(colors: [AppColors.flamingo, AppColors.wine], startPoint: .topLeading, endPoint: .bottomTrailing), in: Circle())
-                    .overlay(Circle().strokeBorder(AppColors.snow.opacity(0.8), lineWidth: 2))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Compare")
-            .accessibilityValue(model.compare.label)
+            CameraBarButton(symbol: model.compare.symbol) { model.cycleCompare() }
+                .accessibilityLabel("Compare")
+                .accessibilityValue(model.compare.label)
             ForEach(TutorialTab.allCases) { tab in
                 let selected = tab == model.tab
                 Button { model.select(tab) } label: {
                     Text(tab.title)
-                        .font(.headline.weight(selected ? .semibold : .regular))
+                        .font(.title3.weight(selected ? .semibold : .regular))
                         .foregroundStyle(AppColors.snow.opacity(selected ? 1 : 0.55))
-                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .lineLimit(1).minimumScaleFactor(0.8)
+                        .frame(maxWidth: .infinity, minHeight: 56)
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
+            CameraBarButton(symbol: light.isOn ? "bolt.fill" : "bolt.slash.fill") { light.toggle() }
+                .accessibilityLabel("Light")
+                .accessibilityValue(light.isOn ? Text("On") : Text("Off"))
         }
     }
 }
@@ -501,7 +505,7 @@ private struct RealCameraView: UIViewRepresentable {
         view.session = session
         session.delegate = delegate
         session.delegateQueue = delegateQueue
-        view.preferredFramesPerSecond = 30
+        view.preferredFramesPerSecond = 60
         view.scene = SCNScene()
         view.automaticallyUpdatesLighting = false
         view.isUserInteractionEnabled = false

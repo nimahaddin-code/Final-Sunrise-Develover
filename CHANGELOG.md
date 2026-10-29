@@ -1,3 +1,15 @@
+## Archive app icon configuration — 2026-10-29
+
+- Wired the `AppIcon` asset catalog into the app target for Debug and Release archives and removed the obsolete Live Activities plist flag.
+
+## Tutorial bar, screen light and uncapped brow — Khalish (2026-10-29)
+
+- Tutorial: wine background like Try On; bottom bar with compare on the left, Blush / Brows / Eyeliner, and a screen light
+  on the right (`ScreenLight`, `ScreenLightGlow`, `CameraBarButton`, `AppColors.ringLight`).
+- Brow frame caps removed at nominal and fair thermal state (drawing and MediaPipe run as fast as frames are free); hot
+  phones keep 15 / 30 fps. Split view's real half at 60 fps.
+- Simulator tests only; device check pending.
+
 ## Brow frame rate — Khalish (2026-10-29)
 
 - MediaPipe gets at most 30 camera frames a second again (`browMaxFramesPerSecond`; fair 24, hot 15); the brow is still drawn

@@ -1,10 +1,18 @@
 ## Brow frame rate — Khalish (2026-10-29)
 
-Tracker and draw caps are separate: MediaPipe gets up to `browMaxFramesPerSecond` (30) frames a second, the picture is drawn
-up to `BrowLoad.drawFPS` (60). `BrowLoad`: nominal 30 tracker / 60 draw, fair 24 / 60, serious and critical 15 / 30 (mask and
-model as below). Do not raise the tracker back to 60: the live draw already follows ARKit's pose every frame. Lifting landmarks
-onto the face mesh (`BrowFaceStabilizer`) passes `projectedVertices()` so each ray tests only triangles around its pixel.
-Device check pending.
+No frame cap until the phone is hot: `BrowLoad.trackerFPS`/`drawFPS` are nil at nominal and fair thermal state, so every
+camera frame is drawn unless the previous one is still queued, and MediaPipe takes every frame it is free for (`isBusy`).
+Serious and critical: 15 fps tracker / 30 fps draw. Lifting landmarks onto the face mesh (`BrowFaceStabilizer`) passes
+`projectedVertices()` so each ray tests only triangles around its pixel; `browStrip` evaluates the centerline once per
+column (`BrowGeometry.section`). Device check pending.
+
+## Tutorial bottom bar and screen light — Khalish (2026-10-29)
+
+The tutorial's background is `AppColors.wine`, like Try On. Its bottom bar is compare (`CameraBarButton`, left), the tabs
+Blush / Brows / Eyeliner, and the screen light (right). `ScreenLight` (DesignSystem/Components) sets brightness to 1 and
+`ScreenLightGlow` draws a 24 pt `AppColors.ringLight` (#FFF4EA) frame round the camera; leaving restores the brightness,
+backgrounding suspends it and returning turns it back on. The split view's real half runs at 60 fps. Try On has no light
+button yet. Simulator build only; device look pending.
 
 ## Brow drawn on every ARKit frame — Khalish (2026-10-29)
 
