@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B5A0C0DE000000000011020C /* Brow.metal.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE000000000011020B /* Brow.metal.txt */; };
+		B5A0C0DE0000000000110002 /* BrowEngine+Tracking.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110001 /* BrowEngine+Tracking.swift */; };
+		B5A0C0DE0000000000110004 /* BrowEngine+Draw.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110003 /* BrowEngine+Draw.swift */; };
+		B5A0C0DE0000000000110006 /* BrowEngine+Hair.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110005 /* BrowEngine+Hair.swift */; };
+		B5A0C0DE0000000000110008 /* BrowEngine+Marks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110007 /* BrowEngine+Marks.swift */; };
+		B5A0C0DE000000000011000A /* BrowEngine+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */; };
 		B5A0C0DE00000000000F000A /* BrowHairMeshTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */; };
 		B5A0C0DE00000000000F0008 /* BrowHairMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */; };
 		B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */; };
@@ -258,6 +264,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B5A0C0DE000000000011020B /* Brow.metal.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brow.metal.txt; sourceTree = "<group>"; };
+		B5A0C0DE0000000000110001 /* BrowEngine+Tracking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Tracking.swift"; sourceTree = "<group>"; };
+		B5A0C0DE0000000000110003 /* BrowEngine+Draw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Draw.swift"; sourceTree = "<group>"; };
+		B5A0C0DE0000000000110005 /* BrowEngine+Hair.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Hair.swift"; sourceTree = "<group>"; };
+		B5A0C0DE0000000000110007 /* BrowEngine+Marks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Marks.swift"; sourceTree = "<group>"; };
+		B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Fixtures.swift"; sourceTree = "<group>"; };
 		B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMeshTests.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowHairMesh.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */ = {isa = PBXFileReference; lastKnownFileType = file; path = "brow-hair-3d.obj"; sourceTree = "<group>"; };
@@ -873,8 +885,6 @@
 			isa = PBXGroup;
 			children = (
 				F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */,
-				B5A0C0DE00000000000C000D /* BrowInpainter.swift */,
-				B5A0C0DE00000000000C000B /* BrowEraser.swift */,
 				3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */,
 				A7B094CA5F993727AE496FAB /* BeautyBlush.metal.txt */,
 			);
@@ -912,9 +922,25 @@
 			path = Contracts;
 			sourceTree = "<group>";
 		};
+		B5A0C0DE0000000000110100 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				B5A0C0DE0000000000110001 /* BrowEngine+Tracking.swift */,
+				B5A0C0DE0000000000110003 /* BrowEngine+Draw.swift */,
+				B5A0C0DE0000000000110005 /* BrowEngine+Hair.swift */,
+				B5A0C0DE0000000000110007 /* BrowEngine+Marks.swift */,
+				B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */,
+				B5A0C0DE00000000000C000B /* BrowEraser.swift */,
+				B5A0C0DE00000000000C000D /* BrowInpainter.swift */,
+				B5A0C0DE000000000011020B /* Brow.metal.txt */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
 		D86BBF720312D2F3CC3CEEAD /* Eyebrow */ = {
 			isa = PBXGroup;
 			children = (
+				B5A0C0DE0000000000110100 /* Engine */,
 				9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */,
 				B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */,
 				B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */,
@@ -1154,6 +1180,7 @@
 				7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */,
 				DA7ABA5E0000000000000003 /* makeup-reference.database.json in Resources */,
 				8BBA5B983D53C01D8867678A /* BeautyBlush.metal.txt in Resources */,
+				B5A0C0DE000000000011020C /* Brow.metal.txt in Resources */,
 				E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */,
 				B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */,
 				72410046D68478AB147FADEC /* blush-rendering.json in Resources */,
@@ -1357,6 +1384,11 @@
 				DA7ABA5E0000000000000001 /* MakeupRuleDatabase.swift in Sources */,
 				614F096B937A6AC4C8AAB4C0 /* BeautyBlushConfiguration.swift in Sources */,
 				40B52D80123CEABD55AB6CD6 /* BeautyBlushEngine.swift in Sources */,
+				B5A0C0DE0000000000110002 /* BrowEngine+Tracking.swift in Sources */,
+				B5A0C0DE0000000000110004 /* BrowEngine+Draw.swift in Sources */,
+				B5A0C0DE0000000000110006 /* BrowEngine+Hair.swift in Sources */,
+				B5A0C0DE0000000000110008 /* BrowEngine+Marks.swift in Sources */,
+				B5A0C0DE000000000011000A /* BrowEngine+Fixtures.swift in Sources */,
 				B5A0C0DE00000000000C000E /* BrowInpainter.swift in Sources */,
 				B5A0C0DE00000000000C000C /* BrowEraser.swift in Sources */,
 				B5A0C0DE00000000000D0002 /* MIGANFace256.mlpackage in Sources */,

@@ -1,3 +1,15 @@
+## Brow code split out of BeautyBlush — Khalish (2026-10-29)
+
+There is still one makeup engine, `BeautyBlushEngine` (blush and brow share its camera session, Metal layer, hand mask and
+shader library). Its brow-only parts now live in `Features/Eyebrow/Engine/` as extensions: `BrowEngine+Tracking` (fps cap,
+`BrowLoad`, handing frames to MediaPipe), `BrowEngine+Draw` (brow strip, texture/picture, `drawBrow`), `BrowEngine+Hair`
+(3D hair), `BrowEngine+Marks` (tutorial mapping, tracking view), `BrowEngine+Fixtures` (DEBUG test helpers), plus
+`BrowEraser`/`BrowInpainter` and the brow shaders `Brow.metal.txt`. `BeautyBlushEngine.swift` keeps stored state, setup,
+configure/pause/submit, camera decoding, the mask and blush. Engine members are internal (not private) so the extensions
+in other files can reach them. `BeautyBlushShaders.sources` joins `BeautyBlush.metal.txt` then `Brow.metal.txt` into one
+library (brow shaders use the shared helpers defined first); shader changes are only checked at runtime, by the tests.
+No behaviour change.
+
 ## Brow load: SceneKit, fill model, temperature — Khalish (2026-10-29)
 
 While the brow's Metal layer is shown, the `ARSCNView` underneath (whose camera picture it covers) runs at
@@ -32,7 +44,7 @@ mesh (same frame's anchor), smooths them in face-local metres and projects them 
 ARKit has no face or disagrees). "Brow 3D" (`BrowOverlay.is3D`) draws `brow-hair-3d.obj` ribbons on ARKit's pose with a depth-only
 face mesh pass, 1.5 px minimum hair width, ambient-light shading and the hand mask; it falls back to its picture without a tracked
 face. Removed from the picker list (`BrowOverlay.all`) on 2026-10-29, with Brow 3 (its image set `brow-overlay-3` stays in the assets, unused); the 3D renderer stays, add an `is3D: true` entry
-to bring it back. New shader code is only checked at runtime: compile `BeautyBlush.metal.txt` with `MTLDevice.makeLibrary(source:)` (a build
+to bring it back. New shader code is only checked at runtime: compile the shader sources (`BeautyBlushShaders.sources`) with `MTLDevice.makeLibrary(source:)` (a build
 does not) and run the tests, which fail every engine test if it does not compile. Device check pending.
 
 ## Brow overlay pictures — Khalish (2026-10-28)
