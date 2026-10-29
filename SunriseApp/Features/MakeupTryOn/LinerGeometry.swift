@@ -13,7 +13,7 @@ enum LinerGeometry {
     /// lower liner), negative moves it into the eye. 0.006 is the spike's own lash offset.
     static let linerLashOffset: Float = 0.006
     /// Scales every style's widths. 1 draws the widths as written. The live view is smaller and softer than the spike's screen overlay, so the line is drawn thicker to stay noticeable.
-    static let linerThicknessScale: Float = 2.5
+    static let linerThicknessScale: Float = 4
     /// How far the upper line is extended past the inner corner; the inner side curves down, so none by default.
     static let innerExtension: Float = 0
     /// How far the upper line is extended past the outer corner; the landmark usually sits inside the visible corner.
@@ -59,7 +59,7 @@ enum LinerGeometry {
                               brow: [SIMD2<Float>], frame: EyeFrame, includeTightline: Bool) -> Shape? {
         // The corner landmarks sit slightly inside the visible lash line, hence the extension past both corners.
         let upperLine = Polyline(MakeupTextureRenderer.smoothed(
-            extended(localLashLine(upper), inner: innerExtension, outer: outerExtension)))
+            extended(localLashLine(upper), inner: innerExtension + style.innerExtension, outer: outerExtension)))
         let lowerLine = Polyline(MakeupTextureRenderer.smoothed(localLashLine(lower)))
         let outerLocal = SIMD2<Float>(1, 0)
 
@@ -200,7 +200,12 @@ enum LinerGeometry {
         }
         var result = points
         if inner > 0 {
-            result.insert(SIMD2(points[0].x - inner, points[0].y - slope(points[0], points[1]) * inner), at: 0)
+            // Hugs the curve of the inner corner: most of the lid's slope there, easing only slightly, in three steps.
+            let s = slope(points[0], points[1]) * 0.8
+            for step in (1...3).reversed() {
+                let u = inner * Float(step) / 3
+                result.insert(SIMD2(points[0].x - u, points[0].y - s * (u - 0.15 * u * u / inner)), at: 0)
+            }
         }
         if outer > 0 {
             let last = points[points.count - 1], before = points[points.count - 2]

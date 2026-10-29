@@ -106,6 +106,8 @@ final class LinerFrameRelay: @unchecked Sendable {
     let relay: LinerFrameRelay
     private var linerStyle: LinerStyle?
     private var linerIsNeutral = true
+    /// Which of the six eyeliner looks is shown (none is the eyeliner tool being off).
+    @Published private(set) var linerLook: LinerLook = .classic
     @Published private(set) var linerRecommendation: MakeupRecommendation?
     private var activation: Task<Void,Never>?
     @Published private(set) var active = false
@@ -218,6 +220,13 @@ final class LinerFrameRelay: @unchecked Sendable {
         if tool == .eyebrow { enabled = [.eyebrow] }
     }
 
+    func setLinerLook(_ look: LinerLook) {
+        guard linerStyle != nil else { return }
+        linerLook = look
+        enabled.insert(.eyeliner)
+        syncLiner()
+    }
+
     func turnOff() {
         enabled.remove(tool)
         if tool == .eyeliner { syncLiner() }
@@ -277,6 +286,6 @@ final class LinerFrameRelay: @unchecked Sendable {
             return
         }
         relay.setEnabled(true)
-        liner.setStyle(linerStyle, shade: shades[.eyeliner], intensity: intensities[.eyeliner] ?? 1)
+        liner.setStyle(EyelinerPlanner.style(linerStyle, look: linerLook), shade: shades[.eyeliner], intensity: intensities[.eyeliner] ?? 1)
     }
 }

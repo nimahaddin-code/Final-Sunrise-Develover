@@ -208,6 +208,16 @@ calibration, product color accuracy or TikTok-equivalent quality is claimed. Dev
 
 # AGENTS.md — read this first
 
+## Camera guidance — shared by every tool
+
+`Features/CameraGuidance/` holds what Try On and the tutorial share, for brows, blush and eyeliner alike: `CameraAdvisor(context:)` publishes
+the one `CameraMessage` to show (priority, delays and hysteresis live in `CameraMessageEngine`, thresholds in `CameraMessageEngine.Limits`);
+`CameraGuidanceCaption` draws it (or a tutorial step) as the spec's caption pill; `ScreenLight` + `ScreenLightGlow` + `ScreenLightButton`
+are the screen light. Screens start/stop the advisor and suspend/resume the light with their own lifecycle. The advisor reads
+`ARSession.currentFrame` only. While `advisor.message != nil` the preview/guide dims and `advisor.pausesAnimation` holds the step
+animation; `reducesLoad` and `pausesSession` follow the thermal state. Eyeliner steps: `LinerTutorialStep` and `LinerStepGuide`
+(`Features/Tutorial`). Spec thresholds are untuned guesses; not yet checked on a real device.
+
 ## Saved scan flow — -Nimah (supersedes launch-only scan)
 
 Completed face/eye analysis is reused on reopening. Root requires both saved results; Retake in Profile reruns
@@ -245,7 +255,14 @@ These notes supersede older all-layers-on descriptions. Device visual/performanc
 ## Tutorial — scan-assigned
 
 `AppRoute.recommendedTutorial(TutorialHandoff)` opens `Features/Tutorial/GuidedTutorialView` (tabs Brows / Eyeliner / Blush, no settings;
-shade and strength are carried over from Try On). Eyeliner steps come from the fitted `LinerStyle`. Not yet checked on a real device.
+shade and strength are carried over from Try On). Eyeliner has three steps (`LinerTutorialStep`) for every look; the look only moves the dots. Not yet checked on a real device.
+
+## Photo — after the tutorial
+
+The tutorial's last-step button enters `GuidedTutorialModel.photoMode` (same screen and camera): full look, coloured frame
+(`PhotoTheme`: palette button cycles pink/blue/white), shutter, then `PolaroidResultView`. Views in `Features/Tutorial/PhotoCaptureViews.swift`.
+In-memory only; sharing is the only way it leaves the app. Not yet checked on a real device.
+
 ## Profile — scan stills
 
 `AppRoute.profile` opens `ProfileView` (face + eye analysis, signature look). Its retake button opens `AppRoute.fullScan`

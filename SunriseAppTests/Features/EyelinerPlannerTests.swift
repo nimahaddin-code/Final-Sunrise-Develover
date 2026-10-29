@@ -24,9 +24,9 @@ final class EyelinerPlannerTests: XCTestCase {
         XCTAssertTrue(EyelinerPlanner.plan(for: eyes(lid: .hooded)).style.tightline)
     }
 
-    func testDownturnedWingFollowsTheLowerLashLineWithoutExtraAngle() {
+    func testDownturnedWingStartsFromTheLowerLashLineAndLifts() {
         let style = EyelinerPlanner.variant(for: .downturned)
-        XCTAssertEqual(style.wingAngle, 0)
+        XCTAssertEqual(style.wingAngle, 18)
         XCTAssertEqual(style.wingBase, .lowerLidTangent)
     }
 
@@ -114,5 +114,17 @@ final class EyelinerPlannerTests: XCTestCase {
         let plan = MakeupPlan(shape: .oval)
         XCTAssertTrue(plan.eyeliner.isNeutral)
         XCTAssertEqual(plan.madeForYou.last?.style, .eyeliner(EyelinerPlanner.naturalLine))
+    }
+
+    func testSixLooksAreDistinctPresets() {
+        let base = EyelinerPlanner.variant(for: .almond)
+        let looks = LinerLook.allCases.map { EyelinerPlanner.style(base, look: $0) }
+        XCTAssertEqual(looks.count, 6)
+        XCTAssertEqual(Set(looks).count, 6)
+        XCTAssertEqual(EyelinerPlanner.style(base, look: .natural).wingLength, 0)
+        XCTAssertGreaterThan(EyelinerPlanner.style(base, look: .cat).wingAngle, EyelinerPlanner.style(base, look: .classic).wingAngle)
+        XCTAssertLessThan(EyelinerPlanner.style(base, look: .puppy).wingAngle, 0)
+        XCTAssertEqual(EyelinerPlanner.style(base, look: .arabian).lowerLine.extent, 1)
+        for look in LinerLook.allCases { XCTAssertEqual(EyelinerPlanner.style(base, look: look).shade, base.shade) }
     }
 }

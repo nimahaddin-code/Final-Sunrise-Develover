@@ -12,6 +12,8 @@ struct LiveGuideView: UIViewRepresentable {
     var eyebrowConfiguration: EyebrowConfiguration? = nil
     // Called on the session queue for every frame with a tracked face, so another overlay can share this camera.
     var onFrame: (@Sendable (ARFrame, ARFaceAnchor) -> Void)? = nil
+    /// Hot phone: run the camera at 30 fps. Changing it re-runs the configuration without resetting tracking.
+    var reducedFrameRate = false
     func makeCoordinator() -> Coordinator { Coordinator(camera: camera, referenceID: referenceID, manager:camera.trackingManager) }
     func makeUIView(context: Context) -> ARSCNView {
         let view=BeautyBlushARView(frame:.zero)
@@ -35,6 +37,7 @@ struct LiveGuideView: UIViewRepresentable {
             style:camera.eyelinerStyle, debug:camera.debugMode, eyebrows:eyebrowConfiguration)
         context.coordinator.configureBeauty(eyebrowConfiguration,visible:camera.overlay && active)
         context.coordinator.setFrameHandler(onFrame)
+        context.coordinator.setReducedFrameRate(reducedFrameRate, view)
         if active && camera.authorized && camera.failure == nil { context.coordinator.start(view) }
         else { context.coordinator.pause(view) }
     }
@@ -175,8 +178,24 @@ struct LiveGuideView: UIViewRepresentable {
             lock.lock(); generation=UUID(); pending=nil; pendingStyles=[:]; activeAnchorID=nil; sessionActive=true; tracked=false; fitAllowed=false; lock.unlock()
             camera.fitReady=false; camera.fitMessage="Look straight ahead with relaxed eyes and lips while the surface is fitted"
             queue.async { self.readiness.reset(); self.previousPosition=nil; self.previousRotation=nil; self.lastReport=0; self.fitStable=false }
+            view.session.run(makeConfiguration(),options:[.resetTracking,.removeExistingAnchors])
+        }
+        private var reducedRate=false
+        private func makeConfiguration() -> ARFaceTrackingConfiguration {
             let configuration=ARFaceTrackingConfiguration(); configuration.maximumNumberOfTrackedFaces=1
-            view.session.run(configuration,options:[.resetTracking,.removeExistingAnchors])
+            if reducedRate {
+                // Same picture size as the default format, at 30 fps.
+                let current=configuration.videoFormat
+                if let slower=ARFaceTrackingConfiguration.supportedVideoFormats.first(where: { $0.framesPerSecond<=30 && $0.imageResolution==current.imageResolution }) { configuration.videoFormat=slower }
+            }
+            return configuration
+        }
+        @MainActor func setReducedFrameRate(_ reduced:Bool,_ view:ARSCNView) {
+            guard reduced != reducedRate else { return }
+            reducedRate=reduced
+            guard running,ARFaceTrackingConfiguration.isSupported else { return }
+            // No reset options: tracking carries on across the change.
+            view.session.run(makeConfiguration())
         }
         @MainActor func pause(_ view:ARSCNView) {
             lock.lock();let engine=beauty;lock.unlock();engine?.pause()

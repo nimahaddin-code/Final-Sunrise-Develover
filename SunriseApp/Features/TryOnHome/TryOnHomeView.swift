@@ -30,6 +30,7 @@ struct TryOnHomeView: View {
                     }
             }
             toolStrip
+            if home.tool == .eyeliner { linerLookPicker }
             if home.tool == .eyebrow && home.canTry(.eyebrow) {
                 BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
             }
@@ -84,7 +85,7 @@ struct TryOnHomeView: View {
                 .sensoryFeedback(.impact, trigger: developerTools)
             HStack {
                 Spacer()
-                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities)) } label: {
+                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,linerLook: home.linerLook)) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)
@@ -143,6 +144,31 @@ struct TryOnHomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
+    }
+
+    // MARK: Liner look
+
+    /// The six liner looks, scrolling sideways; "no liner" is the no-sign button in the shade row.
+    private var linerLookPicker: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: AppSpacing.small) {
+                ForEach(LinerLook.allCases) { look in
+                    let selected = !home.isOff && home.linerLook == look
+                    Button { home.setLinerLook(look) } label: {
+                        Text(look.title)
+                            .font(.subheadline.weight(.semibold))
+                            .padding(.horizontal, AppSpacing.medium)
+                            .frame(minHeight: 40)
+                            .background(AppColors.flamingo.opacity(selected ? 0.32 : 0.16), in: Capsule())
+                            .overlay(Capsule().strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0))
+                            .foregroundStyle(AppColors.snow)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                }
+            }
+        }
+        .disabled(!home.canTry(.eyeliner))
     }
 
     // MARK: Shades

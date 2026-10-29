@@ -10,6 +10,8 @@ struct TutorialHandoff: Hashable {
     var tool: TryOnTool
     var shades: [TryOnTool: MakeupShade]
     var intensities: [TryOnTool: Double]
+    /// Which eyeliner look the person was trying: the tutorial guides that same shape.
+    var linerLook: LinerLook = .classic
 }
 
 /// What the bottom-left button shows: the full filter, half filter / half real camera, or no filter.
@@ -49,8 +51,9 @@ enum TutorialTab: CaseIterable, Identifiable {
     @Published private(set) var tab: TutorialTab
     @Published private(set) var linerStep = 0
     @Published private(set) var compare = TutorialCompare.filter
+    /// After the last step: the camera shows the whole assigned look, with no guide, for taking a photo.
+    @Published private(set) var photoMode = false
     private let linerStyle: LinerStyle?
-    private let linerIsNeutral: Bool
     private var bag = Set<AnyCancellable>()
     // -Nimah: Hidden tutorial tabs must not start a second detector during navigation.
     private var active = false
@@ -59,10 +62,13 @@ enum TutorialTab: CaseIterable, Identifiable {
         self.handoff = handoff
         let start = TutorialTab(tool: handoff.tool)
         tab = start
-        if case .eyeliner(let style)? = plan.madeForYou.first(where: { $0.category == .eyeliner })?.style { linerStyle = style } else { linerStyle = nil }
-        linerIsNeutral = plan.eyeliner.isNeutral
+        if case .eyeliner(let style)? = plan.madeForYou.first(where: { $0.category == .eyeliner })?.style {
+            linerStyle = EyelinerPlanner.style(style, look: handoff.linerLook)
+        } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: start == .blush ? .blush : .eyebrows, startTutorial: true)
         relay = LinerFrameRelay(model: liner)
+        // The guide points follow the skin when the person pulls the lid or the corner of the eye outward.
+        liner.followsPulledLid = true
         applyShade(for: start == .blush ? .blush : .eyebrow)
         // The brow model owns the step index for brows/blush; forward its changes so the screen redraws.
         brow.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
@@ -77,7 +83,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         guard hasGuide else {
             return [FaceGuideLesson(title: "No guide yet", instruction: "This step has no reference yet. Use the other tabs.")]
         }
-        if tab == .eyeliner, let linerStyle { return Self.linerLessons(linerStyle, neutral: linerIsNeutral) }
+        if tab == .eyeliner { return Self.linerLessons }
         return brow.lessons
     }
 
@@ -86,6 +92,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     /// The brow/blush preview configuration for the camera. Eyeliner is drawn by its own overlay, so the face-mesh
     /// guide is off on that tab.
     var liveConfiguration: EyebrowConfiguration {
+        if photoMode { return photoConfiguration }
         var value = brow.liveConfiguration
         value.showMappingFormula = tab == .brows
         // The split comparison is intended to show the applied pigment against the
@@ -96,8 +103,43 @@ enum TutorialTab: CaseIterable, Identifiable {
             value.showGuide = false
             value.showMappingFormula = false
         }
+        // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
+        // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
+        if tab == .eyeliner { value.usesLaunchFit = true }
         if tab == .eyeliner || !hasGuide || compare == .off { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
         return value
+    }
+
+    /// Brow and blush together, in the shades carried over from Try On, like the home preview.
+    private var photoConfiguration: EyebrowConfiguration {
+        var value = brow.liveConfiguration
+        let hasFit = LaunchMakeupFit.shared.hasFit
+        if !hasFit { value.usesLaunchFit = true }
+        value.layered = true
+        value.showGuide = false
+        value.showTrackingPoints = false
+        value.showAllRegions = false
+        value.debugMesh = false
+        value.tutorialStep = nil
+        value.showMakeupPreview = true
+        value.previewAfter = true
+        value.browLayer = photoLayer(.eyebrow, available: hasFit && brow.selectedBrow != nil)
+        value.blushLayer = photoLayer(.blush, available: hasFit && brow.selectedBlush != nil)
+        return value
+    }
+
+    private func photoLayer(_ tool: TryOnTool, available: Bool) -> PreviewLayer {
+        PreviewLayer(on: available, intensity: Float(handoff.intensities[tool] ?? TryOnHomeModel.defaultIntensity),
+                     tint: handoff.shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) })
+    }
+
+    func enterPhoto() { photoMode = true; syncLiner() }
+    func leavePhoto() { photoMode = false; syncLiner() }
+
+    /// The camera picture as shown, with the liner on it. Nil until the camera has produced a picture.
+    func takePhoto() -> UIImage? {
+        guard let image = camera.view?.snapshot() else { return nil }
+        return liner.composed(image)
     }
 
     func select(_ new: TutorialTab) {
@@ -143,7 +185,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     private func syncLiner() {
-        guard active, tab == .eyeliner, let linerStyle else {
+        guard active, tab == .eyeliner || photoMode, let linerStyle else {
             relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
             return
@@ -152,34 +194,10 @@ enum TutorialTab: CaseIterable, Identifiable {
         liner.setStyle(linerStyle, shade: handoff.shades[.eyeliner], intensity: handoff.intensities[.eyeliner] ?? 1)
     }
 
-    // -Nimah: Steps follow the fitted liner (start, taper, wing, lower line); wording makes no claim about the person's result.
-    static func linerLessons(_ style: LinerStyle, neutral: Bool) -> [FaceGuideLesson] {
-        var lessons = [
-            FaceGuideLesson(title: "Mark where it starts",
-                            instruction: style.start > 0.08
-                                ? "Begin the line a little in from the inner corner of your upper lash line, following the dotted outline. Leave the inner corner bare."
-                                : "Begin at the inner corner of your upper lash line, following the dotted outline. Keep the first touch light and close to the lashes."),
-            FaceGuideLesson(title: "Draw along the lash line",
-                            instruction: style.outerWidth > style.innerWidth * 1.2
-                                ? "Work toward the outer corner in short strokes, staying on the lash roots. Let the line grow gradually thicker toward the outside, as outlined."
-                                : "Work toward the outer corner in short strokes, staying on the lash roots and keeping the line an even thickness."),
-        ]
-        if style.wingLength > 0.02 {
-            let tail = style.wingTargetsBrowTail ? ", pointing toward the end of your brow" : ""
-            lessons.append(FaceGuideLesson(title: "Add the wing",
-                                           instruction: "Extend the line past the outer corner as a wing, about \(Int(style.wingAngle.rounded()))° upward\(tail). Follow the dotted tip, then connect it back to the lash line."))
-        } else {
-            lessons.append(FaceGuideLesson(title: "Finish at the corner",
-                                           instruction: "End the line at the outer corner without a wing. Keep the end softly tapered."))
-        }
-        if style.lowerLine.enabled {
-            lessons.append(FaceGuideLesson(title: "Add the lower line",
-                                           instruction: "Draw a thin line under the lower lashes from the outer corner inward, about \(Int((style.lowerLine.extent * 100).rounded()))% of the way. Keep it lighter than the top line."))
-        }
-        let fitted = neutral ? " This is a natural line." : ""
-        lessons.append(FaceGuideLesson(title: "Check both eyes",
-                                       instruction: "Look straight ahead and compare both eyes, then soften any hard edge with a cotton swab. The guide follows your eyes but does not judge your application.\(fitted)"))
-        return lessons
+    /// Three steps for every look (`LinerTutorialStep`). The screen takes its wording from the step, so these only count
+    /// the steps; where the dots sit is what changes with the look.
+    static let linerLessons: [FaceGuideLesson] = LinerTutorialStep.allCases.map {
+        FaceGuideLesson(title: "Step \($0.rawValue + 1)", instruction: "")
     }
 }
 
@@ -198,6 +216,12 @@ private struct TutorialScreen: View {
     @ObservedObject var model: GuidedTutorialModel
     @ObservedObject private var camera: FaceCameraState
     @State private var visible = false
+    @State private var theme = PhotoTheme.pink
+    @State private var flashOn = false
+    @State private var flashing = false
+    @State private var captured: UIImage?
+    @StateObject private var advisor = CameraAdvisor(context: .tutorial)
+    @StateObject private var light = ScreenLight()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
@@ -212,14 +236,34 @@ private struct TutorialScreen: View {
     private var isLast: Bool { index + 1 >= lessons.count }
 
     var body: some View {
-        VStack(spacing: AppSpacing.medium) {
-            card.frame(maxHeight: .infinity)
-            tabBar
+        GeometryReader { proxy in
+            VStack(spacing: AppSpacing.medium) {
+                if model.photoMode { PhotoHeader(theme: theme) { model.leavePhoto() } }
+                // Tutorial: the card fills the screen. Photo: a fixed portrait frame (208:300 in the design) with the controls
+                // right below it.
+                card.frame(maxHeight: model.photoMode ? photoHeight(in: proxy.size) : .infinity)
+                if model.photoMode {
+                    PhotoControls(theme: theme, flashOn: $flashOn, onTheme: { theme = theme.next }, onShutter: takePhoto)
+                    Spacer(minLength: 0)
+                } else {
+                    tabBar
+                }
+            }
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.screen.ignoresSafeArea())
+        .background((model.photoMode ? theme.background : AppColors.screen).ignoresSafeArea())
+        .animation(.easeInOut(duration: 0.25), value: theme)
         .foregroundStyle(AppColors.snow)
+        .overlay {
+            if let captured {
+                PolaroidResultView(image: captured, onRetake: { self.captured = nil }, onDone: { dismiss() })
+                    .transition(.opacity)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: captured != nil)
+        .sensoryFeedback(.selection, trigger: theme)
+        .sensoryFeedback(.success, trigger: captured != nil)
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden()
         .sensoryFeedback(.selection, trigger: model.tab)
@@ -229,11 +273,34 @@ private struct TutorialScreen: View {
             await model.brow.prepare()
             if model.brow.availability == .supported { await camera.requestPermission() }
         }
-        .onAppear { visible = true; model.activate() }
-        .onDisappear { visible = false; model.deactivate() }
+        .onAppear { visible = true; model.activate(); advisor.start(); light.resume() }
+        .onDisappear { visible = false; model.deactivate(); advisor.stop(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active && visible { model.activate(); Task { await camera.requestPermission() } } else { model.deactivate() }
+            if phase == .active && visible {
+                model.activate(); advisor.start(); light.resume()
+                Task { await camera.requestPermission() }
+            } else {
+                model.deactivate(); advisor.stop(); light.suspend()
+            }
         }
+    }
+
+    /// Photographs the camera as shown. With the flash on, the screen goes white for a moment first.
+    private func takePhoto() {
+        Task {
+            if flashOn {
+                flashing = true
+                try? await Task.sleep(for: .milliseconds(180))
+            }
+            let image = model.takePhoto()
+            flashing = false
+            if let image { captured = image }
+        }
+    }
+
+    /// The photo frame's height: 208:300 of the width, but never more than 65% of the screen.
+    private func photoHeight(in size: CGSize) -> CGFloat {
+        min(size.width * 300 / 208, size.height * 0.65)
     }
 
     // MARK: Camera card
@@ -242,21 +309,23 @@ private struct TutorialScreen: View {
         ZStack {
             Color.black
             cameraContent
+            if flashing { Color.white.ignoresSafeArea().allowsHitTesting(false) }
             VStack(spacing: AppSpacing.small) {
-                header
-                if model.brow.availability == .supported, camera.authorized, !camera.tracked {
-                    Text("Position your face in the frame")
-                        .font(AppTypography.body).multilineTextAlignment(.center)
-                        .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
-                        .background(AppColors.wine.opacity(0.85), in: Capsule())
-                        .accessibilityAddTraits(.updatesFrequently)
-                }
+                if !model.photoMode { header }
                 Spacer()
-                wording
+                if !model.photoMode { bottomCaption }
             }
             .padding(AppSpacing.small)
+            if !model.photoMode, model.brow.availability == .supported, camera.authorized {
+                ScreenLightGlow(light: light)
+            }
         }
-        .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous))
+        .overlay(alignment: .leading) {
+            if !model.photoMode, model.brow.availability == .supported, camera.authorized {
+                ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(.leading, AppSpacing.small)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: model.photoMode ? 10 : AppSpacing.cornerRadius, style: .continuous))
     }
 
     @ViewBuilder private var cameraContent: some View {
@@ -268,36 +337,41 @@ private struct TutorialScreen: View {
                     text: "The live guide needs an iPhone with a TrueDepth front camera.")
         case .supported:
             if camera.denied {
-                message(symbol: "camera", title: "Camera access needed",
-                        text: "Allow camera access in Settings to follow the tutorial. Nothing is saved or uploaded.",
-                        actionTitle: "Open Settings") {
+                message(symbol: "camera", title: "I need your camera to be your mirror.",
+                        text: "Nothing is saved or uploaded.",
+                        actionTitle: "Turn on camera") {
                     if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
                 }
             } else if camera.failure != nil {
                 message(symbol: "exclamationmark.triangle", title: "Camera stopped", text: "Face tracking stopped unexpectedly.")
             } else if camera.authorized {
                 ZStack {
-                    LiveGuideView(camera: camera, referenceID: "eyebrows", active: visible && scenePhase == .active,
-                                  eyebrowConfiguration: model.liveConfiguration, onFrame: { [relay = model.relay] frame, face in
+                    LiveGuideView(camera: camera, referenceID: "eyebrows", active: visible && scenePhase == .active && !advisor.pausesSession,
+                                  // Always a configuration, never nil: nil falls back to the old per-frame blush surface renderer.
+                                  eyebrowConfiguration: guideConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
-                                  })
-                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .off {
+                                  }, reducedFrameRate: advisor.reducesLoad)
+                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .off && !model.photoMode {
                         BrowTrackingOverlayView(feed: camera.browTracking)
                     }
-                    if model.tab == .eyeliner && model.compare != .off {
+                    if model.photoMode {
+                        LinerOverlayView(model: model.liner, isVisible: true)
+                    } else if model.tab == .eyeliner && model.compare != .off {
                         ZStack {
-                            LinerOverlayView(model: model.liner, isVisible: true)
-                            LinerGuideOutline(model: model.liner)
+                            LinerStepGuide(model: model.liner, step: LinerTutorialStep(rawValue: index) ?? .markDots,
+                                           paused: advisor.pausesAnimation, dimmed: advisor.isDimmed)
+                                .id(index)
                         }
-                        .mask(alignment: .leading) { halfMask(left: model.compare == .split) }
+                        .mask(alignment: .leading) { halfMask(left: true, half: model.compare == .split) }
                     }
                     if model.compare == .split {
                         // The same camera without the filter, covering the right half.
                         RealCameraView(session: camera.trackingManager.session)
                             .mask(alignment: .trailing) { halfMask(left: false) }
-                        Rectangle().fill(AppColors.snow.opacity(0.85)).frame(width: 1.5).allowsHitTesting(false)
                     }
                 }
+                // The photo is taken from the unzoomed camera, so zoom is off while framing it.
+                .cameraZoom(!model.photoMode)
             } else {
                 ProgressView().tint(AppColors.snow)
             }
@@ -305,9 +379,9 @@ private struct TutorialScreen: View {
     }
 
     /// A mask covering the whole view, or only its left / right half.
-    private func halfMask(left: Bool) -> some View {
+    private func halfMask(left: Bool, half: Bool = true) -> some View {
         GeometryReader { proxy in
-            Rectangle().frame(width: proxy.size.width / 2).frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
+            Rectangle().frame(width: half ? proxy.size.width / 2 : proxy.size.width).frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
         }
     }
 
@@ -338,27 +412,65 @@ private struct TutorialScreen: View {
                 Button {
                     if model.retreat() { dismiss() }
                 } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.title3.weight(.semibold))
-                        .frame(width: 52, height: 52)
-                        .background(AppColors.snow.opacity(0.85), in: Circle())
-                        .foregroundStyle(AppColors.wine)
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left").font(.subheadline.weight(.semibold))
+                        Text("Back").font(.headline)
+                    }
+                    .padding(.horizontal, AppSpacing.medium)
+                    .frame(height: 52)
+                    .background(AppColors.snow.opacity(0.85), in: Capsule())
+                    .foregroundStyle(AppColors.wine)
                 }
                 .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
                 Spacer()
                 Button {
-                    if model.advance() { dismiss() }
+                    if model.advance() { model.enterPhoto() }
                 } label: {
-                    Image(systemName: isLast ? "checkmark" : "arrow.right")
-                        .font(.title3.weight(.medium))
-                        .frame(width: 52, height: 52)
-                        .background(AppColors.flamingo, in: Circle())
+                    if isLast {
+                        // Done goes on to the photo step.
+                        Text("Done")
+                            .font(.headline)
+                            .padding(.horizontal, AppSpacing.large)
+                            .frame(height: 52)
+                            .background(AppColors.flamingo, in: Capsule())
+                            .foregroundStyle(AppColors.snow)
+                    } else {
+                        HStack(spacing: 6) {
+                            Text("Next").font(.headline)
+                            Image(systemName: "arrow.right").font(.subheadline.weight(.semibold))
+                        }
+                        .padding(.horizontal, AppSpacing.medium)
+                        .frame(height: 52)
+                        .background(AppColors.flamingo, in: Capsule())
                         .foregroundStyle(AppColors.snow)
+                    }
                 }
-                .accessibilityLabel(isLast ? "Finish tutorial" : "Next step")
+                .accessibilityLabel(isLast ? "Done" : "Next step")
             }
         }
         .buttonStyle(.plain)
+    }
+
+    /// The brow/blush preview configuration, with the guide hidden while a camera message shows.
+    private var guideConfiguration: EyebrowConfiguration {
+        var value = model.liveConfiguration
+        if advisor.isDimmed && !model.photoMode && model.tab != .eyeliner { value.showGuide = false }
+        return value
+    }
+
+    /// Over the camera: a camera message when there is one; otherwise the eyeliner step caption, or (brows, blush) the
+    /// lesson card.
+    @ViewBuilder private var bottomCaption: some View {
+        if model.tab == .eyeliner, model.hasGuide {
+            let step = LinerTutorialStep(rawValue: index) ?? .markDots
+            CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: step.label, stepText: step.caption)
+                .padding(.bottom, AppSpacing.medium)
+        } else if advisor.message != nil {
+            CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
+                .padding(.bottom, AppSpacing.medium)
+        } else {
+            wording
+        }
     }
 
     private var wording: some View {
@@ -403,23 +515,6 @@ private struct TutorialScreen: View {
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
-    }
-}
-
-/// Dotted outline of the eyeliner shape on each eye, drawn from the same geometry as the liner overlay.
-private struct LinerGuideOutline: View {
-    @ObservedObject var model: LinerOverlayModel
-
-    var body: some View {
-        Canvas { context, _ in
-            guard let frame = model.frame, let shade = model.shade else { return }
-            for fill in LinerOverlayRenderer.fills(frame, shade: shade, intensity: 1) {
-                context.stroke(Path(fill.path), with: .color(.white.opacity(0.95)),
-                               style: StrokeStyle(lineWidth: 1.5, lineCap: .round, dash: [1, 4]))
-            }
-        }
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
     }
 }
 

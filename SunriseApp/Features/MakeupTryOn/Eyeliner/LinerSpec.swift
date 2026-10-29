@@ -19,6 +19,7 @@ struct LinerSpec: Equatable {
     var lowerLine: LowerLineSpec
     var wingOrigin: WingOrigin
     var wingBase: WingBase
+    var innerExtension: Double = 0      // extra line past the inner corner, toward the nose
 
     init(upperStart: Double = 0, upperThickness: [Double] = [0.02, 0.02, 0.02], tightline: Bool = false,
          wingAngleDeg: Double = 0, wingLength: Double = 0, wingTargetsBrowTail: Bool = false,
@@ -45,5 +46,6 @@ struct LinerSpec: Equatable {
                   lowerLine: LowerLineSpec(enabled: style.lowerLine.enabled, extent: Double(style.lowerLine.extent),
                                            thickness: Double(style.lowerLine.thickness)),
                   wingOrigin: style.wingOrigin, wingBase: style.wingBase)
+        innerExtension = Double(style.innerExtension)
     }
 }

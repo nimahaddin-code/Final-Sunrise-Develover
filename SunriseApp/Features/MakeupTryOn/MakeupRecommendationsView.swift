@@ -3,27 +3,20 @@ import SwiftUI
 
 struct MakeupRecommendationsView:View {
     @ObservedObject var store:FaceShapeStore
-    var allowsRescan=true
-    var onScanFace:()->Void
-    // -Nimah: Connect Khalish's separate eye-scan route without restoring removed filters.
-    var onScanEyes:()->Void = {}
     var body:some View {
         List {
             Section("Face scan") {
                 if let result=store.latest {
                     Label { Text(result.shape.title) } icon:{ Image(systemName:result.shape.symbol) }
                     Text("Scan estimate · confidence \(Int(result.confidence*100))%").font(.caption).foregroundStyle(AppColors.subtle)
-                    if allowsRescan { Button("View result / scan again",action:onScanFace) }
                 } else {
-                    Text("Scan your face to get a face-shape estimate and eye measurements.")
-                    if allowsRescan { Button("Scan face",action:onScanFace) }
+                    Text("No saved face scan yet.")
                 }
             }
             Section("Eye scan") {
                 if let eyes=store.eyes {
                     HStack { Text(eyes.openness.title); Text(eyes.tilt.title); Text(eyes.spacing.title) }
                 }
-                if allowsRescan { Button("View eye result / scan again",action:onScanEyes) }
             }
             Section("Eyebrow & Blush") {
                 NavigationLink(value:AppRoute.browBlush(.eyebrows)) { Label("Eyebrow",systemImage:"eyebrow") }

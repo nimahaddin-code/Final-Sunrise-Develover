@@ -228,6 +228,54 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Added — camera messages, light and the three-step eyeliner tutorial (dandan camera and tutorial UX spec)
+- New shared folder `Features/CameraGuidance/`, used by every tool: `CameraMessage` (the 11 lines and their priority/delays), `CameraMessageEngine`
+  (pure: show/clear delays plus hysteresis, unit tested), `CameraSignalSampler` (reads `ARSession.currentFrame`: light estimate, face-vs-frame
+  luma, distance, yaw/roll, speed; Vision face count and coverage about every 0.5 s), `CameraAdvisor` (10 Hz loop, CoreMotion tilt, thermal state),
+  `CameraCaption` (the 15 pt pill and STEP label) and `ScreenLight` (screen at full brightness plus a `#FFF4EA` ring; restored when leaving).
+  It never takes the ARKit session or its delegate.
+- Tutorial and Try On show one message at a time over the camera, fade the preview/guide to 30% and pause the step animation while it shows.
+  Serious heat runs the camera at 30 fps (`LiveGuideView.reducedFrameRate`); critical heat pauses it and shows "Your phone is warm".
+  "Face covered" is Try On only; "face lost" (2 s) replaces "no face" once a tutorial has tracked the face.
+- Eyeliner tutorial: three steps (`LinerTutorialStep`, `Features/Tutorial/LinerStepGuide.swift`): mark dots (inner, middle, outer, wing end; the
+  lower-line dot stays for puppy/foxy/arabian), connect them, fill. A drawn pen taps and moves; the loop is 3 s plus a 2 s pause; Reduce Motion
+  shows the last frame. The last step's button reads Done and goes to the photo step. Replaces the one-step "Follow the dots".
+- Follow-up: head tilt (roll) is ignored and "Face your phone straight on" needs a ~45° turn; tracking lost right after a close or turned face
+  says "Move your phone back" / "Face your phone straight on" (`CameraMessageEngine.Limits`, guesses). Tutorial Back/Next are labelled capsules.
+  Eyeliner step 2 draws the whole closed outline (a wing is a triangle); the split-compare divider line is gone.
+- Camera denied card now reads "I need your camera to be your mirror." with "Turn on camera".
+- Brow and blush tutorial lessons are unchanged (long text); they only get the camera messages, the light and Done. While a message shows,
+  their guide is hidden rather than faded. Thresholds are the spec's suggestions, not tuned; nothing is checked on a real device (simulator build
+  and unit tests only).
+
+### Changed — six eyeliner looks on Try On
+- `LinerLook` is now Classic, Cat, Puppy, Foxy, Arabian, Natural (was Liner only / With wing). Each is a fixed preset in
+  `EyelinerPlanner.style(_:look:)` (the fitted style only supplies the shade); the picker on Try On scrolls sideways. Default is Classic;
+  the tutorial follows the chosen look. Preset numbers are estimates, not yet checked on a real face.
+
+### Added — photo step after the tutorial
+- The last tutorial step's button is now a camera: it opens the photo screen in the same `TutorialScreen` (`GuidedTutorialModel.photoMode`,
+  shared camera session, no restart). The camera shows brow, blush and eyeliner in the Try On shades, with no guide dots and no zoom.
+  The palette button (bottom left) cycles the frame pink / blue / white; the bolt toggles a white screen flash. Shutter takes the AR view
+  snapshot with the liner composed on it and shows it as a polaroid (`Features/Tutorial/PhotoCaptureViews.swift`): retake, share (ShareLink,
+  the polaroid image) and done. Photos stay in memory. Not yet checked on a real device (build only).
+
+### Changed — eyeliner tutorial: key points, one step, zoom
+- The eyeliner tutorial draws only key points on each eye (line start, line end at the outer corner and, for the winged look, the wing
+  tip) instead of an outline. They follow a pulled lid (`LinerOverlayModel.followsPulledLid`: lid tracking and quicker smoothing).
+  The tutorial has one step, "Follow the dots", and uses the look chosen on Try On (`TutorialHandoff.linerLook`).
+- Try On and the tutorial camera card can be zoomed (pinch or the zoom chip, 1x-3x); overlays scale with the picture.
+- Fixes: a mask hid the left eye's guide; Try On kept taking the shared face session back from the tutorial; brow/blush work ran per frame
+  without a launch fit (lag); the old blush surface renderer ran when no brow configuration was passed.
+- Debug builds skip the launch scan (`AppNavigator.debugSkipsLaunchScan`). Not checked on a real device.
+
+### Added — eyeliner looks: line only or with wing
+- Try On eyeliner has "Liner only" (no wing) and "With wing" (default); the no-sign button is the third state. `LinerLook` and
+  `EyelinerPlanner.style(_:look:)` choose the style: winged runs sideways from the outer corner (horizontal base, 6-10 deg lift) and always
+  has at least the classic cat-eye wing length. Per-shape wing lengths/angles follow the reference sheet.
+- Wing elevation limit 80 -> 24 deg and wing skin-anchor reach 0.8 -> 0.1 so the wing no longer points steeply up.
+- Liner ink is darker and less see-through (`maxOpacity` 1.0, `inkReflectance` 0.05, `skinBleed` 0.04). Not checked on a real device.
+
 ### Fixed — Retake presentation from Profile -Nimah
 - Present the complete face/eye enrollment flow above Profile using a full-screen cover, rather than pushing another NavigationStack.
 - Cancel retains Profile; only successful completion returns to the try-on root.

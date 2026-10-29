@@ -1,0 +1,494 @@
+{
+  "meta": {
+    "title": "Eyeliner shape database: eye shape -> liner style",
+    "generatedFrom": [
+      "SunriseApp/Features/MakeupTryOn/EyelinerPlanner.swift  (variant(for:), combine, plan, style(_:look:), naturalLine)",
+      "SunriseApp/Features/FaceShape/EyeScan.swift  (EyeShape, scoring thresholds, confidence weights)",
+      "SunriseApp/Features/MakeupTryOn/MakeupRecommendation.swift  (LinerStyle, LowerLine, WingBase, WingOrigin)",
+      "SunriseApp/Features/MakeupTryOn/MakeupPlan.swift  (savedEyeMeasurements adapter)",
+      "SunriseApp/Features/EyeShape/EyeShapeClassifier.swift  (scan classifier thresholds)",
+      "Docs/Research/makeup_placement_rules.json  (eye_shape, combination_rules R3/R4/R7/R8)"
+    ],
+    "honesty": "Every number is an ESTIMATE from qualitative research and has not been validated on real faces. This file mirrors the code; if code and file disagree, the code wins. Update this file when EyelinerPlanner changes.",
+    "units": {
+      "widthsAndLengths": "fractions of eye width (0.036 = 3.6% of eye width). Widths are total widths, drawn mostly above the lash line.",
+      "angles": "degrees, positive lifts upward, measured from the wing base direction",
+      "start": "fraction of the lid, from the inner corner, left bare (0 = starts at the inner corner)",
+      "lowerLine.extent": "fraction of the lower lash line, measured from the outer corner inward"
+    },
+    "enums": {
+      "wingBase.lowerLidTangent": "wing follows the tangent of the lower lash line at the outer corner, then wingAngle is added",
+      "wingBase.horizontal": "wing follows the eye's own axis (inner to outer corner), then wingAngle is added",
+      "wingOrigin.outerCorner": "wing starts at the outer corner (default for every catalog entry)",
+      "tightline": "modelled in the data but only drawn when MakeupTextureRenderer.drawsTightline is on (off)"
+    }
+  },
+
+  "pipeline": {
+    "summary": "Eye scan -> EyeScan scores per shape -> top two shapes blended -> one LinerStyle (the numbers: thickness, start, wing, lower line) -> optional look (line only / with wing) -> drawn by the live overlay, which places those numbers on the user's real eye points tracked every frame (see the 'rendering' section).",
+    "steps": [
+      {
+        "step": 1,
+        "name": "Measure (Features/EyeShape)",
+        "detail": "MediaPipe landmarks -> EyeMeasurements (openness, tilt, spacing, lidSpace). EyeShapeClassifier also labels openness/tilt/spacing for the result screen, but the liner does NOT use those labels; it uses the raw measurements in step 2.",
+        "classifierThresholds": {
+          "roundOpenness": "openness >= 0.38 -> round, else almond",
+          "tilt": "< 1 deg downturned, > 7 deg upturned, else straight",
+          "spacing": "< 0.9 close, > 1.15 wide, else balanced",
+          "hoodedLidSpace": "lidSpace < 0.9 iris diameters sets mayBeHooded (a hint only)"
+        }
+      },
+      {
+        "step": 2,
+        "name": "Adapt to EyeScan (MakeupPlan.savedEyeMeasurements)",
+        "detail": "EyeShapeResult -> EyeScan(tiltLeft = tiltRight = tilt, spacing, openness, lidType). Returns nil (neutral line) when confidence <= 0.1, any value is not finite, or spacing/openness <= 0. Hooded and monolid are never guessed from mayBeHooded; only the person's chosen EyeLid sets lidType.",
+        "lidTypeMapping": { "hooded": "hooded", "monolid": "monolid", "crease or nil": "neither" }
+      },
+      {
+        "step": 3,
+        "name": "Score each eye shape 0...1 (EyeScan.scores)",
+        "formulas": {
+          "upturned": "clamp((tilt - (typicalTilt + tiltBand)) / tiltRamp)  = clamp((tilt - 7) / 5)",
+          "downturned": "clamp(((typicalTilt - tiltBand) - tilt) / tiltRamp) = clamp((1 - tilt) / 5)",
+          "closeSet": "clamp((1 - spacing) / 0.15)",
+          "wideSet": "clamp((spacing - 1) / 0.15)",
+          "round": "clamp((openness - 0.30) / 0.10)",
+          "almond": "0.4 * (1 - round)   (baseline; wins only while no other trait is clearly present)",
+          "hooded": "1 if lidType == hooded else 0",
+          "monolid": "1 if lidType == monolid else 0"
+        },
+        "constants": {
+          "typicalTilt": 4,
+          "tiltBand": 3,
+          "tiltRamp": 5,
+          "spacingThreshold": 1,
+          "spacingRamp": 0.15,
+          "roundStart": 0.30,
+          "roundRamp": 0.10,
+          "almondBaseline": 0.4,
+          "minimumOpenness": 0.15,
+          "maximumTiltDifference": 6,
+          "minimumConfidence": 0.25,
+          "strongScore": 0.5
+        }
+      },
+      {
+        "step": 4,
+        "name": "Weight by research trust (EyeShape.confidence) and rank",
+        "formula": "weighted = score * confidence; shapes with weighted <= 0 are dropped; sorted strongest first",
+        "confidenceWeights": {
+          "almond": 1.0,
+          "downturned": 1.0,
+          "closeSet": 1.0,
+          "wideSet": 1.0,
+          "monolid": 0.8,
+          "round": 0.6,
+          "hooded": 0.5,
+          "upturned": 0.5
+        }
+      },
+      {
+        "step": 5,
+        "name": "Neutral gate (rule R7)",
+        "detail": "Natural line is used when EyeScan is nil OR isLowConfidence: openness < 0.15, OR |tiltLeft - tiltRight| > 6, OR best weighted score < 0.25."
+      },
+      {
+        "step": 6,
+        "name": "Blend top two (EyelinerPlanner.plan / combine)",
+        "detail": "Take the top 2 ranked shapes; weight_i = weighted_i / sum(weighted of the two). Numeric fields are the weighted mean of the two shapes' variants. Flags and enums (wingOrigin, wingBase, wingTargetsBrowTail, tightline, lowerLine.enabled, shade) come from the PRIMARY (first) shape.",
+        "lowerLine": "extent = weighted mean over only the blended shapes that have a lower line (falls back to the primary's extent); thickness = weighted mean with 0 for shapes without a lower line, so it fades.",
+        "midWidth": "per shape midWidth ?? (innerWidth + outerWidth) / 2, then weighted mean"
+      },
+      {
+        "step": 7,
+        "name": "Wide-set wing removal (rule R4)",
+        "detail": "If the primary shape is wideSet OR wideSet raw score >= 0.5, wingLength = 0 and wingAngle = 0 after blending.",
+        "marksPlanAs": "wingRemoved = true"
+      },
+      {
+        "step": 8,
+        "name": "Apply the chosen look (EyelinerPlanner.style(_:look:))",
+        "lineOnly": "wingLength = 0, wingAngle = 0.",
+        "winged": {
+          "ifFittedWingShorterThanAlmond": "if wingLength < almond.wingLength (0.26), copy almond's wingLength (0.26), wingAngle (14), wingBase, wingOrigin",
+          "always": [
+            "wingBase = horizontal",
+            "wingTargetsBrowTail = false",
+            "wingAngle clamped to 6...10 degrees",
+            "outerWidth = max(outerWidth, almond.outerWidth = 0.036)"
+          ],
+          "note": "So with-wing always yields a sideways wing with only a slight lift, even for wide-set, neutral, closeSet (browTail targeting dropped) and downturned (lowerLidTangent dropped)."
+        }
+      }
+    ]
+  },
+
+  "eyeShapes": {
+    "almond": {
+      "title": "Almond",
+      "definition": "Balanced, with a gently tapered outer corner.",
+      "detectedBy": "openness < 0.30 gives the full almond baseline score 0.4; fades to 0 as openness reaches 0.40. Weighted x1.0 -> max 0.4.",
+      "linerStyle": {
+        "innerWidth": 0.010,
+        "midWidth": 0.022,
+        "outerWidth": 0.036,
+        "start": 0.0,
+        "wingLength": 0.26,
+        "wingAngleDeg": 14,
+        "wingBase": "lowerLidTangent",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": false,
+        "lowerLine": { "enabled": true, "extent": 0.5, "thickness": 0.010 },
+        "shade": "black"
+      },
+      "description": "Follows the natural lash line from the inner corner, builds to a small flick, light lower line on the outer half.",
+      "userNote": "Your eyes are almond-shaped, so the liner follows the natural curve and builds toward a small flick.",
+      "research": {
+        "start": "Inner corner, following natural lash line",
+        "thickness": "inner thin, middle medium, outer thicker",
+        "wing": "angle 0-15 deg, length 10-20% eye width (ESTIMATE), small flick optional",
+        "lowerLashLine": "yes",
+        "confidence": "high"
+      },
+      "usedAsClassicWing": "Its wing numbers are the 'classic' wing the winged look falls back to."
+    },
+
+    "round": {
+      "title": "Round",
+      "definition": "Open and rounded, with more white visible above or below the iris.",
+      "detectedBy": "openness >= 0.40 gives score 1; ramps from 0 at openness 0.30. Weighted x0.6 -> max 0.6.",
+      "linerStyle": {
+        "innerWidth": 0.008,
+        "midWidth": 0.012,
+        "outerWidth": 0.030,
+        "start": 0.08,
+        "wingLength": 0.32,
+        "wingAngleDeg": 12,
+        "wingBase": "lowerLidTangent",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": false,
+        "lowerLine": { "enabled": true, "extent": 0.67, "thickness": 0.010 },
+        "shade": "black"
+      },
+      "description": "Starts a little in from the inner corner, thinnest in the middle, thickens toward a medium wing, light lower line on the outer two-thirds. Goal: a more almond impression.",
+      "userNote": "Your eyes are round, so the liner starts a little in from the inner corner and lengthens the outer corner.",
+      "research": {
+        "start": "Slightly in from inner corner",
+        "thickness": "inner thin, middle thinner, outer thickening toward wing",
+        "wing": "angle 0-10 deg, medium length (ESTIMATE)",
+        "lowerLashLine": "light, outer two-thirds",
+        "confidence": "low-medium",
+        "conflict": "Dramatic upward wing vs not too upward vs liner pulled down the outer edge to elongate"
+      }
+    },
+
+    "hooded": {
+      "title": "Hooded",
+      "definition": "The crease sits close to the lash line and the fold covers part of the lid.",
+      "detectedBy": "Only when the person chooses 'Hooded' (lidType = hooded): score 1. Weighted x0.5 -> 0.5. Never inferred from mayBeHooded.",
+      "linerStyle": {
+        "innerWidth": 0.006,
+        "midWidth": 0.012,
+        "outerWidth": 0.032,
+        "start": 0.0,
+        "wingLength": 0.24,
+        "wingAngleDeg": 18,
+        "wingBase": "lowerLidTangent",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": true,
+        "tightlineDrawn": false,
+        "lowerLine": { "enabled": true, "extent": 0.33, "thickness": 0.014 },
+        "shade": "black"
+      },
+      "description": "Thin line with a small lifted wing; deeper lower line on the outer third. Tightline is modelled but not drawn.",
+      "userNote": "You said your lids are hooded, so the line stays thin and the wing is small and lifted.",
+      "research": {
+        "start": "Tightline or inner corner",
+        "thickness": "inner thin, middle thin-medium, outer medium (INFERENCE)",
+        "wing": "flick up joined to half of lower lash line; angle 5-15 deg (ESTIMATE)",
+        "lowerLashLine": "deeper on outer third, angled upward",
+        "confidence": "low",
+        "conflict": "Thin/tightline vs thick"
+      },
+      "todo": "R3: thick wing (hooded/monolid) should pair with medium brows; not applied because brows are chosen separately."
+    },
+
+    "monolid": {
+      "title": "Monolid",
+      "definition": "A flat lid with little or no visible crease.",
+      "detectedBy": "Only when the person chooses 'Monolid' (lidType = monolid): score 1. Weighted x0.8 -> 0.8.",
+      "linerStyle": {
+        "innerWidth": 0.014,
+        "midWidth": 0.030,
+        "outerWidth": 0.045,
+        "start": 0.0,
+        "wingLength": 0.32,
+        "wingAngleDeg": 14,
+        "wingBase": "lowerLidTangent",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": false,
+        "lowerLine": { "enabled": false, "extent": 0.5, "thickness": 0.015 },
+        "shade": "black"
+      },
+      "description": "Thickest toward the outer end so it does not vanish with the eyes open; wing extends and lifts. No lower line.",
+      "userNote": "You said your lids are monolid, so the line is thicker toward the outer end to stay visible with your eyes open.",
+      "research": {
+        "start": "Close to lash line, from inner corner or slightly in",
+        "thickness": "inner thin, middle medium, outer thickest (INFERENCE)",
+        "wing": "extend outward and lift; angle 5-20 deg, length 15-30% eye width (ESTIMATE)",
+        "lowerLashLine": "light, optional",
+        "confidence": "medium (thicker + eyes open); low (thickness distribution)",
+        "conflict": "Thicker line across the eye vs only the ends/wing vs avoid thick straight line",
+        "gap": "No named Indonesian MUA found; priority for MUA validation"
+      },
+      "todo": "R3: thick wing pairs with medium brows; not applied."
+    },
+
+    "upturned": {
+      "title": "Upturned",
+      "definition": "The outer corner sits higher than the inner corner.",
+      "detectedBy": "tilt > 7 deg starts the score; 1 at tilt >= 12 deg. Weighted x0.5 -> max 0.5.",
+      "linerStyle": {
+        "innerWidth": 0.008,
+        "midWidth": 0.012,
+        "outerWidth": 0.018,
+        "start": 0.0,
+        "wingLength": 0.20,
+        "wingAngleDeg": 6,
+        "wingBase": "horizontal",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": false,
+        "lowerLine": { "enabled": true, "extent": 0.5, "thickness": 0.012 },
+        "shade": "black"
+      },
+      "description": "Full upper line, thin outer end, short level wing, lower liner on the outer half.",
+      "userNote": "Your eyes lift at the outer corners, so the wing stays short and level.",
+      "research": {
+        "start": "Full upper lash line",
+        "thickness": "inner thin, middle thin-medium, outer avoid too thick",
+        "wing": "horizontal, short, not high; angle 0-5 deg (ESTIMATE)",
+        "lowerLashLine": "yes; alternative: lower line only",
+        "confidence": "low"
+      },
+      "relatedRule": "R6: round face + upturned eyes -> keep high brow arch, wing horizontal."
+    },
+
+    "downturned": {
+      "title": "Downturned",
+      "definition": "The outer corner sits lower than the inner corner.",
+      "detectedBy": "tilt < 1 deg starts the score; 1 at tilt <= -4 deg. Weighted x1.0 -> max 1.0.",
+      "linerStyle": {
+        "innerWidth": 0.008,
+        "midWidth": 0.018,
+        "outerWidth": 0.034,
+        "start": 0.10,
+        "wingLength": 0.28,
+        "wingAngleDeg": 18,
+        "wingBase": "lowerLidTangent",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": false,
+        "lowerLine": { "enabled": false, "extent": 0.5, "thickness": 0.015 },
+        "shade": "black"
+      },
+      "description": "Inner corner left open (start 0.10), gradual thickening, wing follows the lower lash line toward the end of the brow. No lower line.",
+      "userNote": "Your outer corners sit low, so the wing follows your lower lash line toward the end of your brow.",
+      "research": {
+        "start": "Keep inner corner open and bright; thin start",
+        "thickness": "inner thin, middle gradual, outer thicker toward wing tip",
+        "wing": "follow extension of lower lash line toward end of brow, subtle, about 0 deg offset; length 10-20% eye width (ESTIMATE)",
+        "lowerLashLine": "optional, light",
+        "confidence": "high"
+      },
+      "codeVsResearch": "Research says ~0 deg offset; code uses 18 deg on lowerLidTangent (the code comment says 'no extra lift' but the number is 18). Check intent before relying on this value.",
+      "relatedRule": "R5: oblong face + downturned eyes -> wing follows lower-lash extension, blush stays horizontal."
+    },
+
+    "closeSet": {
+      "title": "Close-set",
+      "definition": "The gap between your inner corners is less than one eye width.",
+      "detectedBy": "spacing < 1 starts the score; 1 at spacing <= 0.85. Weighted x1.0 -> max 1.0.",
+      "linerStyle": {
+        "innerWidth": 0.004,
+        "midWidth": 0.008,
+        "outerWidth": 0.034,
+        "start": 0.0,
+        "wingLength": 0.34,
+        "wingAngleDeg": 6,
+        "wingBase": "horizontal",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": true,
+        "tightline": false,
+        "lowerLine": { "enabled": false, "extent": 0.5, "thickness": 0.015 },
+        "shade": "black"
+      },
+      "description": "Very thin from the inner corner, thickest at the outer end, long tapered wing in line with the brow tail. No lower line.",
+      "userNote": "Your eyes are close-set, so the inner corner stays light and the liner builds toward the outer end.",
+      "research": {
+        "start": "Inner corner, super thin to the middle",
+        "thickness": "inner very thin, middle thin, outer thicker",
+        "wing": "tapered, ends in line with brow tail, near horizontal; length 25-40% eye width (ESTIMATE)",
+        "lowerLashLine": "outer half only, or bare",
+        "confidence": "high"
+      },
+      "note": "Only entry with wingTargetsBrowTail = true. The 'with wing' look sets it back to false."
+    },
+
+    "wideSet": {
+      "title": "Wide-set",
+      "definition": "The gap between your inner corners is more than one eye width.",
+      "detectedBy": "spacing > 1 starts the score; 1 at spacing >= 1.15. Weighted x1.0 -> max 1.0.",
+      "linerStyle": {
+        "innerWidth": 0.028,
+        "midWidth": 0.020,
+        "outerWidth": 0.010,
+        "start": 0.0,
+        "wingLength": 0.0,
+        "wingAngleDeg": 0,
+        "wingBase": "lowerLidTangent",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": false,
+        "lowerLine": { "enabled": false, "extent": 0.5, "thickness": 0.015 },
+        "shade": "black"
+      },
+      "description": "Strongest at the inner corner, thinning outward, no wing; the liner stops at the outer corner.",
+      "userNote": "Your eyes are wide-set, so the liner is strongest at the inner corner.",
+      "research": {
+        "start": "Inner corner, may be emphasized",
+        "thickness": "inner thicker, middle medium, outer thin",
+        "wing": "do not extend past outer corner; none or very short",
+        "lowerLashLine": "optional smudge",
+        "confidence": "high"
+      },
+      "relatedRule": "R4: wide-set removes the wing from ANY blend when it is primary or its score >= 0.5. Note says: 'Wide-set eyes look balanced without a wing, so the liner stops at the outer corner.'"
+    },
+
+    "neutral": {
+      "title": "Natural line (neutral fallback)",
+      "definition": "Used when the eyes were not measured, or the reading is unreliable (rule R7).",
+      "usedWhen": [
+        "no saved eye scan",
+        "savedEyeMeasurements returned nil (confidence <= 0.1, non-finite values, spacing or openness <= 0)",
+        "openness < 0.15 (eyes not open)",
+        "|tiltLeft - tiltRight| > 6",
+        "best weighted score < 0.25"
+      ],
+      "linerStyle": {
+        "innerWidth": 0.012,
+        "midWidth": 0.014,
+        "outerWidth": 0.016,
+        "start": 0.0,
+        "wingLength": 0.0,
+        "wingAngleDeg": 0,
+        "wingBase": "lowerLidTangent",
+        "wingOrigin": "outerCorner",
+        "wingTargetsBrowTail": false,
+        "tightline": false,
+        "lowerLine": { "enabled": false, "extent": 0.5, "thickness": 0.015 },
+        "shade": "brown"
+      },
+      "description": "Thin, even line along the upper lash line, no wing.",
+      "userNote": "Your eyes could not be measured clearly, so this is a thin natural line. Scan again with your eyes relaxed and open for a tailored liner."
+    }
+  },
+
+  "looks": {
+    "lineOnly": { "title": "Liner only", "rule": "wingLength = 0, wingAngle = 0" },
+    "winged": {
+      "title": "With wing",
+      "rule": "keep the fitted wing if >= 0.26 long, else use almond's (0.26, 14 deg); then wingBase = horizontal, wingTargetsBrowTail = false, wingAngle clamped to 6...10, outerWidth >= 0.036"
+    }
+  },
+
+  "quickTable": {
+    "columns": ["shape", "inner", "mid", "outer", "start", "wingLen", "wingAngle", "wingBase", "browTail", "lowerLine (extent / thickness)", "tightline", "shade"],
+    "rows": [
+      ["almond",     0.010, 0.022, 0.036, 0.00, 0.26, 14, "lowerLidTangent", false, "0.50 / 0.010", false, "black"],
+      ["round",      0.008, 0.012, 0.030, 0.08, 0.32, 12, "lowerLidTangent", false, "0.67 / 0.010", false, "black"],
+      ["hooded",     0.006, 0.012, 0.032, 0.00, 0.24, 18, "lowerLidTangent", false, "0.33 / 0.014", true,  "black"],
+      ["monolid",    0.014, 0.030, 0.045, 0.00, 0.32, 14, "lowerLidTangent", false, "off",          false, "black"],
+      ["upturned",   0.008, 0.012, 0.018, 0.00, 0.20,  6, "horizontal",      false, "0.50 / 0.012", false, "black"],
+      ["downturned", 0.008, 0.018, 0.034, 0.10, 0.28, 18, "lowerLidTangent", false, "off",          false, "black"],
+      ["closeSet",   0.004, 0.008, 0.034, 0.00, 0.34,  6, "horizontal",      true,  "off",          false, "black"],
+      ["wideSet",    0.028, 0.020, 0.010, 0.00, 0.00,  0, "lowerLidTangent", false, "off",          false, "black"],
+      ["neutral",    0.012, 0.014, 0.016, 0.00, 0.00,  0, "lowerLidTangent", false, "off",          false, "brown"]
+    ]
+  },
+
+  "rendering": {
+    "summary": "Two inputs meet at draw time. (A) The scan decides the STYLE: the numbers in eyeShapes.*.linerStyle (thickness, start, wing, lower line). (B) Live landmark tracking decides the POINTS: where the user's lash line, corners and brow tail actually are in each camera frame. The scan does not supply any point positions; those come from MediaPipe every frame. LinerPathBuilder combines (A) and (B).",
+    "whatComesFromWhere": {
+      "fromScanAndPlanner": [
+        "upperThickness [inner, mid, outer] (innerWidth, midWidth, outerWidth)",
+        "start (fraction of lid left bare from inner corner)",
+        "wingLength, wingAngleDeg, wingBase, wingOrigin, wingTargetsBrowTail",
+        "lowerLine enabled / extent / thickness",
+        "tightline flag (not drawn)",
+        "shade"
+      ],
+      "fromLiveTracking": [
+        "inner and outer eye corner positions",
+        "upper lash line points and lower lash line points",
+        "brow points (last = brow tail, used for wingTargetsBrowTail and to decide which side is 'up')",
+        "eyeOpenRatio (blink / closing)",
+        "face anchor points and ARKit head pose (carry the liner with head motion)"
+      ]
+    },
+    "liveLandmarks": {
+      "detector": "MediaPipe Face Landmarker (478-point mesh), via MediaPipeEyeLandmarkProvider, fed ARKit camera frames",
+      "meshIndices": {
+        "subjectRight": { "outer": 33, "inner": 133, "upper": [246, 161, 160, 159, 158, 157, 173], "lower": [7, 163, 144, 145, 153, 154, 155], "browUpper": [70, 63, 105, 66, 107], "browLower": [46, 53, 52, 65, 55] },
+        "subjectLeft": { "outer": 263, "inner": 362, "upper": [466, 388, 387, 386, 385, 384, 398], "lower": [249, 390, 373, 374, 380, 381, 382], "browUpper": [300, 293, 334, 296, 336], "browLower": [276, 283, 282, 295, 285] },
+        "faceAnchors": [168, 6, 197, 195, 5, 4, 1, 129, 358, 98, 327, 234, 454, 127, 356]
+      },
+      "rate": "landmarks at up to 30 Hz; the newest result is carried to the current head position on every ARKit frame (up to 60 Hz); a result is held up to 2.0 s and fades from 0.6 s",
+      "smoothing": "One Euro filter on the points after removing head motion with the rigid face anchors"
+    },
+    "buildSteps": [
+      "1. Make an eye-local frame: origin = inner corner, x axis = inner -> outer corner, unit = eye width. 'Up' is decided by the brow side. Everything below is in eye widths, so it scales with the user's eye and ignores head roll and distance.",
+      "2. Upper lash line = upper lid points, extended 0.07 eye widths past the outer corner (inner extension 0), smoothed with Catmull-Rom.",
+      "3. Upper liner: sample the lash line from `start` to 1 (32 samples). Thickness at position t = piecewise-linear through [innerWidth, midWidth, outerWidth] (inner at t=0, mid at t=0.5, outer at t=1). If start > 0 the first 12% fades in softly. Each sample is pushed up along the lash-line normal by that thickness.",
+      "4. Wing (only if wingLength > 0.005): direction = wingBase (horizontal = eye axis; lowerLidTangent = direction of the last part of the lower lash line at the outer corner). If wingTargetsBrowTail, direction is blended 60% toward the brow tail. Then wingAngleDeg is added and the result clamped to +/-24 degrees elevation. Tip = outer corner + direction * wingLength. The wing is a quadratic Bezier joined to the end of the upper liner, so liner and wing become one merged shape.",
+      "5. Lower line (if enabled): the lower lash line from (1 - extent) to the outer corner, thickness ramps from ~10% at the inner end to full at the outer end, drawn below the lash line.",
+      "6. Tightline: built only when the flag is set, but not drawn.",
+      "7. Convert back to image pixels, then draw (fill + soft halo) in the shade colour, tinted by skin tone sampled near the eye, with hand-occlusion masking."
+    ],
+    "thicknessMultipliers": {
+      "thicknessScale": "every width in the style is multiplied by LinerBuildOptions.thicknessScale = 1.8 (styles hold the research's 'natural line' numbers; on screen a thicker line reads better)",
+      "closedEyeBoost": "when the eye closes the liner thickens: scale *= 1 + 0.8 * (1 - openRelativeToUsersOwnNormal). Openness is measured against the user's own open-eye baseline, so hooded and monolid eyes count as open.",
+      "lashOffset": "liner sits 0.003 eye widths above the lash line"
+    },
+    "liveVsTexturePath": "There is also an older texture path (LinerGeometry + MakeupTextureRenderer, Vision points mapped to the ARKit face-mesh UV) that uses the same LinerStyle. The live Try On overlay uses the MediaPipe path described above (LinerOverlayModel -> LinerTracker -> LinerPathBuilder).",
+    "worked_exampleExplained": "Style says wideSet: innerWidth 0.028, outerWidth 0.010. After thicknessScale 1.8 the inner end is 0.0504 eye widths thick, the outer end 0.018. For an eye 100 px wide in the camera image the line is ~5 px at the inner corner and ~1.8 px at the outer, and it follows wherever the user's lash line is in that frame."
+  },
+
+  "worked_examples": [
+    {
+      "input": { "tilt": 4, "spacing": 1.0, "openness": 0.25, "lidType": "neither" },
+      "scores": { "almond": 0.4, "round": 0, "upturned": 0, "downturned": 0, "closeSet": 0, "wideSet": 0 },
+      "result": "almond only (weight 1.0) -> almond variant"
+    },
+    {
+      "input": { "tilt": 4, "spacing": 1.12, "openness": 0.25, "lidType": "neither" },
+      "scores": { "wideSet": 0.8, "almond": 0.4 },
+      "weighted": { "wideSet": 0.8, "almond": 0.4 },
+      "blend": { "wideSet": 0.667, "almond": 0.333 },
+      "result": "wideSet is primary and scores >= 0.5 -> wing removed (R4). Widths/start are the weighted mean of wideSet and almond; lowerLine enabled flag from primary (wideSet = off) but extent comes from almond's, thickness fades to 0.333 * 0.010."
+    }
+  ],
+
+  "gaps_and_todos": [
+    "All thresholds and every liner number are ESTIMATES; none tuned on real faces.",
+    "downturned: code wingAngle 18 deg vs research 'approx 0 deg offset' (see eyeShapes.downturned.codeVsResearch).",
+    "upturned and hooded have the lowest research trust (0.5).",
+    "R3 (thick wing pairs with medium brows) not applied.",
+    "Hooded and monolid cannot be detected from landmarks; the person chooses.",
+    "Eye shape from the scan screen (openness/tilt/spacing labels) is a separate classifier from the liner EyeScan scoring; thresholds differ (e.g. round at openness 0.38 vs liner ramp 0.30-0.40; upturned > 7 deg in both, downturned < 1 deg vs ramp from 1 deg)."
+  ]
+}
