@@ -159,6 +159,20 @@ struct BrowFaceStabilizer {
         return observation.replacing(out)
     }
 
+    /// The last steadied brow (`steady`, as `stabilize` returned it) moved onto a later camera frame of the same face: its
+    /// face-local points are projected with that frame's pose and camera. This is how the brow follows the head on every
+    /// ARKit frame while MediaPipe answers less often. Nil when there is nothing to move or the face changed.
+    func reproject(_ steady: BrowObservation, onto face: BrowFaceFrame) -> BrowObservation? {
+        guard face.anchorID == anchorID, held.count == steady.flattened.count else { return nil }
+        var out: [SIMD2<Float>] = []
+        out.reserveCapacity(held.count)
+        for p in held {
+            guard let q = face.pixel(of: p) else { return nil }
+            out.append(q)
+        }
+        return steady.replacing(out)
+    }
+
     /// The smoothed landmarks lifted onto the face of this frame, for placing 3D geometry (nil when one cannot be placed).
     static func lift(_ observation: BrowObservation, face: BrowFaceFrame) -> [SIMD3<Float>]? {
         let points = observation.flattened

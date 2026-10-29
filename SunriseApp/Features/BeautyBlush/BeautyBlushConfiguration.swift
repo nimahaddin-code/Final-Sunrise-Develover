@@ -69,8 +69,12 @@ struct BeautyBlushVisibility {
 @preconcurrency import Metal
 private enum BeautyBlushShaderError:Error {case missingSource}
 enum BeautyBlushShaders {
+    /// Shader sources compiled as one library, in order: the shared camera/blush code, then the brow code that uses it.
+    static let sources=["BeautyBlush.metal","Brow.metal"]
     static let library:MTLLibrary? = {
-        guard let device=MTLCreateSystemDefaultDevice(),let url=Bundle.main.url(forResource:"BeautyBlush.metal",withExtension:"txt"),let source=try? String(contentsOf:url,encoding:.utf8) else{return nil}
+        let parts=sources.map {Bundle.main.url(forResource:$0,withExtension:"txt").flatMap {try? String(contentsOf:$0,encoding:.utf8)}}
+        guard let device=MTLCreateSystemDefaultDevice(),parts.allSatisfy({$0 != nil}) else{return nil}
+        let source=parts.compactMap {$0}.joined(separator:"\n")
         do {return try device.makeLibrary(source:source,options:nil)} catch {
             UserDefaults.standard.set("shader_compile: \(error)",forKey:"beautyBlush.status");return nil
         }

@@ -75,6 +75,10 @@ struct LiveGuideView: UIViewRepresentable {
         private var pending: (id:UUID, profile:SurfaceRenderProfile)?
         // -Nimah: running/desiredRunning hanya MainActor; readiness/pose hanya session queue.
         private var running=false, desiredRunning=false
+        /// Another screen took the camera lease. This screen must not take it back until it has been paused: two screens that
+        /// are both active during a push (Try On under the tutorial) would otherwise hand the camera back and forth, each time
+        /// publishing from a view update, until the app stops responding.
+        private var revoked=false
         private var readiness=TrackingReadiness()
         private var previousPosition: SIMD3<Float>?
         private var previousRotation: simd_quatf?
@@ -166,20 +170,21 @@ struct LiveGuideView: UIViewRepresentable {
         private func setTracking(_ value:Bool,canFit:Bool) { lock.lock(); tracked=value && sessionActive; fitAllowed=canFit && sessionActive; lastFrameArrival=ProcessInfo.processInfo.systemUptime; lock.unlock() }
         @MainActor func start(_ view:ARSCNView) {
             desiredRunning=true
-            guard !running,ARFaceTrackingConfiguration.isSupported else { return }
+            guard !running,!revoked,ARFaceTrackingConfiguration.isSupported else { return }
             manager.acquire(owner:leaseID) { [weak self] in
                 guard let self else { return }
-                self.desiredRunning=false; self.running=false; self.invalidateSession(); self.camera.suspend()
+                self.desiredRunning=false; self.running=false; self.revoked=true; self.invalidateSession(); self.camera.suspend()
                 if let oldView=self.camera.view {self.detach(oldView)}
             }
             if view.session !== manager.session {view.session=manager.session}
             view.session.delegate=self; view.session.delegateQueue=queue
+            view.rendersContinuously=true
             running=true
             eyebrowPipeline.reset()
             // Each camera session fits the face in front of it.
             LaunchMakeupFit.shared.clear()
             lock.lock(); generation=UUID(); pending=nil; pendingStyles=[:]; activeAnchorID=nil; sessionActive=true; tracked=false; fitAllowed=false; lock.unlock()
-            camera.fitReady=false; camera.fitMessage="Look straight ahead with relaxed eyes and lips while the surface is fitted"
+            camera.update(\.fitReady,false); camera.update(\.fitMessage,"Look straight ahead with relaxed eyes and lips while the surface is fitted")
             queue.async { self.readiness.reset(); self.previousPosition=nil; self.previousRotation=nil; self.lastReport=0; self.fitStable=false }
             let configuration=ARFaceTrackingConfiguration(); configuration.maximumNumberOfTrackedFaces=1
             view.session.run(configuration,options:[.resetTracking,.removeExistingAnchors])
@@ -189,6 +194,9 @@ struct LiveGuideView: UIViewRepresentable {
             if view.session === manager.session {view.session=ARSession()}
         }
         @MainActor func pause(_ view:ARSCNView) {
+            revoked=false
+            // A paused screen under another one (Try On below the tutorial) must not keep drawing, or retaining, camera frames.
+            view.rendersContinuously=false
             lock.lock();let engine=beauty;lock.unlock();engine?.pause()
             desiredRunning=false; setTracking(false,canFit:false)
             lock.lock(); generation=UUID(); pending=nil; pendingStyles=[:]; activeAnchorID=nil; sessionActive=false; lock.unlock()
