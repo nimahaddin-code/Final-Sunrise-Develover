@@ -246,11 +246,18 @@ struct LinerOverlayView: View {
     @AppStorage(DeveloperTools.key) private var developerMode = false
     /// `false` hides the liner, for comparing with the bare face.
     let isVisible: Bool
+    /// Draws only on this half of the view (the tutorial's side-by-side comparison). Clipping inside the canvas keeps the
+    /// multiply blend against the camera, which a mask outside the view would break.
+    var visibleSide: HorizontalEdge?
 
     var body: some View {
         GeometryReader { proxy in
-            Canvas { context, _ in
+            Canvas { context, size in
                 guard isVisible, let frame = model.frame, let shade = model.shade else { return }
+                if let visibleSide {
+                    let half = size.width / 2
+                    context.clip(to: Path(CGRect(x: visibleSide == .leading ? 0 : half, y: 0, width: half, height: size.height)))
+                }
                 let ink = LinerOverlayRenderer.ink(shade, skin: frame.skin)
                 let color = Color(red: ink.red, green: ink.green, blue: ink.blue)
                 context.drawLayer { layer in

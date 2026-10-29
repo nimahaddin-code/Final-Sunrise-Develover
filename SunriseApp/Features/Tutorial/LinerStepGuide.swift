@@ -24,8 +24,9 @@ struct LinerStepGeometry {
     let lash: [CGPoint]
     /// The lower line of puppy, foxy and arabian, from its start.
     let lower: [CGPoint]
-    /// The whole liner outline, closed: along the lash line, out to the wing and back, so a wing is a triangle.
-    let band: [CGPoint]
+    /// The closed liner outlines: the upper liner with its wing merged in, and the wing on its own when it starts apart
+    /// from the liner (`upperLiner` alone stops at the outer corner and leaves the wing out).
+    let shapes: [[CGPoint]]
     /// Inner corner, middle, outer corner, the wing's end when the look has one, then the lower line's start when it has one.
     let dots: [CGPoint]
 
@@ -35,7 +36,12 @@ struct LinerStepGeometry {
         let lower = Array(guide.lowerLiner.prefix(guide.lowerLiner.count / 2))
         self.lash = lash
         self.lower = lower
-        band = guide.upperLiner
+        var shapes = [guide.outlines.first ?? guide.upperLiner]
+        if let tip = guide.anchors.wingTip, !guide.wing.isEmpty,
+           !shapes[0].contains(where: { hypot($0.x - tip.x, $0.y - tip.y) < 0.5 }) {
+            shapes.append(guide.wing)
+        }
+        self.shapes = shapes
         var dots: [CGPoint] = []
         if let first = lash.first, let last = lash.last {
             dots = [first, lash[lash.count / 2], last]
@@ -45,6 +51,19 @@ struct LinerStepGeometry {
         if let tip = guide.anchors.wingTip { dots.append(tip) }
         if let start = lower.first { dots.append(start) }
         self.dots = dots
+    }
+}
+
+/// The detector's "could not start" note. Its own view, so only it listens to the model's published changes.
+private struct UnavailableNote: View {
+    @ObservedObject var model: LinerOverlayModel
+
+    var body: some View {
+        if let reason = model.unavailableReason {
+            // The eye detector could not start: say so instead of silently drawing nothing.
+            Text(reason).font(.footnote).padding(8).background(.black.opacity(0.6), in: Capsule())
+                .foregroundStyle(.white).frame(maxHeight: .infinity, alignment: .center)
+        }
     }
 }
 
@@ -65,12 +84,15 @@ final class StepClock {
 /// pause, repeating). The animation is only a demonstration; nothing is drawn on the lid. Reduce Motion shows the last
 /// frame as a still picture.
 struct LinerStepGuide: View {
-    @ObservedObject var model: LinerOverlayModel
+    /// Not observed: the canvas reads the newest frame on every tick, so a published frame must not rebuild this view too.
+    let model: LinerOverlayModel
     let step: LinerTutorialStep
     /// A camera message is showing, or the phone is hot: the animation holds where it is.
     var paused = false
     /// A camera message is showing: the whole guide fades to 30%.
     var dimmed = false
+    /// Draws only on this half of the view (the tutorial's side-by-side comparison).
+    var side: HorizontalEdge?
     @Environment(\.cameraZoom) private var zoom
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var clock = StepClock()
@@ -82,15 +104,14 @@ struct LinerStepGuide: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                TimelineView(.animation(minimumInterval: 1 / 30, paused: paused || reduceMotion)) { timeline in
-                    let elapsed = clock.advance(to: timeline.date, paused: paused)
+                // Always ticking, so the dots keep following the face while the animation is held. The animation's own
+                // clock only runs while the liner has a fresh frame to draw on: a gap in tracking must not use it up unseen.
+                TimelineView(.animation(minimumInterval: reduceMotion ? 1 / 30 : 1 / 60)) { timeline in
+                    let live = model.frame.map { CACurrentMediaTime() - $0.receivedAt <= LinerOverlayRenderer.maxAge } ?? false
+                    let elapsed = clock.advance(to: timeline.date, paused: paused || reduceMotion || !live)
                     canvas(elapsed: elapsed)
                 }
-                if let reason = model.unavailableReason {
-                    // The eye detector could not start: say so instead of silently drawing nothing.
-                    Text(reason).font(.footnote).padding(8).background(.black.opacity(0.6), in: Capsule())
-                        .foregroundStyle(.white).frame(maxHeight: .infinity, alignment: .center)
-                }
+                UnavailableNote(model: model)
             }
             // The overlay model builds the liner in this view's size, so it must be told before it can run.
             .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }
@@ -102,8 +123,12 @@ struct LinerStepGuide: View {
     }
 
     private func canvas(elapsed: TimeInterval) -> some View {
-        Canvas { context, _ in
+        Canvas { context, size in
             guard let frame = model.frame, CACurrentMediaTime() - frame.receivedAt <= LinerOverlayRenderer.maxAge else { return }
+            if let side {
+                let half = size.width / 2
+                context.clip(to: Path(CGRect(x: side == .leading ? 0 : half, y: 0, width: half, height: size.height)))
+            }
             // Reduce Motion: the last frame of the animation, and a still highlight at 40%.
             let loop = reduceMotion ? Self.playLength : elapsed.truncatingRemainder(dividingBy: Self.loopLength)
             let progress = min(loop / Self.playLength, 1)
@@ -123,21 +148,20 @@ struct LinerStepGuide: View {
                 case .markDots:
                     if playing { penTip = tapAnimation(&context, dots: dots, progress: progress, eyeWidth: eyeWidth, thin: thin) }
                 case .connect:
-                    let paths = [Self.path(map(geometry.band), closed: true), Self.path(map(geometry.lower))]
+                    let paths = (geometry.shapes.map { Self.path(map($0), closed: true) } + [Self.path(map(geometry.lower))])
                         .filter { !$0.isEmpty }
-                    for path in paths {
-                        context.stroke(path.trimmedPath(from: 0, to: progress), with: .color(.white),
-                                       style: StrokeStyle(lineWidth: max(eyeWidth * 0.018, 1.2 * thin), lineCap: .round,
-                                                          dash: [max(eyeWidth * 0.03, 2 * thin), max(eyeWidth * 0.04, 3 * thin)]))
-                    }
-                    if playing, let first = paths.first { penTip = first.trimmedPath(from: 0, to: progress).currentPoint }
+                        .map { $0.trimmedPath(from: 0, to: progress) }
+                    let style = StrokeStyle(lineWidth: max(eyeWidth * 0.018, 1.2 * thin), lineCap: .round,
+                                            dash: [max(eyeWidth * 0.03, 2 * thin), max(eyeWidth * 0.04, 3 * thin)])
+                    for path in paths { context.stroke(path, with: .color(.white), style: style) }
+                    if playing, let first = paths.first { penTip = first.currentPoint }
                 case .fill:
-                    let band = map(geometry.band)
-                    if band.count > 2 {
-                        context.stroke(Self.path(band, closed: true), with: .color(.white.opacity(0.8)),
+                    for shape in geometry.shapes where shape.count > 2 {
+                        let outline = Self.path(map(shape), closed: true)
+                        context.stroke(outline, with: .color(.white.opacity(0.8)),
                                        style: StrokeStyle(lineWidth: max(eyeWidth * 0.014, 1 * thin), lineCap: .round))
+                        context.fill(outline, with: .color(pink.opacity(pulse)))
                     }
-                    if band.count > 2 { context.fill(Self.path(band, closed: true), with: .color(pink.opacity(pulse))) }
                     let lash = map(geometry.lash)
                     if playing, lash.count > 1 {
                         // Back and forth along the lash line, a bit under two passes in 3 s.

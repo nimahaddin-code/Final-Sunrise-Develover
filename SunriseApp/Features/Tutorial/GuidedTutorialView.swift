@@ -14,17 +14,51 @@ struct TutorialHandoff: Hashable {
     var linerLook: LinerLook = .classic
 }
 
-/// What the bottom-left button shows: the full filter, half filter / half real camera, or no filter.
+/// What one half of the camera shows in the comparison.
+enum TutorialHalf { case tryOn, guide, plain }
+
+/// What the bottom-left button shows, in the order it cycles: the finished look on one half and the step guide on the
+/// other (either way round), the look beside the plain camera (either way round), then the plain camera alone.
 enum TutorialCompare: CaseIterable {
-    case filter, split, off
+    case tryOnGuide, guideTryOn, tryOnPlain, plainTryOn, plain
+
     var next: TutorialCompare {
-        switch self { case .filter: .split; case .split: .off; case .off: .filter }
+        let all = Self.allCases
+        return all[(all.firstIndex(of: self)! + 1) % all.count]
     }
+    var left: TutorialHalf {
+        switch self { case .tryOnGuide, .tryOnPlain: .tryOn; case .guideTryOn: .guide; case .plainTryOn, .plain: .plain }
+    }
+    var right: TutorialHalf {
+        switch self { case .guideTryOn, .plainTryOn: .tryOn; case .tryOnGuide: .guide; case .tryOnPlain, .plain: .plain }
+    }
+    var showsGuide: Bool { left == .guide || right == .guide }
+    var showsTryOn: Bool { left == .tryOn || right == .tryOn }
+    /// Which side of the screen a half sits on; nil when this layout has no such half.
+    func side(of half: TutorialHalf) -> HorizontalEdge? {
+        if left == half { return .leading }
+        if right == half { return .trailing }
+        return nil
+    }
+    /// The side showing the plain camera next to the look, nil when both halves are plain (or none is).
+    var plainBesideLook: HorizontalEdge? { showsTryOn ? side(of: .plain) : nil }
     var symbol: String {
-        switch self { case .filter: "circle.fill"; case .split: "circle.lefthalf.filled"; case .off: "circle" }
+        switch self {
+        case .tryOnGuide: "square.lefthalf.filled"
+        case .guideTryOn: "square.righthalf.filled"
+        case .tryOnPlain: "circle.lefthalf.filled"
+        case .plainTryOn: "circle.righthalf.filled"
+        case .plain: "circle"
+        }
     }
     var label: LocalizedStringKey {
-        switch self { case .filter: "Filter on"; case .split: "Half filter, half real"; case .off: "Filter off" }
+        switch self {
+        case .tryOnGuide: "Look on the left, guide on the right"
+        case .guideTryOn: "Guide on the left, look on the right"
+        case .tryOnPlain: "Look on the left, plain camera on the right"
+        case .plainTryOn: "Plain camera on the left, look on the right"
+        case .plain: "Plain camera"
+        }
     }
 }
 
@@ -50,7 +84,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     let handoff: TutorialHandoff
     @Published private(set) var tab: TutorialTab
     @Published private(set) var linerStep = 0
-    @Published private(set) var compare = TutorialCompare.filter
+    @Published private(set) var compare = TutorialCompare.tryOnGuide
     /// After the last step: the camera shows the whole assigned look, with no guide, for taking a photo.
     @Published private(set) var photoMode = false
     private let linerStyle: LinerStyle?
@@ -95,18 +129,17 @@ enum TutorialTab: CaseIterable, Identifiable {
         if photoMode { return photoConfiguration }
         var value = brow.liveConfiguration
         value.showMappingFormula = tab == .brows
-        // The split comparison is intended to show the applied pigment against the
-        // unfiltered camera. Keep the pigment on the filtered half, but suppress
-        // the placement outline (which reads as a box around the brow at this
-        // scale). The guide remains available in the full-filter tutorial mode.
-        if tab == .brows && compare == .split {
-            value.showGuide = false
-            value.showMappingFormula = false
-        }
         // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
         // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
-        if tab == .eyeliner { value.usesLaunchFit = true }
-        if tab == .eyeliner || !hasGuide || compare == .off { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
+        if tab == .eyeliner {
+            value.usesLaunchFit = true
+            value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil
+            return value
+        }
+        if !hasGuide || compare == .plain { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
+        // Brow and blush are drawn on the face mesh, one configuration for the whole view, so the guide and the look cannot
+        // share the screen: the guide wins when it is in the layout, otherwise the look (beside the plain camera).
+        else if !compare.showsGuide { return photoConfiguration }
         return value
     }
 
@@ -351,23 +384,25 @@ private struct TutorialScreen: View {
                                   eyebrowConfiguration: guideConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   }, reducedFrameRate: advisor.reducesLoad)
-                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .off && !model.photoMode {
+                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .plain && !model.photoMode {
                         BrowTrackingOverlayView(feed: camera.browTracking)
                     }
                     if model.photoMode {
                         LinerOverlayView(model: model.liner, isVisible: true)
-                    } else if model.tab == .eyeliner && model.compare != .off {
-                        ZStack {
+                    } else if model.tab == .eyeliner, model.hasGuide {
+                        // Each half is clipped inside its own canvas: a mask would make an offscreen pass every frame.
+                        if let side = model.compare.side(of: .tryOn) {
+                            LinerOverlayView(model: model.liner, isVisible: true, visibleSide: side)
+                        }
+                        if let side = model.compare.side(of: .guide) {
                             LinerStepGuide(model: model.liner, step: LinerTutorialStep(rawValue: index) ?? .markDots,
-                                           paused: advisor.pausesAnimation, dimmed: advisor.isDimmed)
+                                           paused: advisor.pausesAnimation, dimmed: advisor.isDimmed, side: side)
                                 .id(index)
                         }
-                        .mask(alignment: .leading) { halfMask(left: true, half: model.compare == .split) }
-                    }
-                    if model.compare == .split {
-                        // The same camera without the filter, covering the right half.
+                    } else if model.tab != .eyeliner, let side = model.compare.plainBesideLook {
+                        // The same camera without the look, covering its half.
                         RealCameraView(session: camera.trackingManager.session)
-                            .mask(alignment: .trailing) { halfMask(left: false) }
+                            .mask(alignment: side == .leading ? .leading : .trailing) { halfMask(left: side == .leading) }
                     }
                 }
                 // The photo is taken from the unzoomed camera, so zoom is off while framing it.
@@ -379,9 +414,9 @@ private struct TutorialScreen: View {
     }
 
     /// A mask covering the whole view, or only its left / right half.
-    private func halfMask(left: Bool, half: Bool = true) -> some View {
+    private func halfMask(left: Bool) -> some View {
         GeometryReader { proxy in
-            Rectangle().frame(width: half ? proxy.size.width / 2 : proxy.size.width).frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
+            Rectangle().frame(width: proxy.size.width / 2).frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
         }
     }
 
