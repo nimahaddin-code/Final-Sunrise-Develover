@@ -40,9 +40,12 @@ extension BeautyBlushEngine {
         return BrowFaceFrame(anchorID:anchor.identifier,vertices:geometry.vertices,triangles:browFaceTriangles,intrinsics:frame.camera.intrinsics,
                              imageSize:SIMD2(Float(resolution.width),Float(resolution.height)),faceToWorld:anchor.transform,cameraToWorld:frame.camera.transform)
     }
-    /// Hands this frame to MediaPipe unless one is still being processed; it is drawn when its landmarks return.
+    /// Every camera frame: drawn now with the latest brow (moved by ARKit's face pose), like blush is drawn on every ARKit frame,
+    /// and handed to MediaPipe when one is due, which only updates the brow. The camera picture no longer waits for MediaPipe.
     func submitBrow(_ frame:ARFrame,settings s:Settings) {
         let load=BrowLoad.current(ProcessInfo.processInfo.thermalState)
+        let face=browFaceFrame(frame)
+        drawLiveBrow(frame,face:face,settings:s,maxFPS:load.trackerFPS)
         guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit,maxFPS:load.trackerFPS) else {return}
         let buffer=frame.capturedImage
         let raw=CGSize(width:CVPixelBufferGetWidth(buffer),height:CVPixelBufferGetHeight(buffer))
@@ -53,7 +56,7 @@ extension BeautyBlushEngine {
             return CGPoint(x:(q.x-p.x)*raw.width,y:(q.y-p.y)*raw.height)
         }
         let up=direction(CGPoint(x:0.5,y:0.6),CGPoint(x:0.5,y:0.4)),across=direction(CGPoint(x:0.4,y:0.5),CGPoint(x:0.6,y:0.5))
-        let entry=BrowFrame(frame:frame,epoch:s.epoch,face:browFaceFrame(frame))
+        let entry=BrowFrame(frame:frame,epoch:s.epoch,face:face)
         lock.lock()
         browToken += 1;let token=browToken;lastBrowSubmit=frame.timestamp
         browFrames=browFrames.filter {token-$0.key<2};browFrames[token]=entry
@@ -69,9 +72,41 @@ extension BeautyBlushEngine {
             segmenter.submit(.init(pixelBuffer:SendablePixelBuffer(buffer:entry.frame.capturedImage),timestamp:entry.frame.timestamp,headUp:up,headAnchors:[]))
         }
     }
+    /// A MediaPipe answer (render queue): steadies it in its own frame and keeps it as the brow the live frames draw.
     func renderBrow(_ result:BrowTrackerResult) {
         lock.lock();let entry=browFrames.removeValue(forKey:result.token);let s=settings;lock.unlock()
-        guard let entry,s.enabled,s.isBrow,s.epoch==entry.epoch,s.viewport.width>0,s.viewport.height>0 else {return}
-        autoreleasepool {drawBrow(entry.frame,observation:result.observation,face:entry.face,settings:s)}
+        guard let entry,s.enabled,s.isBrow,s.epoch==entry.epoch else {return}
+        guard let detected=result.observation else {
+            browSmoother.reset();browStabilizer.reset();browStabilized=false;browLatest=nil;return
+        }
+        if let face=entry.face,let steady=browStabilizer.stabilize(detected,face:face) {
+            browSmoother.reset();browStabilized=true
+            browLatest=(steady,detected,true,entry.frame.timestamp)
+        } else {
+            browStabilizer.reset();browStabilized=false
+            browLatest=(browSmoother.smooth(detected),detected,false,entry.frame.timestamp)
+        }
+    }
+    /// How long the last MediaPipe answer is drawn without a newer one (a lost face, a stalled tracker).
+    static let browLatestMaxAge:Double=0.5
+    /// Draws one live camera frame on the render queue with the latest brow. Skipped while a frame is still waiting there, and
+    /// limited to `maxFPS`, so a slow GPU drops frames instead of falling behind the camera.
+    func drawLiveBrow(_ frame:ARFrame,face:BrowFaceFrame?,settings s:Settings,maxFPS:Double) {
+        lock.lock()
+        guard !browDrawPending,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowDraw,maxFPS:maxFPS) else {lock.unlock();return}
+        browDrawPending=true;lastBrowDraw=frame.timestamp
+        lock.unlock()
+        queue.async { [self] in
+            defer {lock.lock();browDrawPending=false;lock.unlock()}
+            lock.lock();let current=settings.enabled && settings.isBrow && settings.epoch==s.epoch;lock.unlock()
+            guard current,s.viewport.width>0,s.viewport.height>0 else {return}
+            var observation:BrowObservation?,raw:BrowObservation?
+            if let latest=browLatest,frame.timestamp-latest.time<Self.browLatestMaxAge {
+                // Moved onto this frame by ARKit's pose when it was steadied on the face; otherwise drawn where it was seen.
+                observation=latest.stabilized ? face.flatMap {browStabilizer.reproject(latest.observation,onto:$0)} ?? latest.observation:latest.observation
+                raw=latest.raw
+            }
+            autoreleasepool {drawBrow(frame,observation:observation,raw:raw,face:face,settings:s)}
+        }
     }
 }

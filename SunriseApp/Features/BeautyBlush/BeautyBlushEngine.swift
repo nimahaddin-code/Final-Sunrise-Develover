@@ -70,6 +70,11 @@ final class BeautyBlushEngine:@unchecked Sendable {
     /// Steadies the brow in ARKit's face space when ARKit tracks the face in the same frame; the image-space smoother is the fallback.
     var browStabilizer=BrowFaceStabilizer()
     var browStabilized=false
+    /// The latest brow MediaPipe found (steadied), with its raw landmarks: drawn on every ARKit frame until the next arrives.
+    var browLatest:(observation:BrowObservation,raw:BrowObservation,stabilized:Bool,time:Double)?
+    /// A live frame is waiting on the render queue; later camera frames are skipped until it is drawn, so they never queue up.
+    var browDrawPending=false
+    var lastBrowDraw:Double = -.infinity
     /// The 3D hair brow: its mesh on the GPU, and the ARKit face mesh drawn as depth only so far hairs hide behind the face.
     var hairBuffer:MTLBuffer?,hairVertexCount=0
     var faceMeshVertices:[MTLBuffer]=[],faceMeshIndices:MTLBuffer?,faceMeshIndexCount=0
@@ -98,16 +103,9 @@ final class BeautyBlushEngine:@unchecked Sendable {
     var lastError:String?
     var presentedFrames=0,pigmentFrames=0,projectionErrorPixels:Double=0
     var maskAgeMilliseconds:Double = -1
-    @MainActor weak var view:BeautyBlushARView?
-    /// SceneKit's frame rate while the brow is shown. The opaque Metal layer covers SceneKit's own camera picture, so drawing
-    /// that picture at 60 fps underneath is wasted; it is kept just running so it can take over at once when the layer hides.
-    static let coveredSceneFramesPerSecond=10
-    /// Shows or hides the Metal layer, and slows SceneKit's camera picture underneath while the brow covers it.
-    @MainActor func setLayerShown(_ shown:Bool,brow:Bool=false) {
-        layer?.isHidden = !shown
-        let fps=shown && brow ? Self.coveredSceneFramesPerSecond:60
-        if let view,view.preferredFramesPerSecond != fps {view.preferredFramesPerSecond=fps}
-    }
+    /// Shows or hides the Metal layer. SceneKit's view under it keeps running at full rate: slowing it also slowed the ARKit
+    /// frames the brow is drawn from.
+    @MainActor func setLayerShown(_ shown:Bool) {layer?.isHidden = !shown}
     @MainActor static func make(on view:BeautyBlushARView) async->BeautyBlushEngine? {
         do {
             let engine=try await Task.detached(priority:.userInitiated) { try BeautyBlushEngine() }.value
@@ -116,7 +114,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             view.beautyLayer.framebufferOnly=true;view.beautyLayer.isOpaque=true;view.beautyLayer.isHidden=true
             view.beautyLayer.actions=["bounds":NSNull(),"position":NSNull(),"contents":NSNull()]
             view.beautyLayer.maximumDrawableCount=3;view.layer.addSublayer(view.beautyLayer)
-            engine.layer=view.beautyLayer;engine.view=view;view.beauty=engine;view.setNeedsLayout();return engine
+            engine.layer=view.beautyLayer;view.beauty=engine;view.setNeedsLayout();return engine
         } catch { UserDefaults.standard.set("setup_error: \(error)",forKey:"beautyBlush.status");return nil }
     }
     init() throws {
@@ -244,7 +242,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         segmenter.stop();browTracker.stop()
         queue.async { [self] in
             visibility=BeautyBlushVisibility();frameTime=0;anchorID=nil;style=nil;lastError=nil;lastSegment=0
-            browSmoother.reset();browStabilizer.reset();browStatus = .none
+            browSmoother.reset();browStabilizer.reset();browStatus = .none;browLatest=nil;lastBrowDraw = -.infinity
             lock.lock()
             attemptedBlushStyle=nil;lastBindAttempt = -.infinity;atlas=nil
             lock.unlock()

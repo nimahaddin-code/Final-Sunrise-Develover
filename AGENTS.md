@@ -1,3 +1,11 @@
+## Brow drawn on every ARKit frame — Khalish (2026-10-29)
+
+Like blush, the brow now draws each ARKit camera frame (`drawLiveBrow`, up to `BrowLoad.trackerFPS`, skipping frames while one
+is still queued) instead of only when MediaPipe answers. A MediaPipe answer only updates `browLatest` (steadied on that frame's
+face by `BrowFaceStabilizer`); each live frame moves it onto its own face pose (`BrowFaceStabilizer.reproject`), or draws it
+where it was seen when ARKit had no face, and drops it after 0.5 s without a new answer. The camera picture no longer waits for
+MediaPipe. Device check pending.
+
 ## Brow code split out of BeautyBlush — Khalish (2026-10-29)
 
 There is still one makeup engine, `BeautyBlushEngine` (blush and brow share its camera session, Metal layer, hand mask and
@@ -12,9 +20,8 @@ No behaviour change.
 
 ## Brow load: SceneKit, fill model, temperature — Khalish (2026-10-29)
 
-While the brow's Metal layer is shown, the `ARSCNView` underneath (whose camera picture it covers) runs at
-`BeautyBlushEngine.coveredSceneFramesPerSecond` (10) instead of 60; it is back at 60 whenever the layer hides
-(`setLayerShown`). MI-GAN (`BrowEraser.modelDue`) is asked again only after the face crop moved more than 6% of its size or
+The `ARSCNView` under the brow's Metal layer stays at 60 fps: slowing it to 10 (tried 2026-10-29) also slowed the ARKit
+frames the brow is drawn from, and the brow lagged and dropped out. MI-GAN (`BrowEraser.modelDue`) is asked again only after the face crop moved more than 6% of its size or
 1 s passed (never sooner than 0.12 s); its answer stays mapped in brow space between requests. `BeautyBlushEngine.BrowLoad`
 follows `ProcessInfo.thermalState`: nominal 40 fps tracker / 15 Hz mask / model; fair 30 fps / 10 Hz / model ≥0.5 s;
 serious and critical 20 fps / 8 Hz / no model (push-pull fill only). Not measured on a device.

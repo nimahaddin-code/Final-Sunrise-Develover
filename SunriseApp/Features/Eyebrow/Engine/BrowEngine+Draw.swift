@@ -128,7 +128,9 @@ extension BeautyBlushEngine {
         if case .some(let current)=browStatus,current==next {return}
         browStatus = .some(next);onStatus?(next)
     }
-    func drawBrow(_ frame:ARFrame,observation detected:BrowObservation?,face:BrowFaceFrame?,settings s:Settings) {
+    /// Draws one camera frame with `observation` (already steadied and placed on this frame); `detected` is MediaPipe's raw
+    /// answer it came from, for the tracking view.
+    func drawBrow(_ frame:ARFrame,observation:BrowObservation?,raw detected:BrowObservation?,face:BrowFaceFrame?,settings s:Settings) {
         guard inFlight.wait(timeout:.now()) == .success else{return}
         var committed=false
         defer {if !committed {inFlight.signal()}}
@@ -152,11 +154,6 @@ extension BeautyBlushEngine {
             catch {lastError="brow_texture_unavailable: \(error)"}
         }
         let display=frame.displayTransform(for:s.orientation,viewportSize:s.viewport)
-        var observation:BrowObservation?
-        if let detected {
-            if let face,let steady=browStabilizer.stabilize(detected,face:face) {observation=steady;browSmoother.reset();browStabilized=true}
-            else {browStabilizer.reset();observation=browSmoother.smooth(detected);browStabilized=false}
-        } else {browSmoother.reset();browStabilizer.reset();browStabilized=false}
         let tracked=observation.map {abs($0.pose.yaw)<config.max_yaw_degrees && abs($0.pose.pitch)<config.max_yaw_degrees} ?? false
         // A 3D brow needs ARKit's face in this frame (browStabilized) and its mesh; otherwise its picture is drawn instead.
         let hairMesh=s.browOverlay?.is3D==true && browStabilized && tracked ? hairMeshIfReady():nil
@@ -245,7 +242,7 @@ extension BeautyBlushEngine {
             withExtendedLifetime(retained) {}
             Task { @MainActor [weak self] in
                 guard let self else{return};self.lock.lock();let show=self.settings.enabled && self.settings.epoch==s.epoch;self.lock.unlock()
-                if show {self.setLayerShown(true,brow:true)}
+                if show {self.setLayerShown(true)}
             }
             self?.queue.async { [weak self] in self?.report(cb,frameTimestamp:ts,maskFresh:fresh,visibility:visible,isBrow:true) }
         }
