@@ -328,6 +328,12 @@ private struct TutorialScreen: View {
                         }
                         .mask(alignment: .leading) { halfMask(left: model.compare == .split) }
                     }
+                    if model.compare == .split {
+                        // The same camera without the filter, covering the right half.
+                        RealCameraView(session: camera.trackingManager.session)
+                            .mask(alignment: .trailing) { halfMask(left: false) }
+                            .transition(.opacity)
+                    }
                 }
                 .animation(.easeInOut(duration: 0.25), value: model.compare)
             } else {
@@ -483,4 +489,27 @@ private struct LinerGuideOutline: View {
         .allowsHitTesting(false)
         .accessibilityHidden(true)
     }
+}
+
+/// Plain camera picture from the shared face session, with no content: the "real" side of the comparison.
+private struct RealCameraView: UIViewRepresentable {
+    let session: ARSession
+
+    func makeUIView(context: Context) -> ARSCNView {
+        let view = ARSCNView(frame: .zero)
+        // Giving a view the session makes the view its delegate. The filtered camera's coordinator is the delegate that
+        // feeds the brow, blush and eyeliner frames, so it is put back: otherwise the filter stops updating in split view.
+        let delegate = session.delegate
+        let delegateQueue = session.delegateQueue
+        view.session = session
+        session.delegate = delegate
+        session.delegateQueue = delegateQueue
+        view.preferredFramesPerSecond = 30
+        view.scene = SCNScene()
+        view.automaticallyUpdatesLighting = false
+        view.isUserInteractionEnabled = false
+        return view
+    }
+
+    func updateUIView(_ view: ARSCNView, context: Context) {}
 }
