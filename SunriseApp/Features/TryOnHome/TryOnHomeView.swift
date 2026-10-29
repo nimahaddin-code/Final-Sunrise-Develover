@@ -27,6 +27,7 @@ struct TryOnHomeView: View {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
                     .overlay(alignment: .topLeading) {
                         if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small) }
+                        if developerTools && home.tool == .blush { BlushDebugMenu().padding(AppSpacing.small) }
                     }
             }
             toolStrip

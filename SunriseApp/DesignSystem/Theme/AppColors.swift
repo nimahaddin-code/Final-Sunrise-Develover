@@ -12,6 +12,8 @@ enum AppColors {
     static let cocoa = Color(red: 0x5F / 255, green: 0x2C / 255, blue: 0x30 / 255)
     static let flamingo = Color(red: 0xF5 / 255, green: 0x47 / 255, blue: 0x7D / 255)
     static let snow = Color.white
+    /// Camera and tutorial caption fill (UX spec 1.1), #370B21.
+    static let captionFill = Color(red: 0x37 / 255, green: 0x0B / 255, blue: 0x21 / 255)
     /// Full-screen background of the Try On, tutorial and palette screens (black; wine stays for pills and accents).
     static let screen = Color.black
 }

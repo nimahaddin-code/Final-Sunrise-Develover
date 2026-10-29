@@ -1,3 +1,42 @@
+## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
+
+`GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it
+into your skin.", with their own `blushStep` (the brow model's three blush lessons are no longer used here). Caption is
+`stepCaption` (spec 1.1: STEP n OF 2 at 70%, 4 pt gap, `AppColors.captionFill` #370B21, radius 18, 22 x 4 padding, max
+300 pt). `BlushTutorialOverlay` draws, anchored to each cheek: step 1 the inner dotted circle (0.38 of the pigment field)
+with a fingertip dabbing three times and a pink tap ring; step 2 also the outer dotted line (0.82), the ring between them
+pulsing 20%-50% every 2 s, the fingertip dabbing outward along the look's direction. 3 s animation, 2 s rest, repeat;
+Reduce Motion shows the last frame and a still 40% ring; thermal `.serious` pauses the loop. Outlines are bound to the
+mesh at bake (`BeautyBlushEngine.guideOutline`), projected with the pigment's own filtered vertices and `mvp`
+(`projectGuide`) at 30 Hz, and published through `FaceCameraState.blushGuide` (`BlushGuideFeed`). The blush shader
+contour is off (`tracking.y = 0`); Try On never used it. Camera messages (spec 1-2) are not implemented. Device check pending.
+
+## Blush cheek fit from MediaPipe landmarks, wide natural wash — -Nimah (2026-10-29)
+
+Device feedback: blush too small and not shaped to the face. For Youthful/Sunkissed/Lifted, `BeautyBlushEngine` now runs
+the shared MediaPipe tracker while blush is selected, only until the cheek fit is measured: 17 landmarks per frame
+(`BlushCheekLandmarks.pairs`: eye corners, lower lid, nostril wing, mouth corner, cheekbone, apple, face edge) are lifted
+onto the same frame's ARKit mesh (`BrowFaceFrame.faceLocal`), frontal frames only (|yaw|,|pitch| < 15), median of 10,
+once per face anchor. `BlushPlacementGenerator.landmarkField` places each cheek in that person's corridor (nostril wing
+to face edge, mouth corner to lower lid) with new preset fields `landmark_*` (fractions of the corridor) and a
+flat-topped `wash` profile (1 - smoothstep(r), atlas `paint.z`), cut softly by nose/lid/face-edge feathers. Pigment is
+still drawn on the ARKit mesh with ARKit UVs. Until the fit arrives, or when it is implausible, the ARKit-only fit is
+drawn (one re-bake when it arrives, no crossfade). Look `max_alpha` 0.48 -> 0.34. Other blush styles are unchanged.
+Synthetic tests only; device look pending.
+
+## Skin-preserving blush compositing and blush lab — -Nimah (2026-10-29)
+
+Blush stays a UV atlas on the native ARKit mesh; placement/silhouettes are unchanged. Fixed in
+`BeautyBlush.metal.txt`: camera decode is now the exact inverse of the sRGB drawable (the BT.709 decode
+lifted shadows 0.10 -> 0.16 for every Metal camera pixel, brow included); default blend colours low-frequency skin
+(`detail_radius_px`, new required JSON field, 2...16 camera px) and puts back each pixel's luminance ratio and chroma
+residual, keeping pores, highlights and freckles; out-of-gamut colours move towards their own luminance instead of
+per-channel clamping; tutorial contour is an antialiased isoline. Alpha 0 is exactly the camera pixel.
+Developer tools + Blush: `BlushDebugMenu` picks blend (pigment, previous, linear alpha, multiply, soft light) and
+diagnostics (neutral, UV checker, mask, boundaries, visibility, wireframe). No MediaPipe blush renderer, Banuba or
+BytePlus exists; the orphan `Features/BeautyBlush/Comparison/` files are not in the project. See ADR 0017 and
+`Docs/blush-rendering.schema.json`. Synthetic Simulator tests only; device look pending.
+
 ## Tutorial camera handoff and welcome revision — 2026-10-29
 
 Try On deactivates before pushing tutorial. Paused/revoked/dismantled ARSCNViews detach

@@ -6969,7 +6969,7 @@
           "maximum": 0.04
         },
         "max_alpha": {
-          "value": 0.48,
+          "value": 0.55,
           "unit": "ratio",
           "basis": "pigment_alpha",
           "provenance": [
@@ -6977,7 +6977,7 @@
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
-          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "rationale": "Feedback iPhone 2026-10-29: 0.34 terlalu samar di slider penuh; area lebar dengan tepi lembut, jadi inti boleh lebih pekat.",
           "minimum": 0,
           "maximum": 0.8
         },
@@ -7025,6 +7025,84 @@
           "basis": "User screenshot design calibration; native face-local geometry",
           "minimum": 0,
           "maximum": 0.6
+        },
+        "landmark_center_across": {
+          "value": 0.45,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sayap hidung (0) ke tepi wajah (1) pada pipi yang diukur MediaPipe.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_center_up": {
+          "value": 0.5,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sudut bibir (0) ke kelopak bawah (1).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_radius_across": {
+          "value": 0.62,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius horizontal relatif lebar koridor pipi; lebar ala filter TikTok, dipotong lembut oleh batas hidung/mata/tepi wajah.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_radius_up": {
+          "value": 0.58,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius vertikal relatif tinggi koridor pipi.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_edge_feather": {
+          "value": 0.35,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Lebar pudar di batas hidung, kelopak bawah dan tepi wajah, relatif lebar koridor pipi; tanpa tepi yang terlihat.",
+          "minimum": 0.05,
+          "maximum": 0.6
+        },
+        "landmark_eye_clearance": {
+          "value": 0.06,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Jarak aman di bawah kelopak bawah, relatif tinggi koridor pipi.",
+          "minimum": 0,
+          "maximum": 0.3
         }
       },
       "center_rule_id": "formula.blush_center",
@@ -7221,7 +7299,7 @@
           "maximum": 0.04
         },
         "max_alpha": {
-          "value": 0.46,
+          "value": 0.55,
           "unit": "ratio",
           "basis": "pigment_alpha",
           "provenance": [
@@ -7229,7 +7307,7 @@
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
-          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "rationale": "Feedback iPhone 2026-10-29: 0.34 terlalu samar di slider penuh; area lebar dengan tepi lembut, jadi inti boleh lebih pekat.",
           "minimum": 0,
           "maximum": 0.8
         },
@@ -7305,6 +7383,84 @@
           "basis": "User screenshot design calibration; native face-local geometry",
           "minimum": 0,
           "maximum": 1
+        },
+        "landmark_center_across": {
+          "value": 0.36,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sayap hidung (0) ke tepi wajah (1) pada pipi yang diukur MediaPipe.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_center_up": {
+          "value": 0.66,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sudut bibir (0) ke kelopak bawah (1).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_radius_across": {
+          "value": 0.72,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius horizontal relatif lebar koridor pipi; lebar ala filter TikTok, dipotong lembut oleh batas hidung/mata/tepi wajah.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_radius_up": {
+          "value": 0.42,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius vertikal relatif tinggi koridor pipi.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_edge_feather": {
+          "value": 0.35,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Lebar pudar di batas hidung, kelopak bawah dan tepi wajah, relatif lebar koridor pipi; tanpa tepi yang terlihat.",
+          "minimum": 0.05,
+          "maximum": 0.6
+        },
+        "landmark_eye_clearance": {
+          "value": 0.06,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Jarak aman di bawah kelopak bawah, relatif tinggi koridor pipi.",
+          "minimum": 0,
+          "maximum": 0.3
         }
       },
       "center_rule_id": "formula.blush_center",
@@ -7501,7 +7657,7 @@
           "maximum": 0.04
         },
         "max_alpha": {
-          "value": 0.48,
+          "value": 0.55,
           "unit": "ratio",
           "basis": "pigment_alpha",
           "provenance": [
@@ -7509,7 +7665,7 @@
             "engineering_proposal"
           ],
           "validation_status": "proposed_initial",
-          "rationale": "Usulan numerik baru untuk wash blush lebih luas dan membaur pada visual yang disetujui; bukan digitasi landmark atau ukuran tervalidasi perangkat.",
+          "rationale": "Feedback iPhone 2026-10-29: 0.34 terlalu samar di slider penuh; area lebar dengan tepi lembut, jadi inti boleh lebih pekat.",
           "minimum": 0,
           "maximum": 0.8
         },
@@ -7557,6 +7713,84 @@
           "basis": "User screenshot design calibration; native face-local geometry",
           "minimum": 0,
           "maximum": 0.6
+        },
+        "landmark_center_across": {
+          "value": 0.6,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sayap hidung (0) ke tepi wajah (1) pada pipi yang diukur MediaPipe.",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_center_up": {
+          "value": 0.66,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Pusat blush dari sudut bibir (0) ke kelopak bawah (1).",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "landmark_radius_across": {
+          "value": 0.74,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius horizontal relatif lebar koridor pipi; lebar ala filter TikTok, dipotong lembut oleh batas hidung/mata/tepi wajah.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_radius_up": {
+          "value": 0.4,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Radius vertikal relatif tinggi koridor pipi.",
+          "minimum": 0.2,
+          "maximum": 1.2
+        },
+        "landmark_edge_feather": {
+          "value": 0.35,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Lebar pudar di batas hidung, kelopak bawah dan tepi wajah, relatif lebar koridor pipi; tanpa tepi yang terlihat.",
+          "minimum": 0.05,
+          "maximum": 0.6
+        },
+        "landmark_eye_clearance": {
+          "value": 0.06,
+          "unit": "ratio",
+          "basis": "cheek_corridor",
+          "provenance": [
+            "user_device_feedback_2026_10_29",
+            "engineering_proposal"
+          ],
+          "validation_status": "proposed_initial",
+          "rationale": "Jarak aman di bawah kelopak bawah, relatif tinggi koridor pipi.",
+          "minimum": 0,
+          "maximum": 0.3
         }
       },
       "center_rule_id": "formula.blush_center",

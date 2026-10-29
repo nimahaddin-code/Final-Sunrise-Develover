@@ -54,6 +54,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     @Published private(set) var linerStep = 0
     /// The Brows tab's own step (its five steps are the tutorial's, not the brow model's).
     @Published private(set) var browStep = 0
+    @Published private(set) var blushStep = 0
     @Published private(set) var compare = TutorialCompare.filter
     private let linerStyle: LinerStyle?
     private let linerIsNeutral: Bool
@@ -80,8 +81,14 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     var stepIndex: Int {
-        switch tab { case .eyeliner: linerStep; case .brows: browStep; case .blush: brow.stepIndex }
+        switch tab { case .eyeliner: linerStep; case .brows: browStep; case .blush: blushStep }
     }
+
+    /// The Blush tab's two steps (UX spec 3.5). "Dab" works for cream and powder alike; the caption is the whole instruction.
+    static let blushLessons = [
+        FaceGuideLesson(title: String(localized: "Dab a little blush inside the small circle."), instruction: ""),
+        FaceGuideLesson(title: String(localized: "Dab outward to blend it into your skin."), instruction: ""),
+    ]
 
     /// The Brows tab's steps, as a brow is drawn with a pencil after brow mapping.
     static let browLessons = [
@@ -108,6 +115,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         }
         if tab == .eyeliner, let linerStyle { return Self.linerLessons(linerStyle, neutral: linerIsNeutral) }
         if tab == .brows { return Self.browLessons }
+        if tab == .blush { return Self.blushLessons }
         return brow.lessons
     }
 
@@ -143,6 +151,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         tab = new
         linerStep = 0
         browStep = 0
+        blushStep = 0
         if new != .eyeliner {
             brow.select(new == .blush ? .blush : .eyebrows)
             applyShade(for: new.tool)
@@ -154,14 +163,14 @@ enum TutorialTab: CaseIterable, Identifiable {
     /// Next step. Returns true when the last step was already showing, so the screen should close.
     func advance() -> Bool {
         guard stepIndex + 1 < lessons.count else { return true }
-        switch tab { case .eyeliner: linerStep += 1; case .brows: browStep += 1; case .blush: brow.nextStep() }
+        switch tab { case .eyeliner: linerStep += 1; case .brows: browStep += 1; case .blush: blushStep += 1 }
         return false
     }
 
     /// Previous step. Returns true when already on the first step, so the screen should close.
     func retreat() -> Bool {
         guard stepIndex > 0 else { return true }
-        switch tab { case .eyeliner: linerStep -= 1; case .brows: browStep -= 1; case .blush: brow.previousStep() }
+        switch tab { case .eyeliner: linerStep -= 1; case .brows: browStep -= 1; case .blush: blushStep -= 1 }
         return false
     }
 
@@ -321,6 +330,10 @@ private struct TutorialScreen: View {
                                   eyebrowConfiguration: model.liveConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   })
+                    if model.tab == .blush && model.compare != .off && model.hasGuide {
+                        BlushTutorialOverlay(feed: camera.blushGuide, step: index)
+                            .mask(alignment: .leading) { halfMask(left: model.compare == .split) }
+                    }
                     if model.tab == .eyeliner && model.compare != .off {
                         ZStack {
                             LinerOverlayView(model: model.liner, isVisible: true)
@@ -402,7 +415,11 @@ private struct TutorialScreen: View {
 
     /// Brows: a small spaced "STEP 1 OF 5" over one short instruction in a pill, like a camera effect's caption.
     @ViewBuilder private var wording: some View {
-        if model.tab == .brows { browCaption } else { lessonCard }
+        switch model.tab {
+        case .brows: browCaption
+        case .blush: stepCaption
+        case .eyeliner: lessonCard
+        }
     }
 
     private var browCaption: some View {
@@ -427,6 +444,37 @@ private struct TutorialScreen: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
         .accessibilityValue(Text(lessons[index].title + ". " + lessons[index].instruction))
+    }
+
+    /// UX spec 1.1: "STEP 1 OF 2" (17 pt, 2 pt tracking, 70%, drop shadow), 4 pt gap, then the caption in a #370B21 rounded
+    /// rectangle (15 pt, -0.43 tracking, 22 pt lines, radius 18, padding 22 x 4, hugging the text up to 300 pt wide).
+    private var stepCaption: some View {
+        VStack(spacing: 4) {
+            Text("Step \(index + 1) of \(lessons.count)")
+                .textCase(.uppercase)
+                .font(.body)
+                .tracking(2)
+                .monospacedDigit()
+                .foregroundStyle(AppColors.snow.opacity(0.7))
+                .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
+            Text(lessons[index].title)
+                .font(.subheadline)
+                .tracking(-0.43)
+                .lineSpacing(2)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(AppColors.snow)
+                .padding(.horizontal, 22).padding(.vertical, 4)
+                .background(AppColors.captionFill, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .frame(maxWidth: 300)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, AppSpacing.medium)
+        .animation(.easeInOut(duration: 0.2), value: index)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
+        .accessibilityValue(Text(lessons[index].title))
     }
 
     private var lessonCard: some View {
@@ -513,3 +561,109 @@ private struct RealCameraView: UIViewRepresentable {
 
     func updateUIView(_ view: ARSCNView, context: Context) {}
 }
+
+/// Blush tutorial overlay (UX spec 3.2 and 3.5), anchored to each cheek through `BlushGuideFeed`.
+/// Step 1: the inner dotted circle, and a fingertip dabbing inside it with a pink tap ring.
+/// Step 2: the outer dotted line too, the ring between them pulsing 20%-50% every 2 s, and the fingertip dabbing outward.
+/// The dab animation runs 3 s, rests 2 s and repeats. Reduce Motion shows its last frame and a still 40% highlight.
+private struct BlushTutorialOverlay: View {
+    @ObservedObject var feed: BlushGuideFeed
+    let step: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var thermal = ProcessInfo.processInfo.thermalState
+
+    static let cycle: Double = 5, animation: Double = 3, pulsePeriod: Double = 2
+    /// Three dabs start at these times within the cycle, each `dab` seconds long.
+    static let dabStarts: [Double] = [0.25, 1.15, 2.05], dab: Double = 0.8
+
+    var body: some View {
+        // Only a critical phone pauses the loop: AR plus MediaPipe reach `.serious` quickly, and a still guide reads as
+        // broken. The overlay itself stays.
+        let paused = reduceMotion || thermal == .critical
+        TimelineView(.animation(paused: paused)) { context in
+            let t = paused ? Self.animation - 0.001 : context.date.timeIntervalSinceReferenceDate
+            ZStack {
+                Canvas { g, _ in draw(&g, time: t, still: paused) }
+                if let cheeks = feed.snapshot?.cheeks {
+                    ForEach(cheeks.indices, id: \.self) { i in fingertip(cheeks[i], time: t, still: paused) }
+                }
+            }
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+        .animation(.easeInOut(duration: 0.25), value: step)
+        .onReceive(NotificationCenter.default.publisher(for: ProcessInfo.thermalStateDidChangeNotification)) { _ in
+            thermal = ProcessInfo.processInfo.thermalState
+        }
+    }
+
+    private func path(_ points: [CGPoint]) -> Path {
+        var p = Path()
+        guard let first = points.first else { return p }
+        p.move(to: first)
+        for q in points.dropFirst() { p.addLine(to: q) }
+        p.closeSubpath()
+        return p
+    }
+    private var dotted: StrokeStyle { StrokeStyle(lineWidth: 2.2, lineCap: .round, dash: [0.1, 7]) }
+
+    private func draw(_ g: inout GraphicsContext, time t: Double, still: Bool) {
+        guard let cheeks = feed.snapshot?.cheeks else { return }
+        for c in cheeks {
+            let inner = path(c.inner), outer = path(c.outer)
+            if step >= 1 {
+                // The ring between the two lines: 20% to 50% and back every 2 s, or a still 40%.
+                let wave = 0.5 - 0.5 * cos(2 * .pi * t / Self.pulsePeriod)
+                var ring = outer; ring.addPath(inner)
+                g.fill(ring, with: .color(AppColors.flamingo.opacity(still ? 0.4 : 0.2 + 0.3 * wave)), style: FillStyle(eoFill: true))
+                g.stroke(outer, with: .color(AppColors.snow.opacity(0.95)), style: dotted)
+            }
+            g.stroke(inner, with: .color(AppColors.snow.opacity(step >= 1 ? 0.7 : 0.95)), style: dotted)
+        }
+    }
+
+    /// Where each of the three dabs lands: around the centre of the small circle, or stepping outward to the outer line.
+    private func targets(_ c: BlushGuideSnapshot.Cheek) -> [CGPoint] {
+        let d = CGPoint(x: c.outward.x - c.center.x, y: c.outward.y - c.center.y)
+        func along(_ k: CGFloat, _ side: CGFloat = 0) -> CGPoint {
+            CGPoint(x: c.center.x + d.x * k - d.y * side, y: c.center.y + d.y * k + d.x * side)
+        }
+        return step == 0 ? [along(0), along(0.25, 0.2), along(-0.2, -0.15)] : [along(0.65), along(0.95, 0.15), along(1.25, -0.1)]
+    }
+
+    static func fingerPosition(_ points: [CGPoint], local: Double, index: Int, u: Double) -> CGPoint {
+        func lerp(_ a: CGPoint, _ b: CGPoint, _ k: Double) -> CGPoint { CGPoint(x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k) }
+        if local < dabStarts[0] { return lerp(points[points.count - 1], points[0], local / dabStarts[0]) }
+        return lerp(index > 0 ? points[index - 1] : points[0], points[index], min(1, u * 3))
+    }
+
+    @ViewBuilder private func fingertip(_ c: BlushGuideSnapshot.Cheek, time t: Double, still: Bool) -> some View {
+        let points = targets(c)
+        let local = still ? Self.animation - 0.001 : t.truncatingRemainder(dividingBy: Self.cycle)
+        // Which dab, how far into it (0...1), and how hard the finger presses (0 up, 1 on the skin).
+        let index = Self.dabStarts.lastIndex { $0 <= local } ?? 0
+        let u = max(0, min(1, (local - Self.dabStarts[index]) / Self.dab))
+        let press = local < Self.dabStarts[0] ? 0 : sin(Double.pi * min(1, u * 1.25))
+        // Before the first dab the finger glides back from where the last cycle ended; it never disappears, and it rests on
+        // the last dab through the 2 s pause.
+        let target = Self.fingerPosition(points, local: local, index: index, u: u)
+        let visible: Double = 1
+        let ringProgress = still ? 0.6 : max(0, min(1, (u - 0.35) / 0.65))
+        ZStack {
+            Circle()
+                .stroke(AppColors.flamingo, lineWidth: 2.5)
+                .frame(width: 10 + 30 * ringProgress, height: 10 + 30 * ringProgress)
+                .opacity((still ? 0.6 : (u > 0.35 && local < Self.animation ? 1 - ringProgress : 0)) * visible)
+                .position(points[index])
+            Image(systemName: "hand.point.up.left.fill")
+                .font(.system(size: 34))
+                .foregroundStyle(AppColors.snow)
+                .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
+                .scaleEffect(1 - 0.08 * press)
+                // The symbol's fingertip is near its top left: put that point on the cheek, lifted while not pressing.
+                .position(x: target.x + 9, y: target.y + 15 - 14 * (1 - press))
+                .opacity(visible)
+        }
+    }
+}
+

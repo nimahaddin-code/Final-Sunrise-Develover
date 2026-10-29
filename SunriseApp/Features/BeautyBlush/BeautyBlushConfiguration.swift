@@ -9,6 +9,8 @@ struct BeautyBlushConfiguration:Decodable,Sendable {
     let absorption:Float
     let saturation:Float
     let pigment_mix:Float
+    /// Radius, in camera pixels, of the low-frequency skin the pigment colours; finer detail is kept from the camera.
+    let detail_radius_px:Float
     let min_cutoff_hz:Double
     let velocity_beta:Double
     let visibility_tau_seconds:Double
@@ -23,11 +25,12 @@ struct BeautyBlushConfiguration:Decodable,Sendable {
         return try decode(Data(contentsOf:url))
     }
     static func decode(_ data:Data)throws->Self {
-        guard let object=try JSONSerialization.jsonObject(with:data) as? [String:Any],Set(object.keys)==Set(["mask_asset","atlas_size","paint_feather","coverage","absorption","saturation","pigment_mix","min_cutoff_hz","velocity_beta","visibility_tau_seconds","mask_max_age_seconds","mask_fade_seconds","max_yaw_degrees","stretch_fade","target_fps","thermal_fps"]) else{throw CocoaError(.coderInvalidValue)}
+        guard let object=try JSONSerialization.jsonObject(with:data) as? [String:Any],Set(object.keys)==Set(["mask_asset","atlas_size","paint_feather","coverage","absorption","saturation","pigment_mix","detail_radius_px","min_cutoff_hz","velocity_beta","visibility_tau_seconds","mask_max_age_seconds","mask_fade_seconds","max_yaw_degrees","stretch_fade","target_fps","thermal_fps"]) else{throw CocoaError(.coderInvalidValue)}
         let c=try JSONDecoder().decode(Self.self,from:data)
         guard c.paint_feather.isFinite,(0.2...1).contains(c.paint_feather),c.mask_asset=="blush-wash-mask.png",[512,1024].contains(c.atlas_size),
               [c.coverage,c.saturation,c.pigment_mix].allSatisfy({$0.isFinite && (0...1).contains($0)}),
               c.absorption.isFinite,(0...2).contains(c.absorption),
+              c.detail_radius_px.isFinite,(2...16).contains(c.detail_radius_px),
               c.min_cutoff_hz.isFinite,(2...30).contains(c.min_cutoff_hz),
               c.velocity_beta.isFinite,(0...200).contains(c.velocity_beta),
               c.visibility_tau_seconds.isFinite,(0.01...0.2).contains(c.visibility_tau_seconds),
@@ -115,4 +118,23 @@ enum BeautyMaskContinuity {
         let t=max(0,min(1,(age-freshAge)/fadeSeconds))
         return 1-t*t*(3-2*t)
     }
+}
+
+// Developer-only blush comparison switches (developer tools on, blush selected). Same camera frame, mask and alpha
+// for every choice, so differences are the blend itself. Users always get `.pigment` / `.final`.
+enum BlushBlend:Int,CaseIterable,Identifiable {
+    case pigment,legacy,alpha,multiply,softLight
+    var id:Int {rawValue}
+    var title:String {switch self {
+    case .pigment:"Skin-preserving pigment";case .legacy:"Previous blend";case .alpha:"Linear alpha"
+    case .multiply:"Multiply";case .softLight:"Soft light"}}
+}
+enum BlushDiagnostic:Int,CaseIterable,Identifiable {
+    case final,neutral,uvChecker,mask,boundaries,visibility,wireframe
+    var id:Int {rawValue}
+    var title:String {switch self {
+    case .final:"Final";case .neutral:"Neutral geometry";case .uvChecker:"UV checker";case .mask:"Pigment mask"
+    case .boundaries:"Mask boundaries";case .visibility:"Visibility (R occluded, G stretch, B tracking)";case .wireframe:"Triangle wireframe"}}
+    /// The wireframe is an extra pass over the final picture, not a shader view.
+    var shaderValue:Int {self == .wireframe ? 0:rawValue}
 }

@@ -111,3 +111,32 @@ struct BrowDebugMenu: View {
         }
     }
 }
+
+/// Blush blend and diagnostic for side-by-side checks on device; shown only while developer tools are on.
+/// English-only developer view: every string is verbatim, so none reaches `Localizable.xcstrings`.
+struct BlushDebugMenu: View {
+    @AppStorage(BeautyBlushEngine.blushBlendKey) private var blend = BlushBlend.pigment.rawValue
+    @AppStorage(BeautyBlushEngine.blushDiagnosticKey) private var diagnostic = BlushDiagnostic.final.rawValue
+
+    var body: some View {
+        Menu {
+            Picker(selection: $blend) {
+                ForEach(BlushBlend.allCases) { Text(verbatim: $0.title).tag($0.rawValue) }
+            } label: { Text(verbatim: "Blend") }
+            Picker(selection: $diagnostic) {
+                ForEach(BlushDiagnostic.allCases) { Text(verbatim: $0.title).tag($0.rawValue) }
+            } label: { Text(verbatim: "Diagnostic") }
+            Section {
+                Text(verbatim: "ARKit face mesh + Metal (drawing)")
+                Text(verbatim: "MediaPipe: cheek fit for the reference looks")
+                Text(verbatim: "Banuba, BytePlus: SDK and licence not installed")
+            } header: { Text(verbatim: "Tracker") }
+        } label: {
+            Label { Text(verbatim: "Blush lab") } icon: { Image(systemName: "ladybug") }
+                .font(AppTypography.caption)
+                .padding(.horizontal, 10).padding(.vertical, 6)
+                .background(AppColors.cocoa.opacity(0.85), in: Capsule())
+                .foregroundStyle(AppColors.snow)
+        }
+    }
+}

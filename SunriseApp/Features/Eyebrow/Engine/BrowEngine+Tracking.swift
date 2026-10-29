@@ -47,6 +47,18 @@ extension BeautyBlushEngine {
         let face=browFaceFrame(frame)
         drawLiveBrow(frame,face:face,settings:s,maxFPS:load.trackerFPS)
         guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit,maxFPS:load.trackerFPS) else {return}
+        let (entry,up,_)=submitToBrowTracker(frame,face:face,settings:s)
+        queue.async { [self] in
+            // Hand/fringe occlusion uses the same face-skin mask as blush (15 Hz, less when the phone is warm). Only the brow
+            // shape and the hidden natural brow draw over the face, so only they need it.
+            guard s.browOverlay != nil || s.hideNatural,entry.frame.timestamp-lastSegment>=load.maskInterval,!segmenter.isBusy,segmenter.isAvailable else {return}
+            lastSegment=entry.frame.timestamp
+            segmenter.submit(.init(pixelBuffer:SendablePixelBuffer(buffer:entry.frame.capturedImage),timestamp:entry.frame.timestamp,headUp:up,headAnchors:[]))
+        }
+    }
+    /// Hands one camera frame to MediaPipe (brow, or the blush cheek fit) and keeps it until the answer returns. Returns the kept
+    /// frame, the screen's up direction in the captured image and whether the tracker took it.
+    @discardableResult func submitToBrowTracker(_ frame:ARFrame,face:BrowFaceFrame?,settings s:Settings)->(entry:BrowFrame,up:CGPoint,accepted:Bool) {
         let buffer=frame.capturedImage
         let raw=CGSize(width:CVPixelBufferGetWidth(buffer),height:CVPixelBufferGetHeight(buffer))
         // The screen's up and across directions in the captured image pick the detector's rotation; no face tracker.
@@ -61,16 +73,10 @@ extension BeautyBlushEngine {
         browToken += 1;let token=browToken;lastBrowSubmit=frame.timestamp
         browFrames=browFrames.filter {token-$0.key<2};browFrames[token]=entry
         lock.unlock()
-        if !browTracker.submit(BrowTrackerInput(pixelBuffer:SendablePixelBuffer(buffer:buffer),timestamp:frame.timestamp,headUp:up,headAcross:across,token:token)) {
-            lock.lock();browFrames[token]=nil;lock.unlock()
+        guard browTracker.submit(BrowTrackerInput(pixelBuffer:SendablePixelBuffer(buffer:buffer),timestamp:frame.timestamp,headUp:up,headAcross:across,token:token)) else {
+            lock.lock();browFrames[token]=nil;lock.unlock();return (entry,up,false)
         }
-        queue.async { [self] in
-            // Hand/fringe occlusion uses the same face-skin mask as blush (15 Hz, less when the phone is warm). Only the brow
-            // shape and the hidden natural brow draw over the face, so only they need it.
-            guard s.browOverlay != nil || s.hideNatural,entry.frame.timestamp-lastSegment>=load.maskInterval,!segmenter.isBusy,segmenter.isAvailable else {return}
-            lastSegment=entry.frame.timestamp
-            segmenter.submit(.init(pixelBuffer:SendablePixelBuffer(buffer:entry.frame.capturedImage),timestamp:entry.frame.timestamp,headUp:up,headAnchors:[]))
-        }
+        return (entry,up,true)
     }
     /// A MediaPipe answer (render queue): steadies it in its own frame and keeps it as the brow the live frames draw.
     func renderBrow(_ result:BrowTrackerResult) {

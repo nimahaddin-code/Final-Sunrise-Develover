@@ -70,6 +70,8 @@ struct BlushPigmentField:Sendable {
     var smoothstepMix:Float = 0
     var curvature:Float = 0
     var softProfile=false
+    /// Landmark-fitted wash: 1 - smoothstep(0, 1, r), flat-topped and with no visible edge (BeautyBlush.metal `paint.z`).
+    var wash=false
     var bounds:[SIMD2<Float>] {
         (0...64).map { i in
             let a=Float(i)*2*Float.pi/64
@@ -86,7 +88,8 @@ struct BlushPigmentField:Sendable {
         let r2=simd_length_squared(q)
         let raw=pow(max(0,1-r2),power)
         let smooth=raw*raw*(3-2*raw)
-        let radial=softProfile ? raw*exp(-0.8*r2):raw+(smooth-raw)*smoothstepMix
+        let r=r2.squareRoot(),t=max(0,min(1,r))
+        let radial=wash ? 1-t*t*(3-2*t):(softProfile ? raw*exp(-0.8*r2):raw+(smooth-raw)*smoothstepMix)
         // -Nimah: Fade inward at safe skin boundaries, without moving or shrinking the JSON ellipse.
         func mask(_ clearance:Float)->Float {
             let t=edgeFeather>0 ? max(0,min(1,clearance/edgeFeather)) : 1
@@ -96,7 +99,56 @@ struct BlushPigmentField:Sendable {
         return radial*mask(point.x*side-nasalLimit)*mask(outerLimit-point.x*side)*mask(eyeLimit-point.y)
     }
 }
+/// MediaPipe face landmarks lifted onto ARKit's face mesh (`BrowFaceFrame.faceLocal`), in the anchor's face-local metres:
+/// the median of several frontal frames. Gives each person's own cheek corridor: nostril wing to face edge, mouth corner
+/// to lower eyelid. Indices are MediaPipe's 468-point topology, never ARKit vertex indices.
+struct BlushCheekLandmarks:Sendable,Equatable {
+    struct Cheek:Sendable,Equatable {
+        var outerEye,innerEye,lowerLid,ala,mouthCorner,cheekbone,apple,faceEdge:SIMD3<Float>
+    }
+    /// (subject right, subject left) pairs, in `Cheek` member order.
+    static let pairs:[(Int,Int)]=[(33,263),(133,362),(145,374),(129,358),(61,291),(116,345),(50,280),(234,454)]
+    static var indices:[Int] {pairs.flatMap {[$0.0,$0.1]}}
+    let cheeks:[Cheek]
+    /// `points` in `indices` order. Sides are told apart by measured x, never by screen mirroring.
+    init?(points:[SIMD3<Float>]) {
+        guard points.count==Self.indices.count,points.allSatisfy({$0.x.isFinite && $0.y.isFinite && $0.z.isFinite}) else {return nil}
+        func cheek(_ k:Int)->Cheek {
+            let p=(0..<Self.pairs.count).map {points[$0*2+k]}
+            return Cheek(outerEye:p[0],innerEye:p[1],lowerLid:p[2],ala:p[3],mouthCorner:p[4],cheekbone:p[5],apple:p[6],faceEdge:p[7])
+        }
+        let a=cheek(0),b=cheek(1)
+        guard a.ala.x*b.ala.x<0,a.faceEdge.x*b.faceEdge.x<0 else {return nil}
+        cheeks=[a,b]
+    }
+    /// The cheek on the side whose x has `sign`.
+    func cheek(sign:Float)->Cheek? {cheeks.first {$0.ala.x*sign>0}}
+    /// Per-coordinate median of several samples (each in `indices` order).
+    static func median(_ samples:[[SIMD3<Float>]])->[SIMD3<Float>]? {
+        guard let first=samples.first,samples.allSatisfy({$0.count==first.count}) else {return nil}
+        func mid(_ v:[Float])->Float {let s=v.sorted();return s.count%2==1 ? s[s.count/2]:(s[s.count/2-1]+s[s.count/2])/2}
+        return first.indices.map {i in SIMD3(mid(samples.map {$0[i].x}),mid(samples.map {$0[i].y}),mid(samples.map {$0[i].z}))}
+    }
+}
 enum BlushPlacementGenerator {
+    /// One cheek's wash from its measured corridor, or nil when the landmarks do not form a usable cheek.
+    static func landmarkField(_ c:BlushCheekLandmarks.Cheek,sign:Float,rule:MakeupRuleDatabase.Preset,width:Float,style:BlushPlacementStyle)->BlushPigmentField? {
+        guard ["landmark_center_across","landmark_center_up","landmark_radius_across","landmark_radius_up","landmark_edge_feather","landmark_eye_clearance"].allSatisfy({rule.parameters[$0] != nil}) else {return nil}
+        let inner=c.ala.x*sign
+        let outer=c.faceEdge.x*sign-width*rule.number("face_edge_margin")
+        let top=min(c.lowerLid.y,c.outerEye.y),bottom=c.mouthCorner.y
+        let across=outer-inner,height=top-bottom
+        // A real cheek is at least ~2.5 cm across and tall; anything less is a bad fit, not a small face.
+        guard across>0.025,height>0.025,across<0.12,height<0.12 else {return nil}
+        let eyeLimit=top-height*rule.number("landmark_eye_clearance")
+        let center=SIMD2(sign*(inner+across*rule.number("landmark_center_across")),bottom+height*rule.number("landmark_center_up"))
+        let radius=SIMD2(across*rule.number("landmark_radius_across"),height*rule.number("landmark_radius_up"))
+        return BlushPigmentField(center:center,radius:radius,angle:rule.number("outward_up_angle")*Float.pi/180,side:sign,
+            nasalLimit:inner,outerLimit:outer,eyeLimit:eyeLimit,opacity:rule.number("max_alpha"),power:1,
+            edgeFeather:across*rule.number("landmark_edge_feather"),smoothstepMix:0,curvature:rule.parameters["curvature"]?.value ?? 0,
+            softProfile:true,wash:true)
+    }
+
     static func mouthExclusion(vertices:[SIMD3<Float>],triangles:[Int16],eyes:[SIMD3<Float>])->SIMD4<Float> {
         struct Edge:Hashable {let a:Int;let b:Int}
         guard eyes.count==2,!vertices.isEmpty,triangles.count%3==0 else{return .zero}
@@ -126,7 +178,9 @@ enum BlushPlacementGenerator {
         return .zero
     }
 
-    static func make(region:EyebrowRegion,style:BlushPlacementStyle) -> BlushPlacementGuide? {
+    /// With `cheeks` (reference looks only), each cheek is fitted to the person's measured corridor; without, or when a
+    /// side's landmarks do not form a usable cheek, the ARKit-only fit below is used for that side.
+    static func make(region:EyebrowRegion,style:BlushPlacementStyle,cheeks:BlushCheekLandmarks?=nil) -> BlushPlacementGuide? {
         guard let rule=MakeupRuleDatabase.blush(style) else { return nil }
         let vertices=region.restVertices
         guard region.brows.count==2,let lo=vertices.map(\.x).min(),let hi=vertices.map(\.x).max() else { return nil }
@@ -179,7 +233,9 @@ enum BlushPlacementGenerator {
             center.x=sign*max(nose+width*0.025,min(localOuter-width*0.025,sign*center.x))
             center.y=min(center.y,eyeLimit-width*0.025)
             if mouth.z>0 {center.y=max(center.y,mouth.y+mouth.w+width*parameter("blush_mouth_clearance",0.025))}
-            let field=BlushPigmentField(center:center,radius:radius,
+            let fitted=style.isReferenceLook ? cheeks?.cheek(sign:sign).flatMap {landmarkField($0,sign:sign,rule:rule,width:width,style:style)}:nil
+            if let fitted {center=fitted.center}
+            let field=fitted ?? BlushPigmentField(center:center,radius:radius,
                 angle:rule.number("outward_up_angle")*Float.pi/180,side:sign,nasalLimit:nose,
                 outerLimit:localOuter,
                 eyeLimit:eyeLimit,opacity:rule.number("max_alpha"),power:rule.number("radial_power"),edgeFeather:width*rule.number("mask_edge_feather"),smoothstepMix:rule.number("falloff_smoothstep_mix"),curvature:rule.parameters["curvature"]?.value ?? 0,softProfile:style.isReferenceLook)
@@ -196,7 +252,8 @@ enum BlushPlacementGenerator {
                 let p=center+SIMD2(sign*(q.x*cos(field.angle)-q.y*sin(field.angle)),q.x*sin(field.angle)+q.y*cos(field.angle))
                 if field.coverage(p)>0 { retained += 1 }
             } }
-            guard Float(retained)/Float(total)>=0.5 else { return nil }
+            // A landmark wash is meant to be wider than the cheek and cut softly by its borders.
+            guard fitted != nil || Float(retained)/Float(total)>=0.5 else { return nil }
             let clipped=field.bounds.map { p in SIMD2(sign*max(field.nasalLimit,min(field.outerLimit,sign*p.x)),min(field.eyeLimit,p.y)) }
             let boundary=clipped.compactMap(bind)
             // Tutorial boundary and filled pigment have separate eligibility. Do not lose a valid
