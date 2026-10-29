@@ -5,6 +5,14 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 
 ## Unreleased
 
+### Fixed / Changed — eyeliner tutorial guide and compare button
+- Step 2/3 outline now includes the wing (`LinerStepGeometry.shapes` uses `LinerGuide.outlines`, which merges the wing; `upperLiner` alone stops at the outer corner).
+- `LinerStepGuide` no longer observes every published liner frame (the timeline redraws it), keeps ticking while held so dots follow the face,
+  and its clock only runs while a fresh frame exists; halves are clipped inside the canvas instead of masked.
+- Compare button (`TutorialCompare`) cycles five layouts: look|guide, guide|look, look|plain, plain|look, plain. Eyeliner splits per half
+  (`LinerOverlayView(visibleSide:)`, `LinerStepGuide(side:)`). Brows/blush draw on one face mesh, so guide layouts show the guide full width and
+  look|plain layouts show the look beside the plain camera. Not yet checked on a real device.
+
 ### Added — camera messages, light and the three-step eyeliner tutorial (dandan camera and tutorial UX spec)
 - New shared folder `Features/CameraGuidance/`, used by every tool: `CameraMessage` (the 11 lines and their priority/delays), `CameraMessageEngine`
   (pure: show/clear delays plus hysteresis, unit tested), `CameraSignalSampler` (reads `ARSession.currentFrame`: light estimate, face-vs-frame
