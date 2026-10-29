@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The confirmation shown over the camera when a scan finishes: a black rounded square with a green circled checkmark, like the
-/// system's "done" HUD. It pops in; the success tap and sound come from `scanFeedback`. Colours are fixed on purpose: it must read on top of any camera picture.
+/// system's "done" HUD. It pops in when a scan completes. Colours are fixed on purpose: it must read on top of any camera picture.
 struct ScanDoneBadge: View {
     var size: CGFloat = 132
 

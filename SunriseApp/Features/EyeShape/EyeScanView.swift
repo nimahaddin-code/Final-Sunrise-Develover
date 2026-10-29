@@ -22,7 +22,6 @@ struct EyeScanView: View {
             .navigationBarTitleDisplayMode(.inline)
             .task { await model.startIfNeeded() }
             .onDisappear { model.stop() }
-            .scanFeedback(title: String(localized: "Eye scan"), progress: scanStatus.progress, isDone: model.result != nil)
             // Let the "done" badge show for a moment before the result sheet covers the camera.
             .task(id: model.result != nil) {
                 guard model.result != nil else { resultReady = false; return }
@@ -127,8 +126,7 @@ struct EyeScanView: View {
     }
 
     @ViewBuilder private var doneBadge: some View {
-        // With a Dynamic Island the confirmation grows out of it instead (`DynamicIslandConfirmation`, from `scanFeedback`).
-        if model.result != nil, !DynamicIslandConfirmation.isAvailable {
+        if model.result != nil {
             ScanDoneBadge().transition(.scale(scale: 0.6).combined(with: .opacity))
         }
     }

@@ -1,3 +1,11 @@
+## Brow frame rate — Khalish (2026-10-29)
+
+Tracker and draw caps are separate: MediaPipe gets up to `browMaxFramesPerSecond` (30) frames a second, the picture is drawn
+up to `BrowLoad.drawFPS` (60). `BrowLoad`: nominal 30 tracker / 60 draw, fair 24 / 60, serious and critical 15 / 30 (mask and
+model as below). Do not raise the tracker back to 60: the live draw already follows ARKit's pose every frame. Lifting landmarks
+onto the face mesh (`BrowFaceStabilizer`) passes `projectedVertices()` so each ray tests only triangles around its pixel.
+Device check pending.
+
 ## Brow drawn on every ARKit frame — Khalish (2026-10-29)
 
 Like blush, the brow now draws each ARKit camera frame (`drawLiveBrow`, up to `BrowLoad.trackerFPS`, skipping frames while one
@@ -388,7 +396,7 @@ file and adds a `CHANGELOG.md` entry in the same PR.
   and lets you try them on live with AR.
 - SwiftUI, iOS 17+, iPhone portrait. Swift 5 language mode with `SWIFT_STRICT_CONCURRENCY = complete`.
 - One third-party dependency: **MediaPipe Tasks Vision** (Swift Package from `google-ai-edge/mediapipe`, pinned to the `v1.1.1` commit `50505c8`; it must be pinned by revision, see ADR 0002), used only by the
-  eye scan in `Features/EyeShape`. One app target (`SunriseApp`), one unit test target (`SunriseAppTests`) and one app extension (`SunriseLiveActivity`, the scan's Dynamic Island).
+  eye scan in `Features/EyeShape`. One app target (`SunriseApp`) and one unit test target (`SunriseAppTests`).
   Why and how: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
 - Light MVVM: ViewModels are `@MainActor final class … : ObservableObject` with `@Published`. Stateless views have no ViewModel.
 - Apple frameworks, plus MediaPipe for the eye scan: ARKit + SceneKit (face tracking and makeup rendering), Vision (landmarks and face outline), AVFoundation (camera permission and the eye-scan camera), MediaPipe (eye and iris landmarks).
@@ -427,7 +435,7 @@ SunriseApp/
     Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
-    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge, DynamicIslandConfirmation
+    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge
   Features/
     FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
     MakeupTryOn/          makeup recommendations and live AR try-on
@@ -440,7 +448,6 @@ SunriseApp/
   PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
   Configuration/          Info.plist (camera + photo-library-add usage strings)
-SunriseLiveActivity/      app extension: the scan's Live Activity (Dynamic Island). `ScanActivityAttributes` (Core/Models) is shared with the app; keep it free of app-only imports
 SunriseDebugMac/          separate Mac-only Xcode project: edits scans exported from the Scan Debug tab (see below and its README)
 SunriseAppTests/
   Features/               face shape, head pose, photo measurer, makeup recommender/personalization/texture tests

@@ -5,21 +5,25 @@
 import SwiftUI
 
 extension BeautyBlushEngine {
-    /// The brow (camera picture and brow together) is redrawn at most this often, so it is not redrawn on every 60 Hz camera frame.
-    static let browMaxFramesPerSecond:Double=60
+    /// MediaPipe is handed at most this many camera frames a second. Between its answers the brow follows ARKit's face pose on
+    /// every drawn frame, so a faster tracker only takes GPU and Neural Engine time from drawing.
+    static let browMaxFramesPerSecond:Double=30
+    /// The camera picture with the brow is drawn at most this often (every frame of the 60 Hz camera).
+    static let browDrawFramesPerSecond:Double=60
     /// How much brow work the phone's temperature allows. The brow tracker, the hand mask and the fill model share the GPU and
     /// Neural Engine; as the phone warms each is asked less often, and when it is hot the fill model stops (the push-pull fill
     /// still hides the natural brow).
     struct BrowLoad:Equatable {
         var trackerFPS:Double
+        var drawFPS:Double
         var maskInterval:Double
         /// Shortest time between fill-model requests; nil turns the model off.
         var modelInterval:Double?
         static func current(_ state:ProcessInfo.ThermalState)->BrowLoad {
             switch state {
-            case .nominal:return BrowLoad(trackerFPS:browMaxFramesPerSecond,maskInterval:1.0/15,modelInterval:BrowEraser.modelInterval)
-            case .fair:return BrowLoad(trackerFPS:40,maskInterval:1.0/10,modelInterval:0.5)
-            default:return BrowLoad(trackerFPS:20,maskInterval:1.0/8,modelInterval:nil)
+            case .nominal:return BrowLoad(trackerFPS:browMaxFramesPerSecond,drawFPS:browDrawFramesPerSecond,maskInterval:1.0/15,modelInterval:BrowEraser.modelInterval)
+            case .fair:return BrowLoad(trackerFPS:24,drawFPS:browDrawFramesPerSecond,maskInterval:1.0/10,modelInterval:0.5)
+            default:return BrowLoad(trackerFPS:15,drawFPS:30,maskInterval:1.0/8,modelInterval:nil)
             }
         }
     }
@@ -45,7 +49,7 @@ extension BeautyBlushEngine {
     func submitBrow(_ frame:ARFrame,settings s:Settings) {
         let load=BrowLoad.current(ProcessInfo.processInfo.thermalState)
         let face=browFaceFrame(frame)
-        drawLiveBrow(frame,face:face,settings:s,maxFPS:load.trackerFPS)
+        drawLiveBrow(frame,face:face,settings:s,maxFPS:load.drawFPS)
         guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit,maxFPS:load.trackerFPS) else {return}
         let buffer=frame.capturedImage
         let raw=CGSize(width:CVPixelBufferGetWidth(buffer),height:CVPixelBufferGetHeight(buffer))

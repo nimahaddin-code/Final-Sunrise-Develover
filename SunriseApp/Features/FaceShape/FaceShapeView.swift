@@ -35,7 +35,6 @@ struct FaceShapeView: View {
                 }
             }
             .onDisappear { model.stop() }
-            .scanFeedback(title: String(localized: "Face scan"), progress: scanStatus.progress, isDone: model.result != nil)
             // Let the "done" badge show for a moment before the result sheet covers the camera.
             .task(id: model.result != nil) {
                 guard model.result != nil else { resultReady = false; return }
@@ -139,8 +138,7 @@ struct FaceShapeView: View {
     }
 
     @ViewBuilder private var doneBadge: some View {
-        // With a Dynamic Island the confirmation grows out of it instead (`DynamicIslandConfirmation`, from `scanFeedback`).
-        if model.result != nil, !DynamicIslandConfirmation.isAvailable {
+        if model.result != nil {
             ScanDoneBadge().transition(.scale(scale: 0.6).combined(with: .opacity))
         }
     }

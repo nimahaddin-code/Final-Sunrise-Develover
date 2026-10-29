@@ -1,3 +1,17 @@
+## Brow frame rate — Khalish (2026-10-29)
+
+- MediaPipe gets at most 30 camera frames a second again (`browMaxFramesPerSecond`; fair 24, hot 15); the brow is still drawn
+  on every 60 Hz frame (`BrowLoad.drawFPS`, 30 when hot), moved by ARKit's pose between answers. Running the landmarker at 60
+  fps took GPU and Neural Engine time from drawing.
+- `BrowFaceFrame.faceLocal(at:projected:)` skips mesh triangles whose image cannot contain the landmark (same result, far
+  fewer ray tests per MediaPipe answer on the render queue). `browStrip` evaluates the centerline once per column
+  (`BrowGeometry.section`) instead of three times per vertex.
+- Simulator tests only; frame rate not measured on a device.
+
+## Remove scan Live Activity — 2026-10-29
+
+- Removed the unused `SunriseLiveActivity` extension and ActivityKit scan feedback. Face and eye scans keep their in-app progress and completion badge.
+
 ## ARKit-pose brow stabilizer and 3D hair brow — Khalish (2026-10-28)
 
 - `BrowFaceStabilizer`: brow landmarks lifted onto ARKit's face mesh, smoothed in face-local metres, projected back; falls
