@@ -22,11 +22,9 @@ enum LinerTutorialStep: Int, CaseIterable {
 struct LinerStepGeometry {
     /// The lash line, inner start to outer corner.
     let lash: [CGPoint]
-    /// The lash line carried on to the wing's tip (or just the lash line for a look without a wing).
-    let outline: [CGPoint]
     /// The lower line of puppy, foxy and arabian, from its start.
     let lower: [CGPoint]
-    /// The area between the outline and the lashes.
+    /// The whole liner outline, closed: along the lash line, out to the wing and back, so a wing is a triangle.
     let band: [CGPoint]
     /// Inner corner, middle, outer corner, the wing's end when the look has one, then the lower line's start when it has one.
     let dots: [CGPoint]
@@ -38,7 +36,6 @@ struct LinerStepGeometry {
         self.lash = lash
         self.lower = lower
         band = guide.upperLiner
-        outline = lash + (guide.anchors.wingTip.map { [$0] } ?? [])
         var dots: [CGPoint] = []
         if let first = lash.first, let last = lash.last {
             dots = [first, lash[lash.count / 2], last]
@@ -126,7 +123,8 @@ struct LinerStepGuide: View {
                 case .markDots:
                     if playing { penTip = tapAnimation(&context, dots: dots, progress: progress, eyeWidth: eyeWidth, thin: thin) }
                 case .connect:
-                    let paths = [map(geometry.outline), map(geometry.lower)].filter { $0.count > 1 }.map { Self.path($0) }
+                    let paths = [Self.path(map(geometry.band), closed: true), Self.path(map(geometry.lower))]
+                        .filter { !$0.isEmpty }
                     for path in paths {
                         context.stroke(path.trimmedPath(from: 0, to: progress), with: .color(.white),
                                        style: StrokeStyle(lineWidth: max(eyeWidth * 0.018, 1.2 * thin), lineCap: .round,
@@ -134,12 +132,11 @@ struct LinerStepGuide: View {
                     }
                     if playing, let first = paths.first { penTip = first.trimmedPath(from: 0, to: progress).currentPoint }
                 case .fill:
-                    let outline = map(geometry.outline)
-                    if outline.count > 1 {
-                        context.stroke(Self.path(outline), with: .color(.white.opacity(0.8)),
+                    let band = map(geometry.band)
+                    if band.count > 2 {
+                        context.stroke(Self.path(band, closed: true), with: .color(.white.opacity(0.8)),
                                        style: StrokeStyle(lineWidth: max(eyeWidth * 0.014, 1 * thin), lineCap: .round))
                     }
-                    let band = map(geometry.band)
                     if band.count > 2 { context.fill(Self.path(band, closed: true), with: .color(pink.opacity(pulse))) }
                     let lash = map(geometry.lash)
                     if playing, lash.count > 1 {

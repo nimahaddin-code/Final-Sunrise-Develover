@@ -17,6 +17,9 @@ structure or usage changes. Group entries under Added / Changed / Fixed / Remove
 - Eyeliner tutorial: three steps (`LinerTutorialStep`, `Features/Tutorial/LinerStepGuide.swift`): mark dots (inner, middle, outer, wing end; the
   lower-line dot stays for puppy/foxy/arabian), connect them, fill. A drawn pen taps and moves; the loop is 3 s plus a 2 s pause; Reduce Motion
   shows the last frame. The last step's button reads Done and goes to the photo step. Replaces the one-step "Follow the dots".
+- Follow-up: head tilt (roll) is ignored and "Face your phone straight on" needs a ~45° turn; tracking lost right after a close or turned face
+  says "Move your phone back" / "Face your phone straight on" (`CameraMessageEngine.Limits`, guesses). Tutorial Back/Next are labelled capsules.
+  Eyeliner step 2 draws the whole closed outline (a wing is a triangle); the split-compare divider line is gone.
 - Camera denied card now reads "I need your camera to be your mirror." with "Turn on camera".
 - Brow and blush tutorial lessons are unchanged (long text); they only get the camera messages, the light and Done. While a message shows,
   their guide is hidden rather than faded. Thresholds are the spec's suggestions, not tuned; nothing is checked on a real device (simulator build

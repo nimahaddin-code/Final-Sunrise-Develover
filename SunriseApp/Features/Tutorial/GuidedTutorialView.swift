@@ -354,7 +354,6 @@ private struct TutorialScreen: View {
                         // The same camera without the filter, covering the right half.
                         RealCameraView(session: camera.trackingManager.session)
                             .mask(alignment: .trailing) { halfMask(left: false) }
-                        Rectangle().fill(AppColors.snow.opacity(0.85)).frame(width: 1.5).allowsHitTesting(false)
                     }
                 }
                 // The photo is taken from the unzoomed camera, so zoom is off while framing it.
@@ -399,11 +398,14 @@ private struct TutorialScreen: View {
                 Button {
                     if model.retreat() { dismiss() }
                 } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.title3.weight(.semibold))
-                        .frame(width: 52, height: 52)
-                        .background(AppColors.snow.opacity(0.85), in: Circle())
-                        .foregroundStyle(AppColors.wine)
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left").font(.subheadline.weight(.semibold))
+                        Text("Back").font(.headline)
+                    }
+                    .padding(.horizontal, AppSpacing.medium)
+                    .frame(height: 52)
+                    .background(AppColors.snow.opacity(0.85), in: Capsule())
+                    .foregroundStyle(AppColors.wine)
                 }
                 .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
                 Spacer()
@@ -419,11 +421,14 @@ private struct TutorialScreen: View {
                             .background(AppColors.flamingo, in: Capsule())
                             .foregroundStyle(AppColors.snow)
                     } else {
-                        Image(systemName: "arrow.right")
-                            .font(.title3.weight(.medium))
-                            .frame(width: 52, height: 52)
-                            .background(AppColors.flamingo, in: Circle())
-                            .foregroundStyle(AppColors.snow)
+                        HStack(spacing: 6) {
+                            Text("Next").font(.headline)
+                            Image(systemName: "arrow.right").font(.subheadline.weight(.semibold))
+                        }
+                        .padding(.horizontal, AppSpacing.medium)
+                        .frame(height: 52)
+                        .background(AppColors.flamingo, in: Capsule())
+                        .foregroundStyle(AppColors.snow)
                     }
                 }
                 .accessibilityLabel(isLast ? "Done" : "Next step")

@@ -50,11 +50,9 @@ final class CameraSignalSampler: @unchecked Sendable {
         let position = SIMD3(relative.columns.3.x, relative.columns.3.y, relative.columns.3.z)
         signals.distance = Double(simd_length(position))
 
-        // The face's outward axis against the camera's: turned left/right moves its y, nodding moves its x (sensor axes).
+        // The face's outward axis against the camera's: turned left/right moves its y (sensor axes).
         let outward = SIMD3(relative.columns.2.x, relative.columns.2.y, relative.columns.2.z)
-        let up = SIMD3(relative.columns.1.x, relative.columns.1.y, relative.columns.1.z)
         signals.yawDegrees = Double(atan2(abs(outward.y), abs(outward.z))) * 180 / .pi
-        signals.rollDegrees = Double(atan2(abs(up.y), abs(up.x))) * 180 / .pi
 
         let motion = movement(time: frame.timestamp, position: position, rotation: simd_quatf(relative))
         signals.speed = motion?.speed

@@ -8,7 +8,6 @@ final class CameraMessageEngineTests: XCTestCase {
         s.ambientIntensity = 800
         s.distance = 0.35
         s.yawDegrees = 3
-        s.rollDegrees = 2
         s.tiltDegrees = 8
         s.speed = 0.02
         s.turnRate = 5
@@ -109,15 +108,47 @@ final class CameraMessageEngineTests: XCTestCase {
         XCTAssertEqual(engine.update(fast, at: 1.5), .movingFast)
     }
 
-    func testHeadTurnedByYawOrRoll() {
-        var yaw = good(); yaw.yawDegrees = 30
+    func testHeadTurnedOnlyWhenStronglyTurned() {
+        var strong = good(); strong.yawDegrees = 50
         var engine = CameraMessageEngine(context: .tryOn)
-        _ = engine.update(yaw, at: 0)
-        XCTAssertEqual(engine.update(yaw, at: 1), .headTurned)
-        var roll = good(); roll.rollDegrees = 25
+        _ = engine.update(strong, at: 0)
+        XCTAssertEqual(engine.update(strong, at: 1), .headTurned)
+        // A moderate turn keeps the filter on and says nothing.
+        var moderate = good(); moderate.yawDegrees = 35
         var other = CameraMessageEngine(context: .tryOn)
-        _ = other.update(roll, at: 0)
-        XCTAssertEqual(other.update(roll, at: 1), .headTurned)
+        for step in 0..<30 { XCTAssertNil(other.update(moderate, at: Double(step) * 0.1)) }
+    }
+
+    func testTiltingTheHeadSidewaysSaysNothing() {
+        // Roll is no longer measured at all: a tilted head looks like a good setup.
+        var engine = CameraMessageEngine(context: .tryOn)
+        for step in 0..<30 { XCTAssertNil(engine.update(good(), at: Double(step) * 0.1)) }
+    }
+
+    func testTrackingLostRightAfterBeingCloseSaysMoveBack() {
+        var engine = CameraMessageEngine(context: .tryOn)
+        var near = good(); near.distance = 0.27
+        _ = engine.update(near, at: 0)
+        var lost = CameraSignals(); lost.ambientIntensity = 800
+        _ = engine.update(lost, at: 0.2)
+        XCTAssertEqual(engine.update(lost, at: 1.3), .tooClose)
+    }
+
+    func testTrackingLostRightAfterTurningAwaySaysFaceStraight() {
+        var engine = CameraMessageEngine(context: .tryOn)
+        var turned = good(); turned.yawDegrees = 40
+        _ = engine.update(turned, at: 0)
+        var lost = CameraSignals(); lost.ambientIntensity = 800
+        _ = engine.update(lost, at: 0.2)
+        XCTAssertEqual(engine.update(lost, at: 1.3), .headTurned)
+    }
+
+    func testTrackingLostFarAwayStillSaysNoFace() {
+        var engine = CameraMessageEngine(context: .tryOn)
+        _ = engine.update(good(), at: 0)
+        var lost = CameraSignals(); lost.ambientIntensity = 800
+        _ = engine.update(lost, at: 0.2)
+        XCTAssertEqual(engine.update(lost, at: 1.3), .noFace)
     }
 
     func testDistanceAndTiltMessages() {
