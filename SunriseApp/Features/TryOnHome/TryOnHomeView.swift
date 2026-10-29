@@ -51,7 +51,7 @@ struct TryOnHomeView: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.screen.ignoresSafeArea())
+        .background(AppColors.wine.ignoresSafeArea())
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: home.tool)
@@ -84,7 +84,7 @@ struct TryOnHomeView: View {
                 .sensoryFeedback(.impact, trigger: developerTools)
             HStack {
                 Spacer()
-                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities)) } label: {
+                Button { onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,browOverlay: home.browOverlay,hideNaturalBrow: !home.naturalBrowVisible)) } label: {
                     Image(systemName: "arrow.right")
                         .font(.title2.weight(.medium))
                         .frame(width: 60, height: 60)

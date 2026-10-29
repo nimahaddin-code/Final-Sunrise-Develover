@@ -41,7 +41,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     static let browDebugKey="beautyBrow.debugView"
     /// How long the brow keeps using the last face-skin mask. The segmenter often lags past `mask_max_age_seconds`
     /// on device, and dropping the brow for those frames made it blink; a hand still hides it within this time.
-    private static let browMaskGraceSeconds:Double=0.3
+    private static let browMaskGraceSeconds:Double=0.6
     private let inFlight=DispatchSemaphore(value:3)
     private let lock=NSLock(),queue=DispatchQueue(label:"dandan.blush.metal",qos:.userInteractive)
     private let device:MTLDevice,commands:MTLCommandQueue
@@ -66,11 +66,32 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private var browTrackerStarting=false
     private var browToken:UInt64=0,browFrames:[UInt64:BrowFrame]=[:]
     /// The brow (camera picture and brow together) is redrawn at most this often, so it is not redrawn on every 60 Hz camera frame.
-    static let browMaxFramesPerSecond:Double=30
+    static let browMaxFramesPerSecond:Double=60
+    /// How much brow work the phone's temperature allows. The brow tracker, the hand mask and the fill model share the GPU and
+    /// Neural Engine; as the phone warms each is asked less often, and when it is hot the fill model stops (the push-pull fill
+    /// still hides the natural brow).
+    struct BrowLoad:Equatable {
+        var trackerFPS:Double
+        var maskInterval:Double
+        /// Shortest time between fill-model requests; nil turns the model off.
+        var modelInterval:Double?
+        static func current(_ state:ProcessInfo.ThermalState)->BrowLoad {
+            switch state {
+            case .nominal:return BrowLoad(trackerFPS:browMaxFramesPerSecond,maskInterval:1.0/15,modelInterval:BrowEraser.modelInterval)
+            case .fair:return BrowLoad(trackerFPS:40,maskInterval:1.0/10,modelInterval:0.5)
+            default:return BrowLoad(trackerFPS:20,maskInterval:1.0/8,modelInterval:nil)
+            }
+        }
+    }
     private var lastBrowSubmit:Double = -.infinity
-    /// Whether a camera frame at `timestamp` is due, given the last one handed to MediaPipe. A little under the full interval is
-    /// enough, so frames from a 60 Hz camera alternate instead of occasionally slipping to every third.
-    static func browFrameDue(timestamp:Double,last:Double,maxFPS:Double=browMaxFramesPerSecond)->Bool {timestamp-last>=0.9/maxFPS}
+    /// Whether a camera frame at `timestamp` is due, given the last one handed to MediaPipe: time is cut into 1/maxFPS slots and
+    /// one frame is taken per slot, so a 60 Hz camera gives 40 fps at a 40 cap (two frames of every three), not the 30 a minimum
+    /// interval would round down to. A frame almost a whole interval after the last is also due, so camera timing jitter at a
+    /// 60 cap does not drop frames that land in the same slot.
+    static func browFrameDue(timestamp:Double,last:Double,maxFPS:Double=browMaxFramesPerSecond)->Bool {
+        guard last.isFinite else {return true}
+        return (timestamp*maxFPS+1e-6).rounded(.down)>(last*maxFPS+1e-6).rounded(.down) || timestamp-last>=0.9/maxFPS
+    }
     private var browSmoother=BrowObservationSmoother()
     /// Steadies the brow in ARKit's face space when ARKit tracks the face in the same frame; the image-space smoother is the fallback.
     private var browStabilizer=BrowFaceStabilizer()
@@ -103,6 +124,16 @@ final class BeautyBlushEngine:@unchecked Sendable {
     private var lastError:String?
     private var presentedFrames=0,pigmentFrames=0,projectionErrorPixels:Double=0
     private var maskAgeMilliseconds:Double = -1
+    @MainActor private weak var view:BeautyBlushARView?
+    /// SceneKit's frame rate while the brow is shown. The opaque Metal layer covers SceneKit's own camera picture, so drawing
+    /// that picture at 60 fps underneath is wasted; it is kept just running so it can take over at once when the layer hides.
+    static let coveredSceneFramesPerSecond=10
+    /// Shows or hides the Metal layer, and slows SceneKit's camera picture underneath while the brow covers it.
+    @MainActor private func setLayerShown(_ shown:Bool,brow:Bool=false) {
+        layer?.isHidden = !shown
+        let fps=shown && brow ? Self.coveredSceneFramesPerSecond:60
+        if let view,view.preferredFramesPerSecond != fps {view.preferredFramesPerSecond=fps}
+    }
     @MainActor static func make(on view:BeautyBlushARView) async->BeautyBlushEngine? {
         do {
             let engine=try await Task.detached(priority:.userInitiated) { try BeautyBlushEngine() }.value
@@ -111,7 +142,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             view.beautyLayer.framebufferOnly=true;view.beautyLayer.isOpaque=true;view.beautyLayer.isHidden=true
             view.beautyLayer.actions=["bounds":NSNull(),"position":NSNull(),"contents":NSNull()]
             view.beautyLayer.maximumDrawableCount=3;view.layer.addSublayer(view.beautyLayer)
-            engine.layer=view.beautyLayer;view.beauty=engine;view.setNeedsLayout();return engine
+            engine.layer=view.beautyLayer;engine.view=view;view.beauty=engine;view.setNeedsLayout();return engine
         } catch { UserDefaults.standard.set("setup_error: \(error)",forKey:"beautyBlush.status");return nil }
     }
     private init() throws {
@@ -169,7 +200,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         let previousBlushStyle=settings.style
         let previousIsBrow=settings.isBrow,previousEnabled=settings.enabled
         if settings.isBrow != nextBrow || settings.enabled != enabled {
-            settings.epoch=UUID();layer?.isHidden=true
+            settings.epoch=UUID();setLayerShown(false)
         }
         // A category/style tap must be eligible on the very next frame. The
         // retry throttle is only for repeated failures of the same request;
@@ -187,7 +218,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         }
         settings.enabled=enabled
         if let c {settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
-        if !enabled {layer?.isHidden=true}
+        if !enabled {setLayerShown(false)}
         if enabled && nextBrow,let overlay=settings.browOverlay {BrowSpriteStore.shared.prepare(overlay);if overlay.is3D {BrowHairStore.shared.prepare()}}
         let start=enabled && !segmenter.isAvailable && !segmentationStarting
         if start {segmentationStarting=true}
@@ -406,7 +437,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             withExtendedLifetime(retained) {}
             Task { @MainActor [weak self] in
                 guard let self else{return};self.lock.lock();let show=self.settings.enabled && self.settings.epoch==s.epoch;self.lock.unlock()
-                if show {self.layer?.isHidden=false}
+                if show {self.setLayerShown(true)}
             }
             self?.queue.async { [weak self] in self?.report(cb,frameTimestamp:ts,maskFresh:fresh,visibility:visible,isBrow:false) }
         }
@@ -556,7 +587,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
     }
     /// Hands this frame to MediaPipe unless one is still being processed; it is drawn when its landmarks return.
     private func submitBrow(_ frame:ARFrame,settings s:Settings) {
-        guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit) else {return}
+        let load=BrowLoad.current(ProcessInfo.processInfo.thermalState)
+        guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit,maxFPS:load.trackerFPS) else {return}
         let buffer=frame.capturedImage
         let raw=CGSize(width:CVPixelBufferGetWidth(buffer),height:CVPixelBufferGetHeight(buffer))
         // The screen's up and across directions in the captured image pick the detector's rotation; no face tracker.
@@ -575,9 +607,9 @@ final class BeautyBlushEngine:@unchecked Sendable {
             lock.lock();browFrames[token]=nil;lock.unlock()
         }
         queue.async { [self] in
-            // Hand/fringe occlusion uses the same face-skin mask as blush, at the same 15 Hz. Only the brow shape and the
-            // hidden natural brow draw over the face, so only they need it.
-            guard s.browOverlay != nil || s.hideNatural,entry.frame.timestamp-lastSegment>=1/15,!segmenter.isBusy,segmenter.isAvailable else {return}
+            // Hand/fringe occlusion uses the same face-skin mask as blush (15 Hz, less when the phone is warm). Only the brow
+            // shape and the hidden natural brow draw over the face, so only they need it.
+            guard s.browOverlay != nil || s.hideNatural,entry.frame.timestamp-lastSegment>=load.maskInterval,!segmenter.isBusy,segmenter.isAvailable else {return}
             lastSegment=entry.frame.timestamp
             segmenter.submit(.init(pixelBuffer:SendablePixelBuffer(buffer:entry.frame.capturedImage),timestamp:entry.frame.timestamp,headUp:up,headAnchors:[]))
         }
@@ -689,6 +721,22 @@ final class BeautyBlushEngine:@unchecked Sendable {
             let n=SIMD2(-d.y,d.x)/length*thickness*width/2
             out += [p+n,p-n,q+n,p-n,q-n,q+n].map {MarkVertex(position:clip($0),color:color)}
         }
+        /// A straight line of dashes, `dash` and `gap` in screen pixels.
+        mutating func dashedLine(_ a:SIMD2<Float>,_ b:SIMD2<Float>,_ color:SIMD4<Float>,width:Float=1,dash:Float,gap:Float) {
+            let p=view(a),q=view(b),length=simd_length(q-p)
+            guard length>1 else {return}
+            var start:Float=0
+            while start<length {
+                let end=min(start+dash,length)
+                let from=p+(q-p)*(start/length),to=p+(q-p)*(end/length)
+                let d=to-from,l=simd_length(d)
+                if l>0.5 {
+                    let n=SIMD2(-d.y,d.x)/l*thickness*width/2
+                    out += [from+n,from-n,to+n,from-n,to-n,to+n].map {MarkVertex(position:clip($0),color:color)}
+                }
+                start += dash+gap
+            }
+        }
         mutating func polyline(_ points:[SIMD2<Float>],_ color:SIMD4<Float>,width:Float=1) {
             for (a,b) in zip(points,points.dropFirst()) {line(a,b,color,width:width)}
         }
@@ -700,18 +748,58 @@ final class BeautyBlushEngine:@unchecked Sendable {
             }
         }
     }
-    /// Tutorial nose-eye mapping lines (brow start, arch, tail) and landmark debug dots, in clip space.
+    struct MappingMark {let name:String;let point:SIMD2<Float>}
+    struct MappingBrow {let side:EyeSide;let origin:SIMD2<Float>;let marks:[MappingMark]}
+    /// Brow mapping, as a brow pencil is laid: every line starts at the side of the nose on that side (the widest point of
+    /// the nostril wing). Through the inner eye corner it marks where the brow starts, through the outer edge of the iris its
+    /// arch, through the outer eye corner its end. Each mark is where the line crosses the brow's centerline.
+    /// The nostril wing and the iris ring come from the full mesh, as offsets from the (steadied) ala and iris centre, so the
+    /// marks move with the same smoothing as the brow; without the mesh they are estimated from the eye.
+    static func mappingMarks(_ o:BrowObservation)->[MappingBrow] {
+        func offset(from base:Int,to target:Int)->SIMD2<Float>? {
+            o.mesh.count>max(base,target) ? o.mesh[target]-o.mesh[base]:nil
+        }
+        var out:[MappingBrow]=[]
+        for side in [EyeSide.subjectRight,.subjectLeft] {
+            guard let eye=o.eyes[side],let contour=o.brows[side],let brow=BrowGeometry(contour:contour) else {continue}
+            let across=eye.outer-eye.inner
+            let toEar=across/max(simd_length(across),1e-3)
+            // Which half of the mesh this eye is: the iris centre and ala nearest this eye's points.
+            let mediaPipeLeftHalf=o.mesh.count>477 && simd_distance(o.mesh[98],eye.ala)<simd_distance(o.mesh[327],eye.ala)
+            let wing=offset(from:mediaPipeLeftHalf ? 98:327,to:mediaPipeLeftHalf ? 129:358)
+            let nose=eye.ala+(wing.map {simd_dot($0,toEar)>0 ? $0:.zero} ?? .zero)
+            let center:SIMD2<Float>=eye.iris ?? (eye.inner+eye.outer)/2
+            var irisEdge=center+across*0.2
+            if o.mesh.count>477,let iris=eye.iris {
+                let base=simd_distance(o.mesh[468],iris)<simd_distance(o.mesh[473],iris) ? 468:473
+                let ring=(base+1...base+4).compactMap {offset(from:base,to:$0)}
+                if let edge=ring.max(by: {simd_dot($0,toEar)<simd_dot($1,toEar)}),simd_dot(edge,toEar)>0 {irisEdge=center+edge}
+            }
+            let throughs:[(String,SIMD2<Float>)]=[("Start",eye.inner),("Arch",irisEdge),("End",eye.outer)]
+            var marks:[MappingMark]=[]
+            for (name,through) in throughs {
+                if let hit=brow.crossing(from:nose,through:through) {marks.append(MappingMark(name:name,point:hit))}
+            }
+            if !marks.isEmpty {out.append(MappingBrow(side:side,origin:nose,marks:marks))}
+        }
+        return out
+    }
+    /// Tutorial brow mapping (white dashed lines from the nostril through inner eye corner, outer iris edge and outer eye
+    /// corner, a pink dot where each crosses the brow) and landmark debug dots, in clip space.
     private static func browMarks(_ o:BrowObservation,display:CGAffineTransform,size:CGSize,landmarks:Bool,mapping:Bool,alpha:Float)->[MarkVertex] {
         var m=MarkBuilder(imageSize:o.imageSize,drawable:size,display:display)
         let thickness=m.thickness
         if mapping {
-            let guide=SIMD4<Float>(0.95,0.72,0.80,0.85*alpha)
-            for side in [EyeSide.subjectRight,.subjectLeft] {
-                guard let eye=o.eyes[side],let contour=o.brows[side],let brow=BrowGeometry(contour:contour) else {continue}
-                for through in [eye.inner,eye.iris ?? (eye.inner+eye.outer)/2,eye.outer] {
-                    guard let hit=brow.crossing(from:eye.ala,through:through) else {continue}
-                    m.line(eye.ala,hit,guide);m.dot(hit,thickness*2.2,guide)
+            // Soft white dashes and small pink dots ringed in white, like a pencil-mapping camera effect.
+            let line=SIMD4<Float>(1,1,1,0.75*alpha),ring=SIMD4<Float>(1,1,1,0.95*alpha),dot=SIMD4<Float>(0.93,0.3,0.52,alpha)
+            let dash=thickness*5,gap=thickness*3.5
+            for brow in mappingMarks(o) {
+                for mark in brow.marks {
+                    // Like a pencil held against the face: from beside the nostril on past the brow.
+                    let along=mark.point-brow.origin
+                    m.dashedLine(brow.origin+along*0.08,mark.point+along*0.22,line,width:1.6,dash:dash,gap:gap)
                 }
+                for mark in brow.marks {m.dot(mark.point,thickness*2.3,ring);m.dot(mark.point,thickness*1.6,dot)}
             }
         }
         if landmarks {
@@ -846,8 +934,10 @@ final class BeautyBlushEngine:@unchecked Sendable {
         let pigment=s.browOverlay != nil && !hair3D
         let strip=tracked && (pigment || s.hideNatural) ? observation.flatMap {Self.browStrip($0,display:display,chord:pigment)}:nil
         let (frameMask,maskTransform,fresh)=uploadMask(slot:frameSlot,capturedImage:buffer,maxAge:max(config.mask_max_age_seconds,Self.browMaskGraceSeconds))
-        // Hiding the natural brow does not wait for the mask; a hand only starts to protect it once one arrives.
-        let ready=fresh || !(pigment || hair3D)
+        // The brow does not wait for the hand mask: when the segmenter falls behind (it shares the GPU with the brow
+        // tracker and the inpainter) the brow is drawn without occlusion instead of fading out. A mask up to
+        // `browMaskGraceSeconds` old still keeps hands in front.
+        let ready=true
         let visible=visibility.update(timestamp:frame.timestamp,visible:(strip != nil || hair3D) && ready && (browTexture != nil || hair3D),tau:config.visibility_tau_seconds)
         let debugView=UserDefaults.standard.bool(forKey:DeveloperTools.key) ? UserDefaults.standard.integer(forKey:Self.browDebugKey):0
         let matrixAttachment=CVBufferCopyAttachment(buffer,kCVImageBufferYCbCrMatrixKey,nil) as? String
@@ -861,7 +951,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
             debug:SIMD4(Float(debugView),s.hideNatural && eraser != nil ? 1:0,pigment ? 1:0,pigment ? 1:0))
         // Hiding the natural brow: this frame's brow-space fill; restarted after the brow was not drawn.
         if let strip,s.hideNatural,let eraser {
-            eraser.encode(vertices:strip.unwrap,cropToRaw:strip.cropToRaw,uniforms:withUnsafeBytes(of:&u) {Array($0)},y:y,cb:cb,timestamp:frame.timestamp,command:command)
+            eraser.encode(vertices:strip.unwrap,cropToRaw:strip.cropToRaw,uniforms:withUnsafeBytes(of:&u) {Array($0)},y:y,cb:cb,timestamp:frame.timestamp,
+                          modelInterval:BrowLoad.current(ProcessInfo.processInfo.thermalState).modelInterval,command:command)
         } else {eraser?.reset()}
         let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=drawable.texture;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
         pass.depthAttachment.texture=depthTexture;pass.depthAttachment.loadAction = .clear;pass.depthAttachment.storeAction = .dontCare;pass.depthAttachment.clearDepth=1
@@ -888,7 +979,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
         var marks:[MarkVertex]=[]
         if s.tracking,let observation {marks=Self.browTrackingMarks(observation,raw:detected,display:display,size:size,tracked:tracked)}
         else if let observation,tracked,debugView==2 || (s.guide && s.mapping) {
-            marks=Self.browMarks(observation,display:display,size:size,landmarks:debugView==2,mapping:s.guide && s.mapping,alpha:Float(visible))
+            // The guide does not wait for the hand mask, or it would vanish whenever the mask is late.
+            marks=Self.browMarks(observation,display:display,size:size,landmarks:debugView==2,mapping:s.guide && s.mapping,alpha:1)
         }
         do {
             if !marks.isEmpty,let mb=marks.withUnsafeBytes({device.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}) {
@@ -921,7 +1013,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             withExtendedLifetime(retained) {}
             Task { @MainActor [weak self] in
                 guard let self else{return};self.lock.lock();let show=self.settings.enabled && self.settings.epoch==s.epoch;self.lock.unlock()
-                if show {self.layer?.isHidden=false}
+                if show {self.setLayerShown(true,brow:true)}
             }
             self?.queue.async { [weak self] in self?.report(cb,frameTimestamp:ts,maskFresh:fresh,visibility:visible,isBrow:true) }
         }

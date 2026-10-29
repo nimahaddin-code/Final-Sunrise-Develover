@@ -25,6 +25,11 @@ final class BrowEraser: @unchecked Sendable {
     static let width = 256, height = 128
     /// The model is asked again at most this often; its result stays attached to the brow in between.
     static let modelInterval: Double = 0.12
+    /// While the face holds still the model is asked again only this often: its answer is mapped into brow space, so it
+    /// stays on the brow as the head moves, and is blended out 1.5 s after it was asked.
+    static let modelRefresh: Double = 1.0
+    /// How far the face crop must move, scale or turn (as a fraction of its size) for the model to be asked again sooner.
+    static let modelMoveFraction: Float = 0.06
 
     private struct ModelResult { let rgba: [UInt8]; let vertices: [BrowUnwrapVertex] }
     private let device: MTLDevice
@@ -45,6 +50,7 @@ final class BrowEraser: @unchecked Sendable {
     private let lock = NSLock()
     private var modelInFlight = false, pending: ModelResult?
     private var lastRequest: Double = -.infinity, modelTime: Double?, modelWeight: Float = 0
+    private var lastRequestCrop: simd_float4x4?
     private(set) var lastModelError: String?
 
     /// The current fill, one slice per brow (0 right, 1 left), linear RGB in brow space.
@@ -107,15 +113,16 @@ final class BrowEraser: @unchecked Sendable {
     /// Forget the previous frame (temporal blend) and any model result, e.g. after the face was lost.
     func reset() {
         lastTime = nil
-        lock.lock(); pending = nil; modelTime = nil; modelWeight = 0; lock.unlock()
+        lock.lock(); pending = nil; modelTime = nil; modelWeight = 0; lastRequestCrop = nil; lock.unlock()
     }
 
     private var indicesPerSide: Int { Self.columns * Self.rows * 6 }
 
     /// Encodes this frame's fill into `command`. `uniforms` are the engine's shader uniforms (camera decoding);
     /// `cropToRaw` maps the model's face crop to camera coordinates, nil when there is no face crop.
+    /// `modelInterval` is the shortest time between model requests (nil: the model is off, for a hot phone).
     func encode(vertices: [BrowUnwrapVertex], cropToRaw: simd_float4x4?, uniforms: [UInt8], y: MTLTexture, cb: MTLTexture,
-                timestamp: Double, command: MTLCommandBuffer) {
+                timestamp: Double, modelInterval: Double? = BrowEraser.modelInterval, command: MTLCommandBuffer) {
         guard vertices.count == Self.vertexCount * 2 else { return }
         let buffer = vertexBuffers[slot % 3]; slot += 1
         vertices.withUnsafeBytes { buffer.contents().copyMemory(from: $0.baseAddress!, byteCount: $0.count) }
@@ -151,7 +158,10 @@ final class BrowEraser: @unchecked Sendable {
         encodeFill(source: known, target: fills[1 - fillIndex], previous: fills[fillIndex], blend: blend, modelWeight: weight, detail: 1, command: command)
         fillIndex = 1 - fillIndex; lastTime = timestamp
         // 6. Ask the model again once the last request is answered.
-        if let cropToRaw, inpainter.isAvailable { requestModel(vertices: vertices, buffer: buffer, cropToRaw: cropToRaw, uniforms: uniforms, y: y, cb: cb, timestamp: timestamp, command: command) }
+        if let cropToRaw, let modelInterval, inpainter.isAvailable {
+            requestModel(vertices: vertices, buffer: buffer, cropToRaw: cropToRaw, uniforms: uniforms, y: y, cb: cb, timestamp: timestamp,
+                         minimumInterval: modelInterval, command: command)
+        }
     }
 
     /// Draws the unwrap grid into slice 0 (right brow) and slice 1 (left brow) of each target.
@@ -214,11 +224,27 @@ final class BrowEraser: @unchecked Sendable {
         lock.lock(); modelTime = timestamp; lock.unlock()
     }
 
+    /// Whether the model should be asked again: never sooner than `minimumInterval`, then once the face crop has moved
+    /// noticeably since the last request, or `modelRefresh` has passed.
+    static func modelDue(timestamp: Double, lastRequest: Double, crop: simd_float4x4, lastCrop: simd_float4x4?, minimumInterval: Double) -> Bool {
+        let elapsed = timestamp - lastRequest
+        guard elapsed >= minimumInterval else { return false }
+        guard let lastCrop, elapsed < max(modelRefresh, minimumInterval) else { return true }
+        // The crop's corners, before and after, measured against the crop's size.
+        let corners = [SIMD4<Float>(0, 0, 0, 1), SIMD4(1, 0, 0, 1), SIMD4(0, 1, 0, 1), SIMD4(1, 1, 0, 1)]
+        let before = corners.map { lastCrop * $0 }, after = corners.map { crop * $0 }
+        let size = max(simd_distance(SIMD2(before[0].x, before[0].y), SIMD2(before[3].x, before[3].y)), 1e-6)
+        let moved = zip(before, after).map { simd_distance(SIMD2($0.x, $0.y), SIMD2($1.x, $1.y)) }.max() ?? 0
+        return moved / size > modelMoveFraction
+    }
+
     private func requestModel(vertices: [BrowUnwrapVertex], buffer: MTLBuffer, cropToRaw: simd_float4x4, uniforms: [UInt8],
-                              y: MTLTexture, cb: MTLTexture, timestamp: Double, command: MTLCommandBuffer) {
+                              y: MTLTexture, cb: MTLTexture, timestamp: Double, minimumInterval: Double, command: MTLCommandBuffer) {
         lock.lock()
-        guard !modelInFlight, timestamp - lastRequest >= Self.modelInterval else { lock.unlock(); return }
-        modelInFlight = true; lastRequest = timestamp
+        guard !modelInFlight,
+              Self.modelDue(timestamp: timestamp, lastRequest: lastRequest, crop: cropToRaw, lastCrop: lastRequestCrop, minimumInterval: minimumInterval)
+        else { lock.unlock(); return }
+        modelInFlight = true; lastRequest = timestamp; lastRequestCrop = cropToRaw
         lock.unlock()
         var matrix = cropToRaw
         let color = MTLRenderPassDescriptor()

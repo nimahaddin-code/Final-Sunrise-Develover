@@ -1,10 +1,38 @@
+## Brow load: SceneKit, fill model, temperature — Khalish (2026-10-29)
+
+While the brow's Metal layer is shown, the `ARSCNView` underneath (whose camera picture it covers) runs at
+`BeautyBlushEngine.coveredSceneFramesPerSecond` (10) instead of 60; it is back at 60 whenever the layer hides
+(`setLayerShown`). MI-GAN (`BrowEraser.modelDue`) is asked again only after the face crop moved more than 6% of its size or
+1 s passed (never sooner than 0.12 s); its answer stays mapped in brow space between requests. `BeautyBlushEngine.BrowLoad`
+follows `ProcessInfo.thermalState`: nominal 40 fps tracker / 15 Hz mask / model; fair 30 fps / 10 Hz / model ≥0.5 s;
+serious and critical 20 fps / 8 Hz / no model (push-pull fill only). Not measured on a device.
+
+## Tutorial follows the Try On brow filter — Khalish (2026-10-29)
+
+`TutorialHandoff` now carries `browOverlay` and `hideNaturalBrow` besides tool, shades and intensities; the Brows tab draws that
+picture with the chosen shade and strength (`GuidedTutorialModel.liveConfiguration`). The tutorial no longer shows the landmark
+view: brow mapping as with a pencil: dashed magenta lines from each side's nostril wing (MediaPipe 129/358, as an offset
+from the steadied ala 98/327) through the inner eye corner (Start), the iris ring's outer edge (Arch; 469-472/474-477, else
+iris centre + 0.2 eye width) and the outer eye corner (End), with cyan dots and labels where they cross the brow
+(`BeautyBlushEngine.mappingMarks`, full-filter mode only). The mapping is drawn as soft white dashes with small pink
+dots ringed in white, no labels. The Brows tab has its own five steps (`GuidedTutorialModel.browLessons`: brush up, mark three
+dots, outline, fill, brush through; its own `browStep`, not the brow model's step) shown as a spaced "STEP 1 OF 5" over one
+instruction in a wine pill; the mapping shows only on the dot and outline steps (`browMappingSteps`). The guide and the brow no longer wait for
+the face-skin mask: a mask up to 0.6 s old keeps hands in front, an older one draws the brow without occlusion instead of
+fading it out (the brow used to vanish whenever the segmenter fell behind). Brow tracking runs at up to 40 fps (`browMaxFramesPerSecond`, one frame per 1/40 s slot: two of every
+three 60 Hz camera frames), still skipped while MediaPipe is busy. Try On → tutorial no longer hangs: `LiveGuideView` keeps a screen whose camera
+lease was taken (`revoked`) from taking it back until it is paused. The split
+button's "real" half (`RealCameraView`) restores the ARSession delegate, because assigning a session to an `ARSCNView` makes the
+view the delegate and would stop the filter's frames. Simulator tests only; split and smoothness need a device check.
+
 ## ARKit pose for the brow, and the 3D hair brow — Khalish (2026-10-28)
 
 Details in `Docs/Decisions/0015-arkit-brow-pose.md`. `BrowFaceStabilizer` lifts MediaPipe's brow landmarks onto ARKit's face
 mesh (same frame's anchor), smooths them in face-local metres and projects them back (fallback: the image-space smoother when
 ARKit has no face or disagrees). "Brow 3D" (`BrowOverlay.is3D`) draws `brow-hair-3d.obj` ribbons on ARKit's pose with a depth-only
 face mesh pass, 1.5 px minimum hair width, ambient-light shading and the hand mask; it falls back to its picture without a tracked
-face. New shader code is only checked at runtime: compile `BeautyBlush.metal.txt` with `MTLDevice.makeLibrary(source:)` (a build
+face. Removed from the picker list (`BrowOverlay.all`) on 2026-10-29, with Brow 3 (its image set `brow-overlay-3` stays in the assets, unused); the 3D renderer stays, add an `is3D: true` entry
+to bring it back. New shader code is only checked at runtime: compile `BeautyBlush.metal.txt` with `MTLDevice.makeLibrary(source:)` (a build
 does not) and run the tests, which fail every engine test if it does not compile. Device check pending.
 
 ## Brow overlay pictures — Khalish (2026-10-28)
@@ -22,8 +50,8 @@ Simulator tests only; device look pending.
 
 ## Black screen background — Khalish (2026-10-28)
 
-`AppColors.screen` (black) is the full-screen background of Try On, the tutorial, the palette sheet and placeholder
-pages; `AppColors.wine` stays for pills and accents.
+`AppColors.screen` (black) is the full-screen background of the tutorial, the palette sheet and placeholder pages;
+`AppColors.wine` stays for pills and accents. Try On's background is `AppColors.wine` (#660033) again (2026-10-29).
 
 ## Brow tracking view — Khalish (2026-10-27)
 

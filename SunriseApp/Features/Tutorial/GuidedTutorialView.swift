@@ -5,11 +5,14 @@ import Combine
 import SceneKit
 import SwiftUI
 
-/// What the Try On screen hands to the tutorial: the tool that was open, and every tool's shade and strength.
+/// What the Try On screen hands to the tutorial: the tool that was open, every tool's shade and strength, and the
+/// brow picture the user chose (nil: none) with whether their own brow was hidden under it.
 struct TutorialHandoff: Hashable {
     var tool: TryOnTool
     var shades: [TryOnTool: MakeupShade]
     var intensities: [TryOnTool: Double]
+    var browOverlay: BrowOverlay? = nil
+    var hideNaturalBrow = false
 }
 
 /// What the bottom-left button shows: the full filter, half filter / half real camera, or no filter.
@@ -48,6 +51,8 @@ enum TutorialTab: CaseIterable, Identifiable {
     let handoff: TutorialHandoff
     @Published private(set) var tab: TutorialTab
     @Published private(set) var linerStep = 0
+    /// The Brows tab's own step (its five steps are the tutorial's, not the brow model's).
+    @Published private(set) var browStep = 0
     @Published private(set) var compare = TutorialCompare.filter
     private let linerStyle: LinerStyle?
     private let linerIsNeutral: Bool
@@ -64,11 +69,34 @@ enum TutorialTab: CaseIterable, Identifiable {
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: start == .blush ? .blush : .eyebrows, startTutorial: true)
         relay = LinerFrameRelay(model: liner)
         applyShade(for: start == .blush ? .blush : .eyebrow)
+        // Bake the chosen brow picture (and the 3D hair) now, so it is ready by the first drawn frame.
+        if let overlay = handoff.browOverlay {
+            BrowSpriteStore.shared.prepare(overlay)
+            if overlay.is3D { BrowHairStore.shared.prepare() }
+        }
         // The brow model owns the step index for brows/blush; forward its changes so the screen redraws.
         brow.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
 
-    var stepIndex: Int { tab == .eyeliner ? linerStep : brow.stepIndex }
+    var stepIndex: Int {
+        switch tab { case .eyeliner: linerStep; case .brows: browStep; case .blush: brow.stepIndex }
+    }
+
+    /// The Brows tab's steps, as a brow is drawn with a pencil after brow mapping.
+    static let browLessons = [
+        FaceGuideLesson(title: String(localized: "Brush your brows up with a spoolie"),
+                        instruction: String(localized: "Brush every hair upward and a little outward, so the real edge of your brow shows.")),
+        FaceGuideLesson(title: String(localized: "Mark three dots along the guide"),
+                        instruction: String(localized: "Make a small dot where each dashed line meets your brow: where it starts, its arch and where it ends.")),
+        FaceGuideLesson(title: String(localized: "Connect the dots into an outline"),
+                        instruction: String(localized: "Draw a light line from the start through the arch to the end along the top edge, then along the bottom.")),
+        FaceGuideLesson(title: String(localized: "Fill in with short, hair-like strokes"),
+                        instruction: String(localized: "Start at the arch and work toward the end, then go lighter toward the start.")),
+        FaceGuideLesson(title: String(localized: "Brush through to soften"),
+                        instruction: String(localized: "Brush the start upward with the spoolie so the front stays soft, then check that both brows match.")),
+    ]
+    /// The brow steps that show the mapping lines: marking the dots and outlining between them.
+    static let browMappingSteps = 1...2
 
     /// False when the tab has no reference (nothing is drawn rather than a default).
     var hasGuide: Bool { tab == .eyeliner ? linerStyle != nil : brow.hasRecommendation }
@@ -78,6 +106,7 @@ enum TutorialTab: CaseIterable, Identifiable {
             return [FaceGuideLesson(title: "No guide yet", instruction: "This step has no reference yet. Use the other tabs.")]
         }
         if tab == .eyeliner, let linerStyle { return Self.linerLessons(linerStyle, neutral: linerIsNeutral) }
+        if tab == .brows { return Self.browLessons }
         return brow.lessons
     }
 
@@ -87,7 +116,14 @@ enum TutorialTab: CaseIterable, Identifiable {
     /// guide is off on that tab.
     var liveConfiguration: EyebrowConfiguration {
         var value = brow.liveConfiguration
-        value.showMappingFormula = tab == .brows
+        value.showMappingFormula = tab == .brows && Self.browMappingSteps.contains(browStep)
+        // The tutorial shows dashed nose-to-brow lines, not MediaPipe's landmark view.
+        value.browTrackingOverlay = false
+        // The filter the user picked on Try On, with its shade and strength (`applyShade`), is what the tutorial shows.
+        if tab == .brows {
+            value.browOverlay = handoff.browOverlay
+            value.hideNaturalBrow = handoff.hideNaturalBrow
+        }
         // The split comparison is intended to show the applied pigment against the
         // unfiltered camera. Keep the pigment on the filtered half, but suppress
         // the placement outline (which reads as a box around the brow at this
@@ -104,6 +140,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         guard new != tab else { return }
         tab = new
         linerStep = 0
+        browStep = 0
         if new != .eyeliner {
             brow.select(new == .blush ? .blush : .eyebrows)
             applyShade(for: new.tool)
@@ -115,14 +152,14 @@ enum TutorialTab: CaseIterable, Identifiable {
     /// Next step. Returns true when the last step was already showing, so the screen should close.
     func advance() -> Bool {
         guard stepIndex + 1 < lessons.count else { return true }
-        if tab == .eyeliner { linerStep += 1 } else { brow.nextStep() }
+        switch tab { case .eyeliner: linerStep += 1; case .brows: browStep += 1; case .blush: brow.nextStep() }
         return false
     }
 
     /// Previous step. Returns true when already on the first step, so the screen should close.
     func retreat() -> Bool {
         guard stepIndex > 0 else { return true }
-        if tab == .eyeliner { linerStep -= 1 } else { brow.previousStep() }
+        switch tab { case .eyeliner: linerStep -= 1; case .brows: browStep -= 1; case .blush: brow.previousStep() }
         return false
     }
 
@@ -281,9 +318,6 @@ private struct TutorialScreen: View {
                                   eyebrowConfiguration: model.liveConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   })
-                    if model.tab == .brows && EyebrowConfiguration.showsBrowTracking && model.compare != .off {
-                        BrowTrackingOverlayView(feed: camera.browTracking)
-                    }
                     if model.tab == .eyeliner && model.compare != .off {
                         ZStack {
                             LinerOverlayView(model: model.liner, isVisible: true)
@@ -295,9 +329,12 @@ private struct TutorialScreen: View {
                         // The same camera without the filter, covering the right half.
                         RealCameraView(session: camera.trackingManager.session)
                             .mask(alignment: .trailing) { halfMask(left: false) }
+                            .transition(.opacity)
                         Rectangle().fill(AppColors.snow.opacity(0.85)).frame(width: 1.5).allowsHitTesting(false)
+                            .transition(.opacity)
                     }
                 }
+                .animation(.easeInOut(duration: 0.25), value: model.compare)
             } else {
                 ProgressView().tint(AppColors.snow)
             }
@@ -361,7 +398,36 @@ private struct TutorialScreen: View {
         .buttonStyle(.plain)
     }
 
-    private var wording: some View {
+    /// Brows: a small spaced "STEP 1 OF 5" over one short instruction in a pill, like a camera effect's caption.
+    @ViewBuilder private var wording: some View {
+        if model.tab == .brows { browCaption } else { lessonCard }
+    }
+
+    private var browCaption: some View {
+        VStack(spacing: AppSpacing.small) {
+            Text("Step \(index + 1) of \(lessons.count)")
+                .textCase(.uppercase)
+                .font(.subheadline.weight(.medium))
+                .tracking(3)
+                .foregroundStyle(AppColors.snow.opacity(0.8))
+                .monospacedDigit()
+            Text(lessons[index].title)
+                .font(.body)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(AppColors.snow)
+                .padding(.horizontal, AppSpacing.large).padding(.vertical, AppSpacing.small)
+                .background(AppColors.wine.opacity(0.55), in: Capsule())
+        }
+        .shadow(color: .black.opacity(0.35), radius: 3)
+        .frame(maxWidth: .infinity)
+        .padding(.bottom, AppSpacing.medium)
+        .animation(.easeInOut(duration: 0.2), value: index)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
+        .accessibilityValue(Text(lessons[index].title + ". " + lessons[index].instruction))
+    }
+
+    private var lessonCard: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text(lessons[index].title).font(.headline)
@@ -429,7 +495,14 @@ private struct RealCameraView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> ARSCNView {
         let view = ARSCNView(frame: .zero)
+        // Giving a view the session makes the view its delegate. The filtered camera's coordinator is the delegate that
+        // feeds the brow, blush and eyeliner frames, so it is put back: otherwise the filter stops updating in split view.
+        let delegate = session.delegate
+        let delegateQueue = session.delegateQueue
         view.session = session
+        session.delegate = delegate
+        session.delegateQueue = delegateQueue
+        view.preferredFramesPerSecond = 30
         view.scene = SCNScene()
         view.automaticallyUpdatesLighting = false
         view.isUserInteractionEnabled = false
