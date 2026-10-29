@@ -330,8 +330,6 @@ private struct TutorialScreen: View {
                         RealCameraView(session: camera.trackingManager.session)
                             .mask(alignment: .trailing) { halfMask(left: false) }
                             .transition(.opacity)
-                        Rectangle().fill(AppColors.snow.opacity(0.85)).frame(width: 1.5).allowsHitTesting(false)
-                            .transition(.opacity)
                     }
                 }
                 .animation(.easeInOut(duration: 0.25), value: model.compare)
@@ -363,38 +361,39 @@ private struct TutorialScreen: View {
         .background(AppColors.cocoa)
     }
 
+    /// Frosted round back button, and a frosted "Next" capsule that turns into a pink "Done" on the last step.
     private var header: some View {
-        ZStack {
-            Image("logo-burgundy")
-                .resizable().scaledToFit()
-                .frame(maxWidth: 140, maxHeight: 40)
-                .shadow(color: AppColors.snow.opacity(0.7), radius: 4)
-                .accessibilityLabel("dandan")
-                .accessibilityAddTraits(.isHeader)
-            HStack {
-                Button {
-                    if model.retreat() { dismiss() }
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.title3.weight(.semibold))
-                        .frame(width: 52, height: 52)
-                        .background(AppColors.snow.opacity(0.85), in: Circle())
-                        .foregroundStyle(AppColors.wine)
-                }
-                .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
-                Spacer()
-                Button {
-                    if model.advance() { dismiss() }
-                } label: {
-                    Image(systemName: isLast ? "checkmark" : "arrow.right")
-                        .font(.title3.weight(.medium))
-                        .frame(width: 52, height: 52)
-                        .background(AppColors.flamingo, in: Circle())
-                        .foregroundStyle(AppColors.snow)
-                }
-                .accessibilityLabel(isLast ? "Finish tutorial" : "Next step")
+        HStack {
+            Button {
+                if model.retreat() { dismiss() }
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.title3.weight(.medium))
+                    .frame(width: 44, height: 44)
+                    .background(AppColors.snow.opacity(0.8), in: Circle())
+                    .overlay(Circle().strokeBorder(AppColors.snow.opacity(0.6), lineWidth: 1))
+                    .foregroundStyle(Color.black)
             }
+            .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
+            Spacer()
+            Button {
+                if model.advance() { dismiss() }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(isLast ? "Done" : "Next")
+                    if !isLast { Image(systemName: "chevron.right").fontWeight(.medium) }
+                }
+                .font(.body)
+                .padding(.horizontal, isLast ? 24 : 18)
+                .frame(height: 44)
+                .background(isLast ? AnyShapeStyle(AppColors.flamingo) : AnyShapeStyle(AppColors.snow.opacity(0.8)), in: Capsule())
+                .overlay(Capsule().strokeBorder(AppColors.snow.opacity(isLast ? 0.25 : 0.6), lineWidth: 1))
+                .foregroundStyle(isLast ? AppColors.snow : Color.black)
+            }
+            .accessibilityLabel(isLast ? "Finish tutorial" : "Next step")
         }
+        .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
+        .animation(.easeInOut(duration: 0.2), value: isLast)
         .buttonStyle(.plain)
     }
 
