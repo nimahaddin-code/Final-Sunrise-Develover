@@ -27,6 +27,10 @@ struct BrowTrackerResult: Sendable {
 /// MediaPipe Face Landmarker in live-stream mode for the eyebrow try-on: brow contours, eye and nose points and the
 /// head pose, from the shared camera's frames. It replaces the ARKit mesh + Vision brow fit.
 final class MediaPipeBrowTracker: NSObject, @unchecked Sendable {
+    /// MediaPipe does not need the full ARKit camera resolution. Keeping the
+    /// detector input bounded avoids a full-resolution YCbCr -> BGRA conversion
+    /// on every accepted frame while preserving the source aspect ratio.
+    static let detectorLongSide: CGFloat = 512
     /// Iris centres, only present in the 478-point model; assigned to an eye by distance.
     static let irisCenters = [468, 473]
     /// Alar points beside the nostrils, the origin of the tutorial's nose-eye mapping lines.
@@ -53,6 +57,7 @@ final class MediaPipeBrowTracker: NSObject, @unchecked Sendable {
     private var space: LandmarkSpace?
     private var lifecycleID = UUID()
     private lazy var ciContext = CIContext()
+    private let colorSpace = CGColorSpaceCreateDeviceRGB()
     private var bgraPool: CVPixelBufferPool?
     private var poolSize = CGSize.zero
     private(set) var lastLatencyMs: Double = 0
@@ -141,8 +146,11 @@ final class MediaPipeBrowTracker: NSObject, @unchecked Sendable {
 
     /// MediaPipe's live stream wants BGRA; ARKit delivers YCbCr.
     private func bgra(from source: CVPixelBuffer) -> CVPixelBuffer? {
-        if CVPixelBufferGetPixelFormatType(source) == kCVPixelFormatType_32BGRA { return source }
-        let size = CGSize(width: CVPixelBufferGetWidth(source), height: CVPixelBufferGetHeight(source))
+        let sourceSize = CGSize(width: CVPixelBufferGetWidth(source), height: CVPixelBufferGetHeight(source))
+        let scale = min(1, Self.detectorLongSide / max(sourceSize.width, sourceSize.height))
+        if CVPixelBufferGetPixelFormatType(source) == kCVPixelFormatType_32BGRA && scale == 1 { return source }
+        let size = CGSize(width: max(1, (sourceSize.width * scale).rounded()),
+                          height: max(1, (sourceSize.height * scale).rounded()))
         if bgraPool == nil || poolSize != size {
             let attributes: [CFString: Any] = [kCVPixelBufferPixelFormatTypeKey: kCVPixelFormatType_32BGRA,
                                                kCVPixelBufferWidthKey: Int(size.width), kCVPixelBufferHeightKey: Int(size.height),
@@ -153,7 +161,8 @@ final class MediaPipeBrowTracker: NSObject, @unchecked Sendable {
         }
         var output: CVPixelBuffer?
         guard let bgraPool, CVPixelBufferPoolCreatePixelBuffer(nil, bgraPool, &output) == kCVReturnSuccess, let output else { return nil }
-        ciContext.render(CIImage(cvPixelBuffer: source), to: output)
+        let image = CIImage(cvPixelBuffer: source).transformed(by: CGAffineTransform(scaleX: scale, y: scale))
+        ciContext.render(image, to: output, bounds: CGRect(origin: .zero, size: size), colorSpace: colorSpace)
         return output
     }
 }

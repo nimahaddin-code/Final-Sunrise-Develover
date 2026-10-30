@@ -147,9 +147,10 @@ extension BeautyBlushEngine {
         let blush=s.withBlush ? prepareBlush(frame,face:blushAnchor,settings:s,frameSlot:frameSlot,size:size,command:command):nil
         if let overlay=s.browOverlay {
             // The picture is baked off this queue; until it is ready the previous texture stays (or none: nothing is drawn).
-            if browTextureKey != "overlay:\(overlay.id)" {
+            let overlayKey = "overlay:\(BrowSpriteStore.cacheKey(overlay))"
+            if browTextureKey != overlayKey {
                 if let baked=BrowSpriteStore.shared.baked(overlay) {
-                    do {try uploadBrowOverlay(baked,id:overlay.id,command:command);if lastError?.hasPrefix("brow_texture_unavailable:")==true {lastError=nil}}
+                    do {try uploadBrowOverlay(baked,id:overlayKey,command:command);if lastError?.hasPrefix("brow_texture_unavailable:")==true {lastError=nil}}
                     catch {lastError="brow_texture_unavailable: \(error)"}
                 } else if BrowSpriteStore.shared.hasFailed(overlay) {lastError="brow_texture_unavailable: overlay \(overlay.id)"}
                 else {BrowSpriteStore.shared.prepare(overlay)}
@@ -166,7 +167,7 @@ extension BeautyBlushEngine {
         if let hairMesh,let observation,let face {hairDraws=Self.hairPlacements(observation,face:face,mesh:hairMesh)}
         let hair3D = !hairDraws.isEmpty
         let pigment=s.browOverlay != nil && !hair3D
-        let strip=tracked && (pigment || s.hideNatural) ? observation.flatMap {Self.browStrip($0,display:display,chord:pigment)}:nil
+        let strip = tracked && (pigment || s.hideNatural) ? observation.flatMap { Self.browStrip($0, display: display, chord: pigment) } : nil
         let (frameMask,maskTransform,fresh)=uploadMask(slot:frameSlot,capturedImage:buffer,maxAge:max(config.mask_max_age_seconds,Self.browMaskGraceSeconds))
         // The brow does not wait for the hand mask: when the segmenter falls behind (it shares the GPU with the brow
         // tracker and the inpainter) the brow is drawn without occlusion instead of fading out. A mask up to
@@ -234,12 +235,15 @@ extension BeautyBlushEngine {
         if s.tracking {
             browResultTimes.append(frame.timestamp);browResultTimes.removeAll {frame.timestamp-$0>1}
             let rate=browResultTimes.count>1 ? Double(browResultTimes.count-1)/max(0.001,frame.timestamp-browResultTimes[0]):0
-            let snapshot=observation.map {o in
-                let pose=Self.screenPose(o,display:display)
-                return BrowTrackingSnapshot(faceFound:true,tracked:tracked,yaw:pose.yaw,pitch:pose.pitch,roll:pose.roll,meshPoints:o.mesh.count,
-                                     latencyMs:browTracker.lastLatencyMs,rate:rate,labels:Self.browTrackingLabels(o,display:display))
-            } ?? BrowTrackingSnapshot(faceFound:false)
-            onTracking?(snapshot)
+            if frame.timestamp - lastTrackingPublish >= 1.0 / 12.0 {
+                lastTrackingPublish = frame.timestamp
+                let snapshot=observation.map {o in
+                    let pose=Self.screenPose(o,display:display)
+                    return BrowTrackingSnapshot(faceFound:true,tracked:tracked,yaw:pose.yaw,pitch:pose.pitch,roll:pose.roll,meshPoints:o.mesh.count,
+                                         latencyMs:browTracker.lastLatencyMs,rate:rate,labels:Self.browTrackingLabels(o,display:display))
+                } ?? BrowTrackingSnapshot(faceFound:false)
+                onTracking?(snapshot)
+            }
         }
         let retained=FrameLifetime(y:cy,cb:cc,frame:frame)
         let completionGate=inFlight

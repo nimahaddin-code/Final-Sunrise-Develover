@@ -81,7 +81,7 @@ final class MakeupPreferenceTests:XCTestCase {
     @MainActor func testCreativeBlushChoiceRetainsShadeAndTutorialStyle() {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         XCTAssertNil(home.currentShade,"a launch starts with no makeup")
-        let shade=home.shades[.blush],intensity=home.intensity
+        let shade=home.shades[.blush],intensity=home.intensities[.blush] ?? TryOnHomeModel.defaultIntensity
         home.choose(blush:.sunkissed)
         XCTAssertEqual(home.liveConfiguration.blushStyle,.sunkissed)
         XCTAssertEqual(home.enabled,[.blush]);XCTAssertEqual(home.currentShade,shade);XCTAssertEqual(home.intensity,intensity)
@@ -435,7 +435,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         let assigned=try XCTUnwrap(home.brow.selectedBlush).id
         let shade=MakeupShade(id:"custom.test",name:"Custom colour",red:0.8,green:0.2,blue:0.4,opacity:0.36)
-        home.choose(shade:shade);home.setIntensity(0.8)
+        home.choose(.blush);home.choose(shade:shade);home.setIntensity(0.8)
         XCTAssertEqual(home.brow.selectedBlush?.id,assigned)
         XCTAssertEqual(home.liveConfiguration.blushLayer.tint,SIMD3<Float>(0.8,0.2,0.4))
         home.choose(.eyebrow)
@@ -583,6 +583,8 @@ final class MakeupPreferenceTests:XCTestCase {
         home.choose(.eyebrow)
         XCTAssertEqual(home.enabled,[],"picking a tool only shows its controls")
         home.choose(shade:home.swatches[1])
+        XCTAssertEqual(home.enabled,[],"a brow shade needs a brow picture first")
+        home.choose(browOverlay:.standard);home.choose(shade:home.swatches[1])
         let browShade=home.shades[.eyebrow]
         home.choose(.blush);home.choose(blush:.lifted)
         home.choose(.eyeliner);home.choose(shade:home.swatches[0]);home.turnOff()

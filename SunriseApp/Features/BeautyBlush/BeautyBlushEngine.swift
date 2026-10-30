@@ -100,7 +100,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     var browDrawPending=false
     var lastBrowDraw:Double = -.infinity
     /// The 3D hair brow: its mesh on the GPU, and the ARKit face mesh drawn as depth only so far hairs hide behind the face.
-    var hairBuffer:MTLBuffer?,hairVertexCount=0
+    var hairBuffer:MTLBuffer?,hairLODBuffer:MTLBuffer?,hairVertexCount=0,hairLODVertexCount=0
     var faceMeshVertices:[MTLBuffer]=[],faceMeshIndices:MTLBuffer?,faceMeshIndexCount=0
     var browLight:Float=1
     var browFaceTriangles:[UInt16]=[]
@@ -124,6 +124,10 @@ final class BeautyBlushEngine:@unchecked Sendable {
     /// The tracking view's per-frame readout (nil when the brow is not in tracking view).
     var onTracking:(@Sendable (BrowTrackingSnapshot?)->Void)?
     var browResultTimes:[Double]=[]
+    var browTrackerSubmitted=0,browTrackerDropped=0
+    /// Tracking diagnostics are developer-only; publishing them at camera
+    /// rate causes SwiftUI to rebuild dozens of labels unnecessarily.
+    var lastTrackingPublish:Double = -.infinity
     var lastError:String?
     var presentedFrames=0,pigmentFrames=0,projectionErrorPixels:Double=0
     var maskAgeMilliseconds:Double = -1
@@ -283,7 +287,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         segmenter.stop();browTracker.stop()
         queue.async { [self] in
             visibility=BeautyBlushVisibility();blushVisibility=BeautyBlushVisibility();frameTime=0;anchorID=nil;style=nil;lastError=nil;lastSegment=0
-            browSmoother.reset();browStabilizer.reset();browStatus = .none;browLatest=nil;lastBrowDraw = -.infinity
+            browSmoother.reset();browStabilizer.reset();browStatus = .none;browLatest=nil;lastBrowDraw = -.infinity;lastTrackingPublish = -.infinity
             lock.lock()
             attemptedBlushStyle=nil;lastBindAttempt = -.infinity;atlas=nil;blushLandmarks=nil
             lock.unlock()
@@ -676,7 +680,15 @@ final class BeautyBlushEngine:@unchecked Sendable {
         guard now-reportStart>=2 else{return}
         let sorted=ages.sorted(),p95=sorted[min(sorted.count-1,Int(Double(sorted.count)*0.95))]
         var report:[String:Any]=["engine":isBrow ? "mediapipe_metal":"arkit_metal_uv","category":isBrow ? "eyebrow":"blush","fps_completed":Double(reportFrames)/(now-reportStart),"fps_presented":Double(presentedFrames)/(now-reportStart),"pigment_frames":pigmentFrames,"projection_error_pixels":projectionErrorPixels,"gpu_ms_mean":gpuTimes.reduce(0,+)/Double(gpuTimes.count),"frame_age_ms_p95":p95,"thermal_state":ProcessInfo.processInfo.thermalState.rawValue,"mask_fresh":maskFresh,"mask_age_ms":maskAgeMilliseconds,"segmenter_available":segmenter.isAvailable,"visibility":visibility,"error":lastError ?? "none","shader_error":cb.error?.localizedDescription ?? "none"]
-        if isBrow {report["landmark_latency_ms"]=browTracker.lastLatencyMs;report["brow_tracker_available"]=browTracker.isAvailable;report["brow_stabilized"]=browStabilized}
+        if isBrow {
+            lock.lock(); let trackerSubmitted = browTrackerSubmitted, trackerDropped = browTrackerDropped; browTrackerSubmitted = 0; browTrackerDropped = 0; lock.unlock()
+            report["landmark_latency_ms"] = browTracker.lastLatencyMs
+            report["brow_tracker_available"] = browTracker.isAvailable
+            report["brow_stabilized"] = browStabilized
+            report["tracker_submitted"] = trackerSubmitted
+            report["tracker_dropped"] = trackerDropped
+            if let eraser { let m = eraser.modelMetrics; report["eraser_model_requests"] = m.requests; report["eraser_model_latency_ms"] = m.latencyMs }
+        }
         // The brow publishes its own status as soon as it changes (a face found or lost cannot wait two seconds).
         if !isBrow {onStatus?(lastError != nil || cb.error != nil ? String(localized:"Makeup is temporarily unavailable") : (!maskFresh && visibility<0.1 ? String(localized:"Preparing makeup visibility"):nil))}
         if let data=try? JSONSerialization.data(withJSONObject:report) {UserDefaults.standard.set(data,forKey:isBrow ? "beautyBrow.metrics":"beautyBlush.metrics")}

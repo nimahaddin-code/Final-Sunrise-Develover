@@ -6,7 +6,9 @@ import Foundation
 import simd
 
 /// One camera frame with the face ARKit tracked in it: enough to move between image pixels and face-local metres.
-struct BrowFaceFrame: Sendable {
+final class BrowFaceFrame: @unchecked Sendable {
+    private static let bucketColumns = 32
+    private static let bucketRows = 24
     let anchorID: UUID
     /// Face-local mesh of this frame (ARKit's 1220 vertices) and its triangles, three indices each.
     let vertices: [SIMD3<Float>]
@@ -19,6 +21,73 @@ struct BrowFaceFrame: Sendable {
     let faceFromCamera: simd_float4x4
     /// Face-local to world, for drawing 3D geometry placed in face-local coordinates.
     let faceToWorld: simd_float4x4
+    /// Built only when a landmark must be lifted. Standard 2D brow frames do
+    /// not pay for the spatial index; 3D hair and tracker responses share it.
+    private let spatialIndexLock = NSLock()
+    private var spatialIndexStorage: SpatialIndex?
+    private var spatialIndex: SpatialIndex {
+        spatialIndexLock.lock(); defer { spatialIndexLock.unlock() }
+        if let existing = spatialIndexStorage { return existing }
+        let created = SpatialIndex(vertices: vertices, triangles: triangles,
+                                   intrinsics: intrinsics, imageSize: imageSize,
+                                   cameraFromFace: cameraFromFace)
+        spatialIndexStorage = created
+        return created
+    }
+
+    private final class SpatialIndex: @unchecked Sendable {
+        let projected: [SIMD2<Float>]
+        let triangleBounds: [SIMD4<Float>]
+        let bucketStarts: [Int]
+        let bucketCounts: [Int]
+        let bucketTriangles: [Int]
+
+        init(vertices: [SIMD3<Float>], triangles: [UInt16], intrinsics: simd_float3x3,
+             imageSize: SIMD2<Float>, cameraFromFace: simd_float4x4) {
+            let fx = intrinsics.columns.0.x, fy = intrinsics.columns.1.y
+            let cx = intrinsics.columns.2.x, cy = intrinsics.columns.2.y
+            func project(_ point: SIMD3<Float>) -> SIMD2<Float> {
+                let c = cameraFromFace * SIMD4(point, 1)
+                guard c.z < -1e-4 else { return SIMD2(.nan, .nan) }
+                let p = SIMD2(cx + fx * c.x / -c.z, cy - fy * c.y / -c.z)
+                return p.x.isFinite && p.y.isFinite ? p : SIMD2(.nan, .nan)
+            }
+            projected = vertices.map(project)
+            var bounds: [SIMD4<Float>] = []
+            bounds.reserveCapacity(triangles.count / 3)
+            let bucketTotal = BrowFaceFrame.bucketColumns * BrowFaceFrame.bucketRows
+            var counts = Array(repeating: 0, count: bucketTotal)
+            var triangleBucketIDs = Array(repeating: [Int](), count: triangles.count / 3)
+            for t in 0..<(triangles.count / 3) {
+                let a = projected[Int(triangles[t * 3])]
+                let b = projected[Int(triangles[t * 3 + 1])]
+                let c = projected[Int(triangles[t * 3 + 2])]
+                let minX = min(a.x, min(b.x, c.x)), maxX = max(a.x, max(b.x, c.x))
+                let minY = min(a.y, min(b.y, c.y)), maxY = max(a.y, max(b.y, c.y))
+                bounds.append(SIMD4(minX, minY, maxX, maxY))
+                guard minX.isFinite, minY.isFinite, maxX.isFinite, maxY.isFinite else { continue }
+                let x0 = max(0, min(BrowFaceFrame.bucketColumns - 1, Int(floor(minX / imageSize.x * Float(BrowFaceFrame.bucketColumns)))))
+                let x1 = max(0, min(BrowFaceFrame.bucketColumns - 1, Int(floor(maxX / imageSize.x * Float(BrowFaceFrame.bucketColumns)))))
+                let y0 = max(0, min(BrowFaceFrame.bucketRows - 1, Int(floor(minY / imageSize.y * Float(BrowFaceFrame.bucketRows)))))
+                let y1 = max(0, min(BrowFaceFrame.bucketRows - 1, Int(floor(maxY / imageSize.y * Float(BrowFaceFrame.bucketRows)))))
+                var ids: [Int] = []
+                for y in y0...y1 { for x in x0...x1 { ids.append(y * BrowFaceFrame.bucketColumns + x); counts[y * BrowFaceFrame.bucketColumns + x] += 1 } }
+                triangleBucketIDs[t] = ids
+            }
+            triangleBounds = bounds
+            var starts = Array(repeating: 0, count: bucketTotal)
+            var cursor = 0
+            for i in 0..<bucketTotal { starts[i] = cursor; cursor += counts[i] }
+            var write = starts
+            var flattened = Array(repeating: 0, count: cursor)
+            for t in triangleBucketIDs.indices {
+                for bucket in triangleBucketIDs[t] { flattened[write[bucket]] = t; write[bucket] += 1 }
+            }
+            bucketStarts = starts
+            bucketCounts = counts
+            bucketTriangles = flattened
+        }
+    }
 
     init(anchorID: UUID, vertices: [SIMD3<Float>], triangles: [UInt16], intrinsics: simd_float3x3, imageSize: SIMD2<Float>,
          faceToWorld: simd_float4x4, cameraToWorld: simd_float4x4) {
@@ -28,8 +97,10 @@ struct BrowFaceFrame: Sendable {
         self.intrinsics = intrinsics
         self.imageSize = imageSize
         self.faceToWorld = faceToWorld
-        faceFromCamera = simd_inverse(faceToWorld) * cameraToWorld
-        cameraFromFace = simd_inverse(faceFromCamera)
+        let faceFromCameraValue = simd_inverse(faceToWorld) * cameraToWorld
+        let cameraFromFaceValue = simd_inverse(faceFromCameraValue)
+        faceFromCamera = faceFromCameraValue
+        cameraFromFace = cameraFromFaceValue
     }
 
     /// The camera ray through `pixel`, in face-local coordinates.
@@ -43,25 +114,34 @@ struct BrowFaceFrame: Sendable {
     /// Where each mesh vertex lands in the image (NaN behind the camera). Passed to `faceLocal(at:projected:)` when many
     /// pixels are lifted from one frame, so each one skips the triangles it cannot be inside.
     func projectedVertices() -> [SIMD2<Float>] {
-        vertices.map { pixel(of: $0) ?? SIMD2(.nan, .nan) }
+        spatialIndex.projected
     }
 
     /// The point of the face mesh seen at `pixel`. A ray that misses the mesh (a brow tail past the face's edge) takes the plane
     /// of the nearest triangle, so every landmark gets a place on the face. `projected` (from `projectedVertices()`) only
     /// makes it faster: a ray can only hit a triangle whose image contains the pixel.
-    func faceLocal(at pixel: SIMD2<Float>, projected: [SIMD2<Float>]? = nil) -> SIMD3<Float>? {
+    func faceLocal(at pixel: SIMD2<Float>, projected providedProjected: [SIMD2<Float>]? = nil) -> SIMD3<Float>? {
         guard pixel.x.isFinite, pixel.y.isFinite, triangles.count >= 3 else { return nil }
         let (origin, direction) = ray(through: pixel)
-        let projected = projected?.count == vertices.count ? projected : nil
+        let index = spatialIndex
+        let projected = providedProjected?.count == vertices.count ? providedProjected : index.projected
         var bestT = Float.infinity
-        for t in 0..<triangles.count / 3 {
+        let sx = max(0, min(Self.bucketColumns - 1, Int(floor(pixel.x / imageSize.x * Float(Self.bucketColumns)))))
+        let sy = max(0, min(Self.bucketRows - 1, Int(floor(pixel.y / imageSize.y * Float(Self.bucketRows)))))
+        let bucket = sy * Self.bucketColumns + sx
+        let start = index.bucketStarts[bucket], end = start + index.bucketCounts[bucket]
+        // Iterate the flattened bucket in place. Building an Array for every
+        // lifted landmark showed up as avoidable churn in the tracker path.
+        let candidateStart = start < end ? start : 0
+        let candidateEnd = start < end ? end : (triangles.count / 3)
+        for candidate in candidateStart..<candidateEnd {
+            let t = start < end ? index.bucketTriangles[candidate] : candidate
             let ia = Int(triangles[t * 3]), ib = Int(triangles[t * 3 + 1]), ic = Int(triangles[t * 3 + 2])
             if let projected {
-                let pa = projected[ia], pb = projected[ib], pc = projected[ic]
+                let bounds = index.triangleBounds[t]
                 // One pixel of margin; a vertex behind the camera (NaN) keeps the triangle in.
-                if pa.x.isFinite, pb.x.isFinite, pc.x.isFinite,
-                   pixel.x < min(pa.x, pb.x, pc.x) - 1 || pixel.x > max(pa.x, pb.x, pc.x) + 1
-                    || pixel.y < min(pa.y, pb.y, pc.y) - 1 || pixel.y > max(pa.y, pb.y, pc.y) + 1 { continue }
+                if bounds.x.isFinite, bounds.y.isFinite, bounds.z.isFinite, bounds.w.isFinite,
+                   pixel.x < bounds.x - 1 || pixel.x > bounds.z + 1 || pixel.y < bounds.y - 1 || pixel.y > bounds.w + 1 { continue }
             }
             let a = vertices[ia], b = vertices[ib], c = vertices[ic]
             // Moller-Trumbore, two-sided.
@@ -105,7 +185,18 @@ struct BrowFaceFrame: Sendable {
     /// The mesh's outward normal at a face-local point (the nearest triangle's), pointing towards the camera.
     func normal(near point: SIMD3<Float>) -> SIMD3<Float> {
         var best: (distance: Float, normal: SIMD3<Float>)?
-        for t in 0..<triangles.count / 3 {
+        let projectedPoint = pixel(of: point)
+        let index = spatialIndex
+        var candidateRange: (Int, Int)?
+        if let projectedPoint {
+            let sx = max(0, min(Self.bucketColumns - 1, Int(floor(projectedPoint.x / imageSize.x * Float(Self.bucketColumns)))))
+            let sy = max(0, min(Self.bucketRows - 1, Int(floor(projectedPoint.y / imageSize.y * Float(Self.bucketRows)))))
+            let bucket = sy * Self.bucketColumns + sx
+            let start = index.bucketStarts[bucket], end = start + index.bucketCounts[bucket]
+            if start < end { candidateRange = (start, end) }
+        }
+        let allCount = triangles.count / 3
+        func consider(_ t: Int) {
             let a = vertices[Int(triangles[t * 3])], b = vertices[Int(triangles[t * 3 + 1])], c = vertices[Int(triangles[t * 3 + 2])]
             let distance = simd_distance((a + b + c) / 3, point)
             if best == nil || distance < best!.distance {
@@ -115,6 +206,11 @@ struct BrowFaceFrame: Sendable {
                 best = (distance, n)
             }
         }
+        let range = candidateRange ?? (0, allCount)
+        for candidate in range.0..<range.1 { consider(candidateRange == nil ? candidate : index.bucketTriangles[candidate]) }
+        // A point outside the visible mesh can land in an empty or unrelated
+        // bucket; retain the old nearest-triangle fallback in that case.
+        if best == nil, candidateRange != nil { for t in 0..<allCount { consider(t) } }
         var n = best?.normal ?? SIMD3(0, 0, 1)
         // Towards the camera, in face-local coordinates.
         let toCamera = SIMD3(faceFromCamera.columns.3.x, faceFromCamera.columns.3.y, faceFromCamera.columns.3.z) - point
