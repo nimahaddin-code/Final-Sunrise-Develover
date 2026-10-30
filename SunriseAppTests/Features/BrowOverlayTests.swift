@@ -162,9 +162,11 @@ final class BrowOverlayTests: XCTestCase {
         XCTAssertEqual(kept, 24, "one frame per 1/24 s slot, not one per whole 50 ms of 60 Hz frames")
         XCTAssertTrue(BeautyBlushEngine.browFrameDue(timestamp: 0, last: -.infinity))
         XCTAssertTrue(BeautyBlushEngine.browFrameDue(timestamp: 1.001, last: 1, maxFPS: nil), "no cap: every frame is due")
-        // Uncapped until the phone is hot; then drawing and MediaPipe slow down.
+        // The camera and compositor remain native-rate; only MediaPipe uses a stable 30 fps budget.
         XCTAssertNil(BeautyBlushEngine.BrowLoad.current(.nominal).drawFPS)
-        XCTAssertNil(BeautyBlushEngine.BrowLoad.current(.nominal).trackerFPS)
+        XCTAssertEqual(BeautyBlushEngine.BrowLoad.current(.nominal).trackerFPS, 30)
+        XCTAssertNil(BeautyBlushEngine.BrowLoad.current(.fair).drawFPS)
+        XCTAssertEqual(BeautyBlushEngine.BrowLoad.current(.fair).trackerFPS, 30)
         XCTAssertEqual(BeautyBlushEngine.BrowLoad.current(.serious).drawFPS, 30)
     }
 }

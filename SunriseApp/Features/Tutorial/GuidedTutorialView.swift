@@ -522,33 +522,17 @@ private struct TutorialScreen: View {
                     } else {
                         HStack(spacing: 6) {
                             Text("Next").font(.headline)
-                            Image(systemName: "arrow.right").font(.subheadline.weight(.semibold))
+                            Image(systemName: "chevron.right").font(.subheadline.weight(.semibold))
                         }
                         .padding(.horizontal, AppSpacing.medium)
                         .frame(height: 52)
-                        .background(AppColors.flamingo, in: Capsule())
-                        .foregroundStyle(AppColors.snow)
+                        .background(AppColors.snow.opacity(0.8), in: Capsule())
+                        .overlay(Capsule().strokeBorder(AppColors.snow.opacity(0.6), lineWidth: 1))
+                        .foregroundStyle(Color.black)
                     }
                 }
                 .accessibilityLabel(isLast ? "Done" : "Next step")
             }
-            .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
-            Spacer()
-            Button {
-                if model.advance() { dismiss() }
-            } label: {
-                HStack(spacing: 6) {
-                    Text(isLast ? "Done" : "Next")
-                    if !isLast { Image(systemName: "chevron.right").fontWeight(.medium) }
-                }
-                .font(.body)
-                .padding(.horizontal, isLast ? 24 : 18)
-                .frame(height: 44)
-                .background(isLast ? AnyShapeStyle(AppColors.flamingo) : AnyShapeStyle(AppColors.snow.opacity(0.8)), in: Capsule())
-                .overlay(Capsule().strokeBorder(AppColors.snow.opacity(isLast ? 0.25 : 0.6), lineWidth: 1))
-                .foregroundStyle(isLast ? AppColors.snow : Color.black)
-            }
-            .accessibilityLabel(isLast ? "Finish tutorial" : "Next step")
         }
         .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
         .animation(.easeInOut(duration: 0.2), value: isLast)

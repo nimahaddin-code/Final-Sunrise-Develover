@@ -5,11 +5,15 @@
 import SwiftUI
 
 extension BeautyBlushEngine {
+    /// MediaPipe is paced separately from the camera compositor. Keeping the compositor at the camera's native rate
+    /// avoids visible jumps between tracker results, while a 30 fps tracker budget leaves the shared GPU and Neural
+    /// Engine enough time to draw each camera frame.
+    static let browNominalTrackerFramesPerSecond:Double = 30
     /// How much brow work the phone's temperature allows. The brow tracker, the hand mask and the fill model share the GPU and
     /// Neural Engine; as the phone warms each is asked less often, and when it is hot the fill model stops (the push-pull fill
     /// still hides the natural brow).
-    /// Frame caps are nil (uncapped) until the phone is hot: every camera frame is drawn unless the previous one is still
-    /// queued, and MediaPipe takes every frame it is free for.
+    /// The camera session and compositor stay at their native rate. MediaPipe is deliberately capped so it cannot
+    /// starve the compositor and cause the applied brow to stutter.
     struct BrowLoad:Equatable {
         var trackerFPS:Double?
         var drawFPS:Double?
@@ -18,13 +22,13 @@ extension BeautyBlushEngine {
         var modelInterval:Double?
         static func current(_ state:ProcessInfo.ThermalState)->BrowLoad {
             switch state {
-            case .nominal:return BrowLoad(trackerFPS:nil,drawFPS:nil,maskInterval:1.0/15,modelInterval:BrowEraser.modelInterval)
-            case .fair:return BrowLoad(trackerFPS:nil,drawFPS:nil,maskInterval:1.0/10,modelInterval:0.5)
+            case .nominal:return BrowLoad(trackerFPS:browNominalTrackerFramesPerSecond,drawFPS:nil,maskInterval:1.0/15,modelInterval:BrowEraser.modelInterval)
+            case .fair:return BrowLoad(trackerFPS:30,drawFPS:nil,maskInterval:1.0/10,modelInterval:0.5)
             default:return BrowLoad(trackerFPS:15,drawFPS:30,maskInterval:1.0/8,modelInterval:nil)
             }
         }
     }
-    /// Whether a camera frame at `timestamp` is due, given the last one taken (always, with no cap): time is cut into 1/maxFPS slots and
+    /// Whether a camera frame at `timestamp` is due, given the last one taken: time is cut into 1/maxFPS slots and
     /// one frame is taken per slot, so a 60 Hz camera gives 40 fps at a 40 cap (two frames of every three), not the 30 a minimum
     /// interval would round down to. A frame almost a whole interval after the last is also due, so camera timing jitter at a
     /// 60 cap does not drop frames that land in the same slot.
