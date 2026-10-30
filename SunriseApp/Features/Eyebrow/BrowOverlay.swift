@@ -42,7 +42,10 @@ enum BrowSpriteBaker {
     static let width = 1024, height = 512
     /// The picture's head and tail sit at these u. MediaPipe's brow rows end short of the real hair, so the picture runs a
     /// little past 0...1 at both ends and covers the natural brow's ends.
-    static let headU: Float = -0.04, tailU: Float = 1.06
+    // Extend the nose-side head slightly beyond the tracked contour so the
+    // two brow overlays meet the face naturally instead of leaving a wide
+    // center gap. The tail keeps the original conservative extension.
+    static let headU: Float = -0.10, tailU: Float = 1.06
     /// Columns with less than this share of the busiest column's coverage are stray hairs, not the brow's ends.
     private static let endShare: Float = 0.02
 
