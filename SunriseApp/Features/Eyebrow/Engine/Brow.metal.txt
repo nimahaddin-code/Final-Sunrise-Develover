@@ -173,12 +173,19 @@ fragment float4 browStripFragment(BrowOut in [[stage_in]],constant U& u [[buffer
  // Hidden natural brow: the brow-space fill (push-pull or model) where the area hides it, soft-edged.
  // The mask includes the detected brow edge; sampled one mip level down so its edge stays soft.
  constexpr sampler fs(coord::normalized,address::clamp_to_edge,filter::linear,mip_filter::linear);
- float2 fuv=float2((in.brow.x-space.x)/(space.y-space.x),(space.w-in.brow.y)/(space.w-space.z));
- uint fslice=uint(in.conceal.z+.5f);
- float hide=hideMask.sample(fs,fuv,fslice,level(1.f)).r;
- float3 hidden=fill.sample(fs,fuv,fslice).rgb;
- // Original brow pixels (debug view): inside that area and darker than the fill.
- float original=hide*smoothstep(.03f,.16f,1-lum/max(lum709(hidden),1e-4f));
+ float hide=0;
+ float3 hidden=skin;
+ float original=0;
+ // Fill and hide-mask textures are only needed when natural-brow concealment is
+ // enabled. Overlay-only frames avoid two array-texture samples per fragment.
+ if(conceal) {
+  float2 fuv=float2((in.brow.x-space.x)/(space.y-space.x),(space.w-in.brow.y)/(space.w-space.z));
+  uint fslice=uint(in.conceal.z+.5f);
+  hide=hideMask.sample(fs,fuv,fslice,level(1.f)).r;
+  hidden=fill.sample(fs,fuv,fslice).rgb;
+  // Original brow pixels (debug view): inside that area and darker than the fill.
+  original=hide*smoothstep(.03f,.16f,1-lum/max(lum709(hidden),1e-4f));
+ }
  // Hide the natural brow. Hands and fringes stay in front.
  float3 base=conceal ? mix(skin,hidden,hide*(1-occ)*in.brow.w):skin;
  // Brow shape, overlay only: output = alpha * hair + (1 - alpha) * base. Alpha is zero outside the designed brow, so

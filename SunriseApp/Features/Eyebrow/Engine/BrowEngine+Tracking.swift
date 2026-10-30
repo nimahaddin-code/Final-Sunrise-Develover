@@ -51,8 +51,12 @@ extension BeautyBlushEngine {
         let load=BrowLoad.current(ProcessInfo.processInfo.thermalState)
         let face=browFaceFrame(frame)
         drawLiveBrow(frame,face:face,settings:s,maxFPS:load.drawFPS)
-        guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit,maxFPS:load.trackerFPS) else {return}
+        guard browTracker.isAvailable,!browTracker.isBusy,Self.browFrameDue(timestamp:frame.timestamp,last:lastBrowSubmit,maxFPS:load.trackerFPS) else {
+            lock.lock(); browTrackerDropped += 1; lock.unlock()
+            return
+        }
         let (entry,up,_)=submitToBrowTracker(frame,face:face,settings:s)
+        lock.lock(); browTrackerSubmitted += 1; lock.unlock()
         queue.async { [self] in
             // Hand/fringe occlusion uses the same face-skin mask as blush (15 Hz, less when the phone is warm). Only the brow
             // shape and the hidden natural brow draw over the face, so only they need it.

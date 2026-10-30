@@ -62,7 +62,6 @@
 		4D3D248B5F57A2BCC5B92F45 /* MakeupPersonalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */; };
 		4EF7EF1EF1E32DE1D3B45E7A /* FaceCalibrationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79305ED9810D6D771F5FD4DA /* FaceCalibrationViewModel.swift */; };
 		4FB931EDE051A5976AE56A63 /* ForeheadGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880B8ADAAD4B4CCC9E778686 /* ForeheadGuideTests.swift */; };
-		4FC2D031C41885221C25F6AA /* face_landmarker.task in Resources */ = {isa = PBXBuildFile; fileRef = 01F40072E3CF347862554017 /* face_landmarker.task */; };
 		50990270ECCC792E5A17200F /* EyelinerRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8D32CBADEAE62284CB8374 /* EyelinerRegion.swift */; };
 		513BAB4E537BC7E6398BE794 /* LiveGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19429AD975CE1483E26A2783 /* LiveGuideView.swift */; };
 		531B53A829A58820D8D01370 /* CameraPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413DF4F73EF8C9FCD698014E /* CameraPreviewView.swift */; };
@@ -244,7 +243,6 @@
 
 /* Begin PBXFileReference section */
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
-		01F40072E3CF347862554017 /* face_landmarker.task */ = {isa = PBXFileReference; lastKnownFileType = file; path = face_landmarker.task; sourceTree = "<group>"; };
 		045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSavedLooksStore.swift; sourceTree = "<group>"; };
 		06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerGeometryTests.swift; sourceTree = "<group>"; };
 		087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommendation.swift; sourceTree = "<group>"; };
@@ -511,7 +509,6 @@
 				AA605D264DFFC483849D92C1 /* selfie_multiclass_256x256.tflite */,
 				B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */,
 				B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */,
-				01F40072E3CF347862554017 /* face_landmarker.task */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -1144,7 +1141,6 @@
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
 				CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */,
 				349F2CBF0A4352FF1D05B64A /* selfie_multiclass_256x256.tflite in Resources */,
-				4FC2D031C41885221C25F6AA /* face_landmarker.task in Resources */,
 				B5A0C0DE00000000000D0004 /* MI-GAN-LICENSE.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
