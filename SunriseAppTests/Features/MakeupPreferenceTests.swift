@@ -69,9 +69,11 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertGreaterThan(lift.pigmentFields[0].curvature,0)
         for placement in [youth,sun,lift] {
             let pixels=try BeautyBlushEngine.renderAtlasFixture(placement:placement)
-            let blue=(0..<(256*256)).map {pixels[$0*4+2]}.max() ?? 0
+            let count:Int=256*256
+            let blue:Float=(0..<count).map {(i:Int)->Float in pixels[i*4+2]}.max() ?? 0
+            let red:Float=(0..<count).map {(i:Int)->Float in pixels[i*4]}.max() ?? 0
             if placement.style == .sunkissed {XCTAssertGreaterThan(blue,0.15)}else{XCTAssertEqual(blue,0)}
-            XCTAssertGreaterThan((0..<(256*256)).map {pixels[$0*4]}.max() ?? 0,0.2)
+            XCTAssertGreaterThan(red,0.2)
         }
     }
     @MainActor func testCreativeBlushChoiceRetainsShadeAndTutorialStyle() {
@@ -793,17 +795,24 @@ final class MakeupPreferenceTests:XCTestCase {
         func lin(_ b:UInt8)->Float {let c=Float(b)/255;return c<=0.04045 ? c/12.92:pow((c+0.055)/1.055,2.4)}
         return 0.0722*lin(data[i])+0.7152*lin(data[i+1])+0.2126*lin(data[i+2])
     }
-    func testBlushCameraRoundTripIsIdentityWhateverTheTransferTag() throws {
+    /// Untagged frames pass through unchanged; BT.709-tagged frames (ARKit's) are decoded with the 709 curve and encoded as
+    /// sRGB, which is what matches ARSCNView on device (decoding them as sRGB made faces visibly darker).
+    func testBlushCameraFollowsTheBuffersTransferTag() throws {
         guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
         let n=64,(luma,chroma)=syntheticSkin(n)
         for tag in [false,true] {
             let bare=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:Array(repeating:128,count:n*n*2),transfer709:tag,size:n)
             for (x,y) in [(2,2),(32,32),(44,22),(60,60)] {
-                let i=(y*n+x)*4
-                XCTAssertEqual(Int(bare[i+1]),Int(luma[y*n+x]),accuracy:1,"untouched camera must reach the screen unchanged (709 tag \(tag))")
+                let i=(y*n+x)*4,v=Float(luma[y*n+x])/255
+                var expected=v
+                if tag {
+                    let linear=v>=0.081 ? pow((v+0.099)/1.099,1/0.45):v/4.5
+                    expected=linear<=0.0031308 ? linear*12.92:1.055*pow(linear,1/2.4)-0.055
+                }
+                XCTAssertEqual(Int(bare[i+1]),Int((expected*255).rounded()),accuracy:1,"camera tone (709 tag \(tag))")
             }
             let warm=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,transfer709:tag,size:n)
-            let reference=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,blend:.legacy,size:n)
+            let reference=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,blend:.legacy,transfer709:tag,size:n)
             XCTAssertEqual(warm,reference,"intensity 0 must give the camera pixel in every blend")
         }
     }
@@ -828,7 +837,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertGreaterThan(chromaDetail(made),chromaDetail(bare)*0.7,"the skin's own colour variation must show through")
         XCTAssertGreaterThan(chromaDetail(made),chromaDetail(legacy)*1.2,"the previous blend replaced it with flat shade colour")
         let lumBare=region.map {linearLuminance(bare,$0)}.reduce(0,+),lumMade=region.map {linearLuminance(made,$0)}.reduce(0,+)
-        XCTAssertGreaterThan(lumMade/lumBare,0.75);XCTAssertLessThan(lumMade/lumBare,1.05,"blush must not glow or go muddy")
+        XCTAssertGreaterThan(lumMade/lumBare,0.92,"blush tints the skin, it must not darken it");XCTAssertLessThan(lumMade/lumBare,1.05,"or make it glow")
         // Highlight centre (0.7, 0.35): stays the brightest, least tinted point; no channel clipped to a flat 255.
         let h=(Int(0.35*Float(n))*n+Int(0.7*Float(n)))*4
         XCTAssertGreaterThan(linearLuminance(made,h),linearLuminance(bare,h)*0.85)

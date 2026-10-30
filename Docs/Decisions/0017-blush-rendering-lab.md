@@ -18,10 +18,11 @@ following was not the defect; style placement and silhouettes are intentional an
 
 Causes found in the code:
 
-1. **Camera tone mismatch.** `decodeCamera` used the BT.709 OETF inverse when the buffer was tagged 709 (ARKit
-   buffers are), and the drawable re-encoded with sRGB. A pixel without makeup did not round-trip: encoded 0.10 came
-   out as 0.16, 0.50 as 0.55. Shadows lifted and the whole Metal picture was flatter than ARSCNView's. Now the
-   decode is the exact inverse of the drawable's sRGB encoding, so untouched pixels pass through unchanged.
+1. ~~**Camera tone mismatch.**~~ **Withdrawn 2026-10-30.** This pass replaced the BT.709 decode of 709-tagged
+   ARKit frames with a plain sRGB decode, reasoning that untouched pixels should round-trip. On device the whole
+   picture, faces included, then looked darker than ARSCNView and than blush switched off: the 709 decode was the
+   one that matched. `decodeCamera` follows the buffer's transfer tag again. The pigment target is also rescaled to
+   95% of the skin's own luminance, because the absorbing layer alone darkened the cheeks by about 15%.
 2. **Skin chroma replaced by flat shade colour.** The old blend set `tint = shade × (skin luminance / shade
    luminance)` per pixel and mixed most of the result towards it. Luminance was kept, but freckles, redness and
    local colour variation inside the blush were replaced by one uniform colour. That reads as paint on top of
