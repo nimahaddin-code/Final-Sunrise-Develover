@@ -70,7 +70,7 @@ extension BeautyBlushEngine {
     /// The strip over both brows for one observation, in clip space; nil when a brow cannot be framed.
     /// With `chord`, each vertex also carries how far the observed centerline lies above the brow's head-to-tail chord, so
     /// an overlay picture (drawn in chord space) keeps its own arch.
-    static func browStrip(_ o:BrowObservation,display:CGAffineTransform,chord:Bool=false)->BrowStrip? {
+    static func browStrip(_ o:BrowObservation,display:CGAffineTransform,chord:Bool=false,mirrorPair:Bool=false)->BrowStrip? {
         guard let right=o.brows[.subjectRight],let left=o.brows[.subjectLeft],
               let r0=BrowGeometry(contour:right),let l0=BrowGeometry(contour:left) else {return nil}
         let across=max(r0.width,l0.width)
@@ -103,7 +103,7 @@ extension BeautyBlushEngine {
                     let p=c.section.point+c.section.across*w,step=c.section.across*0.2
                     let above=(p+step)/image,below=(p-step)/image
                     out.append(BrowVertex(position:clip(p),brow:SIMD4(c.u,w,c.half,fade*fade*(3-2*fade)),
-                                          probes:SIMD4(above.x,above.y,below.x,below.y),skin:SIMD4(blur.x,blur.y,c.bow,0),
+                                          probes:SIMD4(above.x,above.y,below.x,below.y),skin:SIMD4(blur.x,blur.y,c.bow,mirrorPair ? 1:0),
                                           conceal:SIMD4(c.lower.core,c.lower.end,index,0)))
                 }
             }
@@ -164,7 +164,9 @@ extension BeautyBlushEngine {
         if let hairMesh,let observation,let face {hairDraws=Self.hairPlacements(observation,face:face,mesh:hairMesh)}
         let hair3D = !hairDraws.isEmpty
         let pigment=s.browOverlay != nil && !hair3D
-        let strip = tracked && (pigment || s.hideNatural) ? observation.flatMap { Self.browStrip($0, display: display, chord: pigment) } : nil
+        let strip = tracked && (pigment || s.hideNatural) ? observation.flatMap {
+            Self.browStrip($0, display: display, chord: pigment, mirrorPair: s.browOverlay?.mirrorsForPair == true)
+        } : nil
         let (frameMask,maskTransform,fresh)=uploadMask(slot:frameSlot,capturedImage:buffer,maxAge:max(config.mask_max_age_seconds,Self.browMaskGraceSeconds))
         // The brow does not wait for the hand mask: when the segmenter falls behind (it shares the GPU with the brow
         // tracker and the inpainter) the brow is drawn without occlusion instead of fading out. A mask up to
