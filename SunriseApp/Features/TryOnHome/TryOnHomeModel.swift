@@ -83,6 +83,8 @@ final class LinerFrameRelay: @unchecked Sendable {
     static let defaultIntensity = 0.85
 
     /// The tool the shade row and intensity bar currently control.
+    /// Cold launch shows blush only; eyebrow is enabled only after the user
+    /// explicitly selects the eyebrow tool.
     @Published private(set) var blushLook:BlushPlacementStyle = .youthful
     @Published private(set) var tool: TryOnTool = .blush
     @Published private(set) var enabled: Set<TryOnTool> = [.blush]
