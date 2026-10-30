@@ -166,7 +166,6 @@
 		B5A0C0DE00000000000D0004 /* MI-GAN-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */; };
 		B5A0C0DE00000000000E0002 /* BrowOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0001 /* BrowOverlay.swift */; };
 		B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */; };
-		B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */; };
 		B5A0C0DE00000000000E0006 /* BrowOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */; };
 		B5A0C0DE00000000000F0002 /* BrowFaceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */; };
 		B5A0C0DE00000000000F0004 /* BrowFaceStabilizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */; };
@@ -179,6 +178,7 @@
 		B5A0C0DE0000000000110008 /* BrowEngine+Marks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110007 /* BrowEngine+Marks.swift */; };
 		B5A0C0DE000000000011000A /* BrowEngine+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */; };
 		B5A0C0DE000000000011020C /* Brow.metal.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE000000000011020B /* Brow.metal.txt */; };
+		B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */; };
 		B82426BCCB6209B4DC3E2179 /* FaceSnapshotter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7512B62F7A8614E0911E45 /* FaceSnapshotter.swift */; };
 		B8EAE5AAE0A46180B2B92BC2 /* LocalSavedLooksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */; };
 		B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */; };
@@ -393,7 +393,6 @@
 		B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = MIGANFace256.mlpackage; sourceTree = "<group>"; };
 		B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MI-GAN-LICENSE.txt"; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0001 /* BrowOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlay.swift; sourceTree = "<group>"; };
-		B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerLookPicker.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayPicker.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayTests.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizer.swift; sourceTree = "<group>"; };
@@ -407,6 +406,7 @@
 		B5A0C0DE0000000000110007 /* BrowEngine+Marks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Marks.swift"; sourceTree = "<group>"; };
 		B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Fixtures.swift"; sourceTree = "<group>"; };
 		B5A0C0DE000000000011020B /* Brow.metal.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brow.metal.txt; sourceTree = "<group>"; };
+		B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerLookPicker.swift; sourceTree = "<group>"; };
 		B8A0C7629D5BE6A59E2A595E /* TrackingReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingReadinessTests.swift; sourceTree = "<group>"; };
 		BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPreferenceTests.swift; sourceTree = "<group>"; };
 		BC38DE15F5318E7DBE6A6A6A /* BlushMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlushMask.swift; sourceTree = "<group>"; };
@@ -1404,7 +1404,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = 5NYWSR69FZ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1449,7 +1449,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = NZMS9KJ972;
+				DEVELOPMENT_TEAM = 5NYWSR69FZ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
