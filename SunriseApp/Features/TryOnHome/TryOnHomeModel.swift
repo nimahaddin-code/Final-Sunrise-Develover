@@ -85,7 +85,10 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// The tool the shade row and intensity bar currently control.
     @Published private(set) var blushLook:BlushPlacementStyle = .youthful
     @Published private(set) var tool: TryOnTool = .blush
-    @Published private(set) var enabled: Set<TryOnTool> = [.blush]
+    /// The tools with makeup on. Every launch starts bare (no makeup on any tool); a tool goes on when a shade, look,
+    /// brow picture or strength is chosen for it and stays as left when another tool is picked. All of them are drawn
+    /// together, and the tutorial and its photo get exactly this set.
+    @Published private(set) var enabled: Set<TryOnTool> = []
     @Published private(set) var shades: [TryOnTool: MakeupShade]
     /// Colours picked from a product photo, kept per tool so they stay in the shade row after another swatch is chosen.
     @Published private(set) var customShades: [TryOnTool: [MakeupShade]] = [:]
@@ -165,8 +168,8 @@ final class LinerFrameRelay: @unchecked Sendable {
         linerIsNeutral=plan.eyeliner.isNeutral
         linerRecommendation=plan.madeForYou.first
         if case .eyeliner(let style)? = linerRecommendation?.style { linerStyle=style } else { linerStyle=nil }
-        // -Nimah: Only the selected category is visible; other shades/intensities are retained.
-        enabled=canTry(tool) ? [tool] : []
+        // Each tool keeps what was chosen for it; a tool the new analysis cannot fit goes off.
+        enabled=enabled.filter(canTry)
         syncLiner()
     }
 
@@ -198,11 +201,16 @@ final class LinerFrameRelay: @unchecked Sendable {
         return configuration
     }
 
-    /// Selecting a tool also switches its makeup on.
+    /// What the tutorial starts from: every tool's last choice, and which tools have makeup on.
+    var tutorialHandoff: TutorialHandoff {
+        TutorialHandoff(tool: tool, shades: shades, intensities: intensities, linerLook: linerLook, blushStyle: blushLook,
+                        browOverlay: browOverlay, hideNaturalBrow: !naturalBrowVisible, enabled: enabled)
+    }
+
+    /// Selecting a tool only shows its controls; every tool keeps the makeup chosen for it, on or off.
     func choose(_ newTool: TryOnTool) {
         tool = newTool
         isComparing=false
-        enabled=canTry(newTool) ? [newTool] : []
         syncLiner()
         recordLiveState()
     }
@@ -211,7 +219,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     func choose(blush look:BlushPlacementStyle) {
         guard look.isReferenceLook,canTry(.blush) else {return}
         blushLook=look;UserDefaults.standard.set(look.rawValue,forKey:"dandan.blush.look")
-        tool = .blush;enabled=[.blush];isComparing=false;syncLiner()
+        tool = .blush;enabled.insert(.blush);isComparing=false;syncLiner()
     }
 
     func choose(shade: MakeupShade) {
@@ -222,14 +230,14 @@ final class LinerFrameRelay: @unchecked Sendable {
             customShades[tool] = Array(picked.suffix(Self.maxCustomShades))
         }
         shades[tool] = shade
-        enabled=[tool]
+        enabled.insert(tool)
         if tool == .eyeliner { syncLiner() }
     }
 
     func choose(browOverlay overlay: BrowOverlay?) {
         guard canTry(.eyebrow) else { return }
         browOverlay = overlay
-        if tool == .eyebrow { enabled = [.eyebrow] }
+        enabled.insert(.eyebrow)
     }
 
     func setLinerLook(_ look: LinerLook) {
@@ -247,7 +255,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     func setIntensity(_ value: Double) {
         guard canTry(tool) else { return }
         intensities[tool] = min(max(value, 0), 1)
-        enabled=[tool]
+        enabled.insert(tool)
         if tool == .eyeliner { syncLiner() }
     }
 

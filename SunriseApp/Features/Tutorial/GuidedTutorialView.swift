@@ -16,6 +16,9 @@ struct TutorialHandoff: Hashable {
     var blushStyle: BlushPlacementStyle? = nil
     var browOverlay: BrowOverlay? = nil
     var hideNaturalBrow = false
+    /// The tools with makeup on when Try On was left. The photo shows exactly these, each as last chosen; a tab for a
+    /// tool that was off still guides, without a makeup preview.
+    var enabled: Set<TryOnTool> = Set(TryOnTool.allCases)
 }
 
 /// What one half of the camera shows in the comparison.
@@ -185,6 +188,8 @@ enum TutorialTab: CaseIterable, Identifiable {
             return value
         }
         if !hasGuide || compare == .plain { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
+        // No makeup was chosen for this tool on Try On: guide only.
+        if !handoff.enabled.contains(tab.tool) { value.showMakeupPreview = false }
         // A look beside the plain camera has no guide outline over it.
         else if compare.plainBesideLook != nil { value.showGuide = false; value.showMappingFormula = false }
         return value
@@ -209,7 +214,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     private func photoLayer(_ tool: TryOnTool, available: Bool) -> PreviewLayer {
-        PreviewLayer(on: available, intensity: Float(handoff.intensities[tool] ?? TryOnHomeModel.defaultIntensity),
+        PreviewLayer(on: available && handoff.enabled.contains(tool), intensity: Float(handoff.intensities[tool] ?? TryOnHomeModel.defaultIntensity),
                      tint: handoff.shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) })
     }
 
@@ -268,7 +273,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     private func syncLiner() {
-        guard active, tab == .eyeliner || photoMode, let linerStyle else {
+        guard active, tab == .eyeliner || (photoMode && handoff.enabled.contains(.eyeliner)), let linerStyle else {
             relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
             return

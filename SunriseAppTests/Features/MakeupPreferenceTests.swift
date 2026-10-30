@@ -78,7 +78,8 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     @MainActor func testCreativeBlushChoiceRetainsShadeAndTutorialStyle() {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
-        let shade=home.currentShade,intensity=home.intensity
+        XCTAssertNil(home.currentShade,"a launch starts with no makeup")
+        let shade=home.shades[.blush],intensity=home.intensity
         home.choose(blush:.sunkissed)
         XCTAssertEqual(home.liveConfiguration.blushStyle,.sunkissed)
         XCTAssertEqual(home.enabled,[.blush]);XCTAssertEqual(home.currentShade,shade);XCTAssertEqual(home.intensity,intensity)
@@ -571,20 +572,24 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertFalse(tutorial.liner.hasLiner)
         home.deactivate();tutorial.deactivate()
     }
-    @MainActor func testTryOnShowsOnlySelectedToolAndUsesLaunchFitting() {
+    @MainActor func testTryOnStartsBareAndKeepsEachToolsChoiceAcrossSwitches() {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
-        XCTAssertEqual(home.enabled,[.blush])
+        XCTAssertEqual(home.enabled,[],"no makeup on any tool at launch")
         XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
-        XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on)
-        home.choose(.eyebrow)
-        XCTAssertEqual(home.enabled,[.eyebrow])
-        XCTAssertTrue(home.liveConfiguration.browLayer.on);XCTAssertFalse(home.liveConfiguration.blushLayer.on)
-        home.choose(.eyeliner)
-        XCTAssertEqual(home.enabled,[.eyeliner])
         XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertFalse(home.liveConfiguration.blushLayer.on)
-        home.choose(.blush)
-        XCTAssertEqual(home.enabled,[.blush])
+        home.choose(.eyebrow)
+        XCTAssertEqual(home.enabled,[],"picking a tool only shows its controls")
+        home.choose(shade:home.swatches[1])
+        let browShade=home.shades[.eyebrow]
+        home.choose(.blush);home.choose(blush:.lifted)
+        home.choose(.eyeliner);home.choose(shade:home.swatches[0]);home.turnOff()
+        XCTAssertEqual(home.enabled,[.eyebrow,.blush],"each tool keeps its own last choice, eyeliner switched back off")
+        XCTAssertTrue(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on,"all chosen makeup shows together")
+        home.choose(.eyebrow)
+        XCTAssertEqual(home.shades[.eyebrow],browShade);XCTAssertFalse(home.isOff)
+        let handoff=home.tutorialHandoff
+        XCTAssertEqual(handoff.enabled,[.eyebrow,.blush]);XCTAssertEqual(handoff.blushStyle,.lifted)
         home.deactivate()
     }
     // -Nimah: Real brow contours can be fitted without pretending missing pupil/nose points exist.
@@ -966,6 +971,15 @@ final class MakeupPreferenceTests:XCTestCase {
         let numbers=line.split(whereSeparator:{"{},;f".contains($0)}).dropFirst().compactMap {Float($0.trimmingCharacters(in:.whitespaces))}
         XCTAssertEqual(numbers.count,11)
         for (a,b) in zip(numbers,BeautyBlushConfiguration.cameraTone) {XCTAssertEqual(a,b,accuracy:1e-4)}
+    }
+
+    @MainActor func testTutorialPreviewsOnlyTheToolsLeftOnInTryOn() {
+        let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.heart,origin:.analysis),plan:MakeupPlan(shape:.heart),
+            handoff:.init(tool:.blush,shades:[:],intensities:[:],blushStyle:.lifted,enabled:[.blush]))
+        XCTAssertTrue(model.liveConfiguration.showMakeupPreview,"blush was on: the Blush tab previews it")
+        model.select(.brows)
+        XCTAssertFalse(model.liveConfiguration.showMakeupPreview,"the brow was off: its tab guides without makeup")
+        model.deactivate()
     }
 
 }

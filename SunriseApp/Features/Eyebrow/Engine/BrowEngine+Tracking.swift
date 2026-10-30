@@ -87,6 +87,8 @@ extension BeautyBlushEngine {
     func renderBrow(_ result:BrowTrackerResult) {
         lock.lock();let entry=browFrames.removeValue(forKey:result.token);let s=settings;lock.unlock()
         guard let entry,s.enabled,s.isBrow,s.epoch==entry.epoch else {return}
+        // With the blush on too, the same answers measure its cheek fit.
+        if s.withBlush,let detected=result.observation {addBlushSample(detected,face:entry.face)}
         guard let detected=result.observation else {
             browSmoother.reset();browStabilizer.reset();browStabilized=false;browLatest=nil;return
         }

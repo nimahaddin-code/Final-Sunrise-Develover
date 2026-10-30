@@ -85,7 +85,7 @@ final class MakeupPersonalizationTests: XCTestCase {
         home.updateRecommendations(face:face,eyes:eyes)
         XCTAssertTrue(home.canTry(.eyeliner))
         XCTAssertEqual(home.brow.assessment.origin,.analysis)
-        home.choose(.eyeliner)
+        home.choose(.eyeliner);home.choose(shade:home.swatches[0])
         XCTAssertTrue(home.enabled.contains(.eyeliner))
         home.updateRecommendations(face:nil,eyes:nil)
         XCTAssertTrue(home.canTry(.eyeliner))

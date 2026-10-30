@@ -1,3 +1,17 @@
+## Try On starts bare, keeps each tool's choice, shows all together — -Nimah (2026-10-30)
+
+`TryOnHomeModel.enabled` starts empty on every launch (no makeup on any tool). Picking a tool only shows its controls; a
+tool goes on when a shade, blush look, brow picture or strength is chosen for it, off with the no-makeup button, and keeps
+that state and its last choice across tool switches. All tools that are on show together. `BeautyBlushEngine` can now draw
+blush and brow in one frame: `prepareBlush` (fit, atlas, mask, visibility, smoothed mesh, tutorial outlines; before the
+encoder) and `encodeBlush` (depth prepass, pigment) are used by the blush-only `render` and by `drawBrow` when
+`Settings.withBlush` (between the camera and the brow strip). The brow path runs whenever the brow is on
+(`isBrow = needsBrow`, was `needsBrow && !needsBlush`, which dropped the brow whenever blush was on, also in the tutorial
+photo). Brow and blush keep separate tint/strength (`blushTint`, `blushIntensity`) and visibility (`blushVisibility`); with
+both on, the brow tracker's answers also feed the blush cheek fit (`addBlushSample`). `TryOnHomeModel.tutorialHandoff`
+carries `enabled`: the photo shows exactly those tools, each as last chosen, and a tutorial tab for a tool that was off
+guides without a makeup preview (the eyeliner tab still shows its liner). Device check pending.
+
 ## Blush skin tone fix, iOS 26.5 target — -Nimah (2026-10-30)
 
 Device feedback over three rounds (darker cheeks, then a hazy camera, then "brighter when Try On is off"). Final state:

@@ -142,6 +142,9 @@ extension BeautyBlushEngine {
         let frameSlot=slot%3;slot += 1
         let size=CGSize(width:drawable.texture.width,height:drawable.texture.height)
         ensureDepth(for:drawable)
+        // Blush on as well: prepared now (it may bake its atlas on this command) and drawn right after the camera, under the brow.
+        let blushAnchor=s.withBlush ? frame.anchors.compactMap({$0 as? ARFaceAnchor}).first(where:{$0.isTracked}):nil
+        let blush=s.withBlush ? prepareBlush(frame,face:blushAnchor,settings:s,frameSlot:frameSlot,size:size,command:command):nil
         if let overlay=s.browOverlay {
             // The picture is baked off this queue; until it is ready the previous texture stays (or none: nothing is drawn).
             if browTextureKey != "overlay:\(overlay.id)" {
@@ -190,6 +193,7 @@ extension BeautyBlushEngine {
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
         e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
+        if let blush {encodeBlush(blush,e);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0)}
         if let strip,let browTexture,let obstruction=frameMask ?? emptyMask,let fill=s.hideNatural ? eraser?.fill ?? emptyFill:emptyFill,
            strip.vertices.count==Self.browVertexCount*2 {
             let vb=browVertices[frameSlot]
