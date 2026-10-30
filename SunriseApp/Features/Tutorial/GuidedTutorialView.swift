@@ -195,36 +195,35 @@ enum TutorialTab: CaseIterable, Identifiable {
         return value
     }
 
-    /// Brow and blush together, in the shades carried over from Try On, like the home preview.
+    /// The photo is a plain camera: no brow, blush or eyeliner, and the natural brow stays.
     private var photoConfiguration: EyebrowConfiguration {
         var value = brow.liveConfiguration
-        let hasFit = LaunchMakeupFit.shared.hasFit
-        if !hasFit { value.usesLaunchFit = true }
-        value.layered = true
+        value.usesLaunchFit = true
         value.showGuide = false
         value.showTrackingPoints = false
         value.showAllRegions = false
         value.debugMesh = false
         value.tutorialStep = nil
-        value.showMakeupPreview = true
-        value.previewAfter = true
-        value.browLayer = photoLayer(.eyebrow, available: hasFit && brow.selectedBrow != nil)
-        value.blushLayer = photoLayer(.blush, available: hasFit && brow.selectedBlush != nil)
+        value.showMakeupPreview = false
+        value.showMappingFormula = false
+        value.browTrackingOverlay = false
+        value.browOverlay = nil
+        value.hideNaturalBrow = false
+        value.comparisonSplit = false
+        value.browLayer = PreviewLayer(on: false, intensity: 0, tint: nil)
+        value.blushLayer = PreviewLayer(on: false, intensity: 0, tint: nil)
         return value
     }
 
-    private func photoLayer(_ tool: TryOnTool, available: Bool) -> PreviewLayer {
-        PreviewLayer(on: available && handoff.enabled.contains(tool), intensity: Float(handoff.intensities[tool] ?? TryOnHomeModel.defaultIntensity),
-                     tint: handoff.shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) })
-    }
+    /// Only the Arabian look has a lower line to mark and fill.
+    var linerShowsLower: Bool { handoff.linerLook == .arabian }
 
     func enterPhoto() { photoMode = true; syncLiner() }
     func leavePhoto() { photoMode = false; syncLiner() }
 
     /// The camera picture as shown, with the liner on it. Nil until the camera has produced a picture.
     func takePhoto() -> UIImage? {
-        guard let image = camera.view?.snapshot() else { return nil }
-        return liner.composed(image)
+        camera.view?.snapshot()
     }
 
     func select(_ new: TutorialTab) {
@@ -273,7 +272,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     private func syncLiner() {
-        guard active, tab == .eyeliner || (photoMode && handoff.enabled.contains(.eyeliner)), let linerStyle else {
+        guard active, tab == .eyeliner, !photoMode, let linerStyle else {
             relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
             return
@@ -340,7 +339,7 @@ private struct TutorialScreen: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background((model.photoMode ? theme.background : AppColors.screen).ignoresSafeArea())
+        .background((model.photoMode ? theme.background : AppColors.wine).ignoresSafeArea())
         .animation(.easeInOut(duration: 0.25), value: theme)
         .foregroundStyle(AppColors.snow)
         .overlay {
@@ -440,7 +439,7 @@ private struct TutorialScreen: View {
                             .mask(alignment: .leading) { halfMask(left: model.compare.plainBesideLook != nil) }
                     }
                     if model.photoMode {
-                        LinerOverlayView(model: model.liner, isVisible: true)
+                        // Plain camera: nothing drawn on the face.
                     } else if model.tab == .eyeliner, model.hasGuide {
                         // Each half is clipped inside its own canvas: a mask would make an offscreen pass every frame.
                         if let side = model.compare.side(of: .tryOn) {
@@ -448,7 +447,8 @@ private struct TutorialScreen: View {
                         }
                         if let side = model.compare.side(of: .guide) {
                             LinerStepGuide(model: model.liner, step: LinerTutorialStep(rawValue: index) ?? .markDots,
-                                           paused: advisor.pausesAnimation, dimmed: advisor.isDimmed, side: side)
+                                           paused: advisor.pausesAnimation, dimmed: advisor.isDimmed, side: side,
+                                           showsLower: model.linerShowsLower)
                                 .id(index)
                         }
                     } else if model.tab != .eyeliner, model.compare.plainBesideLook != nil {
@@ -489,55 +489,34 @@ private struct TutorialScreen: View {
         .background(AppColors.cocoa)
     }
 
-    /// Frosted round back button, and a frosted "Next" capsule that turns into a pink "Done" on the last step.
+    /// Round frosted back button on the left; a frosted "Next" capsule on the right that turns into a pink "Done" on the last step.
     private var header: some View {
-        ZStack {
-            Image("logo-burgundy")
-                .resizable().scaledToFit()
-                .frame(maxWidth: 140, maxHeight: 40)
-                .shadow(color: AppColors.snow.opacity(0.7), radius: 4)
-                .accessibilityLabel("dandan")
-                .accessibilityAddTraits(.isHeader)
-            HStack {
-                Button {
-                    if model.retreat() { dismiss() }
-                } label: {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chevron.left").font(.subheadline.weight(.semibold))
-                        Text("Back").font(.headline)
-                    }
-                    .padding(.horizontal, AppSpacing.medium)
-                    .frame(height: 52)
-                    .background(AppColors.snow.opacity(0.85), in: Capsule())
+        HStack {
+            Button {
+                if model.retreat() { dismiss() }
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.body.weight(.semibold))
+                    .frame(width: 44, height: 44)
+                    .background(AppColors.snow.opacity(0.8), in: Circle())
                     .foregroundStyle(AppColors.wine)
-                }
-                .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
-                Spacer()
-                Button {
-                    if model.advance() { model.enterPhoto() }
-                } label: {
-                    if isLast {
-                        // Done goes on to the photo step.
-                        Text("Done")
-                            .font(.headline)
-                            .padding(.horizontal, AppSpacing.large)
-                            .frame(height: 52)
-                            .background(AppColors.flamingo, in: Capsule())
-                            .foregroundStyle(AppColors.snow)
-                    } else {
-                        HStack(spacing: 6) {
-                            Text("Next").font(.headline)
-                            Image(systemName: "chevron.right").font(.subheadline.weight(.semibold))
-                        }
-                        .padding(.horizontal, AppSpacing.medium)
-                        .frame(height: 52)
-                        .background(AppColors.snow.opacity(0.8), in: Capsule())
-                        .overlay(Capsule().strokeBorder(AppColors.snow.opacity(0.6), lineWidth: 1))
-                        .foregroundStyle(Color.black)
-                    }
-                }
-                .accessibilityLabel(isLast ? "Done" : "Next step")
             }
+            .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
+            Spacer()
+            Button {
+                if model.advance() { model.enterPhoto() }
+            } label: {
+                HStack(spacing: 6) {
+                    Text(isLast ? "Done" : "Next")
+                    if !isLast { Image(systemName: "chevron.right").fontWeight(.medium) }
+                }
+                .font(.body.weight(isLast ? .semibold : .regular))
+                .padding(.horizontal, isLast ? 24 : 18)
+                .frame(height: 44)
+                .background(isLast ? AnyShapeStyle(AppColors.flamingo) : AnyShapeStyle(AppColors.snow.opacity(0.8)), in: Capsule())
+                .foregroundStyle(isLast ? AppColors.snow : AppColors.wine)
+            }
+            .accessibilityLabel(isLast ? "Done" : "Next step")
         }
         .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
         .animation(.easeInOut(duration: 0.2), value: isLast)

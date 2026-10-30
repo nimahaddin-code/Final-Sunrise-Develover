@@ -85,7 +85,13 @@ struct TryOnLiveCard: View {
                 && !home.isOff && !home.isComparing {
                 BrowTrackingOverlayView(feed: camera.browTracking)
             }
+        }
+        // Pinch or tap the chip to zoom the picture and its overlays together; the light and captions stay put.
+        .cameraZoom()
+        .overlay {
             ScreenLightGlow(light: light)
+        }
+        .overlay {
             if let status {
                 StatusPill(text: status)
             }

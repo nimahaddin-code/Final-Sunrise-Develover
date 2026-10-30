@@ -166,6 +166,7 @@
 		B5A0C0DE00000000000D0004 /* MI-GAN-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */; };
 		B5A0C0DE00000000000E0002 /* BrowOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0001 /* BrowOverlay.swift */; };
 		B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */; };
+		B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */; };
 		B5A0C0DE00000000000E0006 /* BrowOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */; };
 		B5A0C0DE00000000000F0002 /* BrowFaceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */; };
 		B5A0C0DE00000000000F0004 /* BrowFaceStabilizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */; };
@@ -392,6 +393,7 @@
 		B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = MIGANFace256.mlpackage; sourceTree = "<group>"; };
 		B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MI-GAN-LICENSE.txt"; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0001 /* BrowOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlay.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerLookPicker.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayPicker.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayTests.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizer.swift; sourceTree = "<group>"; };
@@ -1040,6 +1042,7 @@
 				FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */,
 				B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */,
 				B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */,
+				B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */,
 				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
 				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
 				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
@@ -1232,6 +1235,7 @@
 				5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */,
 				B5A0C0DE00000000000B0002 /* BrowStylePicker.swift in Sources */,
 				B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */,
+				B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */,
 				EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */,
 				E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */,
 				B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */,

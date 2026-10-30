@@ -123,8 +123,21 @@ import SwiftUI
 
     /// Called for every ARKit frame while the face is tracked. The detector gets a frame when it is idle (frames are
     /// dropped while it is busy); every frame the newest measurement is carried to the head's current position.
+    private var turnedAway = false
+    static let turnHideDegrees = 32.0, turnClearDegrees = 25.0
+
     func submit(_ arFrame: ARFrame, face: ARFaceAnchor) {
         guard isStarted, spec != nil, viewport.width > 1, viewport.height > 1 else { return }
+        // Head turned far enough that one eye is hidden: the liner goes away at once (the detector would otherwise
+        // put it on the other eye, late) and returns when the face is straight again.
+        let relative = simd_inverse(arFrame.camera.transform) * face.transform
+        let yaw = Double(atan2(abs(relative.columns.2.y), abs(relative.columns.2.z))) * 180 / .pi
+        let turned = turnedAway ? yaw > Self.turnClearDegrees : yaw > Self.turnHideDegrees
+        if turned != turnedAway {
+            turnedAway = turned
+            if turned { solution = nil; frame = nil; tracker.reset() }
+        }
+        if turned { return }
         let contour = ContourInput(pixelBuffer: SendablePixelBuffer(buffer: arFrame.capturedImage),
                                    cameraTransform: arFrame.camera.transform, intrinsics: arFrame.camera.intrinsics,
                                    faceTransform: face.transform)
@@ -201,7 +214,7 @@ import SwiftUI
     }
 
     private func receive(_ landmarks: EyeLandmarkFrame?) {
-        guard isStarted, let spec else { return }
+        guard isStarted, !turnedAway, let spec else { return }
         guard let landmarks, let context = landmarks.context else {
             // No face in this frame (a hand over it, for example): keep the last measurement on the head for a while,
             // and smooth afresh when the face comes back.

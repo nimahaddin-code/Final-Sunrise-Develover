@@ -129,6 +129,7 @@ struct PolaroidResultView: View {
     let onRetake: () -> Void
     let onDone: () -> Void
     @State private var shareable: Image?
+    @State private var polaroid: UIImage?
 
     var body: some View {
         GeometryReader { proxy in
@@ -148,7 +149,11 @@ struct PolaroidResultView: View {
                     } else {
                         icon("square.and.arrow.up").opacity(0.5)
                     }
-                    button("checkmark", "Done", action: onDone)
+                    button("checkmark", "Save photo") {
+                        // Done saves the polaroid to Photos (add-only permission), then closes.
+                        UIImageWriteToSavedPhotosAlbum(polaroid ?? image, nil, nil, nil)
+                        onDone()
+                    }
                 }
                 .padding(.top, proxy.size.height * 0.12)
                 Spacer(minLength: 0)
@@ -160,7 +165,7 @@ struct PolaroidResultView: View {
             // The polaroid, not the bare picture, is what gets shared.
             let renderer = ImageRenderer(content: PolaroidCard(image: image).frame(width: 393).padding(40).background(AppColors.wine))
             renderer.scale = 3
-            if let rendered = renderer.uiImage { shareable = Image(uiImage: rendered) }
+            if let rendered = renderer.uiImage { polaroid = rendered; shareable = Image(uiImage: rendered) }
         }
     }
 

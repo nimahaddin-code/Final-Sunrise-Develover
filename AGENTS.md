@@ -9,8 +9,9 @@ encoder) and `encodeBlush` (depth prepass, pigment) are used by the blush-only `
 (`isBrow = needsBrow`, was `needsBrow && !needsBlush`, which dropped the brow whenever blush was on, also in the tutorial
 photo). Brow and blush keep separate tint/strength (`blushTint`, `blushIntensity`) and visibility (`blushVisibility`); with
 both on, the brow tracker's answers also feed the blush cheek fit (`addBlushSample`). `TryOnHomeModel.tutorialHandoff`
-carries `enabled`: the photo shows exactly those tools, each as last chosen, and a tutorial tab for a tool that was off
-guides without a makeup preview (the eyeliner tab still shows its liner). Device check pending.
+carries `enabled`: each tutorial tab previews its tool as last chosen, and a tab for a tool that was off guides without
+a makeup preview (the eyeliner tab still shows its liner). The photo step stays Hanum's plain camera (merged 2026-10-30).
+Device check pending.
 
 ## Blush skin tone fix, iOS 26.5 target — -Nimah (2026-10-30)
 

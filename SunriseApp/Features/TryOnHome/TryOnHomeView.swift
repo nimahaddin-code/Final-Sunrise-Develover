@@ -151,25 +151,10 @@ struct TryOnHomeView: View {
 
     // MARK: Liner look
 
-    /// The six liner looks, scrolling sideways; "no liner" is the no-sign button in the shade row.
+    /// The six liner looks as pictures, scrolling sideways; the first tile switches the liner off.
     private var linerLookPicker: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppSpacing.small) {
-                ForEach(LinerLook.allCases) { look in
-                    let selected = !home.isOff && home.linerLook == look
-                    Button { home.setLinerLook(look) } label: {
-                        Text(look.title)
-                            .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, AppSpacing.medium)
-                            .frame(minHeight: 40)
-                            .background(AppColors.flamingo.opacity(selected ? 0.32 : 0.16), in: Capsule())
-                            .overlay(Capsule().strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0))
-                            .foregroundStyle(AppColors.snow)
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityAddTraits(selected ? .isSelected : [])
-                }
-            }
+        LinerLookPicker(selected: home.isOff ? nil : home.linerLook) { look in
+            if let look { home.setLinerLook(look) } else { home.turnOff() }
         }
         .disabled(!home.canTry(.eyeliner))
     }

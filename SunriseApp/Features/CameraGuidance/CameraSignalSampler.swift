@@ -21,6 +21,7 @@ final class CameraSignalSampler: @unchecked Sendable {
     private var visionBusy = false
     private var faceCount = 1
     private var covered = false
+    private var crowdedStreak = 0
 
     /// `detectsCoverage` adds the face-capture-quality request that backs "Move your hair or hands" (Try On only).
     init(detectsCoverage: Bool) { self.detectsCoverage = detectsCoverage }
@@ -146,14 +147,34 @@ final class CameraSignalSampler: @unchecked Sendable {
             // Same upright, mirrored orientation the app uses for the front camera elsewhere.
             let handler = VNImageRequestHandler(cvPixelBuffer: buffer, orientation: .leftMirrored)
             try? handler.perform(requests)
-            let count = rectangles.results?.count ?? 0
+            let count = Self.otherFaceCount(rectangles.results?.map(\.boundingBox) ?? [])
             let lowest = quality.results?.compactMap { $0.faceCaptureQuality }.min()
             self.lock.lock()
-            self.faceCount = max(count, 1)
+            // One stray detection (a poster, a reflection, a hair-covered half face) must not read as a second person:
+            // it takes three readings in a row (about 1.5 s) before the count goes above one.
+            self.crowdedStreak = count > 1 ? self.crowdedStreak + 1 : 0
+            self.faceCount = self.crowdedStreak >= 3 ? count : 1
             // Hysteresis: low score to start, a clearly higher one to stop. A guess until tuned on real faces.
             if let lowest { self.covered = self.covered ? lowest < 0.25 : lowest < 0.15 } else if !detectsCoverage { self.covered = false }
             self.visionBusy = false
             self.lock.unlock()
         }
+    }
+
+    /// Faces that really are another person: the largest face is the user, and only faces at least 40% of its area that do
+    /// not overlap it count. Vision often returns a second, smaller or overlapping box for the same face. Returns the total
+    /// including the user (1 when alone).
+    static func otherFaceCount(_ boxes: [CGRect]) -> Int {
+        let sorted = boxes.sorted { $0.width * $0.height > $1.width * $1.height }
+        guard let main = sorted.first else { return 1 }
+        var kept = [main]
+        for box in sorted.dropFirst() {
+            guard box.width * box.height >= 0.4 * main.width * main.height else { continue }
+            let overlap = box.intersection(main)
+            let overlapArea = overlap.isNull ? 0 : overlap.width * overlap.height
+            if overlapArea > 0.15 * min(box.width * box.height, main.width * main.height) { continue }
+            kept.append(box)
+        }
+        return kept.count
     }
 }

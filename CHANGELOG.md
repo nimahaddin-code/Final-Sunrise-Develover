@@ -9,8 +9,9 @@ encoder) and `encodeBlush` (depth prepass, pigment) are used by the blush-only `
 (`isBrow = needsBrow`, was `needsBrow && !needsBlush`, which dropped the brow whenever blush was on, also in the tutorial
 photo). Brow and blush keep separate tint/strength (`blushTint`, `blushIntensity`) and visibility (`blushVisibility`); with
 both on, the brow tracker's answers also feed the blush cheek fit (`addBlushSample`). `TryOnHomeModel.tutorialHandoff`
-carries `enabled`: the photo shows exactly those tools, each as last chosen, and a tutorial tab for a tool that was off
-guides without a makeup preview (the eyeliner tab still shows its liner). Device check pending.
+carries `enabled`: each tutorial tab previews its tool as last chosen, and a tab for a tool that was off guides without
+a makeup preview (the eyeliner tab still shows its liner). The photo step stays Hanum's plain camera (merged 2026-10-30).
+Device check pending.
 
 ## Blush skin tone fix, iOS 26.5 target — -Nimah (2026-10-30)
 
@@ -25,6 +26,35 @@ blush layer is colour-managed as sRGB. The darker cheeks came from the absorbing
 rescaled to 95% of the skin's own luminance (test: at least 92% of bare luminance). Fixtures that hand-write camera
 colours use `BeautyBlushConfiguration.cameraLinear`. `IPHONEOS_DEPLOYMENT_TARGET` 26.6 -> 26.5 so the app installs on
 iOS 26.5 phones and runs on this Mac's 26.5 Simulators (Xcode 26.6 here ships the 26.5 SDK); no 26.6 API is used.
+## Liner hides when the head turns, zoom hint (2026-10-30)
+
+- `LinerOverlayModel.submit`: past 32 degrees of head turn (back under 25) the liner is removed at once and in-flight
+  detections are ignored, so it no longer jumps to the other eye late. Limits are guesses, not tuned on a device.
+- "Too far" caption now says "Pinch the screen to zoom in." instead of asking to bring the phone closer.
+
+## Photo, polaroid save, liner lower dot, labelled pickers (2026-10-30)
+
+- Photo step is a plain camera: no brow, blush or eyeliner (`photoConfiguration` has every layer off, natural brow kept,
+  `syncLiner` skips photo mode, `takePhoto` no longer composes the liner).
+- The polaroid's check button saves the polaroid to Photos (`UIImageWriteToSavedPhotosAlbum`, add-only permission) and closes.
+- Eyeliner tutorial: the lower-line dot, dashes and fill (step 3 now fills it) only exist for Arabian
+  (`GuidedTutorialModel.linerShowsLower`, `LinerStepGeometry(showsLower:)`); puppy and foxy no longer show it.
+- Brow and liner pickers show the picture with its name under it; the first tile reads "None".
+Not checked on a real device.
+
+## Try On: zoom, faster liner, picture picker, tutorial look (2026-10-30)
+
+- Try On camera card has the same zoom as the tutorial: pinch or tap the chip (1x / 1.5x / 2x / 3x). Picture and overlays
+  scale together; the light, captions and status stay put. Tracking is unchanged.
+- `LinerFrameRelay` no longer caps eyeliner frames at 30 Hz (that budget is for brow/blush); every ARKit frame is offered,
+  so fast blinks follow like the Eyeliner-Hanum build.
+- "Keep it to just you" no longer shows for one person: `CameraSignalSampler.otherFaceCount` ignores faces under 40% of
+  the main face's area and overlapping duplicate boxes, and three readings in a row (~1.5 s) are needed.
+- Eyeliner looks are pictures (`LinerLookPicker`, drawn eyes with each wing/lower line) with a no-sign tile first,
+  like the brow pictures.
+- Tutorial screen: wine background (not black), round frosted back button and one Next/Done capsule (a duplicate Next
+  button left over from the merge is removed).
+Not checked on a real device.
 
 ## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
 

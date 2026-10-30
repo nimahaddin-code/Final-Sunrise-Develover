@@ -187,4 +187,17 @@ final class CameraMessageEngineTests: XCTestCase {
                        [.tooDark, .backlit, .noFace, .faceLost, .multipleFaces, .faceCovered, .tooClose, .tooFar,
                         .tiltedPhone, .headTurned, .movingFast])
     }
+
+    func testOtherFaceCountIgnoresDuplicatesAndSmallFaces() {
+        let me = CGRect(x: 0.2, y: 0.2, width: 0.6, height: 0.6)
+        XCTAssertEqual(CameraSignalSampler.otherFaceCount([me]), 1)
+        XCTAssertEqual(CameraSignalSampler.otherFaceCount([]), 1)
+        // A second box on the same face, and a tiny one far behind.
+        XCTAssertEqual(CameraSignalSampler.otherFaceCount([me, CGRect(x: 0.25, y: 0.25, width: 0.5, height: 0.5)]), 1)
+        XCTAssertEqual(CameraSignalSampler.otherFaceCount([me, CGRect(x: 0.9, y: 0.9, width: 0.05, height: 0.05)]), 1)
+        // A real second person beside her.
+        XCTAssertEqual(CameraSignalSampler.otherFaceCount([me, CGRect(x: 0.82, y: 0.3, width: 0.17, height: 0.5)]), 1)
+        XCTAssertEqual(CameraSignalSampler.otherFaceCount([CGRect(x: 0, y: 0.2, width: 0.4, height: 0.4),
+                                                           CGRect(x: 0.55, y: 0.2, width: 0.4, height: 0.4)]), 2)
+    }
 }
