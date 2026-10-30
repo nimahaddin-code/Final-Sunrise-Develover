@@ -144,9 +144,10 @@ extension BeautyBlushEngine {
         ensureDepth(for:drawable)
         if let overlay=s.browOverlay {
             // The picture is baked off this queue; until it is ready the previous texture stays (or none: nothing is drawn).
-            if browTextureKey != "overlay:\(overlay.id)" {
+            let overlayKey = "overlay:\(BrowSpriteStore.cacheKey(overlay))"
+            if browTextureKey != overlayKey {
                 if let baked=BrowSpriteStore.shared.baked(overlay) {
-                    do {try uploadBrowOverlay(baked,id:overlay.id,command:command);if lastError?.hasPrefix("brow_texture_unavailable:")==true {lastError=nil}}
+                    do {try uploadBrowOverlay(baked,id:overlayKey,command:command);if lastError?.hasPrefix("brow_texture_unavailable:")==true {lastError=nil}}
                     catch {lastError="brow_texture_unavailable: \(error)"}
                 } else if BrowSpriteStore.shared.hasFailed(overlay) {lastError="brow_texture_unavailable: overlay \(overlay.id)"}
                 else {BrowSpriteStore.shared.prepare(overlay)}
