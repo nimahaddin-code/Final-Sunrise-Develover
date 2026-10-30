@@ -15,6 +15,10 @@ struct BrowOverlay: Identifiable, Hashable, Sendable {
     var is3D = false
 
     static let all: [BrowOverlay] = [
+        // Original production overlays remain available before the new sample
+        // set; the samples are additive choices in the same picker.
+        BrowOverlay(id: "overlay.1", title: String(localized: "Brow 1"), assetName: "brow-overlay-1"),
+        BrowOverlay(id: "overlay.2", title: String(localized: "Brow 2"), assetName: "brow-overlay-2"),
         BrowOverlay(id: "sample.1", title: String(localized: "Feathered arch"), assetName: "brow-sample-1"),
         BrowOverlay(id: "sample.2", title: String(localized: "Full feather"), assetName: "brow-sample-2"),
         BrowOverlay(id: "sample.3", title: String(localized: "Lifted feather"), assetName: "brow-sample-3"),
