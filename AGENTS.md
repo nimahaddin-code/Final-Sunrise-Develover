@@ -1,10 +1,10 @@
 ## Blush skin tone fix, iOS 26.5 target — -Nimah (2026-10-30)
 
-Device feedback: faces turned darker in the Blush tab. Two causes, both from the 2026-10-29 blush work: the camera decode
-was changed to plain sRGB, but ARKit tags its frames BT.709 and only the 709 decode matches ARSCNView (the other tabs and
-blush off), so the whole Metal picture went darker; it again follows the buffer's transfer tag (`decodeCamera`,
-`camera.z`). And the absorbing layer in `pigmentTarget` took ~15% of the skin's brightness; the target is now rescaled to
-95% of the skin's own luminance, so blush tints rather than darkens (test: at least 92% of bare luminance).
+Device feedback, in two rounds: first darker cheeks, then (after restoring the BT.709 decode) a hazy blush camera next to
+eyeliner. Final state: `decodeCamera` is the exact inverse of the drawable's sRGB encoding whatever the transfer tag, so an
+untouched pixel reaches the screen unchanged like the eyeliner tab's ARSCNView, and the blush Metal layer is colour-managed
+as sRGB (`colorspace`, was nil). The darker cheeks came from the absorbing layer in `pigmentTarget`, which took ~15% of the
+skin's brightness; the target is now rescaled to 95% of the skin's own luminance (test: at least 92% of bare luminance).
 `IPHONEOS_DEPLOYMENT_TARGET` 26.6 -> 26.5 so the app installs on iOS 26.5 phones and runs on this Mac's 26.5 Simulators
 (Xcode 26.6 here ships the 26.5 SDK); no 26.6 API is used. Device check of the tone pending.
 
@@ -37,7 +37,7 @@ Synthetic tests only; device look pending.
 ## Skin-preserving blush compositing and blush lab — -Nimah (2026-10-29)
 
 Blush stays a UV atlas on the native ARKit mesh; placement/silhouettes are unchanged. Fixed in
-`BeautyBlush.metal.txt` (the camera-decode change made here was reverted on 2026-10-30, see above); default blend colours low-frequency skin
+`BeautyBlush.metal.txt` (its camera decode stands; see the 2026-10-30 entry above); default blend colours low-frequency skin
 (`detail_radius_px`, new required JSON field, 2...16 camera px) and puts back each pixel's luminance ratio and chroma
 residual, keeping pores, highlights and freckles; out-of-gamut colours move towards their own luminance instead of
 per-channel clamping; tutorial contour is an antialiased isoline. Alpha 0 is exactly the camera pixel.

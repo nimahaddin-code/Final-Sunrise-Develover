@@ -795,21 +795,16 @@ final class MakeupPreferenceTests:XCTestCase {
         func lin(_ b:UInt8)->Float {let c=Float(b)/255;return c<=0.04045 ? c/12.92:pow((c+0.055)/1.055,2.4)}
         return 0.0722*lin(data[i])+0.7152*lin(data[i+1])+0.2126*lin(data[i+2])
     }
-    /// Untagged frames pass through unchanged; BT.709-tagged frames (ARKit's) are decoded with the 709 curve and encoded as
-    /// sRGB, which is what matches ARSCNView on device (decoding them as sRGB made faces visibly darker).
-    func testBlushCameraFollowsTheBuffersTransferTag() throws {
+    /// Without makeup the camera reaches the screen unchanged whatever the transfer tag, like the eyeliner tab's ARSCNView.
+    /// Decoding ARKit's 709-tagged frames with the 709 curve made the blush camera hazy on device.
+    func testBlushCameraIsUnchangedWhateverTheTransferTag() throws {
         guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
         let n=64,(luma,chroma)=syntheticSkin(n)
         for tag in [false,true] {
             let bare=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:Array(repeating:128,count:n*n*2),transfer709:tag,size:n)
             for (x,y) in [(2,2),(32,32),(44,22),(60,60)] {
-                let i=(y*n+x)*4,v=Float(luma[y*n+x])/255
-                var expected=v
-                if tag {
-                    let linear=v>=0.081 ? pow((v+0.099)/1.099,1/0.45):v/4.5
-                    expected=linear<=0.0031308 ? linear*12.92:1.055*pow(linear,1/2.4)-0.055
-                }
-                XCTAssertEqual(Int(bare[i+1]),Int((expected*255).rounded()),accuracy:1,"camera tone (709 tag \(tag))")
+                let i=(y*n+x)*4
+                XCTAssertEqual(Int(bare[i+1]),Int(luma[y*n+x]),accuracy:1,"untouched camera must reach the screen unchanged (709 tag \(tag))")
             }
             let warm=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,transfer709:tag,size:n)
             let reference=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,blend:.legacy,transfer709:tag,size:n)

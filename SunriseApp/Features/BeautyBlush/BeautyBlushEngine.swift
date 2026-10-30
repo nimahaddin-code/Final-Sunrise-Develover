@@ -131,6 +131,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
             let engine=try await Task.detached(priority:.userInitiated) { try BeautyBlushEngine() }.value
             guard view.window != nil else{return nil}
             view.beautyLayer.device=engine.device;view.beautyLayer.pixelFormat = .bgra8Unorm_srgb
+            // Colour-managed as sRGB like ARSCNView's camera; with no colour space iOS shows the bytes unmanaged.
+            view.beautyLayer.colorspace=CGColorSpace(name:CGColorSpace.sRGB)
             view.beautyLayer.framebufferOnly=true;view.beautyLayer.isOpaque=true;view.beautyLayer.isHidden=true
             view.beautyLayer.actions=["bounds":NSNull(),"position":NSNull(),"contents":NSNull()]
             view.beautyLayer.maximumDrawableCount=3;view.layer.addSublayer(view.beautyLayer)

@@ -46,12 +46,11 @@ fragment float4 blushAtlasFragment(O in [[stage_in]],constant Bake& b [[buffer(0
 vertex O blushBackgroundVertex(uint i [[vertex_id]]) {
  float2 p=float2((i<<1)&2,i&2);O o;o.position=float4(p*2-1,1,1);o.uv=float2(p.x,1-p.y);o.local=0;o.rest=0;return o;
 }
-// Camera R'G'B' to linear light by the buffer's own transfer tag (camera.z: BT.709, as ARKit tags its frames, else sRGB).
-// The sRGB drawable then encodes it. This is what makes the Metal camera match ARSCNView and the other tabs; decoding a
-// 709-tagged frame as sRGB (tried 2026-10-29) left the whole picture, faces included, visibly darker on device.
-float3 decodeCamera(float3 x,float transfer) {
+// Camera R'G'B' to linear light with the exact inverse of the drawable's sRGB encoding, whatever the buffer's transfer
+// tag: a pixel without makeup reaches the screen unchanged, as in the eyeliner tab's ARSCNView. Decoding ARKit's 709-tagged
+// frames with the BT.709 curve lifted every shadow and made the blush camera look hazy next to eyeliner (device, 2026-10-30).
+float3 decodeCamera(float3 x) {
  x=max(x,0.f);
- if(transfer>.5) return select(x/4.5,pow((x+.099)/1.099,float3(1/.45)),x>=.081);
  return select(x/12.92,pow((x+.055)/1.055,float3(2.4)),x>.04045);
 }
 float3 cameraPixel(float2 raw,constant U& u,texture2d<float> y,texture2d<float> cb) {
@@ -60,7 +59,7 @@ float3 cameraPixel(float2 raw,constant U& u,texture2d<float> y,texture2d<float> 
  if(u.camera.y<.5){l=(l-16.f/255)*255.f/219;c*=255.f/224;}
  float3 rgb=u.camera.x>.5 ? float3(l+1.5748*c.y,l-.187324*c.x-.468124*c.y,l+1.8556*c.x)
  : float3(l+1.402*c.y,l-.344136*c.x-.714136*c.y,l+1.772*c.x);
- return decodeCamera(rgb,u.camera.z);
+ return decodeCamera(rgb);
 }
 fragment float4 blushBackgroundFragment(O in [[stage_in]],constant U& u [[buffer(0)]],texture2d<float> y [[texture(0)]],texture2d<float> cb [[texture(1)]]) {
  // Brow debug: alpha mask and original-brow mask over black, texture only over neutral grey.
