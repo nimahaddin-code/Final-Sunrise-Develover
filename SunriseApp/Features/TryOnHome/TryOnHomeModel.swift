@@ -82,9 +82,10 @@ final class LinerFrameRelay: @unchecked Sendable {
     // -Nimah: Start with a clearly visible simulation; the slider can soften it.
     static let defaultIntensity = 0.85
 
-    /// The tool the shade row and intensity bar currently control.
+    /// The tool the shade row and intensity bar currently control. The launch
+    /// state is normalized in `activate()` so cold and warm starts match.
     @Published private(set) var blushLook:BlushPlacementStyle = .youthful
-    @Published private(set) var tool: TryOnTool = .blush
+    @Published private(set) var tool: TryOnTool = .eyebrow
     /// The tools with makeup on. Every launch starts bare (no makeup on any tool); a tool goes on when a shade, look,
     /// brow picture or strength is chosen for it and stays as left when another tool is picked. All of them are drawn
     /// together, and the tutorial and its photo get exactly this set.
@@ -97,11 +98,12 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// Held down on the camera card to see the bare face.
     @Published var isComparing = false
     /// Test toggles under the eyebrow tool: the MediaPipe tracking overlay, and the user's own eyebrow.
-    /// Both start off: the user's own brow is hidden and the chosen overlay picture is drawn in its place.
+    /// Both start off; the no-overlay choice leaves the natural brow visible.
     @Published var browLandmarksVisible = false
     @Published var naturalBrowVisible = false
-    /// The brow picture drawn over the hidden natural brow; nil draws none (hiding the natural brow is the separate toggle).
-    @Published private(set) var browOverlay: BrowOverlay? = .standard
+    /// The brow picture drawn over the natural brow. The no-overlay choice is
+    /// the disabled eyebrow state shown on cold and warm launch.
+    @Published private(set) var browOverlay: BrowOverlay? = nil
 
     /// Blush/eyebrow style choices and availability; its configuration is only used as the base for the live preview.
     let brow: EyebrowViewModel
@@ -168,8 +170,9 @@ final class LinerFrameRelay: @unchecked Sendable {
         linerIsNeutral=plan.eyeliner.isNeutral
         linerRecommendation=plan.madeForYou.first
         if case .eyeliner(let style)? = linerRecommendation?.style { linerStyle=style } else { linerStyle=nil }
-        // Each tool keeps what was chosen for it; a tool the new analysis cannot fit goes off.
-        enabled=enabled.filter(canTry)
+        // Each tool keeps what was chosen for it; a tool the new analysis cannot fit goes off, and so does the
+        // eyebrow while the no-overlay tile is chosen.
+        enabled=enabled.filter { canTry($0) && ($0 != .eyebrow || browOverlay != nil) }
         syncLiner()
     }
 
@@ -224,6 +227,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     func choose(shade: MakeupShade) {
         guard canTry(tool) else { return }
+        guard tool != .eyebrow || browOverlay != nil else { return }
         if shade.id.hasPrefix("custom.") {
             var picked = customShades[tool] ?? []
             if !picked.contains(shade) { picked.append(shade) }
@@ -237,7 +241,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     func choose(browOverlay overlay: BrowOverlay?) {
         guard canTry(.eyebrow) else { return }
         browOverlay = overlay
-        enabled.insert(.eyebrow)
+        if overlay == nil { enabled.remove(.eyebrow) } else { enabled.insert(.eyebrow) }
     }
 
     func setLinerLook(_ look: LinerLook) {
@@ -254,6 +258,7 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     func setIntensity(_ value: Double) {
         guard canTry(tool) else { return }
+        guard tool != .eyebrow || browOverlay != nil else { return }
         intensities[tool] = min(max(value, 0), 1)
         enabled.insert(tool)
         if tool == .eyeliner { syncLiner() }
@@ -264,6 +269,11 @@ final class LinerFrameRelay: @unchecked Sendable {
     func activate() {
         // -Nimah: A late permission response must not revive the home camera behind a scan/tutorial.
         guard !active else { return }
+        // Cold and warm starts show the eyebrow tool with the no-overlay tile
+        // selected. Choosing a brow overlay enables it; other tools keep their choice.
+        tool = .eyebrow
+        enabled.remove(.eyebrow)
+        browOverlay = nil
         active=true
         isComparing=false
         syncLiner()
@@ -294,7 +304,8 @@ final class LinerFrameRelay: @unchecked Sendable {
     }
 
     private func layer(_ tool: TryOnTool) -> PreviewLayer {
-        PreviewLayer(on: canTry(tool) && enabled.contains(tool), intensity: Float(intensities[tool] ?? Self.defaultIntensity),
+        let selectedBrow = tool != .eyebrow || browOverlay != nil
+        return PreviewLayer(on: selectedBrow && canTry(tool) && enabled.contains(tool), intensity: Float(intensities[tool] ?? Self.defaultIntensity),
                      tint: shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) })
     }
 

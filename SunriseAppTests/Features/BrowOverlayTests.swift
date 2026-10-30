@@ -132,15 +132,19 @@ final class BrowOverlayTests: XCTestCase {
         for u in [Float(-0.2), 0, 0.5, 1, 1.1] { XCTAssertEqual(g.chordOffset(u), 0, accuracy: 0.001) }
     }
 
-    @MainActor func testNoOverlayOptionOnlyRemovesThePictureNotTheNaturalBrowHiding() {
+    @MainActor func testNoOverlayOptionTurnsTheEyebrowOffNotTheNaturalBrowHiding() {
         let home = TryOnHomeModel(plan: MakeupPlan(shape: .heart), assessment: .init(shape: .heart, origin: .analysis), checker: MockFaceTrackingChecker())
-        home.choose(.eyebrow)
-        XCTAssertEqual(home.liveConfiguration.browOverlay, .standard, "starts on the first picture")
-        XCTAssertTrue(home.liveConfiguration.hideNaturalBrow)
+        XCTAssertEqual(home.tool, .eyebrow)
+        XCTAssertNil(home.liveConfiguration.browOverlay, "starts on the no-overlay tile")
+        XCTAssertFalse(home.liveConfiguration.browLayer.on, "the eyebrow starts off")
+        home.choose(browOverlay: .standard)
+        XCTAssertTrue(home.liveConfiguration.browLayer.on)
+        home.choose(.blush); home.choose(blush: .lifted); home.choose(.eyebrow)
         home.choose(browOverlay: nil)
         XCTAssertNil(home.liveConfiguration.browOverlay)
         XCTAssertTrue(home.liveConfiguration.hideNaturalBrow, "the natural brow stays hidden")
-        XCTAssertTrue(home.liveConfiguration.browLayer.on, "the eyebrow tool stays on")
+        XCTAssertFalse(home.liveConfiguration.browLayer.on, "the eyebrow goes off")
+        XCTAssertEqual(home.enabled, [.blush], "other tools keep their choice")
         home.choose(browOverlay: BrowOverlay.all[1])
         XCTAssertEqual(home.liveConfiguration.browOverlay, BrowOverlay.all[1])
         home.deactivate()
