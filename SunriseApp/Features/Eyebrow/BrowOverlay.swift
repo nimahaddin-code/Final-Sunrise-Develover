@@ -13,8 +13,8 @@ struct BrowOverlay: Identifiable, Hashable, Sendable {
     let assetName: String
     /// Drawn as a 3D hair mesh on ARKit's face pose when ARKit tracks the face; otherwise as its picture.
     var is3D = false
-    /// The supplied samples are authored for the subject's left brow. The
-    /// renderer mirrors the same baked picture for the opposite side.
+    /// The supplied samples are drawn flipped along the brow on both sides
+    /// (left and right swapped).
     var mirrorsForPair = false
 
     static let all: [BrowOverlay] = [

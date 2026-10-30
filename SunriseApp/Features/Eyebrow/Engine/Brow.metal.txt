@@ -157,10 +157,9 @@ fragment float4 browStripFragment(BrowOut in [[stage_in]],constant U& u [[buffer
  float3 skin=cameraPixel(raw,u,y,cb);
  // skin.z: an overlay picture is drawn in chord space, so its row is offset by the centerline's rise above the chord (0 for shapes).
  // An overlay picture is sampled a little blurrier: fine strands crawling with the tracking read as glitter.
- // Supplied sample overlays are authored for the subject's left brow. Keep
- // that side in source orientation and mirror the texture on the opposite
- // side so the pair has matching inner and outer hair direction.
- bool mirrorPair=in.skin.w>.5f && in.conceal.z<.5f;
+ // Supplied sample overlays are drawn flipped along the brow on both sides: each brow's picture
+ // is swapped with its opposite side's orientation (strands and thick end).
+ bool mirrorPair=in.skin.w>.5f;
  float sampleU=mirrorPair ? extent.x+extent.y-in.brow.x : in.brow.x;
  float4 packed=brow.sample(s,float2((sampleU-extent.x)/(extent.y-extent.x),(extent.z-(in.brow.y+in.skin.z))/(2*extent.z)),bias(u.debug.w>.5f ? .5f:0.f));
  float coverage=packed.r;
