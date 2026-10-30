@@ -54,7 +54,6 @@ final class LinerFrameRelay: @unchecked Sendable {
     private let lock = NSLock()
     private var pending = false
     private var isEnabled = false
-    private var budget=LiveOverlayBudget()
     private weak var model: LinerOverlayModel?
 
     @MainActor init(model: LinerOverlayModel) { self.model = model }
@@ -64,7 +63,8 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     func deliver(_ frame: ARFrame, _ face: ARFaceAnchor) {
         lock.lock()
-        if pending || !isEnabled || !budget.accepts(frame.timestamp) { lock.unlock(); return }
+        // No frame-rate cap: a blink lasts about 150 ms, so every camera frame counts for the liner.
+        if pending || !isEnabled { lock.unlock(); return }
         pending = true
         lock.unlock()
         let box = Box(frame: frame, face: face)

@@ -34,7 +34,7 @@ enum CameraMessage: Int, CaseIterable, Comparable, Sendable {
         case .multipleFaces: "Let's keep it to just you in the frame."
         case .faceCovered: "Move your hair or hands so I can see your face."
         case .tooClose: "Move your phone back a little."
-        case .tooFar: "Bring your phone a little closer."
+        case .tooFar: "Pinch the screen to zoom in."
         case .tiltedPhone: "Hold your phone straight, at eye level."
         case .headTurned: "Face your phone straight on."
         case .movingFast: "Nice and slow, so I can keep up."

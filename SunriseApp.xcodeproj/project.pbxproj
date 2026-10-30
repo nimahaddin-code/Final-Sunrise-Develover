@@ -112,6 +112,14 @@
 		7DB81FB8CB5E3553D1C1A689 /* ScanDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C01B2455DB9CB4D248BF904A /* ScanDebugView.swift */; };
 		7F3A91C2D45E6B80A1C9E0F4 /* GuidedTutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */; };
 		7F3A91C2D45E6B80A1C9E0F6 /* PhotoCaptureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1C9E0F5 /* PhotoCaptureViews.swift */; };
+		7F3A91C2D45E6B80A1D00003 /* CameraMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00002 /* CameraMessage.swift */; };
+		7F3A91C2D45E6B80A1D00005 /* CameraMessageEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00004 /* CameraMessageEngine.swift */; };
+		7F3A91C2D45E6B80A1D00007 /* CameraSignalSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00006 /* CameraSignalSampler.swift */; };
+		7F3A91C2D45E6B80A1D00009 /* CameraAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00008 /* CameraAdvisor.swift */; };
+		7F3A91C2D45E6B80A1D0000B /* CameraCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D0000A /* CameraCaption.swift */; };
+		7F3A91C2D45E6B80A1D0000D /* ScreenLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D0000C /* ScreenLight.swift */; };
+		7F3A91C2D45E6B80A1D0000F /* LinerStepGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */; };
+		7F3A91C2D45E6B80A1D00011 /* CameraMessageEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */; };
 		81C6BD9EDD701F40A703E2F6 /* MakeupReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F3C4D0A24B6DEC94B862617 /* MakeupReference.swift */; };
 		8344B16103485A1C292BE01E /* MediaPipeEyeDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */; };
 		8390F5679DF570C890190E7C /* FaceContourDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = C46FF01BBC0933B3F49A571A /* FaceContourDetector.swift */; };
@@ -159,6 +167,7 @@
 		B5A0C0DE00000000000D0004 /* MI-GAN-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */; };
 		B5A0C0DE00000000000E0002 /* BrowOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0001 /* BrowOverlay.swift */; };
 		B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */; };
+		B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */; };
 		B5A0C0DE00000000000E0006 /* BrowOverlayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */; };
 		B5A0C0DE00000000000F0002 /* BrowFaceStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */; };
 		B5A0C0DE00000000000F0004 /* BrowFaceStabilizerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */; };
@@ -223,14 +232,6 @@
 		F98D0D3E66B44C6597817B04 /* ScanOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC99C146DF9B268DA514E88 /* ScanOverlayView.swift */; };
 		F9B2EA3A6046C331C92A991C /* FaceShapeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BEE2E6597318E2548E93D3E /* FaceShapeView.swift */; };
 		FD2E311FC44972331A578843 /* TutorialViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */; };
-		7F3A91C2D45E6B80A1D00003 /* CameraMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00002 /* CameraMessage.swift */; };
-		7F3A91C2D45E6B80A1D00005 /* CameraMessageEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00004 /* CameraMessageEngine.swift */; };
-		7F3A91C2D45E6B80A1D00007 /* CameraSignalSampler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00006 /* CameraSignalSampler.swift */; };
-		7F3A91C2D45E6B80A1D00009 /* CameraAdvisor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00008 /* CameraAdvisor.swift */; };
-		7F3A91C2D45E6B80A1D0000B /* CameraCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D0000A /* CameraCaption.swift */; };
-		7F3A91C2D45E6B80A1D0000D /* ScreenLight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D0000C /* ScreenLight.swift */; };
-		7F3A91C2D45E6B80A1D0000F /* LinerStepGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */; };
-		7F3A91C2D45E6B80A1D00011 /* CameraMessageEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -339,6 +340,14 @@
 		7ED8B4D9166DBE43F2B1D643 /* FaceFeatureLocator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceFeatureLocator.swift; sourceTree = "<group>"; };
 		7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedTutorialView.swift; sourceTree = "<group>"; };
 		7F3A91C2D45E6B80A1C9E0F5 /* PhotoCaptureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureViews.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D00002 /* CameraMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessage.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D00004 /* CameraMessageEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessageEngine.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D00006 /* CameraSignalSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSignalSampler.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D00008 /* CameraAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAdvisor.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D0000A /* CameraCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaption.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D0000C /* ScreenLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLight.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerStepGuide.swift; sourceTree = "<group>"; };
+		7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessageEngineTests.swift; sourceTree = "<group>"; };
 		832873944F90986F04549D21 /* LidFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidFlowTests.swift; sourceTree = "<group>"; };
 		85190E6578A99E0FCFAD9638 /* FaceShapeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeStore.swift; sourceTree = "<group>"; };
 		86692327C6B7D587C8265F12 /* TrackingReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingReadiness.swift; sourceTree = "<group>"; };
@@ -385,6 +394,7 @@
 		B5A0C0DE00000000000D0001 /* MIGANFace256.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = MIGANFace256.mlpackage; sourceTree = "<group>"; };
 		B5A0C0DE00000000000D0003 /* MI-GAN-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "MI-GAN-LICENSE.txt"; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0001 /* BrowOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlay.swift; sourceTree = "<group>"; };
+		B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerLookPicker.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayPicker.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowOverlayTests.swift; sourceTree = "<group>"; };
 		B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFaceStabilizer.swift; sourceTree = "<group>"; };
@@ -461,14 +471,6 @@
 		FC4C011F1BD38F1F34920FBD /* MediaPipeEyeDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPipeEyeDetectorTests.swift; sourceTree = "<group>"; };
 		FE2B5E1913561C0593FD7840 /* TutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialView.swift; sourceTree = "<group>"; };
 		FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowRegionMapper.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D00002 /* CameraMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessage.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D00004 /* CameraMessageEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessageEngine.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D00006 /* CameraSignalSampler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraSignalSampler.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D00008 /* CameraAdvisor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAdvisor.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D0000A /* CameraCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCaption.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D0000C /* ScreenLight.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLight.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerStepGuide.swift; sourceTree = "<group>"; };
-		7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessageEngineTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -662,6 +664,19 @@
 				22C1BB35C6F3190923BD2E6B /* Resources */,
 			);
 			path = SunriseApp;
+			sourceTree = "<group>";
+		};
+		7F3A91C2D45E6B80A1D00001 /* CameraGuidance */ = {
+			isa = PBXGroup;
+			children = (
+				7F3A91C2D45E6B80A1D00002 /* CameraMessage.swift */,
+				7F3A91C2D45E6B80A1D00004 /* CameraMessageEngine.swift */,
+				7F3A91C2D45E6B80A1D00006 /* CameraSignalSampler.swift */,
+				7F3A91C2D45E6B80A1D00008 /* CameraAdvisor.swift */,
+				7F3A91C2D45E6B80A1D0000A /* CameraCaption.swift */,
+				7F3A91C2D45E6B80A1D0000C /* ScreenLight.swift */,
+			);
+			path = CameraGuidance;
 			sourceTree = "<group>";
 		};
 		8F8BDBF2721E1A0E45FAA4A7 /* ReferenceCatalog */ = {
@@ -1029,25 +1044,13 @@
 				FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */,
 				B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */,
 				B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */,
+				B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */,
 				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
 				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
 				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
 				5E1A0C0DE0000000000A0001 /* ProfileView.swift */,
 			);
 			path = TryOnHome;
-			sourceTree = "<group>";
-		};
-		7F3A91C2D45E6B80A1D00001 /* CameraGuidance */ = {
-			isa = PBXGroup;
-			children = (
-				7F3A91C2D45E6B80A1D00002 /* CameraMessage.swift */,
-				7F3A91C2D45E6B80A1D00004 /* CameraMessageEngine.swift */,
-				7F3A91C2D45E6B80A1D00006 /* CameraSignalSampler.swift */,
-				7F3A91C2D45E6B80A1D00008 /* CameraAdvisor.swift */,
-				7F3A91C2D45E6B80A1D0000A /* CameraCaption.swift */,
-				7F3A91C2D45E6B80A1D0000C /* ScreenLight.swift */,
-			);
-			path = CameraGuidance;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1236,6 +1239,7 @@
 				5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */,
 				B5A0C0DE00000000000B0002 /* BrowStylePicker.swift in Sources */,
 				B5A0C0DE00000000000E0004 /* BrowOverlayPicker.swift in Sources */,
+				B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */,
 				EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */,
 				E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */,
 				B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */,
@@ -1401,11 +1405,11 @@
 		281FF16EF2B60E76A20BAD7F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WP97CT3PT7;
+				DEVELOPMENT_TEAM = 5NYWSR69FZ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1445,11 +1449,11 @@
 		8B63A0393819EF9DE7F2B473 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WP97CT3PT7;
+				DEVELOPMENT_TEAM = 5NYWSR69FZ;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/Configuration/Info.plist;
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

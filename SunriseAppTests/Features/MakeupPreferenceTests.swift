@@ -13,10 +13,12 @@ final class MakeupPreferenceTests:XCTestCase {
             plan:MakeupPlan(shape:.oval),handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true))
         XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
         XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
-        model.cycleCompare()
+        // Five layouts: look|guide, guide|look, look|plain, plain|look, plain.
+        for _ in 0..<2 { model.cycleCompare() }
         XCTAssertTrue(model.liveConfiguration.comparisonSplit)
         XCTAssertFalse(model.liveConfiguration.showGuide)
-        model.cycleCompare()
+        for _ in 0..<2 { model.cycleCompare() }
+        XCTAssertEqual(model.compare, .plain)
         XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
         XCTAssertFalse(model.liveConfiguration.showMakeupPreview)
         model.select(.blush)

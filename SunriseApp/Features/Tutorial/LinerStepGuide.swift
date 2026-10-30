@@ -30,10 +30,11 @@ struct LinerStepGeometry {
     /// Inner corner, middle, outer corner, the wing's end when the look has one, then the lower line's start when it has one.
     let dots: [CGPoint]
 
-    init(_ guide: LinerGuide) {
+    /// `showsLower`: only the look that really has a lower line (Arabian) gets its dot, dashes and fill.
+    init(_ guide: LinerGuide, showsLower: Bool = false) {
         // `upperLiner` is the lash-line side followed by the outer edge reversed, so its first half is the lash line.
         let lash = Array(guide.upperLiner.prefix(guide.upperLiner.count / 2))
-        let lower = Array(guide.lowerLiner.prefix(guide.lowerLiner.count / 2))
+        let lower = showsLower ? Array(guide.lowerLiner.prefix(guide.lowerLiner.count / 2)) : []
         self.lash = lash
         self.lower = lower
         var shapes = [guide.outlines.first ?? guide.upperLiner]
@@ -93,6 +94,8 @@ struct LinerStepGuide: View {
     var dimmed = false
     /// Draws only on this half of the view (the tutorial's side-by-side comparison).
     var side: HorizontalEdge?
+    /// The look has a lower line, so the guide shows its dot, outline and fill.
+    var showsLower = false
     @Environment(\.cameraZoom) private var zoom
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var clock = StepClock()
@@ -136,7 +139,7 @@ struct LinerStepGuide: View {
             let pulse = reduceMotion ? 0.4 : 0.35 - 0.15 * cos(elapsed * .pi)
             let thin = 1 / zoom
             for eye in frame.eyes where eye.alpha > 0.05 {
-                let geometry = LinerStepGeometry(eye.guide)
+                let geometry = LinerStepGeometry(eye.guide, showsLower: showsLower)
                 let map = { (points: [CGPoint]) in points.map { frame.mapping.map($0) } }
                 let inner = frame.mapping.map(eye.guide.anchors.innerCorner)
                 let outer = frame.mapping.map(eye.guide.anchors.outerCorner)
@@ -161,6 +164,13 @@ struct LinerStepGuide: View {
                         context.stroke(outline, with: .color(.white.opacity(0.8)),
                                        style: StrokeStyle(lineWidth: max(eyeWidth * 0.014, 1 * thin), lineCap: .round))
                         context.fill(outline, with: .color(pink.opacity(pulse)))
+                    }
+                    if geometry.lower.count > 1 {
+                        let lowerPath = Self.path(map(geometry.lower))
+                        context.stroke(lowerPath, with: .color(pink.opacity(pulse + 0.2)),
+                                       style: StrokeStyle(lineWidth: max(eyeWidth * 0.035, 2 * thin), lineCap: .round))
+                        context.stroke(lowerPath, with: .color(.white.opacity(0.8)),
+                                       style: StrokeStyle(lineWidth: max(eyeWidth * 0.012, 1 * thin), lineCap: .round))
                     }
                     let lash = map(geometry.lash)
                     if playing, lash.count > 1 {
