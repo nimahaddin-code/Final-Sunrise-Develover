@@ -1,3 +1,11 @@
+## Tutorial brow and eyeliner guides back — -Nimah (2026-10-30)
+
+After Try On started bare, the Brows tab turned its makeup preview off for a brow that was off, which stopped the makeup
+engine and with it the brow guide (drawn by that engine). Now the tab keeps the engine on and only drops the brow picture
+(`browOverlay = nil`, natural brow left alone). The face landmarker the engine starts for the blush cheek fit is stopped
+whenever the engine has nothing to draw (e.g. the Eyeliner tab), so it no longer runs beside the eyeliner's own MediaPipe
+detector. The eyeliner cause is not confirmed on a device.
+
 ## Blush tutorial comparison like eyeliner, one camera — -Nimah (2026-10-30)
 
 The Blush tab uses the five compare layouts the way the eyeliner does: look | guide, guide | look, look | plain,

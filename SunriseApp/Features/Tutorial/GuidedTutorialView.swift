@@ -188,8 +188,9 @@ enum TutorialTab: CaseIterable, Identifiable {
             return value
         }
         if !hasGuide || compare == .plain { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
-        // No makeup was chosen for this tool on Try On: guide only.
-        if !handoff.enabled.contains(tab.tool) { value.showMakeupPreview = false }
+        // No brow chosen on Try On: the brow guide is still drawn by the makeup engine, so it stays on, with no brow
+        // picture and the natural brow left alone. (Turning the preview off stopped the engine and took the guide with it.)
+        if tab == .brows && !handoff.enabled.contains(.eyebrow) { value.browOverlay = nil; value.hideNaturalBrow = false }
         if tab == .blush && hasGuide {
             // Like the eyeliner: the look on its half, the step guide on the other half over the bare camera, the plain
             // camera on either side. The Metal camera stays on in every layout and only the pigment is clipped, so the

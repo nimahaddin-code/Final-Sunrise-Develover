@@ -231,6 +231,10 @@ final class BeautyBlushEngine:@unchecked Sendable {
             settings.blushIntensity=c.layered ? c.blushLayer.intensity:c.previewIntensity
         }
         if !enabled {setLayerShown(false)}
+        // Nothing of ours on screen (e.g. the eyeliner tab): release the face landmarker so it does not compete with the
+        // eyeliner's own MediaPipe detector. It starts again with the brow or the blush.
+        let stopTracker = !enabled && (browTracker.isAvailable || browTrackerStarting)
+        if stopTracker {browTrackerStarting=false;browFrames=[:]}
         if enabled && nextBrow,let overlay=settings.browOverlay {BrowSpriteStore.shared.prepare(overlay);if overlay.is3D {BrowHairStore.shared.prepare()}}
         let start=enabled && !segmenter.isAvailable && !segmentationStarting
         if start {segmentationStarting=true}
@@ -238,6 +242,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         let startTracker=enabled && !browTracker.isAvailable && !browTrackerStarting
         if startTracker {browTrackerStarting=true}
         lock.unlock()
+        if stopTracker {browTrackerTask?.cancel();browTrackerTask=nil;browTracker.stop()}
         if startTracker {
             browTrackerTask=Task { [weak self] in
                 guard let self else{return}

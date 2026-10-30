@@ -980,7 +980,9 @@ final class MakeupPreferenceTests:XCTestCase {
             handoff:.init(tool:.blush,shades:[:],intensities:[:],blushStyle:.lifted,enabled:[.blush]))
         XCTAssertTrue(model.liveConfiguration.showMakeupPreview,"blush was on: the Blush tab previews it")
         model.select(.brows)
-        XCTAssertFalse(model.liveConfiguration.showMakeupPreview,"the brow was off: its tab guides without makeup")
+        let brows=model.liveConfiguration
+        XCTAssertTrue(brows.showMakeupPreview,"the brow guide is drawn by the makeup engine, so it must stay on")
+        XCTAssertNil(brows.browOverlay,"the brow was off: no brow picture");XCTAssertFalse(brows.hideNaturalBrow)
         model.deactivate()
     }
 
