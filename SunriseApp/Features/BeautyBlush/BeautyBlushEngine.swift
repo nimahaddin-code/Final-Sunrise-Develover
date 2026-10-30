@@ -40,6 +40,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     struct Settings {
         var comparisonSplit=false;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()
         /// Blush drawn too (on the brow path when the brow is also on). Its own shade and strength: brow and blush differ.
+        var pigmentHalf=PigmentHalf.full
         var withBlush=false;var blushTint=SIMD3<Float>(0.9,0.3,0.45);var blushIntensity:Float=0.72
     }
     /// Developer brow view (`BrowDebugView` raw value), read each frame so the developer picker applies live.
@@ -221,7 +222,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         }
         settings.enabled=enabled
         if let c {
-            settings.comparisonSplit=c.comparisonSplit;settings.isBrow=c.needsBrow;settings.withBlush=c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay
+            settings.comparisonSplit=c.comparisonSplit;settings.pigmentHalf=c.pigmentHalf ?? (c.comparisonSplit ? .left:.full);settings.isBrow=c.needsBrow;settings.withBlush=c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay
             settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow
             let browDefault=SIMD3<Float>(0.2,0.13,0.09),blushDefault=SIMD3<Float>(0.9,0.3,0.45)
             settings.tint=c.layered ? c.browLayer.tint ?? browDefault:c.shadeTint ?? browDefault
@@ -594,8 +595,14 @@ final class BeautyBlushEngine:@unchecked Sendable {
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
         e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
-        if s.comparisonSplit {e.setScissorRect(MTLScissorRect(x:0,y:0,width:max(1,drawable.texture.width/2),height:drawable.texture.height))}
-        encodeBlush(blush,e)
+        // The camera fills the view in every comparison layout; only the pigment is limited to its half.
+        let half=drawable.texture.width/2
+        switch s.pigmentHalf {
+        case .none:break
+        case .full:encodeBlush(blush,e)
+        case .left:e.setScissorRect(MTLScissorRect(x:0,y:0,width:max(1,half),height:drawable.texture.height));encodeBlush(blush,e)
+        case .right:e.setScissorRect(MTLScissorRect(x:half,y:0,width:max(1,drawable.texture.width-half),height:drawable.texture.height));encodeBlush(blush,e)
+        }
         e.endEncoding()
         if let anchor {
             let world=SIMD3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)

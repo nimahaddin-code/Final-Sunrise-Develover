@@ -1,3 +1,12 @@
+## Blush tutorial comparison like eyeliner, one camera — -Nimah (2026-10-30)
+
+The Blush tab uses the five compare layouts the way the eyeliner does: look | guide, guide | look, look | plain,
+plain | look, plain. The pigment is clipped to the look's half (`EyebrowConfiguration.pigmentHalf`, engine
+`Settings.pigmentHalf`: full, left, right, none; scissor in `render`), the animated guide (`BlushTutorialOverlay`) to the
+guide's half over the bare camera. The Metal camera stays on in every layout (`showMakeupPreview` true for the tab), so the
+halves never come from different cameras: `RealCameraView` (a second ARSCNView, a visible seam) is now used by the Brows
+tab only. `comparisonSplit` still means `.left` when `pigmentHalf` is nil. Device check pending.
+
 ## Try On starts bare, keeps each tool's choice, shows all together — -Nimah (2026-10-30)
 
 `TryOnHomeModel.enabled` starts empty on every launch (no makeup on any tool). Picking a tool only shows its controls; a

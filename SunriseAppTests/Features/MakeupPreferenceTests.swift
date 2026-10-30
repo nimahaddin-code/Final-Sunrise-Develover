@@ -984,5 +984,20 @@ final class MakeupPreferenceTests:XCTestCase {
         model.deactivate()
     }
 
+    @MainActor func testBlushComparisonSplitsLikeEyelinerOnOneCamera() {
+        let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.heart,origin:.analysis),plan:MakeupPlan(shape:.heart),
+            handoff:.init(tool:.blush,shades:[:],intensities:[:],blushStyle:.youthful,enabled:[.blush]))
+        guard model.hasGuide else {return XCTFail("blush guide expected")}
+        // look|guide, guide|look, look|plain, plain|look, plain
+        let expected:[(PigmentHalf,Bool)]=[(.left,true),(.right,true),(.left,false),(.right,false),(.none,false)]
+        for (half,guide) in expected {
+            let c=model.liveConfiguration
+            XCTAssertEqual(c.pigmentHalf,half,"\(model.compare)");XCTAssertEqual(c.showGuide,guide,"\(model.compare)")
+            XCTAssertTrue(c.showMakeupPreview,"the Metal camera stays on in \(model.compare), so the halves share one camera")
+            model.cycleCompare()
+        }
+        model.deactivate()
+    }
+
 }
 
