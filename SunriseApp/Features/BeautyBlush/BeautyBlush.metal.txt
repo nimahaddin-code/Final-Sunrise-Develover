@@ -46,11 +46,18 @@ fragment float4 blushAtlasFragment(O in [[stage_in]],constant Bake& b [[buffer(0
 vertex O blushBackgroundVertex(uint i [[vertex_id]]) {
  float2 p=float2((i<<1)&2,i&2);O o;o.position=float4(p*2-1,1,1);o.uv=float2(p.x,1-p.y);o.local=0;o.rest=0;return o;
 }
-// Camera R'G'B' to linear light with the exact inverse of the drawable's sRGB encoding, whatever the buffer's transfer
-// tag: a pixel without makeup reaches the screen unchanged, as in the eyeliner tab's ARSCNView. Decoding ARKit's 709-tagged
-// frames with the BT.709 curve lifted every shadow and made the blush camera look hazy next to eyeliner (device, 2026-10-30).
+// The camera tone ARSCNView shows (the eyeliner tab, Try On switched off), measured on iPhone 17 from paired screenshots
+// on 2026-10-30: encoded camera value at 0, 0.1 ... 1 -> encoded value on screen. Neither standard curve matched (sRGB
+// decode: up to 13/255 too dark in the mid-tones; BT.709 decode: 11/255 too light in the shadows, "hazy"); this table
+// left under 1.5/255 of systematic error per brightness band on blocks not used to fit it. Linear between knots, then
+// the inverse of the drawable's sRGB encoding, so the screen shows exactly the table's value.
+constant float cameraTone[11]={0.f,.1228f,.2301f,.3507f,.4543f,.544f,.6322f,.7219f,.8087f,.8916f,.9842f};
+float toneOf(float x) {
+ float t=clamp(x,0.f,1.f)*10;int i=min(int(t),9);
+ return mix(cameraTone[i],cameraTone[i+1],t-float(i));
+}
 float3 decodeCamera(float3 x) {
- x=max(x,0.f);
+ x=float3(toneOf(x.r),toneOf(x.g),toneOf(x.b));
  return select(x/12.92,pow((x+.055)/1.055,float3(2.4)),x>.04045);
 }
 float3 cameraPixel(float2 raw,constant U& u,texture2d<float> y,texture2d<float> cb) {

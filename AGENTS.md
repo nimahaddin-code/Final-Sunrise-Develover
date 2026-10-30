@@ -1,12 +1,16 @@
 ## Blush skin tone fix, iOS 26.5 target — -Nimah (2026-10-30)
 
-Device feedback, in two rounds: first darker cheeks, then (after restoring the BT.709 decode) a hazy blush camera next to
-eyeliner. Final state: `decodeCamera` is the exact inverse of the drawable's sRGB encoding whatever the transfer tag, so an
-untouched pixel reaches the screen unchanged like the eyeliner tab's ARSCNView, and the blush Metal layer is colour-managed
-as sRGB (`colorspace`, was nil). The darker cheeks came from the absorbing layer in `pigmentTarget`, which took ~15% of the
-skin's brightness; the target is now rescaled to 95% of the skin's own luminance (test: at least 92% of bare luminance).
-`IPHONEOS_DEPLOYMENT_TARGET` 26.6 -> 26.5 so the app installs on iOS 26.5 phones and runs on this Mac's 26.5 Simulators
-(Xcode 26.6 here ships the 26.5 SDK); no 26.6 API is used. Device check of the tone pending.
+Device feedback over three rounds (darker cheeks, then a hazy camera, then "brighter when Try On is off"). Final state:
+the Metal camera (blush and brow) now shows the tone ARSCNView shows. Measured on iPhone 17 from paired screenshots
+(Try On on with no pigment / off, same scene): neither the sRGB decode (up to 13/255 too dark in the mid-tones) nor the
+BT.709 decode (11/255 too light in the shadows, the haze) matched. A fitted 11-knot curve, `cameraTone` in
+BeautyBlush.metal and `BeautyBlushConfiguration.cameraTone` (a test keeps them equal), left under 1.5/255 of systematic
+error per brightness band on blocks not used to fit it; `decodeCamera` applies it, then the inverse of the drawable's sRGB
+encoding, whatever the transfer tag. One device, one scene, lossy screenshots: re-measure if another iPhone differs. The
+blush layer is colour-managed as sRGB. The darker cheeks came from the absorbing layer in `pigmentTarget`; the target is
+rescaled to 95% of the skin's own luminance (test: at least 92% of bare luminance). Fixtures that hand-write camera
+colours use `BeautyBlushConfiguration.cameraLinear`. `IPHONEOS_DEPLOYMENT_TARGET` 26.6 -> 26.5 so the app installs on
+iOS 26.5 phones and runs on this Mac's 26.5 Simulators (Xcode 26.6 here ships the 26.5 SDK); no 26.6 API is used.
 
 ## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
 

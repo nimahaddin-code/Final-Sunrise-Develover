@@ -18,11 +18,11 @@ following was not the defect; style placement and silhouettes are intentional an
 
 Causes found in the code:
 
-1. **Camera tone mismatch.** `decodeCamera` used the BT.709 OETF inverse when the buffer was tagged 709 (ARKit
-   buffers are), and the drawable re-encoded with sRGB, lifting shadows (0.10 -> 0.16). On device (2026-10-30) the
-   blush camera looked hazy next to the eyeliner tab's ARSCNView with it, and matched once the decode became the exact
-   inverse of the sRGB drawable for every tag; the Metal layer is also colour-managed as sRGB now. A darker-face report
-   in between came from the pigment's absorbing layer, not the decode; the pigment keeps 95% of skin luminance.
+1. **Camera tone mismatch.** The Metal camera must show what ARSCNView shows (eyeliner tab, Try On off). Neither
+   standard curve does: the BT.709 decode lifted shadows (hazy), the plain sRGB decode was up to 13/255 too dark in
+   the mid-tones. On 2026-10-30 the tone was measured from paired iPhone 17 screenshots and fitted as an 11-knot curve
+   (`cameraTone`), under 1.5/255 of systematic error on held-out blocks. A darker-face report in between came from the
+   pigment's absorbing layer, not the decode; the pigment keeps 95% of skin luminance.
 2. **Skin chroma replaced by flat shade colour.** The old blend set `tint = shade × (skin luminance / shade
    luminance)` per pixel and mixed most of the result towards it. Luminance was kept, but freckles, redness and
    local colour variation inside the blush were replaced by one uniform colour. That reads as paint on top of

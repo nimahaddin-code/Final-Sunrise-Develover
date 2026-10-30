@@ -48,6 +48,15 @@ struct BeautyBlushConfiguration:Decodable,Sendable {
         return distance>0.00025 ? current+delta*(0.00025/distance):filtered
     }
     static func linear(_ c:Float)->Float { c<=0.04045 ? c/12.92 : pow((c+0.055)/1.055,2.4) }
+    /// The camera tone ARSCNView shows, measured on device (`cameraTone` in BeautyBlush.metal, which must match):
+    /// encoded camera value at 0, 0.1 ... 1 -> encoded value on screen.
+    static let cameraTone:[Float]=[0,0.1228,0.2301,0.3507,0.4543,0.544,0.6322,0.7219,0.8087,0.8916,0.9842]
+    static func cameraToneOf(_ v:Float)->Float {
+        let t=min(max(v,0),1)*10,i=min(Int(t),9)
+        return cameraTone[i]+(cameraTone[i+1]-cameraTone[i])*(t-Float(i))
+    }
+    /// A camera value (encoded, 0...1) in the linear light the Metal makeup shaders work in.
+    static func cameraLinear(_ v:Float)->Float {linear(cameraToneOf(v))}
 }
 // Timestamp rejects backwards samples, keeps rigid ARKit pose unfiltered; only local mesh residuals are smoothed.
 struct BeautyBlushVisibility {

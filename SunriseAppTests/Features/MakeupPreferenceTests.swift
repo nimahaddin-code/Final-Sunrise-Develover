@@ -194,7 +194,8 @@ final class MakeupPreferenceTests:XCTestCase {
         let i=(16*32+16)*4
         XCTAssertGreaterThan(Int(makeup[i+2])-Int(makeup[i+1]),20,"GPU pigment must tint actual camera pixels")
         for c in 0..<3 {XCTAssertEqual(Int(bare[i+c]),Int(obstructed[i+c]),accuracy:1,"Occlusion must restore camera skin, not black or transparent edges")}
-        XCTAssertEqual(Int(bare[i+1]),128,accuracy:2,"sRGB camera must not be decoded twice")
+        // Mid-grey 128 shows as ARSCNView shows it: the measured tone, 0.544 + 0.02 * (0.6322 - 0.544) of full scale (139).
+        XCTAssertEqual(Int(bare[i+1]),139,accuracy:2,"camera tone must match ARSCNView, decoded once")
     }
     func testBeautyBlushConfigurationRejectsUnsafeValuesAndVisibilityRejectsStaleClock() throws {
         let config=try BeautyBlushConfiguration.load()
@@ -795,16 +796,17 @@ final class MakeupPreferenceTests:XCTestCase {
         func lin(_ b:UInt8)->Float {let c=Float(b)/255;return c<=0.04045 ? c/12.92:pow((c+0.055)/1.055,2.4)}
         return 0.0722*lin(data[i])+0.7152*lin(data[i+1])+0.2126*lin(data[i+2])
     }
-    /// Without makeup the camera reaches the screen unchanged whatever the transfer tag, like the eyeliner tab's ARSCNView.
-    /// Decoding ARKit's 709-tagged frames with the 709 curve made the blush camera hazy on device.
-    func testBlushCameraIsUnchangedWhateverTheTransferTag() throws {
+    /// Without makeup the camera shows the tone ARSCNView shows (the eyeliner tab), measured on device: `cameraTone` in
+    /// BeautyBlush.metal, the same for any transfer tag.
+    func testBlushCameraMatchesTheMeasuredARSCNViewTone() throws {
         guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
         let n=64,(luma,chroma)=syntheticSkin(n)
+        func tone(_ v:Float)->Float {BeautyBlushConfiguration.cameraToneOf(v)}
         for tag in [false,true] {
             let bare=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:Array(repeating:128,count:n*n*2),transfer709:tag,size:n)
             for (x,y) in [(2,2),(32,32),(44,22),(60,60)] {
-                let i=(y*n+x)*4
-                XCTAssertEqual(Int(bare[i+1]),Int(luma[y*n+x]),accuracy:1,"untouched camera must reach the screen unchanged (709 tag \(tag))")
+                let i=(y*n+x)*4,expected=tone(Float(luma[y*n+x])/255)
+                XCTAssertEqual(Int(bare[i+1]),Int((expected*255).rounded()),accuracy:1,"camera tone (709 tag \(tag))")
             }
             let warm=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,transfer709:tag,size:n)
             let reference=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,blend:.legacy,transfer709:tag,size:n)
@@ -955,6 +957,15 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     func testBlushTutorialHasTheTwoSpecSteps() {
         XCTAssertEqual(GuidedTutorialModel.blushLessons.map(\.title),["Dab a little blush inside the small circle.","Dab outward to blend it into your skin."])
+    }
+
+    func testShaderCameraToneMatchesTheSwiftTable() throws {
+        let url=try XCTUnwrap(Bundle.main.url(forResource:"BeautyBlush.metal",withExtension:"txt"))
+        let source=try String(contentsOf:url,encoding:.utf8)
+        let line=try XCTUnwrap(source.components(separatedBy:"\n").first {$0.hasPrefix("constant float cameraTone[11]")})
+        let numbers=line.split(whereSeparator:{"{},;f".contains($0)}).dropFirst().compactMap {Float($0.trimmingCharacters(in:.whitespaces))}
+        XCTAssertEqual(numbers.count,11)
+        for (a,b) in zip(numbers,BeautyBlushConfiguration.cameraTone) {XCTAssertEqual(a,b,accuracy:1e-4)}
     }
 
 }
