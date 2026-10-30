@@ -258,6 +258,9 @@ final class LinerFrameRelay: @unchecked Sendable {
     func activate() {
         // -Nimah: A late permission response must not revive the home camera behind a scan/tutorial.
         guard !active else { return }
+        // Keep eyebrow off for both a cold launch and a warm foreground
+        // reactivation. Selecting the eyebrow tool explicitly turns it on.
+        enabled.remove(.eyebrow)
         active=true
         isComparing=false
         syncLiner()
