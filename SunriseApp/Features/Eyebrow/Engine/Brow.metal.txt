@@ -186,8 +186,12 @@ fragment float4 browStripFragment(BrowOut in [[stage_in]],constant U& u [[buffer
   // Original brow pixels (debug view): inside that area and darker than the fill.
   original=hide*smoothstep(.03f,.16f,1-lum/max(lum709(hidden),1e-4f));
  }
- // Hide the natural brow. Hands and fringes stay in front.
- float3 base=conceal ? mix(skin,hidden,hide*(1-occ)*in.brow.w):skin;
+ // Hide the natural brow. Hands and fringes stay in front. The lower edge
+ // sits against the eyelid, where a full-strength forehead fill reads as a
+ // dark strip on warm skin; ease that replacement toward the live skin tone.
+ float concealAmount=hide*(1-occ)*in.brow.w;
+ if(in.brow.y<0) concealAmount*=.52f;
+ float3 base=conceal ? mix(skin,hidden,concealAmount):skin;
  // Brow shape, overlay only: output = alpha * hair + (1 - alpha) * base. Alpha is zero outside the designed brow, so
  // every other pixel is unchanged. Between strands the skin stays visible.
  float density=mix(.35f,1.f,saturate(packed.g/max(coverage,.001f)));
