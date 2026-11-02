@@ -7,6 +7,12 @@ on the tracker's serial queue and is invalidated there in `stop()`. If a transfe
 needed. VT uses the buffer's YCbCr matrix attachments and writes the pool buffer's own colour space; no extra colour management.
 Simulator build only; device timing and colour match not measured.
 
+## Brow draw loop cleanups — Khalish (2026-11-01)
+
+No behaviour change: the brow's per-frame work is trimmed. Marks use a 3-slot buffer ring like the brow vertices, the developer
+menu flags are read at most twice a second, the camera colour attachments are read only when the pixel format or size changes,
+and the natural-brow unwrap grid is built only on frames where the eraser's fill is due (`BrowEraser.isDue`). Simulator build only; device check pending.
+
 ## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
 
 `GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it

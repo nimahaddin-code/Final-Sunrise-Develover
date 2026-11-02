@@ -4,6 +4,12 @@ The brow tracker's 512 px BGRA frame for MediaPipe is made with `VTPixelTransfer
 instead of `CIContext.render`, which stays as the fallback for a failed transfer. Session created lazily, used only on the
 tracker queue, invalidated in `stop()`. Simulator build only; device timing and colour not measured.
 
+## Brow draw loop cleanups — Khalish (2026-11-01)
+
+No behaviour change: the brow's per-frame work is trimmed. Marks use a 3-slot buffer ring like the brow vertices, the developer
+menu flags are read at most twice a second, the camera colour attachments are read only when the pixel format or size changes,
+and the natural-brow unwrap grid is built only on frames where the eraser's fill is due (`BrowEraser.isDue`). Simulator build only; device check pending.
+
 ## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
 
 `GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it

@@ -102,6 +102,11 @@ final class BeautyBlushEngine:@unchecked Sendable {
     var browFaceTriangles:[UInt16]=[]
     var browTexture:MTLTexture?,browTextureKey:String?
     var browVertices:[MTLBuffer]=[],browIndices:MTLBuffer?
+    var browMarkBuffers:[MTLBuffer?]=[nil,nil,nil]
+    /// Developer-menu values read from UserDefaults, refreshed at most every half second.
+    var browDebugCache=0,browDebugRead:Double = -.infinity
+    /// Camera colour attachments (pixel format, width, height as the key) and the `camera` uniform built from them.
+    var browCameraKey:SIMD3<Int>?,browCamera=SIMD4<Float>.zero
     /// Stands in for the face-skin mask until one arrives: nothing occluded.
     var emptyMask:MTLTexture?
     /// Hides the natural brow (brow-space push-pull fill, optional MI-GAN); nil if its shaders are unavailable.
