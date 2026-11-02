@@ -1,3 +1,13 @@
+## Engine folder layout — -Nimah (2026-11-02)
+
+Files moved, no code change: `Core/Engine/` holds the shared makeup engine (`BeautyBlushEngine.swift`: device, queue,
+Metal layer, camera decode, hand mask, frame loop; `BeautyBlush.metal.txt`: shared shader helpers plus blush shaders, the
+first part of the library) and the one MediaPipe face tracker (`MediaPipeBrowTracker.swift`). `Features/Blush/` (was
+`Features/BeautyBlush/`) has the blush config and placement (`BlushPlacementGuide`/`BlushPlacementSketch`, from
+`MakeupPreferences`). `Features/Brow/` (was `Features/Eyebrow/`) has all brow code, `Engine/` the brow extensions and
+`Brow.metal.txt`. Type names are unchanged. Resources load by bundle name, so folders do not matter at runtime. Next
+step, not started: a `MakeupLayer` protocol with blush and brow as layers. Older notes below use the old paths.
+
 ## Brow tutorial demo, face-midline split, get-ready page on Try On — 2026-11-02
 
 `BrowTutorialOverlay` (Features/Tutorial) draws the brow tutorial of UX spec 3.4 on the brow outlines the engine publishes
@@ -138,7 +148,7 @@ residual, keeping pores, highlights and freckles; out-of-gamut colours move towa
 per-channel clamping; tutorial contour is an antialiased isoline. Alpha 0 is exactly the camera pixel.
 Developer tools + Blush: `BlushDebugMenu` picks blend (pigment, previous, linear alpha, multiply, soft light) and
 diagnostics (neutral, UV checker, mask, boundaries, visibility, wireframe). No MediaPipe blush renderer, Banuba or
-BytePlus exists; the orphan `Features/BeautyBlush/Comparison/` files are not in the project. See ADR 0017 and
+BytePlus exists; the orphan `Features/Blush/Comparison/` files are not in the project. See ADR 0017 and
 `Docs/blush-rendering.schema.json`. Synthetic Simulator tests only; device look pending.
 
 ## Tutorial camera handoff and welcome revision — 2026-10-29
@@ -193,7 +203,7 @@ MediaPipe. Device check pending.
 ## Brow code split out of BeautyBlush — Khalish (2026-10-29)
 
 There is still one makeup engine, `BeautyBlushEngine` (blush and brow share its camera session, Metal layer, hand mask and
-shader library). Its brow-only parts now live in `Features/Eyebrow/Engine/` as extensions: `BrowEngine+Tracking` (fps cap,
+shader library). Its brow-only parts now live in `Features/Brow/Engine/` as extensions: `BrowEngine+Tracking` (fps cap,
 `BrowLoad`, handing frames to MediaPipe), `BrowEngine+Draw` (brow strip, texture/picture, `drawBrow`), `BrowEngine+Hair`
 (3D hair), `BrowEngine+Marks` (tutorial mapping, tracking view), `BrowEngine+Fixtures` (DEBUG test helpers), plus
 `BrowEraser`/`BrowInpainter` and the brow shaders `Brow.metal.txt`. `BeautyBlushEngine.swift` keeps stored state, setup,
@@ -651,12 +661,15 @@ SunriseApp/
   App/                    SunriseApp entry, AppContainer (composition root), AppRootView (tabs + route destinations)
     Navigation/           AppRoute (all destinations), AppNavigator (tabs, per-tab paths, onboarding flag)
   Core/
+    Engine/               shared makeup engine (Metal, camera, hand mask), its shaders and the MediaPipe face tracker
     Models/               cross-feature models: MakeupReference, Tutorial, SavedLookMetadata, FaceTrackingAvailability, ScanOverlay (+ ScanSnapshot)
     Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
     Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge
   Features/
+    Blush/                blush config, cheek placement (engine in Core/Engine)
+    Brow/                 eyebrow: tracking, design, overlays; Engine/ = brow parts of the makeup engine
     FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
     MakeupTryOn/          makeup recommendations and live AR try-on
     Onboarding/           welcome screen, then the face scan

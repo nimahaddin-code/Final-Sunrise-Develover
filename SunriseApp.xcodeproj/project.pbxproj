@@ -536,6 +536,7 @@
 		28BE0691E5755C999C2D4014 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				5E0C0DE0000000000000E001 /* Engine */,
 				AA93A80688E1C6D74605DA8D /* Models */,
 				71407E93971344FFC151D513 /* Services */,
 				38FF9B2420102D6F286CBF88 /* AR */,
@@ -546,8 +547,6 @@
 		3023F688733753EB734C8BF9 /* MakeupPreferences */ = {
 			isa = PBXGroup;
 			children = (
-				3A07AB7461B6903140D1D165 /* BlushPlacementGuide.swift */,
-				9BE83A467EAAC48EF29EBFB8 /* BlushPlacementSketch.swift */,
 				528DBE5F90FFAE037040249C /* MakeupPreferences.swift */,
 				DA7ABA5E0000000000000002 /* MakeupRuleDatabase.swift */,
 			);
@@ -800,10 +799,10 @@
 				B95177704166936436E03B4B /* EyeShape */,
 				5748080315332B832AA1B191 /* ScanDebug */,
 				F62FFB0088DC3F46B57C2CA3 /* MakeupTryOn */,
-				D86BBF720312D2F3CC3CEEAD /* Eyebrow */,
+				D86BBF720312D2F3CC3CEEAD /* Brow */,
 				D087DAE48C0672211810B9AA /* Forehead */,
 				3023F688733753EB734C8BF9 /* MakeupPreferences */,
-				BEA07F000000000000000001 /* BeautyBlush */,
+				BEA07F000000000000000001 /* Blush */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -896,14 +895,24 @@
 			path = EyeShape;
 			sourceTree = "<group>";
 		};
-		BEA07F000000000000000001 /* BeautyBlush */ = {
+		5E0C0DE0000000000000E001 /* Engine */ = {
 			isa = PBXGroup;
 			children = (
 				F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */,
-				3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */,
 				A7B094CA5F993727AE496FAB /* BeautyBlush.metal.txt */,
+				B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */,
 			);
-			path = BeautyBlush;
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		BEA07F000000000000000001 /* Blush */ = {
+			isa = PBXGroup;
+			children = (
+				9BE83A467EAAC48EF29EBFB8 /* BlushPlacementSketch.swift */,
+				3A07AB7461B6903140D1D165 /* BlushPlacementGuide.swift */,
+				3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */,
+			);
+			path = Blush;
 			sourceTree = "<group>";
 		};
 		C4208C4BC220C4C631815466 /* Tutorial */ = {
@@ -940,13 +949,12 @@
 			path = Contracts;
 			sourceTree = "<group>";
 		};
-		D86BBF720312D2F3CC3CEEAD /* Eyebrow */ = {
+		D86BBF720312D2F3CC3CEEAD /* Brow */ = {
 			isa = PBXGroup;
 			children = (
 				B5A0C0DE0000000000110100 /* Engine */,
 				9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */,
 				B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */,
-				B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */,
 				B5A0C0DE00000000000C0003 /* BrowObservation.swift */,
 				B5A0C0DE00000000000C0001 /* BrowDesign.swift */,
 				B5A0C0DE00000000000E0001 /* BrowOverlay.swift */,
@@ -960,7 +968,7 @@
 				6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */,
 				4A6545BC9255A551C688D4B1 /* FaceGuideFlow.swift */,
 			);
-			path = Eyebrow;
+			path = Brow;
 			sourceTree = "<group>";
 		};
 		DAD9D2CF91F6E55477A880CE /* LiveGuide */ = {

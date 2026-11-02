@@ -1,3 +1,13 @@
+## Engine folder layout — -Nimah (2026-11-02)
+
+Files moved, no code change: `Core/Engine/` holds the shared makeup engine (`BeautyBlushEngine.swift`: device, queue,
+Metal layer, camera decode, hand mask, frame loop; `BeautyBlush.metal.txt`: shared shader helpers plus blush shaders, the
+first part of the library) and the one MediaPipe face tracker (`MediaPipeBrowTracker.swift`). `Features/Blush/` (was
+`Features/BeautyBlush/`) has the blush config and placement (`BlushPlacementGuide`/`BlushPlacementSketch`, from
+`MakeupPreferences`). `Features/Brow/` (was `Features/Eyebrow/`) has all brow code, `Engine/` the brow extensions and
+`Brow.metal.txt`. Type names are unchanged. Resources load by bundle name, so folders do not matter at runtime. Next
+step, not started: a `MakeupLayer` protocol with blush and brow as layers.
+
 ## Brow tutorial demo, face-midline split, prep overlay (2026-11-02)
 
 - Brow tutorial steps and captions follow UX spec 3.4, with animated tools over each brow. Split comparison follows the face.

@@ -4,7 +4,7 @@
 
 An earlier, uncommitted draft of this ADR described a MediaPipe blush renderer, five blend modes and a camera
 hand-off manager. None of that code was ever committed on any branch or stash; only two orphan files
-(`Features/BeautyBlush/Comparison/*.swift`, not in the Xcode project, calling APIs that do not exist) survived.
+(`Features/Blush/Comparison/*.swift`, not in the Xcode project, calling APIs that do not exist) survived.
 This version describes what is actually in the code.
 
 ## Diagnosis (blush looks detached from the skin)

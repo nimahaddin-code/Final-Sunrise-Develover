@@ -8,7 +8,7 @@ rows sit inside the hair, so nearby samples catch hair, and a fill that only mat
 
 ## Decision
 
-Two layers, both on device, both in `Features/BeautyBlush`.
+Two layers, both on device, in `Core/Engine` and `Features/Brow/Engine` (originally `Features/BeautyBlush`).
 
 1. **Brow-space push-pull fill (always on, no dependency).** `BrowEraser` unwraps each brow into its own 256 x 128
    brow-space texture (u along the brow, w -0.5...0.75 brow widths across it, one array slice per brow), with each
