@@ -39,13 +39,15 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertTrue(navigator.discoverPath.isEmpty)
         XCTAssertTrue(navigator.savedPath.isEmpty)
     }
+    private func tutorial(_ tool: TryOnTool) -> AppRoute {
+        .recommendedTutorial(TutorialHandoff(tool: tool, shades: [:], intensities: [:]))
+    }
     @MainActor func testFinishingDiscoverFlowPreservesSavedTabHistory() {
         let navigator = AppNavigator()
-        let savedRoute = AppRoute.savedLookDetail(SampleData.savedLook)
+        let savedRoute = tutorial(.blush)
         navigator.open(savedRoute, in: .myLooks)
-        navigator.open(.referenceDetail(SampleData.references[0]), in: .discover)
-        navigator.open(.session(SampleData.references[0]), in: .discover)
-        navigator.open(.referenceImport, in: .discover)
+        navigator.open(tutorial(.eyebrow), in: .discover)
+        navigator.open(tutorial(.eyeliner), in: .discover)
         navigator.returnToRoot(of: .discover)
         XCTAssertEqual(navigator.selectedTab, .discover)
         XCTAssertTrue(navigator.discoverPath.isEmpty)
@@ -53,33 +55,22 @@ final class AppNavigatorTests: XCTestCase {
     }
     @MainActor func testOpeningSavedDetailSelectsItsTabAndPreservesDiscoverPath() {
         let navigator = AppNavigator()
-        navigator.open(.referenceImport, in: .discover)
-        let route = AppRoute.savedLookDetail(SampleData.savedLook)
+        navigator.open(tutorial(.eyebrow), in: .discover)
+        let route = tutorial(.blush)
         navigator.open(route, in: .myLooks)
         XCTAssertEqual(navigator.selectedTab, .myLooks)
         XCTAssertEqual(navigator.savedPath, [route])
-        XCTAssertEqual(navigator.discoverPath, [.referenceImport])
+        XCTAssertEqual(navigator.discoverPath, [tutorial(.eyebrow)])
     }
     @MainActor func testReturningToTryOnRootSelectsTabAndClearsOnlyItsPath() {
         let navigator = AppNavigator()
-        navigator.open(.referenceImport, in: .discover)
-        let plan = MakeupPlan(shape: .oval)
-        let route = AppRoute.makeupTryOn(plan: plan, applied: plan.madeForYou)
+        navigator.open(tutorial(.eyebrow), in: .discover)
+        let route = tutorial(.blush)
         navigator.open(route, in: .tryOn)
         XCTAssertEqual(navigator.tryOnPath, [route])
         navigator.returnToRoot(of: .tryOn)
         XCTAssertEqual(navigator.selectedTab, .tryOn)
         XCTAssertTrue(navigator.tryOnPath.isEmpty)
-        XCTAssertEqual(navigator.discoverPath, [.referenceImport])
-    }
-    @MainActor func testFaceShapeResultIsRestoredAcrossLaunches() {
-        let classifier = FaceShapeClassifier(reference: FaceProportions(length: 1.2, forehead: 0.85, jaw: 0.8, chin: 0.5))
-        var result = classifier.classify(FaceProportions(length: 1.15, forehead: 0.85, jaw: 0.8, chin: 0.47))
-        result.contourSamples = 12
-        result.eyes = EyeScan(tiltLeft: 3, tiltRight: 5, spacing: 1.05, openness: 0.31, samples: 8, lidType: .hooded)
-        FaceShapeStore(defaults: defaults).latest = result
-        XCTAssertEqual(FaceShapeStore(defaults: defaults).latest, result)
-        FaceShapeStore(defaults: defaults).latest = nil
-        XCTAssertNil(FaceShapeStore(defaults: defaults).latest)
+        XCTAssertEqual(navigator.discoverPath, [tutorial(.eyebrow)])
     }
 }

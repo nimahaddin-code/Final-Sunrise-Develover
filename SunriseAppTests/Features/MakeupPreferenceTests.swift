@@ -568,8 +568,7 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     // -Nimah: Off-screen recommendations/tab changes must not load a second eyeliner detector.
     @MainActor func testHiddenHomeAndTutorialDoNotStartEyeliner() {
-        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let plan=MakeupPlan(shape:.heart,eyeScan:eyes)
+        let plan=MakeupPlan(shape:.heart)
         let assessment=FaceShapeAssessment(shape:.heart,origin:.analysis)
         let home=TryOnHomeModel(plan:plan,assessment:assessment,checker:MockFaceTrackingChecker())
         home.choose(.eyeliner)
@@ -583,8 +582,7 @@ final class MakeupPreferenceTests:XCTestCase {
         home.deactivate();tutorial.deactivate()
     }
     @MainActor func testTryOnStartsBareAndKeepsEachToolsChoiceAcrossSwitches() {
-        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         XCTAssertEqual(home.enabled,[],"no makeup on any tool at launch")
         XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
         XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertFalse(home.liveConfiguration.blushLayer.on)

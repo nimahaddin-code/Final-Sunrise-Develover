@@ -39,25 +39,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UTExportedTypeDeclarations</key>
-	<array>
-		<dict>
-			<key>UTTypeConformsTo</key>
-			<array>
-				<string>public.json</string>
-			</array>
-			<key>UTTypeDescription</key>
-			<string>Sunrise Scan Debug File</string>
-			<key>UTTypeIdentifier</key>
-			<string>com.sunrise.scan-debug</string>
-			<key>UTTypeTagSpecification</key>
-			<dict>
-				<key>public.filename-extension</key>
-				<array>
-					<string>sunrisescan</string>
-				</array>
-			</dict>
-		</dict>
-	</array>
 </dict>
 </plist>

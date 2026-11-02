@@ -12,19 +12,6 @@ final class MakeupPersonalizationTests: XCTestCase {
 
     // MARK: Plan from the scan
 
-    // -Nimah: Saved eye output drives Hanum's planner independently of face-shape labels.
-    func testSavedEyeOutputOverridesOldFaceEyeReadings() throws {
-        var eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        eyes.lid = .monolid
-        let plan=MakeupPlan(scan:scan(),eyeScan:eyes)
-        let adapted=try XCTUnwrap(plan.eyes)
-        XCTAssertEqual(adapted.spacing,0.72,accuracy:0.001)
-        XCTAssertEqual(adapted.lidType,.monolid)
-        XCTAssertEqual(adapted.samples,0)
-        XCTAssertEqual(plan.eyeliner.style,MakeupPlan(shape:.heart,eyeScan:eyes).eyeliner.style)
-        let defaultLid=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:0.1))
-        XCTAssertEqual(MakeupPlan.savedEyeMeasurements(defaultLid)?.lidType,.neither)
-    }
 
     func testUnclearSavedEyesUseNeutralRatherThanInventingResults() {
         let unclear=EyeShapeResult(openness:.almond,tilt:.straight,spacing:.balanced,mayBeHooded:false,lid:nil,
@@ -71,46 +58,7 @@ final class MakeupPersonalizationTests: XCTestCase {
 
 
 
-    // -Nimah: New scans update the shared-camera assignment; unsupported data must not leave stale makeup on.
-    @MainActor func testSharedHomeRefreshesAssignmentsAfterRescan() throws {
-        let home=TryOnHomeModel(plan:MakeupPlan(shape:.oval),assessment:.init(shape:.unknown),checker:MockFaceTrackingChecker())
-        home.updateRecommendations(face:nil,eyes:nil)
-        // Brow and blush need a saved face scan; the eyeliner falls back to a natural line so its colour can be tried.
-        XCTAssertFalse(home.canTry(.eyebrow)); XCTAssertFalse(home.canTry(.blush))
-        XCTAssertTrue(home.canTry(.eyeliner))
-        home.choose(.eyebrow)
-        XCTAssertFalse(home.liveConfiguration.browLayer.on)
-        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
-        let face=scan()
-        home.updateRecommendations(face:face,eyes:eyes)
-        XCTAssertTrue(home.canTry(.eyeliner))
-        XCTAssertEqual(home.brow.assessment.origin,.analysis)
-        home.choose(.eyeliner);home.choose(shade:home.swatches[0])
-        XCTAssertTrue(home.enabled.contains(.eyeliner))
-        home.updateRecommendations(face:nil,eyes:nil)
-        XCTAssertTrue(home.canTry(.eyeliner))
-        XCTAssertTrue(home.enabled.contains(.eyeliner))
-        XCTAssertFalse(home.canTry(.eyebrow)); XCTAssertFalse(home.canTry(.blush))
-        XCTAssertFalse(home.enabled.contains(.eyebrow)); XCTAssertFalse(home.enabled.contains(.blush))
-        XCTAssertFalse(home.liveConfiguration.browLayer.on)
-        XCTAssertFalse(home.liveConfiguration.blushLayer.on)
-        home.deactivate()
-    }
 
-    // -Nimah: Replayed scan publishers must not create an invalidation loop or turn makeup back on.
-    @MainActor func testRepeatedScanOutputsDoNotRepublishHome() {
-        let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5)),face=scan()
-        let home=TryOnHomeModel(plan:MakeupPlan(scan:face,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
-        home.updateRecommendations(face:face,eyes:eyes)
-        home.choose(.eyeliner);home.turnOff()
-        var events=0
-        let subscription=home.objectWillChange.sink { events += 1 }
-        for _ in 0..<30 { home.updateRecommendations(face:face,eyes:eyes) }
-        XCTAssertEqual(events,0)
-        XCTAssertFalse(home.enabled.contains(.eyeliner))
-        withExtendedLifetime(subscription) {}
-        home.deactivate()
-    }
 
     // MARK: Fit to measured features
 
