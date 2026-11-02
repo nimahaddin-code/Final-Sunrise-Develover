@@ -1,3 +1,13 @@
+## Brow tutorial demo, face-midline split, get-ready page on Try On — 2026-11-02
+
+`BrowTutorialOverlay` (Features/Tutorial) draws the brow tutorial of UX spec 3.4 on the brow outlines the engine publishes
+(`BrowGuideFeed`, `BrowEngine.browGuide`): guide outline, three dots, pulsing regions, spoolie/pencil/cotton bud. The
+tutorial's split comparison cuts at the face's midline (`FaceSplitFeed`, `BeautyBlushEngine.updateSplit`: nose bridge for brows,
+the face anchor for blush, which also scissors the blush pigment), not at the screen's middle. The "get you ready" page is an
+overlay of `TryOnHomeView` (`prepHandoff`), no longer the route `tutorialPrep`: replacing a pushed route with the tutorial in one
+path update was the suspected cause of the arrow doing nothing after coming back from the tutorial (not reproduced; no device
+log). The photo screen's flash now turns on the screen light. Device check pending.
+
 ## Eyeliner stretch follow and native Liquid Glass — 2026-10-31
 
 `LidFollower` now starts a pull from the skin's own motion (`skinSpeed`/`skinFrames`), holds it until the followed points and

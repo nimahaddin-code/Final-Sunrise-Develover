@@ -1,3 +1,9 @@
+## Brow tutorial demo, face-midline split, prep overlay (2026-11-02)
+
+- Brow tutorial steps and captions follow UX spec 3.4, with animated tools over each brow. Split comparison follows the face.
+- Get-ready page is an overlay on Try On; the arrow stopped working after returning from the tutorial (cause not reproduced).
+- Photo flash lights the screen. Not checked on a real device.
+
 ## Eyeliner follows a stretched corner, native Liquid Glass UI (2026-10-31)
 
 - `LidFollower`: a pull of the lid is detected from the skin's own motion (no hand mask needed), held until the skin and

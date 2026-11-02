@@ -27,6 +27,10 @@ import ImageIO
     let browTracking=BrowTrackingFeed()
     /// The blush tutorial's cheek outlines, updated about 30 times a second apart from this object so the screen is not redrawn.
     let blushGuide=BlushGuideFeed()
+    /// The brow tutorial's brow outlines, apart from this object for the same reason.
+    let browGuide=BrowGuideFeed()
+    /// The face's midline for the tutorial's side-by-side comparison.
+    let faceSplit=FaceSplitFeed()
     @Published var previewStrength: Float = 0.8
     // -Nimah: Shared session + eyebrow module status; tidak menyimpan gambar atau landmark ke disk.
     let trackingManager=ARFaceTrackingManager.shared
@@ -106,4 +110,9 @@ struct BlushGuideSnapshot:Equatable,Sendable {
 }
 @MainActor final class BlushGuideFeed: ObservableObject {
     @Published var snapshot: BlushGuideSnapshot?
+}
+
+@MainActor final class FaceSplitFeed: ObservableObject {
+    /// View-normalized x of the line between the two halves of the face; the middle of the view until a face is seen.
+    @Published var x: CGFloat = 0.5
 }

@@ -10,6 +10,8 @@ struct TryOnHomeView: View {
     @State private var isVisible=false
     @State private var showColours=false
     @State private var paletteSource = PaletteSource.camera
+    /// The "get you ready" page, drawn over Try On (not a pushed route) until she starts the tutorial or goes back.
+    @State private var prepHandoff: TutorialHandoff?
     @StateObject private var light = ScreenLight()
     @Namespace private var toolGlass
 
@@ -49,9 +51,6 @@ struct TryOnHomeView: View {
                     .overlay(alignment: .bottom) { stylePicker.padding(.bottom, AppSpacing.small) }
             }
             toolStrip
-            if home.tool == .eyebrow && home.canTry(.eyebrow) && EyebrowConfiguration.showsBrowTracking {
-                browTrackingToggles
-            }
             if home.tool == .eyebrow && home.canTry(.eyebrow) && !EyebrowConfiguration.showsBrowTracking {
                 BrowStylePicker(styles: home.brow.browStyleChoices, selected: home.brow.configuration.style,
                                 onSelect: home.brow.chooseBrowStyle)
@@ -70,6 +69,15 @@ struct TryOnHomeView: View {
         .background { MainBackground() }
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
+        .overlay {
+            if let handoff = prepHandoff {
+                TutorialPrepView(onBack: {
+                    withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = nil }
+                    if isVisible && !showColours { home.activate() }
+                }, onStart: { onTutorial(handoff) })
+                .transition(.move(edge: .trailing))
+            }
+        }
         .sensoryFeedback(.selection, trigger: home.tool)
         .sensoryFeedback(.selection, trigger: light.isOn)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
@@ -79,12 +87,14 @@ struct TryOnHomeView: View {
         .onAppear {
             isVisible=true
             light.resume()
+            // Coming back from the tutorial: the get-ready page is done with.
+            prepHandoff = nil
             if !showColours { home.activate() }
         }
         .onDisappear { isVisible=false; home.deactivate(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
             // Pause the camera off-screen; resume through the same guarded path.
-            if phase == .active && isVisible && !showColours { home.activate(); light.resume() } else { home.deactivate(); light.suspend() }
+            if phase == .active && isVisible && !showColours && prepHandoff == nil { home.activate(); light.resume() } else { home.deactivate(); light.suspend() }
         }
     }
 
@@ -104,7 +114,7 @@ struct TryOnHomeView: View {
                 Spacer()
                 GlassCircleButton(symbol: "arrow.right", size: 48, tint: AppColors.flamingo.opacity(0.9), label: "Open tutorial") {
                     home.deactivate()
-                    onTutorial(home.tutorialHandoff)
+                    withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = home.tutorialHandoff }
                 }
                 .disabled(!home.canTry(home.tool))
             }
@@ -135,27 +145,6 @@ struct TryOnHomeView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    /// Test toggles under the eyebrow tool for the MediaPipe tracking view.
-    private var browTrackingToggles: some View {
-        HStack(spacing: AppSpacing.small) {
-            Spacer()
-            trackingToggle("Landmarks", symbol: "circle.grid.3x3", isOn: $home.browLandmarksVisible)
-            trackingToggle("Natural brow", symbol: "eyebrow", isOn: $home.naturalBrowVisible)
-        }
-    }
-
-    private func trackingToggle(_ title: LocalizedStringKey, symbol: String, isOn: Binding<Bool>) -> some View {
-        Button { isOn.wrappedValue.toggle() } label: {
-            Label(title, systemImage: symbol)
-                .font(AppTypography.caption.weight(.semibold))
-                .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
-                .glassCapsule(tint: isOn.wrappedValue ? AppColors.glassSelected : nil)
-                .foregroundStyle(AppColors.snow.opacity(isOn.wrappedValue ? 1 : 0.7))
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
     }
 
     // MARK: Liner look
