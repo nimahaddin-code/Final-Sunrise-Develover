@@ -71,11 +71,11 @@ struct ScreenLightButton: View {
 
     var body: some View {
         Button { light.toggle() } label: {
-            Image(systemName: light.isOn ? "sun.max.fill" : "sun.max")
-                .font(.title3)
-                .frame(width: 52, height: 52)
-                .glassCircle(tint: light.isOn ? ScreenLight.glow.opacity(0.3) : nil)
-                .foregroundStyle(light.isOn ? ScreenLight.glow : AppColors.snow)
+            Image(systemName: "bolt.fill")
+                .font(.system(size: 20, weight: .medium))
+                .frame(width: 48, height: 48)
+                .glassCircle(tint: light.isOn ? AppColors.snow.opacity(0.7) : nil)
+                .foregroundStyle(light.isOn ? Color(red: 0.96, green: 0.28, blue: 0.49) : AppColors.snow)
                 // Reduce Motion: a pink outline instead of a pulse.
                 .overlay(Circle().strokeBorder(AppColors.flamingo, lineWidth: 3).opacity(pulsing && reduceMotion ? 1 : 0))
                 .scaleEffect(pulsing && !reduceMotion ? 1.25 : 1)

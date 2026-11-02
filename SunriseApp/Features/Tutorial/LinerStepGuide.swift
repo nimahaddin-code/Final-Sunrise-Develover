@@ -9,9 +9,9 @@ enum LinerTutorialStep: Int, CaseIterable {
 
     var caption: LocalizedStringKey {
         switch self {
-        case .markDots: "Mark dots along the guide."
-        case .connect: "Connect the dots into a thin line."
-        case .fill: "Fill it in, close to your lashes."
+        case .markDots: "Start at the inner corner and mark dots along the guide."
+        case .connect: "From the inner corner, connect the dots into a thin line."
+        case .fill: "Fill it in from the inner corner, close to your lashes."
         }
     }
 
@@ -112,7 +112,7 @@ struct LinerStepGuide: View {
                 TimelineView(.animation(minimumInterval: reduceMotion ? 1 / 30 : 1 / 60)) { timeline in
                     let live = model.frame.map { CACurrentMediaTime() - $0.receivedAt <= LinerOverlayRenderer.maxAge } ?? false
                     let elapsed = clock.advance(to: timeline.date, paused: paused || reduceMotion || !live)
-                    canvas(elapsed: elapsed)
+                    canvas(elapsed: elapsed, stamp: model.frame?.receivedAt ?? 0)
                 }
                 UnavailableNote(model: model)
             }
@@ -125,8 +125,11 @@ struct LinerStepGuide: View {
         .accessibilityHidden(true)
     }
 
-    private func canvas(elapsed: TimeInterval) -> some View {
+    /// `stamp` is the newest frame's time: it changes with every tracking frame, so the canvas has a new input to redraw on
+    /// even while the animation's own clock is held.
+    private func canvas(elapsed: TimeInterval, stamp: CFTimeInterval) -> some View {
         Canvas { context, size in
+            _ = stamp
             guard let frame = model.frame, CACurrentMediaTime() - frame.receivedAt <= LinerOverlayRenderer.maxAge else { return }
             if let side {
                 let cut = frame.splitX(fallback: size.width / 2)
@@ -139,12 +142,18 @@ struct LinerStepGuide: View {
             let playing = !reduceMotion && loop < Self.playLength
             let pulse = reduceMotion ? 0.4 : 0.35 - 0.15 * cos(elapsed * .pi)
             let thin = 1 / zoom
+            // A soft dark edge keeps the white guide readable on bright skin, under the ring light and on dark skin alike. It is a
+            // canvas filter, not a `.shadow` modifier, so the canvas itself is redrawn every tick.
+            context.addFilter(.shadow(color: .black.opacity(0.35), radius: 1.5, x: 0, y: 0))
             for eye in frame.eyes where eye.alpha > 0.05 {
                 let geometry = LinerStepGeometry(eye.guide, showsLower: showsLower)
                 let map = { (points: [CGPoint]) in points.map { frame.mapping.map($0) } }
                 let inner = frame.mapping.map(eye.guide.anchors.innerCorner)
                 let outer = frame.mapping.map(eye.guide.anchors.outerCorner)
                 let eyeWidth = hypot(outer.x - inner.x, outer.y - inner.y)
+                // The face's roll on screen (the eye axis, whichever way this eye faces): the pen leans with the head.
+                var roll = atan2(outer.y - inner.y, outer.x - inner.x) * 180 / .pi
+                if roll > 90 { roll -= 180 } else if roll < -90 { roll += 180 }
                 let dots = map(geometry.dots)
                 var penTip: CGPoint?
 
@@ -181,8 +190,8 @@ struct LinerStepGuide: View {
                     }
                 }
 
-                drawDots(&context, dots: dots, hasWing: eye.guide.anchors.wingTip != nil, eyeWidth: eyeWidth, thin: thin)
-                if let penTip { drawPen(&context, tip: penTip, eyeWidth: eyeWidth) }
+                drawDots(&context, dots: dots, hasWing: eye.guide.anchors.wingTip != nil, eyeWidth: eyeWidth, thin: thin, pulse: pulse)
+                if let penTip { drawPen(&context, tip: penTip, eyeWidth: eyeWidth, roll: roll) }
             }
         }
     }
@@ -207,7 +216,7 @@ struct LinerStepGuide: View {
         return tip
     }
 
-    private func drawDots(_ context: inout GraphicsContext, dots: [CGPoint], hasWing: Bool, eyeWidth: Double, thin: CGFloat) {
+    private func drawDots(_ context: inout GraphicsContext, dots: [CGPoint], hasWing: Bool, eyeWidth: Double, thin: CGFloat, pulse: Double) {
         for (index, point) in dots.enumerated() {
             // The wing's end is a little bigger than the others.
             let isTip = hasWing && index == 3
@@ -216,16 +225,28 @@ struct LinerStepGuide: View {
             let dot = Path(ellipseIn: CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2))
             context.fill(dot, with: .color(pink))
             context.stroke(dot, with: .color(.white), style: StrokeStyle(lineWidth: max(radius * 0.3, 0.6 * thin)))
+            // The order to work in: numbers on the first two steps, and "Start here" on the inner corner on all three.
+            let fontSize = min(max(eyeWidth * 0.11, 9), 15)
+            if index == 0 {
+                let halo = radius * (2.2 + 0.8 * pulse)
+                context.stroke(Path(ellipseIn: CGRect(x: point.x - halo, y: point.y - halo, width: halo * 2, height: halo * 2)),
+                               with: .color(pink.opacity(0.9)), style: StrokeStyle(lineWidth: max(1.4 * thin, 1)))
+                context.draw(Text("Start here").font(.system(size: fontSize, weight: .semibold)).foregroundStyle(.white),
+                             at: CGPoint(x: point.x, y: point.y - radius * 2.2 - fontSize * 1.1))
+            } else if step != .fill {
+                context.draw(Text("\(index + 1)").font(.system(size: fontSize, weight: .semibold)).foregroundStyle(.white),
+                             at: CGPoint(x: point.x, y: point.y - radius - fontSize * 0.9))
+            }
         }
     }
 
     /// A simple liner pen, tilted, with its tip on `tip`.
-    private func drawPen(_ context: inout GraphicsContext, tip: CGPoint, eyeWidth: Double) {
+    private func drawPen(_ context: inout GraphicsContext, tip: CGPoint, eyeWidth: Double, roll: Double) {
         let length = min(max(eyeWidth * 0.9, 36), 90)
         let width = length * 0.12
         var pen = context
         pen.translateBy(x: tip.x, y: tip.y)
-        pen.rotate(by: .degrees(30))
+        pen.rotate(by: .degrees(30 + roll))
         let body = Path(roundedRect: CGRect(x: -width / 2, y: -length, width: width, height: length * 0.82), cornerRadius: width / 2)
         pen.fill(body, with: .color(AppColors.snow))
         pen.stroke(body, with: .color(AppColors.wine.opacity(0.6)), lineWidth: 0.8)

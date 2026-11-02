@@ -7,6 +7,8 @@ struct BrowTutorialOverlay: View {
     @ObservedObject var feed: BrowGuideFeed
     let step: Int
     var paused = false
+    /// Draws only the brow on this half of the screen (the tutorial's comparison); nil draws both.
+    var side: HorizontalEdge?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     static let cycle: Double = 5, animation: Double = 3, pulsePeriod: Double = 2
@@ -18,9 +20,14 @@ struct BrowTutorialOverlay: View {
             let local = reduceMotion ? Self.animation : time.truncatingRemainder(dividingBy: Self.cycle)
             let progress = min(1, local / Self.animation)
             GeometryReader { proxy in
-                let brows = (feed.snapshot?.brows ?? []).compactMap { Shape(brow: $0, size: proxy.size) }
+                let all = feed.snapshot?.brows ?? []
+                // The snapshot lists the screen's left brow first.
+                let picked = side.map { [$0 == .leading ? all.first : all.last].compactMap { $0 } } ?? all
+                let brows = picked.compactMap { Shape(brow: $0, size: proxy.size) }
                 ZStack {
                     Canvas { g, _ in
+                        // A soft dark edge keeps the white guide readable on bright skin and under the ring light.
+                        g.addFilter(.shadow(color: .black.opacity(0.35), radius: 1.5, x: 0, y: 0))
                         for b in brows { draw(&g, b, time: time, progress: progress, still: reduceMotion) }
                     }
                     ForEach(brows.indices, id: \.self) { i in tool(brows[i], progress: progress) }
@@ -39,16 +46,40 @@ struct BrowTutorialOverlay: View {
         let upper: [CGPoint], lower: [CGPoint]
         let height: CGFloat
         let arch: Double
+        /// The brow's length in points and its slope (degrees, head to tail), so tools and marks scale and tilt with this face.
+        let length: CGFloat
+        let angle: Double
+        /// 1 for an average brow on screen; bigger or smaller with the face's size and distance.
+        var scale: CGFloat { max(0.55, min(1.7, length / 95)) }
 
         init?(brow: BrowGuideSnapshot.Brow, size: CGSize) {
             func scaled(_ p: [CGPoint]) -> [CGPoint] { p.map { CGPoint(x: $0.x * size.width, y: $0.y * size.height) } }
-            let up = scaled(brow.upper), low = scaled(brow.lower)
+            // Chaikin smoothing: the guide is the brow's own outline without landmark jitter or kinks.
+            let up = Self.smooth(scaled(brow.upper)), low = Self.smooth(scaled(brow.lower))
             guard up.count > 1, low.count > 1 else { return nil }
             upper = up; lower = low
             let mid = (0...20).map { i in Self.point(up, Double(i) / 20).y + Self.point(low, Double(i) / 20).y }
             let top = mid.enumerated().min { $0.element < $1.element }?.offset ?? 10
-            arch = max(0.3, min(0.7, Double(top) / 20))
+            arch = max(0.4, min(0.7, Double(top) / 20))
+            let head = Self.point(up, 0), tail = Self.point(up, 1)
+            length = hypot(tail.x - head.x, tail.y - head.y)
+            angle = atan2(Double(tail.y - head.y), Double(tail.x - head.x)) * 180 / .pi
             height = max(6, abs(Self.point(up, 0.5).y - Self.point(low, 0.5).y))
+        }
+
+        static func smooth(_ poly: [CGPoint], rounds: Int = 2) -> [CGPoint] {
+            var p = poly
+            for _ in 0..<rounds where p.count > 2 {
+                var q = [p[0]]
+                for i in 0..<(p.count - 1) {
+                    let a = p[i], b = p[i + 1]
+                    q.append(CGPoint(x: 0.75 * a.x + 0.25 * b.x, y: 0.75 * a.y + 0.25 * b.y))
+                    q.append(CGPoint(x: 0.25 * a.x + 0.75 * b.x, y: 0.25 * a.y + 0.75 * b.y))
+                }
+                q.append(p[p.count - 1])
+                p = q
+            }
+            return p
         }
 
         static func point(_ poly: [CGPoint], _ f: Double) -> CGPoint {
@@ -86,7 +117,7 @@ struct BrowTutorialOverlay: View {
 
     // MARK: Drawing
 
-    private var dotted: StrokeStyle { StrokeStyle(lineWidth: 2, lineCap: .round, dash: [0.1, 6]) }
+    private func dotted(_ scale: CGFloat) -> StrokeStyle { StrokeStyle(lineWidth: 2 * scale, lineCap: .round, dash: [0.1, 6 * scale]) }
 
     private func pulse(_ time: Double, still: Bool) -> Double {
         still ? 0.4 : 0.2 + 0.3 * (0.5 - 0.5 * cos(2 * .pi * time / Self.pulsePeriod))
@@ -99,14 +130,14 @@ struct BrowTutorialOverlay: View {
         case 3: g.fill(b.region(0, b.arch), with: .color(glow.opacity(pulse(time, still: still))))
         case 4:
             // Just outside the outline: a band, not the brow.
-            g.stroke(b.outline, with: .color(glow.opacity(pulse(time, still: still))), lineWidth: max(10, b.height * 0.9))
+            g.stroke(b.outline, with: .color(glow.opacity(pulse(time, still: still))), lineWidth: max(10 * b.scale, b.height * 0.9))
         default: break
         }
-        g.stroke(b.outline, with: .color(AppColors.snow.opacity(0.95)), style: dotted)
+        g.stroke(b.outline, with: .color(AppColors.snow.opacity(0.95)), style: dotted(b.scale))
         if step >= 1 {
             for (i, f) in b.marks.enumerated() where step > 1 || still || progress > Double(i) / 3 {
                 let c = b.center(f)
-                let r: CGFloat = 4.5
+                let r: CGFloat = 4.5 * b.scale
                 g.fill(Path(ellipseIn: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2)), with: .color(glow))
                 g.stroke(Path(ellipseIn: CGRect(x: c.x - r, y: c.y - r, width: r * 2, height: r * 2)), with: .color(.white), lineWidth: 1.5)
             }
@@ -156,20 +187,22 @@ struct BrowTutorialOverlay: View {
         let s = spot(b, progress: p)
         if step == 0 || step == 3 {
             // Handle to the left, bristles to the right: the bristles' tip is the point.
+            let k = b.scale
             SpoolieIcon()
                 .frame(width: SpoolieIcon.size.width, height: SpoolieIcon.size.height)
-                .rotationEffect(.degrees(-18), anchor: UnitPoint(x: 0.97, y: 0.5))
-                .position(x: s.point.x - SpoolieIcon.size.width / 2 + 3, y: s.point.y)
+                .scaleEffect(k, anchor: UnitPoint(x: 0.97, y: 0.5))
+                .rotationEffect(.degrees(-18 + b.angle * 0.5), anchor: UnitPoint(x: 0.97, y: 0.5))
+                .position(x: s.point.x - (SpoolieIcon.size.width / 2 - 3) * k, y: s.point.y)
         } else {
             let symbol = step == 4 ? "pencil.tip" : "pencil"
             Image(systemName: symbol)
-                .font(.system(size: 30))
+                .font(.system(size: 30 * b.scale))
                 .foregroundStyle(AppColors.snow)
                 .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
-                .rotationEffect(.degrees(step == 4 ? 20 : 0))
+                .rotationEffect(.degrees((step == 4 ? 20 : 0) + b.angle * 0.5))
                 .scaleEffect(1 - 0.1 * (1 - s.press))
                 // The tool's working end is near its lower left: put that on the point, lifted a little when not pressing.
-                .position(x: s.point.x + 11, y: s.point.y - 13 - 8 * (1 - s.press))
+                .position(x: s.point.x + 11 * b.scale, y: s.point.y - 13 * b.scale - 8 * (1 - s.press))
         }
     }
 }

@@ -275,7 +275,7 @@ extension BeautyBlushEngine {
             updateSplit(CGPoint(x:CGFloat(bridge.x/image.x),y:CGFloat(bridge.y/image.y)).applying(display).x)
         }
         if s.guide {
-            if frame.timestamp - lastBrowGuidePublish >= 1.0 / 30.0 {
+            if frame.timestamp - lastBrowGuidePublish >= 1.0 / 60.0 {
                 lastBrowGuidePublish = frame.timestamp
                 if let observation,tracked {onBrowGuide?(Self.browGuide(observation,display:display));browGuidePublished=true}
                 else if browGuidePublished {onBrowGuide?(nil);browGuidePublished=false}
