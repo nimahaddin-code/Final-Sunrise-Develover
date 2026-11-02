@@ -25,7 +25,7 @@ struct LiveGuideView: UIViewRepresentable {
         view.automaticallyUpdatesLighting=false
         Task { [weak view,coordinator=context.coordinator] in
             guard let view else{return}
-            if let beauty=await BeautyBlushEngine.make(on:view) {coordinator.installBeauty(beauty)} else {coordinator.camera.beautyStatus=String(localized:"Blush renderer is unavailable")}
+            if let beauty=await BeautyBlushEngine.make(on:view) {view.antialiasingMode = .none;coordinator.installBeauty(beauty)} else {coordinator.camera.beautyStatus=String(localized:"Blush renderer is unavailable")}
         }
         camera.view=view
         camera.stopSession = { [weak coordinator=context.coordinator, weak view] in if let view { coordinator?.pause(view) } }
@@ -64,6 +64,12 @@ struct LiveGuideView: UIViewRepresentable {
             engine.onBlushGuide={ [weak feed=camera.blushGuide] snapshot in Task { @MainActor in if feed?.snapshot != snapshot {feed?.snapshot=snapshot} } }
             lock.lock();beauty=engine;lock.unlock()
             let s=snapshot().0;lock.lock();let active=sessionActive;lock.unlock();engine.configure(s.visible && active ? s.eyebrows:nil)
+        }
+        /// The Metal engine draws a brow-only filter itself, so the ARKit/Vision/SceneKit brow path has nothing left to do.
+        /// Layered (home/photo), blush and "all regions" configurations keep it: they use the launch fit and its guides.
+        private func metalBrowOnly(_ c:EyebrowConfiguration)->Bool {
+            lock.lock();let metal=beauty != nil;lock.unlock()
+            return metal && c.needsBrow && !c.needsBlush && !c.layered && !c.showAllRegions
         }
         @MainActor func configureBeauty(_ config:EyebrowConfiguration?,visible:Bool) {
             lock.lock();let engine=beauty;lock.unlock();engine?.configure(visible ? config:nil)
@@ -332,6 +338,7 @@ struct LiveGuideView: UIViewRepresentable {
         private func renderEyebrows(_ face:RenderFace,node:SCNNode,anchor:ARFaceAnchor,configuration:EyebrowConfiguration,trackingOK:Bool,visible:Bool) {
             node.isHidden = !anchor.isTracked || !trackingOK || !visible
             guard !node.isHidden else { return }
+            if metalBrowOnly(configuration) { node.isHidden=true; return }
             SCNTransaction.begin(); SCNTransaction.disableActions=true
             face.makeupNode.isHidden=true; face.dots.isHidden=true; face.eyelinerRoot.isHidden=true; face.labels.isHidden=true
             face.depth.update(from:anchor.geometry)
@@ -485,7 +492,8 @@ struct LiveGuideView: UIViewRepresentable {
             let relaxed=face.map { ($0.blendShapes[.jawOpen]?.floatValue ?? 0)<0.20 && ($0.blendShapes[.eyeBlinkLeft]?.floatValue ?? 0)<0.25 && ($0.blendShapes[.eyeBlinkRight]?.floatValue ?? 0)<0.25 } ?? false
             setTracking(isTracked,canFit:isTracked && self.fitStable && relaxed && abs(relative.columns.2.z)>0.85)
             let options=snapshot().0
-            if let configuration=options.eyebrows {
+            let metalBrow=options.eyebrows.map(metalBrowOnly) ?? false
+            if let configuration=options.eyebrows,!metalBrow {
                 if isTracked,let face {
                     if configuration.usesLaunchFit {
                         // Brow/cheek attachments are fitted from this live camera, then followed by ARKit tracking.
@@ -509,7 +517,7 @@ struct LiveGuideView: UIViewRepresentable {
             let ready=readiness.update(timestamp:frame.timestamp,tracked:isTracked,steady:steady)
             fitStable=ready
             let distance=isTracked ? Double(simd_length(position)) : nil
-            let brow=options.eyebrows.map { eyebrowPipeline.snapshot(style:$0.style,foreheadStyle:($0.region == .forehead || $0.showAllRegions) ? $0.foreheadStyle : nil,height:$0.foreheadHeight,includeBrow:$0.showAllRegions || ($0.layered && $0.browLayer.on),blushStyle:$0.needsBlush ? $0.blushStyle : nil) }
+            let brow=metalBrow ? nil : options.eyebrows.map { eyebrowPipeline.snapshot(style:$0.style,foreheadStyle:($0.region == .forehead || $0.showAllRegions) ? $0.foreheadStyle : nil,height:$0.foreheadHeight,includeBrow:$0.showAllRegions || ($0.layered && $0.browLayer.on),blushStyle:$0.needsBlush ? $0.blushStyle : nil) }
             Task { @MainActor in
                 guard self.isCurrent(ticket) else { return }
                 if let brow {
@@ -521,6 +529,10 @@ struct LiveGuideView: UIViewRepresentable {
                     self.camera.update(\.eyebrowMessage, isTracked ? scanMessage : (self.camera.eyebrowWasTracked ? "Tracking lost · guides hidden; face the camera to remap" : "Position your face in the frame"))
                     let confidence=brow.confidence.map { String(format:"%.2f",$0) } ?? "—"
                     self.camera.update(\.eyebrowDebug, "Vision face confidence \(confidence) · mapped brows \(brow.guide?.curves.count ?? 0)/2 · style \(options.eyebrows?.style.rawValue ?? "—")")
+                }
+                // Metal brow-only skips the Vision fit; EyebrowOverlayView still reads these, so say "ready" once the face is seen.
+                if metalBrow && isTracked {
+                    self.camera.update(\.eyebrowWasTracked, true); self.camera.update(\.eyebrowGuideReady, true)
                 }
                 self.camera.report(tracked:isTracked,ready:ready); self.camera.update(\.distanceMeters, distance.map { ($0*100).rounded()/100 })
             }
