@@ -1,12 +1,18 @@
-## Engine folder layout — -Nimah (2026-11-02)
+## Folders per tool: TryOn/<Tool>/{TryOn,Engine,Tutorial}, Legacy — -Nimah (2026-11-02)
 
-Files moved, no code change: `Core/Engine/` holds the shared makeup engine (`BeautyBlushEngine.swift`: device, queue,
-Metal layer, camera decode, hand mask, frame loop; `BeautyBlush.metal.txt`: shared shader helpers plus blush shaders, the
-first part of the library) and the one MediaPipe face tracker (`MediaPipeBrowTracker.swift`). `Features/Blush/` (was
-`Features/BeautyBlush/`) has the blush config and placement (`BlushPlacementGuide`/`BlushPlacementSketch`, from
-`MakeupPreferences`). `Features/Brow/` (was `Features/Eyebrow/`) has all brow code, `Engine/` the brow extensions and
-`Brow.metal.txt`. Type names are unchanged. Resources load by bundle name, so folders do not matter at runtime. Next
-step, not started: a `MakeupLayer` protocol with blush and brow as layers.
+Files moved, no code, flow or UI change. Live code is under `Features/TryOn/`, one folder per tool, each with `TryOn/`
+(what the Try On screen shows: pickers, looks, config), `Engine/` (what draws it on the camera) and `Tutorial/` (steps,
+animations); `Shared/` holds what the tools share: `Home/` (Try On screen, live card, palette), `Camera/` (LiveGuide,
+CameraGuidance, `DeviceFaceTrackingChecker`, `TrackingReadiness`), `Tutorial/` (`GuidedTutorialView` shell, prep page,
+photo), `Rules/` (rule database, `MakeupPlan`, recommendation types), `Support/` (five files from the old scan/try-on that
+live code still uses: `FaceContourDetector`/`SendablePixelBuffer`, `FaceShapeClassifier`/`FaceShapeResult`,
+`EyeShapeResult`, `EyeDebugView`/`DeveloperTools`, `MakeupTextureRenderer`; their own dependencies still live in Legacy).
+`Core/Engine/` keeps the shared engine (`BeautyBlushEngine`, `BeautyBlush.metal.txt`, `MediaPipeBrowTracker`).
+`Features/Legacy/` holds what the app no longer reaches, kept, not deleted: `Scan/` (FaceShape, EyeShape), `ScanDebug/`,
+`OldTryOn/` (old try-on screen and renderer, `EyebrowOverlayView`, `ProfileView`, `BlushMask`, `BlushPlacementSketch`),
+`OldTutorial/`, `Reference*`, `SavedLooks/`, `Comparison/`, `FaceCalibration/`, `BlushComparison/` (orphans, not in the
+project). `Onboarding/` (welcome) stays. `SunriseDebugMac` paths follow. Types keep their names; resources load by bundle
+name. Older notes below use the old paths:
 
 ## Brow tutorial demo, face-midline split, prep overlay (2026-11-02)
 
