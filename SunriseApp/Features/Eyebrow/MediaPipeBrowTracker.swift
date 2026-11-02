@@ -4,6 +4,7 @@ import Foundation
 import MediaPipeTasksVision
 import QuartzCore
 import UIKit
+import VideoToolbox
 import simd
 
 /// One camera frame for the brow tracker. `token` comes back with the result, so the renderer can draw the very
@@ -56,6 +57,8 @@ final class MediaPipeBrowTracker: NSObject, @unchecked Sendable {
     private var lastTimestampMs = -1
     private var space: LandmarkSpace?
     private var lifecycleID = UUID()
+    /// Hardware scale + YCbCr -> BGRA; only touched on `queue`. Core Image stays as the per-frame fallback.
+    private var transferSession: VTPixelTransferSession?
     private lazy var ciContext = CIContext()
     private let colorSpace = CGColorSpaceCreateDeviceRGB()
     private var bgraPool: CVPixelBufferPool?
@@ -102,7 +105,11 @@ final class MediaPipeBrowTracker: NSObject, @unchecked Sendable {
         let retired = landmarker
         landmarker = nil; pending.removeAll(); inFlightSince = nil; space = nil
         lock.unlock()
-        queue.async { withExtendedLifetime(retired) {} }
+        queue.async { [self] in
+            withExtendedLifetime(retired) {}
+            if let transferSession { VTPixelTransferSessionInvalidate(transferSession) }
+            transferSession = nil
+        }
     }
 
     @discardableResult
@@ -161,9 +168,23 @@ final class MediaPipeBrowTracker: NSObject, @unchecked Sendable {
         }
         var output: CVPixelBuffer?
         guard let bgraPool, CVPixelBufferPoolCreatePixelBuffer(nil, bgraPool, &output) == kCVReturnSuccess, let output else { return nil }
+        if transfer(source, to: output) { return output }
         let image = CIImage(cvPixelBuffer: source).transformed(by: CGAffineTransform(scaleX: scale, y: scale))
         ciContext.render(image, to: output, bounds: CGRect(origin: .zero, size: size), colorSpace: colorSpace)
         return output
+    }
+
+    /// One VideoToolbox call scales the whole source into `output` and converts it to BGRA (the buffer's YCbCr matrix
+    /// attachments are honoured). `false` sends the frame down the Core Image path.
+    private func transfer(_ source: CVPixelBuffer, to output: CVPixelBuffer) -> Bool {
+        if transferSession == nil {
+            var session: VTPixelTransferSession?
+            guard VTPixelTransferSessionCreate(allocator: nil, pixelTransferSessionOut: &session) == noErr, let session else { return false }
+            VTSessionSetProperty(session, key: kVTPixelTransferPropertyKey_ScalingMode, value: kVTScalingMode_Normal)
+            transferSession = session
+        }
+        guard let transferSession else { return false }
+        return VTPixelTransferSessionTransferImage(transferSession, from: source, to: output) == noErr
     }
 }
 

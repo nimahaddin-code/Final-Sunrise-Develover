@@ -135,6 +135,9 @@ final class BrowEraser: @unchecked Sendable {
         lock.lock(); pending = nil; modelTime = nil; modelWeight = 0; lastRequestCrop = nil; lock.unlock()
     }
 
+    /// Whether `encode` runs for a frame at `timestamp`: the fill is due for an update.
+    func isDue(_ timestamp: Double) -> Bool { timestamp.isFinite && timestamp - lastEncode >= Self.fillUpdateInterval }
+
     private var indicesPerSide: Int { Self.columns * Self.rows * 6 }
 
     /// Encodes this frame's fill into `command`. `uniforms` are the engine's shader uniforms (camera decoding);
@@ -143,7 +146,7 @@ final class BrowEraser: @unchecked Sendable {
     func encode(vertices: [BrowUnwrapVertex], cropToRaw: simd_float4x4?, uniforms: [UInt8], y: MTLTexture, cb: MTLTexture,
                 timestamp: Double, modelInterval: Double? = BrowEraser.modelInterval, command: MTLCommandBuffer) {
         guard vertices.count == Self.vertexCount * 2 else { return }
-        guard timestamp.isFinite, timestamp - lastEncode >= Self.fillUpdateInterval else { return }
+        guard isDue(timestamp) else { return }
         lastEncode = timestamp
         let buffer = vertexBuffers[slot % 3]; slot += 1
         vertices.withUnsafeBytes { buffer.contents().copyMemory(from: $0.baseAddress!, byteCount: $0.count) }

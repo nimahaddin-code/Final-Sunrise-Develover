@@ -8,19 +8,29 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
-    @MainActor func testTutorialRetainsBrowAndUsesSingleCameraSplit() {
+    @MainActor func testTutorialBrowCompareCyclesOneBrowWithoutSplit() {
         let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.standardLook,
             plan:MakeupPlan(shape:.oval),handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true))
         XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
         XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
-        // Five layouts: look|guide, guide|look, look|plain, plain|look, plain.
-        for _ in 0..<2 { model.cycleCompare() }
-        XCTAssertTrue(model.liveConfiguration.comparisonSplit)
-        XCTAssertFalse(model.liveConfiguration.showGuide)
-        for _ in 0..<2 { model.cycleCompare() }
-        XCTAssertEqual(model.compare, .plain)
+        XCTAssertFalse(model.liveConfiguration.comparisonSplit)
+        XCTAssertNil(model.liveConfiguration.browOnlySide)
+        model.cycleCompare()   // look on the user's left brow only
+        XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectLeft)
+        XCTAssertFalse(model.liveConfiguration.comparisonSplit)
+        XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
+        model.cycleCompare()   // look on the right brow only
+        XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectRight)
+        XCTAssertFalse(model.liveConfiguration.comparisonSplit)
+        model.cycleCompare()   // plain camera
+        XCTAssertNil(model.liveConfiguration.browOnlySide)
+        XCTAssertFalse(model.liveConfiguration.comparisonSplit)
         XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
         XCTAssertFalse(model.liveConfiguration.showMakeupPreview)
+        model.cycleCompare()   // look on both brows again
+        XCTAssertNil(model.liveConfiguration.browOnlySide)
+        XCTAssertFalse(model.liveConfiguration.comparisonSplit)
+        XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
         model.select(.blush)
         XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
         model.deactivate()

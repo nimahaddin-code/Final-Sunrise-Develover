@@ -1,3 +1,43 @@
+## Brows compare one brow at a time; brow overlay cleanup — Khalish (2026-11-02)
+
+The Brows tab's compare button cycles `BrowCompare` (`.both` → `.left` → `.right` → `.off`), not the split screen. `EyebrowConfiguration.browOnlySide`
+(`.subjectLeft`/`.subjectRight`, nil = both brows) makes `drawBrow` draw only that half of the strip index buffer (`BrowEngine+Draw`); `comparisonSplit`
+stays false on Brows. `.off` is the plain camera: no hidden natural brow, guide or preview. Blush still cycles the split (`TutorialCompare`).
+Removed the eight `brow-sample-1…8` overlays and the `mirrorsForPair` flag: the `supplied.*` PNGs are already head-left/tail-right, so
+`browStrip` and the shader no longer mirror them. Simulator build only; device check pending.
+
+## Brow tracker frames via VideoToolbox — Khalish (2026-11-01)
+
+`MediaPipeBrowTracker.bgra(from:)` scales the ARKit YCbCr frame to the 512-long-side BGRA pool buffer with a lazily created
+`VTPixelTransferSession` (scaling mode normal, whole source, one call) instead of a Core Image graph per frame. The session lives
+on the tracker's serial queue and is invalidated there in `stop()`. If a transfer fails, that frame uses the old `CIContext` render
+(still lazy). MediaPipe's `MPImage(pixelBuffer:)` only takes BGRA/RGBA buffers (`MPPImage+Utils.mm`), so a conversion stays
+needed. VT uses the buffer's YCbCr matrix attachments and writes the pool buffer's own colour space; no extra colour management.
+Simulator build only; device timing and colour match not measured.
+
+## Brow draw loop cleanups — Khalish (2026-11-01)
+
+No behaviour change: the brow's per-frame work is trimmed. Marks use a 3-slot buffer ring like the brow vertices, the developer
+menu flags are read at most twice a second, the camera colour attachments are read only when the pixel format or size changes,
+and the natural-brow unwrap grid is built only on frames where the eraser's fill is due (`BrowEraser.isDue`). Simulator build only; device check pending.
+
+## Brow split compare in Metal — Khalish (2026-11-01)
+
+The tutorial no longer stacks a second `ARSCNView` (`RealCameraView`, deleted) masked over half the screen. Merged with
+staging (2026-11-02): blush halves use staging's `pigmentHalf` (scissor in `render`); this change's `HorizontalEdge`
+`comparisonSplit` and `splitScissor` were dropped, and the Brows tab no longer splits (see the top section). Simulator build only;
+device look pending.
+
+## Brow: legacy fit off while Metal draws — Khalish (2026-11-01)
+
+When the Metal engine is installed and the configuration is brow-only (`needsBrow`, not blush, not `layered`, not
+`showAllRegions`; `LiveGuideView.Coordinator.metalBrowOnly`), the old ARKit/Vision/SceneKit brow path no longer runs: no
+`LaunchMakeupFit.fitLive`, `followLaunchFit` or Vision `observe` per frame, `renderEyebrows` hides the anchor node and
+returns before copying vertices or taking a pipeline snapshot, and the 0.1 s publish no longer builds a brow snapshot (it
+sets `eyebrowWasTracked`/`eyebrowGuideReady` to true once the face is tracked, for the legacy `EyebrowOverlayView`).
+Layered/blush/all-regions configurations keep the old behaviour. The ARSCNView drops 4x MSAA once the engine is
+installed (kept if it failed, since SceneKit then draws the brow); it stays at 60 fps. Simulator build only; device check pending.
+
 ## Eyeliner stretch follow and native Liquid Glass — 2026-10-31
 
 `LidFollower` now starts a pull from the skin's own motion (`skinSpeed`/`skinFrames`), holds it until the followed points and
@@ -129,7 +169,7 @@ column (`BrowGeometry.section`). Device check pending.
 The tutorial's background is `AppColors.wine`, like Try On. Its bottom bar is compare (`CameraBarButton`, left), the tabs
 Blush / Brows / Eyeliner, and the screen light (right). `ScreenLight` (DesignSystem/Components) sets brightness to 1 and
 `ScreenLightGlow` draws a 24 pt `AppColors.ringLight` (#FFF4EA) frame round the camera; leaving restores the brightness,
-backgrounding suspends it and returning turns it back on. The split view's real half runs at 60 fps. Try On has no light
+backgrounding suspends it and returning turns it back on. Try On has no light
 button yet. Simulator build only; device look pending.
 
 ## Brow drawn on every ARKit frame — Khalish (2026-10-29)
@@ -175,8 +215,7 @@ the face-skin mask: a mask up to 0.6 s old keeps hands in front, an older one dr
 fading it out (the brow used to vanish whenever the segmenter fell behind). Brow tracking runs at up to 40 fps (`browMaxFramesPerSecond`, one frame per 1/40 s slot: two of every
 three 60 Hz camera frames), still skipped while MediaPipe is busy. Try On → tutorial no longer hangs: `LiveGuideView` keeps a screen whose camera
 lease was taken (`revoked`) from taking it back until it is paused. The split
-button's "real" half (`RealCameraView`) restores the ARSession delegate, because assigning a session to an `ARSCNView` makes the
-view the delegate and would stop the filter's frames. Simulator tests only; split and smoothness need a device check.
+button's "real" half was a second `ARSCNView` (`RealCameraView`, removed 2026-11-01: the engine scissors the look instead). Simulator tests only; split and smoothness need a device check.
 
 ## ARKit pose for the brow, and the 3D hair brow — Khalish (2026-10-28)
 

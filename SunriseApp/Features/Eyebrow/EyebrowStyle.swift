@@ -1,5 +1,6 @@
 // -Nimah: Style mengubah geometry guide; bukan hanya judul pada UI.
 import Foundation
+import SwiftUI
 
 /// The brow shapes offered in try-on, in picker order. Their geometry comes from the matching `brow.*` preset in
 /// makeup-reference.database.json (see `MakeupRuleDatabase.browID`).
@@ -48,6 +49,8 @@ struct EyebrowConfiguration: Equatable, Sendable {
     var comparisonSplit=false
     /// Blush only: overrides `comparisonSplit` (which means `.left`) when set.
     var pigmentHalf: PigmentHalf? = nil
+    /// Tutorial Brows compare: draw the look on this brow only (the subject's own side); nil = both.
+    var browOnlySide:EyeSide?
     // -Nimah: Region/style selection untuk dua modul pada shared tracking pipeline.
     var region:FaceGuideRegion = .eyebrows
     var foreheadStyle:ForeheadStyle = .hairline

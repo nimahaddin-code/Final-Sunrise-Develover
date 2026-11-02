@@ -1,3 +1,40 @@
+## Brows compare one brow at a time; brow overlay cleanup — Khalish (2026-11-02)
+
+The Brows tab's compare button cycles `BrowCompare` (`.both` → `.left` → `.right` → `.off`), not the split screen. `EyebrowConfiguration.browOnlySide`
+(`.subjectLeft`/`.subjectRight`, nil = both brows) makes `drawBrow` draw only that half of the strip index buffer (`BrowEngine+Draw`); `comparisonSplit`
+stays false on Brows. `.off` is the plain camera: no hidden natural brow, guide or preview. Blush still cycles the split (`TutorialCompare`).
+Removed the eight `brow-sample-1…8` overlays and the `mirrorsForPair` flag: the `supplied.*` PNGs are already head-left/tail-right, so
+`browStrip` and the shader no longer mirror them. Simulator build only; device check pending.
+
+## Brow tracker frames via VideoToolbox — Khalish (2026-11-01)
+
+The brow tracker's 512 px BGRA frame for MediaPipe is made with `VTPixelTransferSession` (hardware scale and YCbCr to BGRA)
+instead of `CIContext.render`, which stays as the fallback for a failed transfer. Session created lazily, used only on the
+tracker queue, invalidated in `stop()`. Simulator build only; device timing and colour not measured.
+
+## Brow draw loop cleanups — Khalish (2026-11-01)
+
+No behaviour change: the brow's per-frame work is trimmed. Marks use a 3-slot buffer ring like the brow vertices, the developer
+menu flags are read at most twice a second, the camera colour attachments are read only when the pixel format or size changes,
+and the natural-brow unwrap grid is built only on frames where the eraser's fill is due (`BrowEraser.isDue`). Simulator build only; device check pending.
+
+## Brow split compare in Metal — Khalish (2026-11-01)
+
+The tutorial no longer stacks a second `ARSCNView` (`RealCameraView`, deleted) masked over half the screen. Merged with
+staging (2026-11-02): blush halves use staging's `pigmentHalf` (scissor in `render`); this change's `HorizontalEdge`
+`comparisonSplit` and `splitScissor` were dropped, and the Brows tab no longer splits (see the top section). Simulator build only;
+device look pending.
+
+## Brow: legacy fit off while Metal draws — Khalish (2026-11-01)
+
+When the Metal engine is installed and the configuration is brow-only (`needsBrow`, not blush, not `layered`, not
+`showAllRegions`; `LiveGuideView.Coordinator.metalBrowOnly`), the old ARKit/Vision/SceneKit brow path no longer runs: no
+`LaunchMakeupFit.fitLive`, `followLaunchFit` or Vision `observe` per frame, `renderEyebrows` hides the anchor node and
+returns before copying vertices or taking a pipeline snapshot, and the 0.1 s publish no longer builds a brow snapshot (it
+sets `eyebrowWasTracked`/`eyebrowGuideReady` to true once the face is tracked, for the legacy `EyebrowOverlayView`).
+Layered/blush/all-regions configurations keep the old behaviour. The ARSCNView drops 4x MSAA once the engine is
+installed (kept if it failed, since SceneKit then draws the brow); it stays at 60 fps. Simulator build only; device check pending.
+
 ## Eyeliner follows a stretched corner, native Liquid Glass UI (2026-10-31)
 
 - `LidFollower`: a pull of the lid is detected from the skin's own motion (no hand mask needed), held until the skin and

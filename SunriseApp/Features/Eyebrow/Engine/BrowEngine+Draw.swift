@@ -70,7 +70,8 @@ extension BeautyBlushEngine {
     /// The strip over both brows for one observation, in clip space; nil when a brow cannot be framed.
     /// With `chord`, each vertex also carries how far the observed centerline lies above the brow's head-to-tail chord, so
     /// an overlay picture (drawn in chord space) keeps its own arch.
-    static func browStrip(_ o:BrowObservation,display:CGAffineTransform,chord:Bool=false)->BrowStrip? {
+    /// `unwrap` false leaves the unwrap grid empty (the natural brow is not hidden this frame); `cropToRaw` is still returned.
+    static func browStrip(_ o:BrowObservation,display:CGAffineTransform,chord:Bool=false,unwrap wantsUnwrap:Bool=true)->BrowStrip? {
         guard let right=o.brows[.subjectRight],let left=o.brows[.subjectLeft],
               let r0=BrowGeometry(contour:right),let l0=BrowGeometry(contour:left) else {return nil}
         let across=max(r0.width,l0.width)
@@ -84,7 +85,7 @@ extension BeautyBlushEngine {
         // hair spacing, narrower than the brow, in camera coordinates.
         let blur=across*0.05/image
         var out:[BrowVertex]=[],unwrap:[BrowUnwrapVertex]=[]
-        out.reserveCapacity(browVertexCount*2);unwrap.reserveCapacity(BrowEraser.vertexCount*2)
+        out.reserveCapacity(browVertexCount*2);unwrap.reserveCapacity(wantsUnwrap ? BrowEraser.vertexCount*2:0)
         let cropToRaw=BrowEraser.faceCrop(o)
         for (side,g) in [(EyeSide.subjectRight,r),(.subjectLeft,l)] {
             let lid=o.eyes[side]?.lid ?? []
@@ -109,7 +110,7 @@ extension BeautyBlushEngine {
             }
             // Unwrap grid for hiding the natural brow: the same columns, from below the brow up into the forehead.
             let space=BrowEraser.space
-            for row in 0...BrowEraser.rows {
+            if wantsUnwrap {for row in 0...BrowEraser.rows {
                 let w=space.z+(space.w-space.z)*Float(row)/Float(BrowEraser.rows)
                 for c in columns {
                     let p=c.section.point+c.section.across*w
@@ -117,7 +118,7 @@ extension BeautyBlushEngine {
                     unwrap.append(BrowUnwrapVertex(brow:SIMD4(c.u,w,c.half,index),raw:SIMD4(p.x/image.x,p.y/image.y,crop.x*2-1,1-crop.y*2),
                                                    conceal:SIMD4(c.lower.core,c.lower.end,0,0)))
                 }
-            }
+            }}
         }
         guard out.allSatisfy({$0.position.x.isFinite && $0.position.y.isFinite}),unwrap.allSatisfy({$0.raw.x.isFinite && $0.raw.y.isFinite}) else {return nil}
         return BrowStrip(vertices:out,unwrap:unwrap,cropToRaw:cropToRaw)
@@ -167,21 +168,33 @@ extension BeautyBlushEngine {
         if let hairMesh,let observation,let face {hairDraws=Self.hairPlacements(observation,face:face,mesh:hairMesh)}
         let hair3D = !hairDraws.isEmpty
         let pigment=s.browOverlay != nil && !hair3D
-        let strip = tracked && (pigment || s.hideNatural) ? observation.flatMap { Self.browStrip($0, display: display, chord: pigment) } : nil
+        let strip = tracked && (pigment || s.hideNatural) ? observation.flatMap {
+            Self.browStrip($0, display: display, chord: pigment,
+                           unwrap: s.hideNatural && (eraser?.isDue(frame.timestamp) ?? false))
+        } : nil
         let (frameMask,maskTransform,fresh)=uploadMask(slot:frameSlot,capturedImage:buffer,maxAge:max(config.mask_max_age_seconds,Self.browMaskGraceSeconds))
         // The brow does not wait for the hand mask: when the segmenter falls behind (it shares the GPU with the brow
         // tracker and the inpainter) the brow is drawn without occlusion instead of fading out. A mask up to
         // `browMaskGraceSeconds` old still keeps hands in front.
         let ready=true
         let visible=visibility.update(timestamp:frame.timestamp,visible:(strip != nil || hair3D) && ready && (browTexture != nil || hair3D),tau:config.visibility_tau_seconds)
-        let debugView=UserDefaults.standard.bool(forKey:DeveloperTools.key) ? UserDefaults.standard.integer(forKey:Self.browDebugKey):0
-        let matrixAttachment=CVBufferCopyAttachment(buffer,kCVImageBufferYCbCrMatrixKey,nil) as? String
-        let transfer=CVBufferCopyAttachment(buffer,kCVImageBufferTransferFunctionKey,nil) as? String
-        let full=CVPixelBufferGetPixelFormatType(buffer)==kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+        // The developer menu changes these live, so they are read at most every half second (or again if time goes back).
+        if frame.timestamp<browDebugRead || frame.timestamp-browDebugRead>=0.5 {
+            browDebugCache=UserDefaults.standard.bool(forKey:DeveloperTools.key) ? UserDefaults.standard.integer(forKey:Self.browDebugKey):0;browDebugRead=frame.timestamp
+        }
+        let debugView=browDebugCache
+        // The camera colour attachments only depend on the pixel format and size, so they are read again only when those change.
+        let cameraKey=SIMD3(Int(CVPixelBufferGetPixelFormatType(buffer)),CVPixelBufferGetWidth(buffer),CVPixelBufferGetHeight(buffer))
+        if browCameraKey != cameraKey {
+            let matrixAttachment=CVBufferCopyAttachment(buffer,kCVImageBufferYCbCrMatrixKey,nil) as? String
+            let transfer=CVBufferCopyAttachment(buffer,kCVImageBufferTransferFunctionKey,nil) as? String
+            let full=CVPixelBufferGetPixelFormatType(buffer)==kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+            browCameraKey=cameraKey;browCamera=SIMD4(matrixAttachment==(kCVImageBufferYCbCrMatrix_ITU_R_709_2 as String) ? 1:0,full ? 1:0,transfer==(kCVImageBufferTransferFunction_ITU_R_709_2 as String) ? 1:0,1)
+        }
         var u=Uniforms(mvp:matrix_identity_float4x4,rawFromClip:Self.affine(display.inverted()),maskFromRaw:maskTransform,
             shade:SIMD4(BeautyBlushConfiguration.linear(s.tint.x),BeautyBlushConfiguration.linear(s.tint.y),BeautyBlushConfiguration.linear(s.tint.z),s.intensity),
             controls:SIMD4(config.coverage,config.absorption,config.saturation,config.pigment_mix),tracking:SIMD4(ready ? Float(visible):0,s.guide && pigment ? 1:0,1/Float(size.width),1/Float(size.height)),
-            camera:SIMD4(matrixAttachment==(kCVImageBufferYCbCrMatrix_ITU_R_709_2 as String) ? 1:0,full ? 1:0,transfer==(kCVImageBufferTransferFunction_ITU_R_709_2 as String) ? 1:0,1),
+            camera:browCamera,
             stretch:SIMD4(config.stretch_fade[0],config.stretch_fade[1],config.stretch_fade[2],config.stretch_fade[3]),
             debug:SIMD4(Float(debugView),s.hideNatural && eraser != nil ? 1:0,pigment ? 1:0,pigment ? 1:0))
         // Hiding the natural brow: this frame's brow-space fill; restarted after the brow was not drawn.
@@ -205,7 +218,9 @@ extension BeautyBlushEngine {
             e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1);e.setFragmentTexture(browTexture,index:2);e.setFragmentTexture(obstruction,index:3)
             var space=BrowEraser.space;e.setFragmentBytes(&space,length:MemoryLayout<SIMD4<Float>>.stride,index:2)
             e.setFragmentTexture(fill,index:4);e.setFragmentTexture(s.hideNatural ? eraser?.hide ?? emptyFill:emptyFill,index:5)
-            e.drawIndexedPrimitives(type:.triangle,indexCount:Self.browIndexCount,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0)
+            // Tutorial brow compare: the index buffer lists side 0 (subjectRight) then side 1 (subjectLeft), so one brow is one half.
+            let half=Self.browIndexCount/2
+            e.drawIndexedPrimitives(type:.triangle,indexCount:s.browOnlySide == nil ? Self.browIndexCount:half,indexType:.uint16,indexBuffer:ib,indexBufferOffset:s.browOnlySide == .subjectLeft ? half*MemoryLayout<UInt16>.stride:0)
         }
         if hair3D,let face,uploadFaceMesh(face,slot:frameSlot) {
             if let estimate=frame.lightEstimate {browLight += (Float(max(0.55,min(1.4,(estimate.ambientIntensity/1000).squareRoot())))-browLight)*0.1}
@@ -219,7 +234,16 @@ extension BeautyBlushEngine {
             marks=Self.browMarks(observation,display:display,size:size,landmarks:debugView==2,mapping:s.guide && s.mapping,alpha:1)
         }
         do {
-            if !marks.isEmpty,let mb=marks.withUnsafeBytes({device.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}) {
+            // One buffer per frame slot, like `browVertices`: reused while it is big enough, else replaced by a power-of-two size.
+            let markBytes=marks.count*MemoryLayout<MarkVertex>.stride
+            if !marks.isEmpty {
+                if (browMarkBuffers[frameSlot]?.length ?? 0) < markBytes {
+                    var capacity=4096;while capacity<markBytes {capacity*=2}
+                    browMarkBuffers[frameSlot]=device.makeBuffer(length:capacity,options:.storageModeShared)
+                }
+            }
+            if !marks.isEmpty,let mb=browMarkBuffers[frameSlot] {
+                marks.withUnsafeBytes {mb.contents().copyMemory(from:$0.baseAddress!,byteCount:$0.count)}
                 e.setRenderPipelineState(browMarkPipeline);e.setVertexBuffer(mb,offset:0,index:0)
                 e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:marks.count)
             }

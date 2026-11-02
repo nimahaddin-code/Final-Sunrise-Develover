@@ -89,7 +89,8 @@ final class BrowHairMeshTests: XCTestCase {
         // The brow is 54 mm wide at 30 cm in a 128 px frame (about 0.54 of the half width) and above the axis.
         let rows = drawn.map { $0 / 128 }, columns = drawn.map { $0 % 128 }
         XCTAssertLessThan(rows.max() ?? 999, 64, "above the middle of the frame")
-        XCTAssertGreaterThan(columns.min() ?? 0, 20); XCTAssertLessThan(columns.max() ?? 999, 108)
+        // Head extension -0.10 (BrowSpriteBaker.defaultHeadU) brings the head to about 18 px.
+        XCTAssertGreaterThan(columns.min() ?? 0, 12); XCTAssertLessThan(columns.max() ?? 999, 108)
         XCTAssertGreaterThan(columns.max()! - columns.min()!, 50, "most of the brow's width")
         // Hairs are dark against the grey frame.
         let dark = drawn.filter { Int(hairy[$0 * 4]) < Int(base[$0 * 4]) }.count

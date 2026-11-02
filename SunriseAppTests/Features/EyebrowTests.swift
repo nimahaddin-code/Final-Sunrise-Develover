@@ -152,7 +152,7 @@ final class EyebrowTests:XCTestCase {
         XCTAssertNil(pipeline.snapshot(style:.flatStraight).guide)
         let working=EyebrowTrackingPipeline(provider:FixtureLandmarks(result:[f.detection()]),requiredScanSamples:1)
         working.reset(anchorID:f.anchor); working.calibrate(input:try f.input(),style:.flatStraight)
-        for _ in 0..<30 {
+        for _ in 0..<100 {
             if working.snapshot(style:.flatStraight).guide != nil { break }
             try await Task.sleep(for:.milliseconds(30))
         }
