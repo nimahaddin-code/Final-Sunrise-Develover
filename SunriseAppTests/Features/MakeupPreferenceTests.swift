@@ -93,6 +93,7 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     @MainActor func testCreativeBlushChoiceRetainsShadeAndTutorialStyle() {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        home.choose(.blush)
         let shade=home.currentShade,intensity=home.intensity
         home.choose(blush:.sunkissed)
         XCTAssertEqual(home.liveConfiguration.blushStyle,.sunkissed)
@@ -446,6 +447,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         let assigned=try XCTUnwrap(home.brow.selectedBlush).id
         let shade=MakeupShade(id:"custom.test",name:"Custom colour",red:0.8,green:0.2,blue:0.4,opacity:0.36)
+        home.choose(.blush)
         home.choose(shade:shade);home.setIntensity(0.8)
         XCTAssertEqual(home.brow.selectedBlush?.id,assigned)
         XCTAssertEqual(home.liveConfiguration.blushLayer.tint,SIMD3<Float>(0.8,0.2,0.4))
@@ -588,10 +590,13 @@ final class MakeupPreferenceTests:XCTestCase {
     @MainActor func testTryOnShowsOnlySelectedToolAndUsesLaunchFitting() {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
-        XCTAssertEqual(home.enabled,[.blush])
+        XCTAssertEqual(home.enabled,[])
         XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
-        XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on)
-        home.choose(.eyebrow)
+        XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertFalse(home.liveConfiguration.blushLayer.on)
+        home.choose(.blush)
+        XCTAssertEqual(home.enabled,[.blush])
+        XCTAssertTrue(home.liveConfiguration.blushLayer.on);XCTAssertFalse(home.liveConfiguration.browLayer.on)
+        home.choose(browOverlay:.standard);home.choose(.eyebrow)
         XCTAssertEqual(home.enabled,[.eyebrow])
         XCTAssertTrue(home.liveConfiguration.browLayer.on);XCTAssertFalse(home.liveConfiguration.blushLayer.on)
         home.choose(.eyeliner)
