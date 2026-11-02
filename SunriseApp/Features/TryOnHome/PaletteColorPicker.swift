@@ -59,9 +59,13 @@ struct PalettePhoto: @unchecked Sendable {
 
 /// The sheet behind the "+" button: photograph a makeup product, then drag the pin to the colour to use.
 /// Photos stay in memory and are never saved or uploaded.
+enum PaletteSource { case camera, library }
+
 struct PaletteColorPicker: View {
     let initial: MakeupShade
+    let source: PaletteSource
     let onApply: (MakeupShade) -> Void
+    @State private var showsLibrary = false
     @Environment(\.dismiss) private var dismiss
     @StateObject private var camera = ProductCamera()
     @State private var photo: PalettePhoto?
@@ -70,11 +74,14 @@ struct PaletteColorPicker: View {
     @State private var selection: PhotosPickerItem?
     @State private var error: String?
 
-    private static let frameSize = CGSize(width: 280, height: 294)
+    private static let frameSize = CGSize(width: 330, height: 350)
     private static let pinSize: CGFloat = 40
+    /// The pin's tip sits this far above the finger, so the tip and the colour under it stay in view while dragging.
+    private static let fingerGap: CGFloat = 56
 
-    init(initial: MakeupShade, onApply: @escaping (MakeupShade) -> Void) {
+    init(initial: MakeupShade, source: PaletteSource = .camera, onApply: @escaping (MakeupShade) -> Void) {
         self.initial = initial
+        self.source = source
         self.onApply = onApply
         _color = State(initialValue: initial.color)
     }
@@ -94,11 +101,18 @@ struct PaletteColorPicker: View {
         .padding(.horizontal, AppSpacing.medium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .foregroundStyle(AppColors.snow)
-        .presentationBackground(AppColors.screen)
-        .presentationDetents([.height(600), .large])
-        .presentationCornerRadius(32)
+        .presentationBackground(AppColors.sheet)
+        .presentationDetents([.height(560), .large])
+        .presentationCornerRadius(40)
         .presentationDragIndicator(.visible)
-        .task { await camera.start() }
+        .task {
+            if source == .library { showsLibrary = true } else { await camera.start() }
+        }
+        .photosPicker(isPresented: $showsLibrary, selection: $selection, matching: .images)
+        .onChange(of: showsLibrary) { _, isShown in
+            // Cancelled without a photo: fall back to photographing the product.
+            if !isShown && selection == nil && photo == nil { Task { await camera.start() } }
+        }
         .onDisappear { camera.stop() }
         .task(id: selection) { await loadSelection() }
     }
@@ -120,7 +134,7 @@ struct PaletteColorPicker: View {
         }
         .frame(width: Self.frameSize.width, height: Self.frameSize.height)
         .background(Color.black.opacity(0.35))
-        .clipShape(RoundedRectangle(cornerRadius: 44, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 
     private func pickSurface(_ photo: PalettePhoto) -> some View {
@@ -132,9 +146,10 @@ struct PaletteColorPicker: View {
         }
         .contentShape(Rectangle())
         .gesture(DragGesture(minimumDistance: 0).onChanged { drag in
-            if let picked = photo.sample(at: drag.location, in: Self.frameSize) {
+            let tip = CGPoint(x: drag.location.x, y: drag.location.y - Self.fingerGap)
+            if let picked = photo.sample(at: tip, in: Self.frameSize) {
                 color = Color(uiColor: picked)
-                marker = drag.location
+                marker = tip
             }
         })
         .accessibilityLabel("Product photo. Drag the pin to a colour.")
@@ -170,8 +185,8 @@ struct PaletteColorPicker: View {
         if photo == nil {
             Button(action: snap) {
                 ZStack {
-                    Circle().strokeBorder(AppColors.snow, lineWidth: 3).frame(width: 76, height: 76)
-                    Circle().fill(AppColors.flamingo.opacity(0.6)).frame(width: 60, height: 60)
+                    Circle().strokeBorder(AppColors.snow.opacity(0.65), lineWidth: 5).frame(width: 84, height: 84)
+                    Circle().fill(AppColors.snow).frame(width: 66, height: 66)
                 }
             }
             .buttonStyle(.plain)
@@ -179,25 +194,23 @@ struct PaletteColorPicker: View {
             .opacity(camera.state == .running ? 1 : 0.4)
             .accessibilityLabel("Take photo of product")
         } else {
-            HStack(spacing: AppSpacing.large) {
+            HStack {
                 roundButton("arrow.counterclockwise", label: "Retake", action: retake)
-                Circle().fill(color).frame(width: 60, height: 60)
-                    .overlay(Circle().strokeBorder(AppColors.snow, lineWidth: 2))
-                    .accessibilityLabel("Selected colour")
-                roundButton("checkmark", label: "Use this colour", action: apply)
+                Spacer()
+                Button(action: apply) {
+                    Text("Done").font(.headline).foregroundStyle(AppColors.snow)
+                        .padding(.horizontal, 28).frame(height: 48)
+                        .glassCapsule(tint: AppColors.glassSelected)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Use this colour")
             }
+            .padding(.horizontal, AppSpacing.small)
         }
     }
 
     private func roundButton(_ symbol: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: symbol).font(.title2.weight(.semibold))
-                .frame(width: 60, height: 60)
-                .background(AppColors.flamingo, in: Circle())
-                .foregroundStyle(AppColors.snow)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(label)
+        GlassCircleButton(symbol: symbol, size: 48, tint: AppColors.glassSelected, label: label, action: action)
     }
 
     // MARK: Actions

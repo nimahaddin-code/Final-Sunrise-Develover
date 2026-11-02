@@ -74,7 +74,7 @@ struct ScreenLightButton: View {
             Image(systemName: light.isOn ? "sun.max.fill" : "sun.max")
                 .font(.title3)
                 .frame(width: 52, height: 52)
-                .background(AppColors.wine.opacity(0.75), in: Circle())
+                .glassCircle(tint: light.isOn ? ScreenLight.glow.opacity(0.3) : nil)
                 .foregroundStyle(light.isOn ? ScreenLight.glow : AppColors.snow)
                 // Reduce Motion: a pink outline instead of a pulse.
                 .overlay(Circle().strokeBorder(AppColors.flamingo, lineWidth: 3).opacity(pulsing && reduceMotion ? 1 : 0))
@@ -93,7 +93,8 @@ struct ScreenLightButton: View {
     }
 }
 
-/// The round, raised wine button of the camera screens' bottom bar (compare, light).
+/// The round, raised wine button of the tutorial's bottom bar (compare, light), drawn as in the design: a flat #8D1F44
+/// disc with fine noise, a soft white inner shadow on its left rim and a dark drop shadow to the right. No glass.
 struct CameraBarButton: View {
     var symbol: String
     var action: () -> Void
@@ -101,19 +102,46 @@ struct CameraBarButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: symbol)
-                .font(.title2)
-                .foregroundStyle(AppColors.snow.opacity(0.9))
-                .frame(width: 56, height: 56)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundStyle(AppColors.snow)
+                .frame(width: 44, height: 44)
                 .background {
-                    Circle()
-                        .fill(LinearGradient(colors: [AppColors.snow.opacity(0.14), AppColors.snow.opacity(0.04)],
-                                             startPoint: .top, endPoint: .bottom))
-                        .background(AppColors.wine, in: Circle())
-                        .shadow(color: .black.opacity(0.35), radius: 6, y: 3)
+                    Circle().fill(AppColors.raisedWine)
+                        .overlay { RaisedNoise().clipShape(Circle()) }
+                        .overlay {
+                            // Inner shadow: only the thin crescent the disc leaves when shifted 2 pt to the right.
+                            Circle().fill(Color.white.opacity(0.24))
+                                .mask {
+                                    Rectangle().overlay { Circle().offset(x: 2).blendMode(.destinationOut) }
+                                        .compositingGroup()
+                                }
+                                .blur(radius: 1.5)
+                                .clipShape(Circle())
+                        }
+                        .shadow(color: .black.opacity(0.42), radius: 1.5, x: 3, y: 0)
                 }
-                .overlay(Circle().strokeBorder(AppColors.snow.opacity(0.12), lineWidth: 1))
+                .padding(6)
+                .contentShape(Circle())
                 .contentTransition(.symbolEffect(.replace))
         }
         .buttonStyle(.plain)
+    }
+}
+
+/// Fixed fine speckle (black and white at 25%), the design's duo noise. Drawn once from a seeded sequence, so it never shimmers.
+private struct RaisedNoise: View {
+    var body: some View {
+        Canvas { context, size in
+            var seed: UInt64 = 0x9E3779B97F4A7C15
+            func next() -> CGFloat {
+                seed = seed &* 6364136223846793005 &+ 1442695040888963407
+                return CGFloat((seed >> 33) & 0xFFFF) / 65535
+            }
+            for i in 0..<70 {
+                let dot = CGRect(x: next() * size.width, y: next() * size.height, width: 1, height: 1)
+                context.fill(Path(ellipseIn: dot), with: .color((i % 2 == 0 ? Color.black : Color.white).opacity(0.16)))
+            }
+        }
+        .allowsHitTesting(false)
     }
 }

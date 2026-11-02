@@ -9,6 +9,9 @@ struct TryOnHomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible=false
     @State private var showColours=false
+    @State private var paletteSource = PaletteSource.camera
+    @StateObject private var light = ScreenLight()
+    @Namespace private var toolGlass
 
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
          onTutorial: @escaping (TutorialHandoff) -> Void) {
@@ -17,7 +20,7 @@ struct TryOnHomeView: View {
     }
 
     var body: some View {
-        VStack(spacing: AppSpacing.medium) {
+        VStack(spacing: AppSpacing.small) {
             header
             // -Nimah: Dismantle the face camera while the palette picker owns the rear camera.
             if showColours {
@@ -25,16 +28,27 @@ struct TryOnHomeView: View {
                     .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
             } else {
                 TryOnLiveCard(home: home).frame(maxHeight:.infinity)
+                    .overlay { ScreenLightGlow(light: light) }
                     .overlay(alignment: .topLeading) {
+                        Button { light.toggle() } label: {
+                            Image(systemName: "bolt.fill")
+                                .font(.system(size: 18, weight: .medium))
+                                .foregroundStyle(light.isOn ? ScreenLight.glow : AppColors.snow)
+                                .frame(width: 44, height: 44)
+                                .glassCircle(tint: light.isOn ? ScreenLight.glow.opacity(0.3) : AppColors.snow.opacity(0.18))
+                        }
+                        .buttonStyle(.plain)
+                        .padding(AppSpacing.small)
+                        .accessibilityLabel("Light")
+                        .accessibilityValue(light.isOn ? Text("On") : Text("Off"))
+                    }
+                    .overlay(alignment: .topTrailing) {
                         if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small) }
                         if developerTools && home.tool == .blush { BlushDebugMenu().padding(AppSpacing.small) }
                     }
+                    .overlay(alignment: .bottom) { stylePicker.padding(.bottom, AppSpacing.small) }
             }
             toolStrip
-            if home.tool == .eyeliner { linerLookPicker }
-            if home.tool == .eyebrow && home.canTry(.eyebrow) {
-                BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
-            }
             if home.tool == .eyebrow && home.canTry(.eyebrow) && EyebrowConfiguration.showsBrowTracking {
                 browTrackingToggles
             }
@@ -42,8 +56,6 @@ struct TryOnHomeView: View {
                 BrowStylePicker(styles: home.brow.browStyleChoices, selected: home.brow.configuration.style,
                                 onSelect: home.brow.chooseBrowStyle)
             }
-            // -Nimah: Never silently show an empty tool.
-            if home.tool == .blush {blushPlacementRow}
             // -Nimah: Old installs may have analysis but no persisted fit; never silently show an empty tool.
             if !home.canTry(home.tool) {
                 Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
@@ -55,22 +67,24 @@ struct TryOnHomeView: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background(AppColors.wine.ignoresSafeArea())
+        .background { MainBackground() }
         .foregroundStyle(AppColors.snow)
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: home.tool)
+        .sensoryFeedback(.selection, trigger: light.isOn)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
         .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
-            PaletteColorPicker(initial:home.currentShade ?? home.swatches[0]) { home.choose(shade:$0) }
+            PaletteColorPicker(initial:home.currentShade ?? home.swatches[0], source: paletteSource) { home.choose(shade:$0) }
         }
         .onAppear {
             isVisible=true
+            light.resume()
             if !showColours { home.activate() }
         }
-        .onDisappear { isVisible=false; home.deactivate() }
+        .onDisappear { isVisible=false; home.deactivate(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
             // Pause the camera off-screen; resume through the same guarded path.
-            if phase == .active && isVisible && !showColours { home.activate() } else { home.deactivate() }
+            if phase == .active && isVisible && !showColours { home.activate(); light.resume() } else { home.deactivate(); light.suspend() }
         }
     }
 
@@ -88,14 +102,10 @@ struct TryOnHomeView: View {
                 .sensoryFeedback(.impact, trigger: developerTools)
             HStack {
                 Spacer()
-                Button { home.deactivate(); onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,linerLook: home.linerLook,blushStyle:home.blushLook,browOverlay:home.browOverlay,hideNaturalBrow:!home.naturalBrowVisible)) } label: {
-                    Image(systemName: "arrow.right")
-                        .font(.title2.weight(.medium))
-                        .frame(width: 60, height: 60)
-                        .background(AppColors.flamingo, in: Circle())
-                        .foregroundStyle(AppColors.snow)
+                GlassCircleButton(symbol: "arrow.right", size: 48, tint: AppColors.flamingo.opacity(0.9), label: "Open tutorial") {
+                    home.deactivate()
+                    onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,linerLook: home.linerLook,blushStyle:home.blushLook,browOverlay:home.browOverlay,hideNaturalBrow:!home.naturalBrowVisible))
                 }
-                .accessibilityLabel("Open tutorial")
                 .disabled(!home.canTry(home.tool))
             }
         }
@@ -104,27 +114,27 @@ struct TryOnHomeView: View {
 
     // MARK: Tools
 
+    /// The three tools as text; the chosen one sits on a glass capsule that slides to the next one.
     private var toolStrip: some View {
-        HStack(spacing: AppSpacing.medium) {
-            ForEach(TryOnTool.allCases) { tool in
-                let selected = tool == home.tool
-                Button { home.choose(tool) } label: {
-                    Image(systemName: tool.symbol)
-                        .font(.title)
-                        .frame(maxWidth: .infinity, minHeight: 76)
-                        .background(AppColors.flamingo.opacity(selected ? 0.32 : 0.16),
-                                    in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0)
-                        }
-                        .foregroundStyle(AppColors.snow)
+        GlassEffectContainer(spacing: 12) {
+            HStack(spacing: 12) {
+                ForEach(TryOnTool.allCases) { tool in
+                    let selected = tool == home.tool
+                    Button { withAnimation(.smooth(duration: 0.3)) { home.choose(tool) } } label: {
+                        Text(tool.title)
+                            .font(.system(size: 18, weight: selected ? .semibold : .regular))
+                            .foregroundStyle(AppColors.snow.opacity(selected ? 1 : 0.6))
+                            .padding(.horizontal, 18)
+                            .frame(minHeight: 42)
+                            .modifier(SelectedToolGlass(selected: selected, namespace: toolGlass))
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(tool.title)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(tool.title)
-                .accessibilityAddTraits(selected ? .isSelected : [])
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     /// Test toggles under the eyebrow tool for the MediaPipe tracking view.
@@ -141,9 +151,8 @@ struct TryOnHomeView: View {
             Label(title, systemImage: symbol)
                 .font(AppTypography.caption.weight(.semibold))
                 .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
-                .background(AppColors.flamingo.opacity(isOn.wrappedValue ? 0.32 : 0.12), in: Capsule())
-                .overlay { Capsule().strokeBorder(AppColors.snow, lineWidth: isOn.wrappedValue ? 1.5 : 0) }
-                .foregroundStyle(AppColors.snow.opacity(isOn.wrappedValue ? 1 : 0.6))
+                .glassCapsule(tint: isOn.wrappedValue ? AppColors.glassSelected : nil)
+                .foregroundStyle(AppColors.snow.opacity(isOn.wrappedValue ? 1 : 0.7))
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isOn.wrappedValue ? .isSelected : [])
@@ -159,67 +168,104 @@ struct TryOnHomeView: View {
         .disabled(!home.canTry(.eyeliner))
     }
 
+    /// The look choices of the selected tool, as glass circles over the bottom of the camera card.
+    @ViewBuilder private var stylePicker: some View {
+        switch home.tool {
+        case .eyeliner:
+            linerLookPicker
+        case .eyebrow where home.canTry(.eyebrow):
+            BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
+        case .blush:
+            blushPlacementRow
+        default:
+            EmptyView()
+        }
+    }
+
     // -Nimah: Placement and shade are independent. User requested these three creative alternatives.
-    private var blushPlacementRow:some View {
-        HStack(spacing:8) {
-            ForEach(BlushPlacementStyle.referenceLooks) {look in
-                Button {home.choose(blush:look)} label: {
-                    Text(look.title).font(.subheadline.weight(.semibold))
-                        .frame(maxWidth:.infinity).padding(.vertical,10)
-                        .background(home.blushLook==look ? AppColors.flamingo:AppColors.snow.opacity(0.12),in:Capsule())
+    private var blushPlacementRow: some View {
+        GlassPickerRow(title: home.isOff ? Text("None") : Text(home.blushLook.title),
+                       selectedID: home.isOff ? "none" : "\(home.blushLook.id)", onCenter: { id in
+            if let look = BlushPlacementStyle.referenceLooks.first(where: { $0.id == id }) { home.choose(blush: look) } else { home.turnOff() }
+        }) {
+            Button { home.turnOff() } label: {
+                StyleCircle(selected: home.isOff, isNone: true) { EmptyView() }
+            }
+            .buttonStyle(.plain).id("none").accessibilityLabel("No makeup")
+            ForEach(BlushPlacementStyle.referenceLooks) { look in
+                let selected = !home.isOff && home.blushLook == look
+                Button { home.choose(blush: look) } label: {
+                    StyleCircle(selected: selected) { BlushStyleIcon(look: look) }
                 }
                 .buttonStyle(.plain)
-                .accessibilityAddTraits(home.blushLook==look ? .isSelected:[])
+                .id("\(look.id)")
+                .accessibilityLabel(look.title)
+                .accessibilityAddTraits(selected ? .isSelected : [])
             }
-        }.disabled(!home.canTry(.blush))
+        }
+        .disabled(!home.canTry(.blush))
     }
 
     // MARK: Shades
 
-    private var shadeRow: some View {
-        HStack(spacing: AppSpacing.small) {
-            circleButton(selected: home.isOff, label: "No makeup", action: home.turnOff) {
-                Image(systemName: "nosign").font(.title3)
-            }
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    ForEach(home.swatches) { shade in
-                        let selected = shade == home.currentShade
-                        Button { home.choose(shade: shade) } label: {
-                            Circle().fill(shade.color)
-                                .frame(width: 36, height: 36)
-                                .padding(3)
-                                .overlay(Circle().strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0))
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityLabel(Text(shade.name))
-                        .accessibilityAddTraits(selected ? .isSelected : [])
-                    }
-                }
-                .padding(.horizontal, 2)
-            }
-            // The "+" opens the snap-a-product colour sheet.
-            circleButton(selected: false, label: "Add a colour from a product", action: {
-                home.deactivate(); showColours = true
-            }) {
-                Image(systemName: "plus").font(.title2)
-            }
-        }
-        .frame(height: 56)
+    private func openPalette(_ source: PaletteSource) {
+        home.deactivate()
+        paletteSource = source
+        showColours = true
     }
 
-    private func circleButton<Content: View>(selected: Bool, label: LocalizedStringKey, action: @escaping () -> Void,
-                                             @ViewBuilder content: () -> Content) -> some View {
-        Button(action: action) {
-            content()
-                .frame(width: 52, height: 52)
-                .background(AppColors.cocoa, in: Circle())
-                .overlay(Circle().strokeBorder(AppColors.snow, lineWidth: selected ? 2 : 0))
+    private var shadeRow: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 14) { shadeCells(equalWidth: true) }.frame(maxWidth: .infinity, alignment: .leading)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 14) { shadeCells(equalWidth: true) }
+            }
+        }
+        .frame(height: 48)
+    }
+
+    @ViewBuilder private func shadeCells(equalWidth: Bool) -> some View {
+        ForEach(home.swatches) { shade in
+            let selected = shade == home.currentShade
+            Button { home.choose(shade: shade) } label: {
+                Circle().fill(shade.color)
+                    .frame(width: 48, height: 48)
+                    .glassCircle(tint: shade.color.opacity(0.55))
+                .overlay { if selected { Circle().strokeBorder(AppColors.snow, lineWidth: 2.5) } }
+                .frame(minHeight: 48)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(shade.name))
+            .accessibilityAddTraits(selected ? .isSelected : [])
+        }
+        // The plus opens a menu: photograph a product, or pick a photo, then choose its colour in the sheet.
+        Menu {
+            Button { openPalette(.camera) } label: { Label("Take a Photo", systemImage: "camera") }
+            Button { openPalette(.library) } label: { Label("Choose From Photo", systemImage: "photo") }
+        } label: {
+            Image(systemName: "plus").font(.title2.weight(.medium))
                 .foregroundStyle(AppColors.snow)
+                .frame(width: 48, height: 48)
+                .glassCircle(tint: AppColors.glassLight)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(label)
-        .accessibilityAddTraits(selected ? .isSelected : [])
+        .accessibilityLabel("Add a colour from a product")
+    }
+}
+
+/// The chosen tool's glass capsule. Every tool gets the same id, so changing the choice slides one capsule across.
+private struct SelectedToolGlass: ViewModifier {
+    let selected: Bool
+    let namespace: Namespace.ID
+
+    func body(content: Content) -> some View {
+        if selected {
+            content
+                .glassCapsule(tint: AppColors.glassSelected)
+                .glassEffectID("selected-tool", in: namespace)
+        } else {
+            content
+        }
     }
 }
 
@@ -230,26 +276,27 @@ private struct IntensityBar: View {
     let tint: Color
     @State private var isDragging = false
 
-    private let trackHeight: CGFloat = 14
-    private let thumbSize: CGFloat = 32
+    private let trackHeight: CGFloat = 20 // design: a full-width fade from soft mauve through the shade to near-black
+    private let thumbSize: CGFloat = 28
 
     var body: some View {
         GeometryReader { proxy in
             let travel = max(proxy.size.width - thumbSize, 1)
             let thumbX = thumbSize / 2 + travel * CGFloat(value)
             ZStack(alignment: .leading) {
-                Capsule().strokeBorder(AppColors.snow.opacity(0.9), lineWidth: 1)
-                    .frame(height: trackHeight)
+                // One glass capsule over the fade: no outline, no inner stroke.
                 Capsule()
-                    .fill(LinearGradient(colors: [tint, AppColors.wine], startPoint: .leading, endPoint: .trailing))
-                    .frame(width: thumbX, height: trackHeight - 4)
-                    .padding(.leading, 2)
-                Circle()
-                    .fill(AppColors.snow)
+                    .fill(LinearGradient(colors: [AppColors.glassLight.opacity(0.5), tint, Color.black.opacity(0.9)],
+                                         startPoint: .leading, endPoint: .trailing))
+                    .frame(height: trackHeight)
+                    .glassCapsule(tint: tint.opacity(0.12), interactive: false)
+                // The thumb is glass too and lifts off the track while held.
+                Color.clear
                     .frame(width: thumbSize, height: thumbSize)
-                    .overlay(Circle().fill(tint).frame(width: thumbSize - 14, height: thumbSize - 14))
-                    .shadow(color: .black.opacity(0.35), radius: isDragging ? 6 : 3, y: 1)
-                    .scaleEffect(isDragging ? 1.15 : 1)
+                    .glassCircle(tint: AppColors.snow.opacity(0.9), interactive: false)
+                    .scaleEffect(isDragging ? 1.35 : 1)
+                    .shadow(color: .black.opacity(isDragging ? 0.35 : 0), radius: isDragging ? 8 : 0, y: isDragging ? 5 : 0)
+                    .offset(y: isDragging ? -3 : 0)
                     .position(x: thumbX, y: proxy.size.height / 2)
             }
             .frame(maxHeight: .infinity)
@@ -261,9 +308,9 @@ private struct IntensityBar: View {
                     value = min(max(Double(fraction), 0), 1)
                 }
                 .onEnded { _ in isDragging = false })
-            .animation(.easeOut(duration: 0.12), value: isDragging)
+            .animation(.spring(duration: 0.3, bounce: 0.35), value: isDragging)
         }
-        .frame(height: 44)
+        .frame(height: 36)
         .accessibilityElement()
         .accessibilityLabel("Intensity")
         .accessibilityValue("\(Int(value * 100)) percent")

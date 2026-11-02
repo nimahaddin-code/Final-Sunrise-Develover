@@ -12,7 +12,7 @@ struct AppRootView: View {
         // Preserve staging’s scan-free home after the one-time welcome.
         NavigationStack(path: $navigator.tryOnPath) {
             TryOnHomeView(plan: plan, assessment: assessment, checker: container.faceTracking,
-                          onTutorial: { handoff in navigator.open(.recommendedTutorial(handoff),in:.tryOn) })
+                          onTutorial: { handoff in navigator.open(.tutorialPrep(handoff),in:.tryOn) })
                 .navigationDestination(for: AppRoute.self, destination: destination)
             }
         }
@@ -29,6 +29,13 @@ struct AppRootView: View {
         // -Nimah: Integration routing; teammate feature implementations remain unchanged.
         case .eyebrowGuide: EyebrowOverlayView(checker: container.faceTracking,assessment:assessment)
         case .browBlush(let region): EyebrowOverlayView(checker:container.faceTracking,assessment:assessment,initialRegion:region)
+        case .tutorialPrep(let handoff):
+            TutorialPrepView(onBack: { navigator.tryOnPath.removeLast() },
+                             onStart: {
+                                 // The tutorial replaces this page, so its back button returns to Try On.
+                                 navigator.tryOnPath.removeLast()
+                                 navigator.open(.recommendedTutorial(handoff), in: .tryOn)
+                             })
         case .recommendedTutorial(let handoff):
             GuidedTutorialView(checker:container.faceTracking,assessment:assessment,plan:plan,handoff:handoff)
         case .referenceImport: ReferenceImportView(checker: container.faceTracking, store: container.savedLooks)

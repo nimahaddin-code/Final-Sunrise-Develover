@@ -1,3 +1,12 @@
+## Eyeliner stretch follow and native Liquid Glass — 2026-10-31
+
+`LidFollower` now starts a pull from the skin's own motion (`skinSpeed`/`skinFrames`), holds it until the followed points and
+the detector agree (`stretchRelease`), and pulls back slowly while held (`stretchPullPerResult`); `refresh` + `LinerOverlayModel.refollow`
+redraw the followed lid every camera frame. Tutorial and Try On share the model, so guide dots follow too. Benchmark:
+`LinerStretchTests`. UI controls use `DesignSystem/Components/GlassKit.swift` (native `glassEffect`; tints `AppColors.glassBase`/
+`glassSelected`); the image assets for buttons are gone. Simulator needs iOS 27.0 (target is 26.6); with `xcode-select` on the
+Command Line Tools use `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer`. Device check pending. See ADR 0018.
+
 ## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
 
 `GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it

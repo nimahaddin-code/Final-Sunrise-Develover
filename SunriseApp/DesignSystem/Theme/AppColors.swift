@@ -18,4 +18,32 @@ enum AppColors {
     static let ringLight = Color(red: 0xFF / 255, green: 0xF4 / 255, blue: 0xEA / 255)
     /// Full-screen background of the Try On, tutorial and palette screens (black; wine stays for pills and accents).
     static let screen = Color.black
+    /// Tint of the standard glass controls over the camera (smoky wine, so white icons stay readable on bright pictures).
+    static let glassBase = Color(red: 0x66 / 255, green: 0x00 / 255, blue: 0x33 / 255).opacity(0.38)
+    /// Tint of a chosen glass control: the design's raspberry (#C41E5A) behind the white ring.
+    static let glassSelected = Color(red: 0xC4 / 255, green: 0x1E / 255, blue: 0x5A / 255).opacity(0.9)
+    /// Tint for a flamingo (#F5477D) glass button: glass lifts the tint towards white, so the tint is a step deeper
+    /// (#CC3F6B) and the rendered button lands on the design's #F5477D-looking pink.
+    static let glassAction = Color(red: 0xCC / 255, green: 0x3F / 255, blue: 0x6B / 255)
+    /// Pink of the "Go to Tutorial" button as it renders in the design (#EC2A6B, deeper than the design swatch because glass milks the colour).
+    static let prepPink = Color(red: 0xEC / 255, green: 0x2A / 255, blue: 0x6B / 255)
+    /// Fill of the tutorial's raised bottom-bar buttons (#8D1F44).
+    static let raisedWine = Color(red: 0x8D / 255, green: 0x1F / 255, blue: 0x44 / 255)
+    /// Background of the add-colour sheet: the design's raspberry wine (#8B1C42).
+    static let sheet = Color(red: 0x8B / 255, green: 0x1C / 255, blue: 0x42 / 255)
+    /// Tint of an unchosen style circle over the camera: near white, so the dark picture on it reads (#FFF1F5).
+    static let glassPale = Color(red: 0xFF / 255, green: 0xF1 / 255, blue: 0xF5 / 255).opacity(0.78)
+    /// Tint of the pale mauve add-colour button and the start of the intensity track (#D9A6BD).
+    static let glassLight = Color(red: 0xD9 / 255, green: 0xA6 / 255, blue: 0xBD / 255).opacity(0.6)
+}
+
+/// Full-screen burgundy page background: the `main-bg` asset over wine.
+struct MainBackground: View {
+    var body: some View {
+        AppColors.wine.overlay {
+            Image("main-bg").resizable().scaledToFill()
+        }
+        .clipped()
+        .ignoresSafeArea()
+    }
 }

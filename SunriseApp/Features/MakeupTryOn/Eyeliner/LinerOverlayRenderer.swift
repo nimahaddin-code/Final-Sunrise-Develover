@@ -15,6 +15,20 @@ struct LinerOverlayFrame {
     var skin: InkColor?
 }
 
+extension LinerOverlayFrame {
+    /// Where the tutorial's comparison cuts the picture: the line between the two eyes, so each half is one side of the
+    /// face wherever the person stands. With fewer than two eyes it falls back to `fallback` (the view's middle).
+    func splitX(fallback: CGFloat) -> CGFloat {
+        guard eyes.count == 2 else { return fallback }
+        let centres = eyes.map { eye -> CGFloat in
+            let inner = mapping.map(eye.guide.anchors.innerCorner)
+            let outer = mapping.map(eye.guide.anchors.outerCorner)
+            return (inner.x + outer.x) / 2
+        }
+        return (centres[0] + centres[1]) / 2
+    }
+}
+
 /// Draws the liner into a Core Graphics context in view points. Used by the live SwiftUI canvas and, with the same
 /// numbers, by the photo composition, so a saved photo shows exactly what the screen showed.
 enum LinerOverlayRenderer {

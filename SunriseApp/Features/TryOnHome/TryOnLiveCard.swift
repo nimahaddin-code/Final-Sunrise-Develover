@@ -32,7 +32,7 @@ struct TryOnLiveCard: View {
                     .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
                     .background(AppColors.wine.opacity(0.85), in: Capsule())
                     .foregroundStyle(AppColors.snow)
-                    .padding(.bottom, AppSpacing.medium)
+                    .padding(.bottom, 100)
             }
         }
         // Hold to see the bare face; VoiceOver users toggle it with the action below.
@@ -101,7 +101,7 @@ struct TryOnLiveCard: View {
         }
         .overlay(alignment: .bottom) {
             CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
-                .padding(.bottom, AppSpacing.large)
+                .padding(.bottom, 100)
         }
     }
 

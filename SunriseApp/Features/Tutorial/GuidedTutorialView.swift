@@ -316,6 +316,9 @@ private struct TutorialScreen: View {
     private var lessons: [FaceGuideLesson] { model.lessons }
     private var index: Int { min(model.stepIndex, lessons.count - 1) }
     private var isLast: Bool { index + 1 >= lessons.count }
+    /// The screen light is on: white screen, dark labels (the design's "tutorial w flash").
+    private var lit: Bool { light.isOn && !model.photoMode }
+    private var ink: Color { lit ? .black : AppColors.snow }
 
     var body: some View {
         GeometryReader { proxy in
@@ -334,8 +337,14 @@ private struct TutorialScreen: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background((model.photoMode ? theme.background : AppColors.wine).ignoresSafeArea())
+        .background {
+            if model.photoMode { theme.background.ignoresSafeArea() }
+            else if lit { Color.white.ignoresSafeArea() }
+            else { MainBackground() }
+        }
         .animation(.easeInOut(duration: 0.25), value: theme)
+        .animation(.easeInOut(duration: 0.25), value: lit)
+        .preferredColorScheme(lit ? .light : nil)
         .foregroundStyle(AppColors.snow)
         .overlay {
             if let captured {
@@ -390,8 +399,14 @@ private struct TutorialScreen: View {
 
     private var card: some View {
         ZStack {
-            Color.black
+            if !lit { Color.black }
+            // Light on: the picture fades softly into the white screen instead of ending in a hard edge.
             cameraContent
+                .mask {
+                    RoundedRectangle(cornerRadius: AppSpacing.cornerRadius * 2, style: .continuous)
+                        .padding(lit ? 26 : 0)
+                        .blur(radius: lit ? 26 : 0)
+                }
             if flashing { Color.white.ignoresSafeArea().allowsHitTesting(false) }
             VStack(spacing: AppSpacing.small) {
                 if !model.photoMode { header }
@@ -399,10 +414,8 @@ private struct TutorialScreen: View {
                 if !model.photoMode { bottomCaption }
             }
             .padding(AppSpacing.small)
-            if !model.photoMode, model.brow.availability == .supported, camera.authorized {
-                ScreenLightGlow(light: light)
-            }
         }
+        .animation(.easeInOut(duration: 0.25), value: lit)
         .clipShape(RoundedRectangle(cornerRadius: model.photoMode ? 10 : AppSpacing.cornerRadius, style: .continuous))
     }
 
@@ -493,8 +506,8 @@ private struct TutorialScreen: View {
                 Image(systemName: "chevron.left")
                     .font(.body.weight(.semibold))
                     .frame(width: 44, height: 44)
-                    .background(AppColors.snow.opacity(0.8), in: Circle())
-                    .foregroundStyle(AppColors.wine)
+                    .glassCircle(tint: lit ? AppColors.snow.opacity(0.6) : nil)
+                    .foregroundStyle(ink)
             }
             .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
             Spacer()
@@ -508,12 +521,11 @@ private struct TutorialScreen: View {
                 .font(.body.weight(isLast ? .semibold : .regular))
                 .padding(.horizontal, isLast ? 24 : 18)
                 .frame(height: 44)
-                .background(isLast ? AnyShapeStyle(AppColors.flamingo) : AnyShapeStyle(AppColors.snow.opacity(0.8)), in: Capsule())
-                .foregroundStyle(isLast ? AppColors.snow : AppColors.wine)
+                .glassCapsule(tint: isLast ? AppColors.glassSelected : (lit ? AppColors.snow.opacity(0.6) : nil))
+                .foregroundStyle(isLast ? AppColors.snow : ink)
             }
             .accessibilityLabel(isLast ? "Done" : "Next step")
         }
-        .shadow(color: .black.opacity(0.15), radius: 3, y: 1)
         .animation(.easeInOut(duration: 0.2), value: isLast)
         .buttonStyle(.plain)
     }
@@ -632,7 +644,7 @@ private struct TutorialScreen: View {
                 Button { model.select(tab) } label: {
                     Text(tab.title)
                         .font(.title3.weight(selected ? .semibold : .regular))
-                        .foregroundStyle(AppColors.snow.opacity(selected ? 1 : 0.55))
+                        .foregroundStyle(ink.opacity(selected ? 1 : 0.55))
                         .lineLimit(1).minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity, minHeight: 56)
                 }

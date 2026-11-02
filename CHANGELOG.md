@@ -1,3 +1,17 @@
+## Eyeliner follows a stretched corner, native Liquid Glass UI (2026-10-31)
+
+- `LidFollower`: a pull of the lid is detected from the skin's own motion (no hand mask needed), held until the skin and
+  the detector agree again, with a much slower detector pull-back while held (0.002, was 0.02), so a stretched outer
+  corner keeps its wing. `LidFollower.refresh` + `LinerOverlayModel.refollow` draw the followed lid on every camera frame
+  (60 Hz), not only on detector results (30 Hz). Developer readout shows `pull n/2`.
+- `LinerStretchTests` (10 tests): synthetic skin-pull benchmark. Baseline without a hand: error 0.41 eye widths, with a
+  hand about 0.21; now under 0.08. Rest-state output unchanged.
+- UI: `GlassKit` (native `glassEffect`, `GlassEffectContainer`, `glassEffectID`) replaces the image-asset buttons on Try On,
+  palette sheet, tutorial, photo/result and the camera bar. Blush looks are capsules (names no longer cut). Removed assets:
+  `trailing`, `circle-liquidglass`, `button-circle-selected`, `button-circle-unselect`.
+- Tests: 410 -> 420 executed on an iOS 27.0 Simulator (iPhone 18 Pro; iOS 26.x simulators are below the 26.6 target), 4 skipped, 0 failures.
+- Not checked on a real device: stretch following, glass legibility over the camera. See ADR 0018.
+
 ## Liner hides when the head turns, zoom hint (2026-10-30)
 
 - `LinerOverlayModel.submit`: past 32 degrees of head turn (back under 25) the liner is removed at once and in-flight
