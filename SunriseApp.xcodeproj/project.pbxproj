@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B3F3D772985683090A203B92 /* EyelinerTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1985CD06870F896A31580E6A /* EyelinerTutorial.swift */; };
+		EE3C7BD72A1C6F2ECBD25C95 /* BrowTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */; };
+		57E939C540F41B8C26003DE1 /* BlushTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2050995FB80EEA6772CE79ED /* BlushTutorial.swift */; };
+		BBD99B371CEA67B052D2D704 /* BlushEngine+Draw.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		033A5C6F22B5AC3CD0D490DB /* LiveGuideDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */; };
 		07F174CB78A6BBEEF965D4F0 /* EyeScanTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE546DAE72C16511E6F0464 /* EyeScanTests.swift */; };
@@ -248,6 +252,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1985CD06870F896A31580E6A /* EyelinerTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EyelinerTutorial.swift"; sourceTree = "<group>"; };
+		B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowTutorial.swift"; sourceTree = "<group>"; };
+		2050995FB80EEA6772CE79ED /* BlushTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlushTutorial.swift"; sourceTree = "<group>"; };
+		E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlushEngine+Draw.swift"; sourceTree = "<group>"; };
 		00BBB2277B8061F71917B4DB /* SavedLookMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedLookMetadata.swift; sourceTree = "<group>"; };
 		045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalSavedLooksStore.swift; sourceTree = "<group>"; };
 		06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerGeometryTests.swift; sourceTree = "<group>"; };
@@ -833,9 +841,27 @@
 			path = TryOn;
 			sourceTree = "<group>";
 		};
+		CCC7ACB3B1D49FA8380915A8 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		3D2A4E1EE4C2C00FF7E62161 /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				2050995FB80EEA6772CE79ED /* BlushTutorial.swift */,
+			);
+			path = Tutorial;
+			sourceTree = "<group>";
+		};
 		08BDB6949AB0352E8369738B /* Blush */ = {
 			isa = PBXGroup;
 			children = (
+				3D2A4E1EE4C2C00FF7E62161 /* Tutorial */,
+				CCC7ACB3B1D49FA8380915A8 /* Engine */,
 				2943C61584900A5ADBDCE9E0 /* TryOn */,
 			);
 			path = Blush;
@@ -883,6 +909,7 @@
 		9D48A6299C1E749E0B635219 /* Tutorial */ = {
 			isa = PBXGroup;
 			children = (
+				B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */,
 				7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */,
 			);
 			path = Tutorial;
@@ -936,6 +963,7 @@
 		80C6011C0108DA32B5EDD767 /* Tutorial */ = {
 			isa = PBXGroup;
 			children = (
+				1985CD06870F896A31580E6A /* EyelinerTutorial.swift */,
 				7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */,
 			);
 			path = Tutorial;
@@ -1307,6 +1335,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3F3D772985683090A203B92 /* EyelinerTutorial.swift in Sources */,
+				EE3C7BD72A1C6F2ECBD25C95 /* BrowTutorial.swift in Sources */,
+				57E939C540F41B8C26003DE1 /* BlushTutorial.swift in Sources */,
+				BBD99B371CEA67B052D2D704 /* BlushEngine+Draw.swift in Sources */,
 				E28CA8BC201771E861AFEA21 /* AppNavigator.swift in Sources */,
 				7115E09FBA46C990F2D232A2 /* AppRoute.swift in Sources */,
 				5811410751FADBA1C66E1183 /* AppContainer.swift in Sources */,

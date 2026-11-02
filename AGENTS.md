@@ -14,11 +14,19 @@ live code still uses: `FaceContourDetector`/`SendablePixelBuffer`, `FaceShapeCla
 project). `Onboarding/` (welcome) stays. `SunriseDebugMac` paths follow. Types keep their names; resources load by bundle
 name. Older notes below use the old paths:
 
+Split, no logic change (2026-11-02, second commit): each tool's tutorial is in its `Tutorial/` folder as an extension of
+`GuidedTutorialModel` (`BlushTutorial.swift`: `blushLessons` and `BlushTutorialOverlay`, now internal;
+`BrowTutorial.swift`: `browLessons`; `EyelinerTutorial.swift`: `linerLessons`, `linerShowsLower`); the shell
+(`GuidedTutorialView.swift`: handoff, compare, tabs, per-tab `liveConfiguration`, screen, photo) stays in
+`Shared/Tutorial/`. The blush parts of the engine moved from `BeautyBlushEngine.swift` to
+`TryOn/Blush/Engine/BlushEngine+Draw.swift` (cheek landmark fit, guide outlines, `bind`, `prepareBlush`, `encodeBlush`), like
+the brow's `BrowEngine+*`; `Core/Engine/BeautyBlushEngine.swift` keeps state, setup, configure/submit, `render`, the mask.
+
 | Old | New |
 | --- | --- |
 | `Features/TryOnHome/` | `TryOn/Shared/Home/`; brow/liner pickers in their tool's `TryOn/`; prep page in `Shared/Tutorial/` |
 | `Features/Tutorial/` | `TryOn/Shared/Tutorial/` (`GuidedTutorialView`, photo); `BrowTutorialOverlay` → `Brow/Tutorial/`, `LinerStepGuide` → `Eyeliner/Tutorial/` |
-| `Features/BeautyBlush/`, `Features/Blush/` | engine in `Core/Engine/`; config and placement in `TryOn/Blush/TryOn/` |
+| `Features/BeautyBlush/`, `Features/Blush/` | shared engine in `Core/Engine/`, blush drawing in `TryOn/Blush/Engine/`; config and placement in `TryOn/Blush/TryOn/` |
 | `Features/Eyebrow/`, `Features/Brow/` | `TryOn/Brow/TryOn/` (style, overlays, view model, picker) and `TryOn/Brow/Engine/` (drawing, tracking, eraser, forehead guide) |
 | `Features/MakeupTryOn/Eyeliner/` | `TryOn/Eyeliner/Engine/` (with `LinerGeometry`); `EyelinerPlanner` → `Eyeliner/TryOn/` |
 | `Features/LiveGuide/`, `Features/CameraGuidance/` | `TryOn/Shared/Camera/` |
