@@ -1,3 +1,9 @@
+## Brow tracker frames via VideoToolbox — Khalish (2026-11-01)
+
+The brow tracker's 512 px BGRA frame for MediaPipe is made with `VTPixelTransferSession` (hardware scale and YCbCr to BGRA)
+instead of `CIContext.render`, which stays as the fallback for a failed transfer. Session created lazily, used only on the
+tracker queue, invalidated in `stop()`. Simulator build only; device timing and colour not measured.
+
 ## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
 
 `GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it

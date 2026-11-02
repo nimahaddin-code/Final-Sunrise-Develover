@@ -1,3 +1,12 @@
+## Brow tracker frames via VideoToolbox — Khalish (2026-11-01)
+
+`MediaPipeBrowTracker.bgra(from:)` scales the ARKit YCbCr frame to the 512-long-side BGRA pool buffer with a lazily created
+`VTPixelTransferSession` (scaling mode normal, whole source, one call) instead of a Core Image graph per frame. The session lives
+on the tracker's serial queue and is invalidated there in `stop()`. If a transfer fails, that frame uses the old `CIContext` render
+(still lazy). MediaPipe's `MPImage(pixelBuffer:)` only takes BGRA/RGBA buffers (`MPPImage+Utils.mm`), so a conversion stays
+needed. VT uses the buffer's YCbCr matrix attachments and writes the pool buffer's own colour space; no extra colour management.
+Simulator build only; device timing and colour match not measured.
+
 ## Blush tutorial per UX spec 3.5 — -Nimah (2026-10-29)
 
 `GuidedTutorialModel.blushLessons`: two steps, "Dab a little blush inside the small circle." / "Dab outward to blend it
