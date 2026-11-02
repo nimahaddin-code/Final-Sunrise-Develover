@@ -38,7 +38,11 @@ final class BeautyBlushEngine:@unchecked Sendable {
     struct Field {var ellipse:SIMD4<Float>;var shape:SIMD4<Float>;var limits:SIMD4<Float>}
     struct Bake {var left:Field;var right:Field;var bridge=Field(ellipse:.zero,shape:.zero,limits:.zero);var paint=SIMD4<Float>.zero;var options=SIMD4<Float>.zero;var mouth=SIMD4<Float>.zero}
     struct Settings {
-        var comparisonSplit=false;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
+        var comparisonSplit=false;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()
+        /// Blush drawn too (on the brow path when the brow is also on). Its own shade and strength: brow and blush differ.
+        var pigmentHalf=PigmentHalf.full
+        var withBlush=false;var blushTint=SIMD3<Float>(0.9,0.3,0.45);var blushIntensity:Float=0.72
+    }
     /// Developer brow view (`BrowDebugView` raw value), read each frame so the developer picker applies live.
     static let browDebugKey="beautyBrow.debugView"
     /// Developer blush blend and diagnostic (`BlushBlend` / `BlushDiagnostic` raw values), read each frame; only
@@ -96,7 +100,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     var browDrawPending=false
     var lastBrowDraw:Double = -.infinity
     /// The 3D hair brow: its mesh on the GPU, and the ARKit face mesh drawn as depth only so far hairs hide behind the face.
-    var hairBuffer:MTLBuffer?,hairVertexCount=0
+    var hairBuffer:MTLBuffer?,hairLODBuffer:MTLBuffer?,hairVertexCount=0,hairLODVertexCount=0
     var faceMeshVertices:[MTLBuffer]=[],faceMeshIndices:MTLBuffer?,faceMeshIndexCount=0
     var browLight:Float=1
     var browFaceTriangles:[UInt16]=[]
@@ -110,7 +114,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     var emptyFill:MTLTexture?
     var browStatus:String?? = .none
     var style:BlushPlacementStyle?,anchorID:UUID?,frameTime:Double=0
-    var visibility=BeautyBlushVisibility(),lastSegment:Double=0
+    var visibility=BeautyBlushVisibility(),blushVisibility=BeautyBlushVisibility(),lastSegment:Double=0
     let segmenter=HandOcclusionSegmenter(faceSkinOnly:true)
     var segmentationTask:Task<Void,Never>?
     var segmentationStarting=false,latestMask:OcclusionMask?
@@ -120,6 +124,10 @@ final class BeautyBlushEngine:@unchecked Sendable {
     /// The tracking view's per-frame readout (nil when the brow is not in tracking view).
     var onTracking:(@Sendable (BrowTrackingSnapshot?)->Void)?
     var browResultTimes:[Double]=[]
+    var browTrackerSubmitted=0,browTrackerDropped=0
+    /// Tracking diagnostics are developer-only; publishing them at camera
+    /// rate causes SwiftUI to rebuild dozens of labels unnecessarily.
+    var lastTrackingPublish:Double = -.infinity
     var lastError:String?
     var presentedFrames=0,pigmentFrames=0,projectionErrorPixels:Double=0
     var maskAgeMilliseconds:Double = -1
@@ -131,6 +139,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
             let engine=try await Task.detached(priority:.userInitiated) { try BeautyBlushEngine() }.value
             guard view.window != nil else{return nil}
             view.beautyLayer.device=engine.device;view.beautyLayer.pixelFormat = .bgra8Unorm_srgb
+            // Colour-managed as sRGB like ARSCNView's camera; with no colour space iOS shows the bytes unmanaged.
+            view.beautyLayer.colorspace=CGColorSpace(name:CGColorSpace.sRGB)
             view.beautyLayer.framebufferOnly=true;view.beautyLayer.isOpaque=true;view.beautyLayer.isHidden=true
             view.beautyLayer.actions=["bounds":NSNull(),"position":NSNull(),"contents":NSNull()]
             view.beautyLayer.maximumDrawableCount=3;view.layer.addSublayer(view.beautyLayer)
@@ -193,7 +203,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
     @MainActor func configure(_ c:EyebrowConfiguration?) {
         let enabled=c.map { $0.previewAfter && ($0.layered ? ($0.browLayer.on || $0.blushLayer.on):(($0.needsBlush || $0.needsBrow) && $0.showMakeupPreview)) } ?? false
         lock.lock()
-        let nextBrow=c.map {$0.needsBrow && !$0.needsBlush} ?? false
+        // The brow path runs whenever the brow is on and draws the blush in the same frame when that is on too.
+        let nextBrow=c.map {$0.needsBrow} ?? false
         let previousBlushStyle=settings.style
         let previousIsBrow=settings.isBrow,previousEnabled=settings.enabled
         if settings.isBrow != nextBrow || settings.enabled != enabled {
@@ -214,8 +225,20 @@ final class BeautyBlushEngine:@unchecked Sendable {
             lastBindAttempt = -.infinity
         }
         settings.enabled=enabled
-        if let c {settings.comparisonSplit=c.comparisonSplit;settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
+        if let c {
+            settings.comparisonSplit=c.comparisonSplit;settings.pigmentHalf=c.pigmentHalf ?? (c.comparisonSplit ? .left:.full);settings.isBrow=c.needsBrow;settings.withBlush=c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay
+            settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow
+            let browDefault=SIMD3<Float>(0.2,0.13,0.09),blushDefault=SIMD3<Float>(0.9,0.3,0.45)
+            settings.tint=c.layered ? c.browLayer.tint ?? browDefault:c.shadeTint ?? browDefault
+            settings.intensity=c.layered ? c.browLayer.intensity:c.previewIntensity
+            settings.blushTint=c.layered ? c.blushLayer.tint ?? blushDefault:c.shadeTint ?? blushDefault
+            settings.blushIntensity=c.layered ? c.blushLayer.intensity:c.previewIntensity
+        }
         if !enabled {setLayerShown(false)}
+        // Nothing of ours on screen (e.g. the eyeliner tab): release the face landmarker so it does not compete with the
+        // eyeliner's own MediaPipe detector. It starts again with the brow or the blush.
+        let stopTracker = !enabled && (browTracker.isAvailable || browTrackerStarting)
+        if stopTracker {browTrackerStarting=false;browFrames=[:]}
         if enabled && nextBrow,let overlay=settings.browOverlay {BrowSpriteStore.shared.prepare(overlay);if overlay.is3D {BrowHairStore.shared.prepare()}}
         let start=enabled && !segmenter.isAvailable && !segmentationStarting
         if start {segmentationStarting=true}
@@ -223,6 +246,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         let startTracker=enabled && !browTracker.isAvailable && !browTrackerStarting
         if startTracker {browTrackerStarting=true}
         lock.unlock()
+        if stopTracker {browTrackerTask?.cancel();browTrackerTask=nil;browTracker.stop()}
         if startTracker {
             browTrackerTask=Task { [weak self] in
                 guard let self else{return}
@@ -267,8 +291,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
         lock.lock();settings.epoch=UUID();settings.enabled=false;latestMask=nil;segmentationStarting=false;browTrackerStarting=false;browFrames=[:];lock.unlock()
         segmenter.stop();browTracker.stop()
         queue.async { [self] in
-            visibility=BeautyBlushVisibility();frameTime=0;anchorID=nil;style=nil;lastError=nil;lastSegment=0
-            browSmoother.reset();browStabilizer.reset();browStatus = .none;browLatest=nil;lastBrowDraw = -.infinity
+            visibility=BeautyBlushVisibility();blushVisibility=BeautyBlushVisibility();frameTime=0;anchorID=nil;style=nil;lastError=nil;lastSegment=0
+            browSmoother.reset();browStabilizer.reset();browStatus = .none;browLatest=nil;lastBrowDraw = -.infinity;lastTrackingPublish = -.infinity
             lock.lock()
             attemptedBlushStyle=nil;lastBindAttempt = -.infinity;atlas=nil;blushLandmarks=nil
             lock.unlock()
@@ -308,8 +332,14 @@ final class BeautyBlushEngine:@unchecked Sendable {
     /// kept; after `blushLandmarkSamples` of them their median becomes this anchor's cheek fit and the atlas is re-baked.
     func collectBlushLandmarks(_ result:BrowTrackerResult) {
         lock.lock();let entry=browFrames.removeValue(forKey:result.token);let s=settings;lock.unlock()
-        guard let entry,s.enabled,!s.isBrow,s.epoch==entry.epoch,let face=entry.face,let o=result.observation,o.mesh.count>=468,
-              abs(o.pose.yaw)<15,abs(o.pose.pitch)<15 else {return}
+        guard let entry,s.enabled,!s.isBrow,s.epoch==entry.epoch,let o=result.observation else {return}
+        addBlushSample(o,face:entry.face)
+    }
+    /// One MediaPipe answer for the blush cheek fit (blush alone, or alongside the brow). Frontal faces only; render queue.
+    func addBlushSample(_ o:BrowObservation,face:BrowFaceFrame?) {
+        guard let face,o.mesh.count>=468,abs(o.pose.yaw)<15,abs(o.pose.pitch)<15 else {return}
+        lock.lock();let measured=blushLandmarks?.anchor==face.anchorID;lock.unlock()
+        guard !measured else {return}
         if blushSampleAnchor != face.anchorID {blushSamples=[];blushSampleAnchor=face.anchorID}
         let points=BlushCheekLandmarks.indices.compactMap {face.faceLocal(at:o.mesh[$0])}
         guard BlushCheekLandmarks(points:points) != nil else {return}
@@ -406,15 +436,17 @@ final class BeautyBlushEngine:@unchecked Sendable {
         BlushPlacementGenerator.mouthExclusion(vertices:vertices,triangles:triangles,eyes:eyes)
     }
 
-    func render(_ frame:ARFrame,face anchor:ARFaceAnchor?,settings s:Settings) {
-        guard inFlight.wait(timeout:.now()) == .success else{return}
-        var committed=false
-        defer {if !committed {inFlight.signal()}}
-        guard CVPixelBufferGetPlaneCount(frame.capturedImage)>=2,let (cy,y)=texture(frame.capturedImage,plane:0,format:.r8Unorm),let (cc,cb)=texture(frame.capturedImage,plane:1,format:.rg8Unorm),
-              let drawable=layer?.nextDrawable(),let command=commands.makeCommandBuffer() else{return}
-        let frameSlot=slot%3;slot += 1
-        let size=CGSize(width:drawable.texture.width,height:drawable.texture.height)
-        ensureDepth(for:drawable)
+    /// One frame's blush face pass, prepared before the frame's render encoder starts (it may bake the atlas on `command`):
+    /// fit and atlas, hand mask, visibility, this frame's smoothed mesh and the tutorial outlines. `surface` is nil when
+    /// there is no face to draw on; `u` is still valid for the camera background.
+    struct BlushPrepared {
+        var u:Uniforms
+        var surface:(buffer:MTLBuffer,atlas:MTLTexture,indices:MTLBuffer,obstruction:MTLTexture)?
+        var diagnostic:BlushDiagnostic
+        var opacity:Double,fresh:Bool,tracked:Bool
+        var view:simd_float4x4,projection:simd_float4x4
+    }
+    func prepareBlush(_ frame:ARFrame,face anchor:ARFaceAnchor?,settings s:Settings,frameSlot:Int,size:CGSize,command:MTLCommandBuffer)->BlushPrepared {
         // -Nimah: Match ARSCNView camera orientation; do not add a category-only reflection.
         let raw=Self.affine(frame.displayTransform(for:s.orientation,viewportSize:s.viewport).inverted())
         let view=frame.camera.viewMatrix(for:s.orientation)
@@ -491,13 +523,13 @@ final class BeautyBlushEngine:@unchecked Sendable {
         }
         maskAgeMilliseconds=mask.map {max(0,CACurrentMediaTime()-$0.time)*1000} ?? -1
         let compatible=anchorID==anchor?.identifier && style==s.style && atlas != nil
-        let visible=visibility.update(timestamp:frame.timestamp,target:tracked && compatible ? maskWeight:0,tau:config.visibility_tau_seconds)
+        let visible=blushVisibility.update(timestamp:frame.timestamp,target:tracked && compatible ? maskWeight:0,tau:config.visibility_tau_seconds)
         let opacity=maskWeight>0 ? BeautyMaskContinuity.opacity(filtered:visible,age:age,freshAge:config.mask_max_age_seconds,fadeSeconds:config.mask_fade_seconds):0
         let matrixAttachment=CVBufferCopyAttachment(frame.capturedImage,kCVImageBufferYCbCrMatrixKey,nil) as? String
         let transfer=CVBufferCopyAttachment(frame.capturedImage,kCVImageBufferTransferFunctionKey,nil) as? String
         let full=CVPixelBufferGetPixelFormatType(frame.capturedImage)==kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
         var u=Uniforms(mvp:projection*view*(anchor?.transform ?? matrix_identity_float4x4),rawFromClip:raw,maskFromRaw:maskTransform,
-            shade:SIMD4(BeautyBlushConfiguration.linear(s.tint.x),BeautyBlushConfiguration.linear(s.tint.y),BeautyBlushConfiguration.linear(s.tint.z),s.intensity),
+            shade:SIMD4(BeautyBlushConfiguration.linear(s.blushTint.x),BeautyBlushConfiguration.linear(s.blushTint.y),BeautyBlushConfiguration.linear(s.blushTint.z),s.blushIntensity),
             controls:SIMD4(config.coverage,config.absorption,config.saturation,config.pigment_mix),tracking:SIMD4(Float(opacity),0,1/Float(size.width),1/Float(size.height)),
             camera:SIMD4(matrixAttachment==(kCVImageBufferYCbCrMatrix_ITU_R_709_2 as String) ? 1:0,full ? 1:0,transfer==(kCVImageBufferTransferFunction_ITU_R_709_2 as String) ? 1:0,0),
             stretch:SIMD4(config.stretch_fade[0],config.stretch_fade[1],config.stretch_fade[2],config.stretch_fade[3]))
@@ -505,12 +537,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         let blend=developer ? BlushBlend(rawValue:UserDefaults.standard.integer(forKey:Self.blushBlendKey)) ?? .pigment:.pigment
         let diagnostic=developer ? BlushDiagnostic(rawValue:UserDefaults.standard.integer(forKey:Self.blushDiagnosticKey)) ?? .final:.final
         u.blush=SIMD4(Float(blend.rawValue),Float(diagnostic.shaderValue),config.detail_radius_px,0)
-        let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=drawable.texture;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
-        pass.depthAttachment.texture=depthTexture;pass.depthAttachment.loadAction = .clear;pass.depthAttachment.storeAction = .dontCare;pass.depthAttachment.clearDepth=1
-        guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
-        e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
-        e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
-        if s.comparisonSplit {e.setScissorRect(MTLScissorRect(x:0,y:0,width:max(1,drawable.texture.width/2),height:drawable.texture.height))}
+        var surface:(buffer:MTLBuffer,atlas:MTLTexture,indices:MTLBuffer,obstruction:MTLTexture)?
         if let anchor,anchorID==anchor.identifier,style==s.style,let atlas,let ib=indices,let obstruction=frameMask,!vertices.isEmpty {
             let buffer=vertices[frameSlot]
             let pointer=buffer.contents().bindMemory(to:Vertex.self,capacity:rest.count)
@@ -535,22 +562,56 @@ final class BeautyBlushEngine:@unchecked Sendable {
                     guideSeen=frame.timestamp;onBlushGuide?(snapshot);guidePublished=true
                 } else if guidePublished && frame.timestamp-guideSeen>Self.guideHoldSeconds {onBlushGuide?(nil);guidePublished=false}
             }
-            e.setCullMode(.none) // Native mesh depth prepass resolves visible surfaces without mirrored-winding assumptions.
-            e.setVertexBuffer(buffer,offset:0,index:0);e.setVertexBytes(&u,length:MemoryLayout<Uniforms>.stride,index:1)
-            e.setRenderPipelineState(depth);e.setDepthStencilState(depthWrite)
-            e.drawIndexedPrimitives(type:.triangle,indexCount:indexCount,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0)
-            e.setRenderPipelineState(face);e.setDepthStencilState(depthRead);e.setFragmentTexture(atlas,index:2);e.setFragmentTexture(obstruction,index:3);
-            e.drawIndexedPrimitives(type:.triangle,indexCount:indexCount,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0)
-            if diagnostic == .wireframe {
-                // The native ARKit triangles as drawn this frame, front and back (no depth test).
-                e.setRenderPipelineState(wire);e.setDepthStencilState(noDepth);e.setTriangleFillMode(.lines)
-                e.drawIndexedPrimitives(type:.triangle,indexCount:indexCount,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0)
-                e.setTriangleFillMode(.fill)
-            }
+            surface=(buffer,atlas,ib,obstruction)
         }
         // Outlines leave with the face, or when the tutorial guide is turned off.
         let guideSurface=anchor.map {anchorID==$0.identifier && style==s.style && atlas != nil} ?? false
         if guidePublished && (!s.guide || (!guideSurface && frame.timestamp-guideSeen>Self.guideHoldSeconds)) {onBlushGuide?(nil);guidePublished=false}
+        return BlushPrepared(u:u,surface:surface,diagnostic:diagnostic,opacity:opacity,fresh:fresh,tracked:tracked,view:view,projection:projection)
+    }
+    /// Draws a prepared blush onto the face (depth prepass, pigment, optional wireframe), leaving depth testing off.
+    func encodeBlush(_ p:BlushPrepared,_ e:MTLRenderCommandEncoder) {
+        guard let surface=p.surface else {return}
+        var u=p.u
+        e.setCullMode(.none) // Native mesh depth prepass resolves visible surfaces without mirrored-winding assumptions.
+        e.setVertexBuffer(surface.buffer,offset:0,index:0);e.setVertexBytes(&u,length:MemoryLayout<Uniforms>.stride,index:1)
+        e.setRenderPipelineState(depth);e.setDepthStencilState(depthWrite)
+        e.drawIndexedPrimitives(type:.triangle,indexCount:indexCount,indexType:.uint16,indexBuffer:surface.indices,indexBufferOffset:0)
+        e.setRenderPipelineState(face);e.setDepthStencilState(depthRead);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0)
+        e.setFragmentTexture(surface.atlas,index:2);e.setFragmentTexture(surface.obstruction,index:3)
+        e.drawIndexedPrimitives(type:.triangle,indexCount:indexCount,indexType:.uint16,indexBuffer:surface.indices,indexBufferOffset:0)
+        if p.diagnostic == .wireframe {
+            // The native ARKit triangles as drawn this frame, front and back (no depth test).
+            e.setRenderPipelineState(wire);e.setDepthStencilState(noDepth);e.setTriangleFillMode(.lines)
+            e.drawIndexedPrimitives(type:.triangle,indexCount:indexCount,indexType:.uint16,indexBuffer:surface.indices,indexBufferOffset:0)
+            e.setTriangleFillMode(.fill)
+        }
+        e.setDepthStencilState(noDepth)
+    }
+    func render(_ frame:ARFrame,face anchor:ARFaceAnchor?,settings s:Settings) {
+        guard inFlight.wait(timeout:.now()) == .success else{return}
+        var committed=false
+        defer {if !committed {inFlight.signal()}}
+        guard CVPixelBufferGetPlaneCount(frame.capturedImage)>=2,let (cy,y)=texture(frame.capturedImage,plane:0,format:.r8Unorm),let (cc,cb)=texture(frame.capturedImage,plane:1,format:.rg8Unorm),
+              let drawable=layer?.nextDrawable(),let command=commands.makeCommandBuffer() else{return}
+        let frameSlot=slot%3;slot += 1
+        let size=CGSize(width:drawable.texture.width,height:drawable.texture.height)
+        ensureDepth(for:drawable)
+        let blush=prepareBlush(frame,face:anchor,settings:s,frameSlot:frameSlot,size:size,command:command)
+        var u=blush.u
+        let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=drawable.texture;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
+        pass.depthAttachment.texture=depthTexture;pass.depthAttachment.loadAction = .clear;pass.depthAttachment.storeAction = .dontCare;pass.depthAttachment.clearDepth=1
+        guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
+        e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
+        e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
+        // The camera fills the view in every comparison layout; only the pigment is limited to its half.
+        let half=drawable.texture.width/2
+        switch s.pigmentHalf {
+        case .none:break
+        case .full:encodeBlush(blush,e)
+        case .left:e.setScissorRect(MTLScissorRect(x:0,y:0,width:max(1,half),height:drawable.texture.height));encodeBlush(blush,e)
+        case .right:e.setScissorRect(MTLScissorRect(x:half,y:0,width:max(1,drawable.texture.width-half),height:drawable.texture.height));encodeBlush(blush,e)
+        }
         e.endEncoding()
         if let anchor {
             let world=SIMD3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
@@ -558,7 +619,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             let rp=frame.camera.projectPoint(world,orientation:.landscapeRight,viewportSize:rawSize)
             let normalized=CGPoint(x:rp.x/rawSize.width,y:rp.y/rawSize.height)
             let expected=normalized.applying(frame.displayTransform(for:s.orientation,viewportSize:s.viewport))
-            let clip=projection*view*SIMD4(world,1)
+            let clip=blush.projection*blush.view*SIMD4(world,1)
             let actual=CGPoint(x:CGFloat(clip.x/clip.w)*0.5+0.5,y:0.5-CGFloat(clip.y/clip.w)*0.5)
             projectionErrorPixels=hypot((expected.x-actual.x)*s.viewport.width,(expected.y-actual.y)*s.viewport.height)
         }
@@ -567,7 +628,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         #endif
         command.present(drawable)
         let ts=frame.timestamp
-        if tracked && opacity>0.9 {pigmentFrames += 1;lastError=nil}
+        if blush.tracked && blush.opacity>0.9 {pigmentFrames += 1;lastError=nil}
         let retained=FrameLifetime(y:cy,cb:cc,frame:frame)
         let completionGate=inFlight
         command.addCompletedHandler { [weak self] cb in
@@ -577,7 +638,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
                 guard let self else{return};self.lock.lock();let show=self.settings.enabled && self.settings.epoch==s.epoch;self.lock.unlock()
                 if show {self.setLayerShown(true)}
             }
-            self?.queue.async { [weak self] in self?.report(cb,frameTimestamp:ts,maskFresh:fresh,visibility:opacity,isBrow:false) }
+            self?.queue.async { [weak self] in self?.report(cb,frameTimestamp:ts,maskFresh:blush.fresh,visibility:blush.opacity,isBrow:false) }
         }
         committed=true;command.commit()
     }
@@ -624,7 +685,15 @@ final class BeautyBlushEngine:@unchecked Sendable {
         guard now-reportStart>=2 else{return}
         let sorted=ages.sorted(),p95=sorted[min(sorted.count-1,Int(Double(sorted.count)*0.95))]
         var report:[String:Any]=["engine":isBrow ? "mediapipe_metal":"arkit_metal_uv","category":isBrow ? "eyebrow":"blush","fps_completed":Double(reportFrames)/(now-reportStart),"fps_presented":Double(presentedFrames)/(now-reportStart),"pigment_frames":pigmentFrames,"projection_error_pixels":projectionErrorPixels,"gpu_ms_mean":gpuTimes.reduce(0,+)/Double(gpuTimes.count),"frame_age_ms_p95":p95,"thermal_state":ProcessInfo.processInfo.thermalState.rawValue,"mask_fresh":maskFresh,"mask_age_ms":maskAgeMilliseconds,"segmenter_available":segmenter.isAvailable,"visibility":visibility,"error":lastError ?? "none","shader_error":cb.error?.localizedDescription ?? "none"]
-        if isBrow {report["landmark_latency_ms"]=browTracker.lastLatencyMs;report["brow_tracker_available"]=browTracker.isAvailable;report["brow_stabilized"]=browStabilized}
+        if isBrow {
+            lock.lock(); let trackerSubmitted = browTrackerSubmitted, trackerDropped = browTrackerDropped; browTrackerSubmitted = 0; browTrackerDropped = 0; lock.unlock()
+            report["landmark_latency_ms"] = browTracker.lastLatencyMs
+            report["brow_tracker_available"] = browTracker.isAvailable
+            report["brow_stabilized"] = browStabilized
+            report["tracker_submitted"] = trackerSubmitted
+            report["tracker_dropped"] = trackerDropped
+            if let eraser { let m = eraser.modelMetrics; report["eraser_model_requests"] = m.requests; report["eraser_model_latency_ms"] = m.latencyMs }
+        }
         // The brow publishes its own status as soon as it changes (a face found or lost cannot wait two seconds).
         if !isBrow {onStatus?(lastError != nil || cb.error != nil ? String(localized:"Makeup is temporarily unavailable") : (!maskFresh && visibility<0.1 ? String(localized:"Preparing makeup visibility"):nil))}
         if let data=try? JSONSerialization.data(withJSONObject:report) {UserDefaults.standard.set(data,forKey:isBrow ? "beautyBrow.metrics":"beautyBlush.metrics")}

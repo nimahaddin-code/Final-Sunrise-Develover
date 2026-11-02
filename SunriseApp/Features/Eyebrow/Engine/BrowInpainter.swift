@@ -10,6 +10,10 @@ final class BrowInpainter: @unchecked Sendable {
     private let model: MLModel?
     private let inputName: String
     private let outputName: String
+    /// Core ML accepts the same shaped tensor for every crop. Reuse it on the
+    /// model queue to avoid allocating and zeroing a 1 MB MLMultiArray for
+    /// every inpaint request.
+    private var reusableInput: MLMultiArray?
 
     init(bundle: Bundle = .main) {
         let configuration = MLModelConfiguration()
@@ -27,7 +31,17 @@ final class BrowInpainter: @unchecked Sendable {
     /// bytes, known pixels unchanged. Blocking; call it off the render queue.
     func inpaint(rgba: [UInt8], hole: [UInt8]) throws -> [UInt8] {
         guard let model else { throw CocoaError(.featureUnsupported) }
-        let input = try Self.input(rgba: rgba, hole: hole)
+        guard rgba.count == Self.side * Self.side * 4, hole.count == Self.side * Self.side else {
+            throw CocoaError(.coderInvalidValue)
+        }
+        let input: MLMultiArray
+        if let reusableInput, reusableInput.count == Self.side * Self.side * 4 {
+            input = reusableInput
+            Self.fill(input: input, rgba: rgba, hole: hole)
+        } else {
+            input = try Self.input(rgba: rgba, hole: hole)
+            reusableInput = input
+        }
         let features = try MLDictionaryFeatureProvider(dictionary: [inputName: MLFeatureValue(multiArray: input)])
         guard let output = try model.prediction(from: features).featureValue(for: outputName)?.multiArrayValue else {
             throw CocoaError(.coderValueNotFound)
@@ -41,13 +55,18 @@ final class BrowInpainter: @unchecked Sendable {
         let n = side * side
         guard rgba.count == n * 4, hole.count == n else { throw CocoaError(.coderInvalidValue) }
         let array = try MLMultiArray(shape: [1, 4, NSNumber(value: side), NSNumber(value: side)], dataType: .float32)
+        fill(input: array, rgba: rgba, hole: hole)
+        return array
+    }
+
+    private static func fill(input array: MLMultiArray, rgba: [UInt8], hole: [UInt8]) {
+        let n = side * side
         let pointer = array.dataPointer.bindMemory(to: Float.self, capacity: n * 4)
         for i in 0..<n {
             let keep: Float = hole[i] > 127 ? 0 : 1
             pointer[i] = keep - 0.5
             for c in 0..<3 { pointer[(c + 1) * n + i] = (Float(rgba[i * 4 + c]) / 127.5 - 1) * keep }
         }
-        return array
     }
 
     /// The generator's 1 x 3 x 256 x 256 output (-1...1) where the mask fills, the original bytes elsewhere.

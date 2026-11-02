@@ -16,6 +16,9 @@ struct TutorialHandoff: Hashable {
     var blushStyle: BlushPlacementStyle? = nil
     var browOverlay: BrowOverlay? = nil
     var hideNaturalBrow = false
+    /// The tools with makeup on when Try On was left. The photo shows exactly these, each as last chosen; a tab for a
+    /// tool that was off still guides, without a makeup preview.
+    var enabled: Set<TryOnTool> = Set(TryOnTool.allCases)
 }
 
 /// What one half of the camera shows in the comparison.
@@ -185,6 +188,19 @@ enum TutorialTab: CaseIterable, Identifiable {
             return value
         }
         if !hasGuide || compare == .plain { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
+        // No brow chosen on Try On: the brow guide is still drawn by the makeup engine, so it stays on, with no brow
+        // picture and the natural brow left alone. (Turning the preview off stopped the engine and took the guide with it.)
+        if tab == .brows && !handoff.enabled.contains(.eyebrow) { value.browOverlay = nil; value.hideNaturalBrow = false }
+        if tab == .blush && hasGuide {
+            // Like the eyeliner: the look on its half, the step guide on the other half over the bare camera, the plain
+            // camera on either side. The Metal camera stays on in every layout and only the pigment is clipped, so the
+            // halves never come from different cameras.
+            let look = compare.side(of: .tryOn)
+            value.pigmentHalf = !handoff.enabled.contains(.blush) ? PigmentHalf.none : (look.map { $0 == .leading ? PigmentHalf.left : .right } ?? PigmentHalf.none)
+            value.showMakeupPreview = true
+            value.showGuide = compare.showsGuide
+            value.comparisonSplit = false
+        }
         // A look beside the plain camera has no guide outline over it.
         else if compare.plainBesideLook != nil { value.showGuide = false; value.showMappingFormula = false }
         return value
@@ -442,9 +458,10 @@ private struct TutorialScreen: View {
                                   eyebrowConfiguration: guideConfiguration, onFrame: { [relay = model.relay] frame, face in
                                       relay.deliver(frame, face)
                                   }, reducedFrameRate: advisor.reducesLoad)
-                    if model.tab == .blush && model.compare != .plain && model.hasGuide && !model.photoMode {
+                    if model.tab == .blush, model.hasGuide, !model.photoMode, let side = model.compare.side(of: .guide) {
+                        // The guide's half only, over the bare camera; the look is on the other half.
                         BlushTutorialOverlay(feed: camera.blushGuide, step: index)
-                            .mask(alignment: .leading) { halfMask(left: model.compare.plainBesideLook != nil) }
+                            .mask { halfMask(left: side == .leading) }
                     }
                     if model.photoMode {
                         // Plain camera: nothing drawn on the face.
@@ -459,7 +476,7 @@ private struct TutorialScreen: View {
                                            showsLower: model.linerShowsLower)
                                 .id(index)
                         }
-                    } else if model.tab != .eyeliner, model.compare.plainBesideLook != nil {
+                    } else if model.tab == .brows, model.compare.plainBesideLook != nil {
                         // The same camera without the look, covering its half.
                         RealCameraView(session: camera.trackingManager.session)
                             .mask(alignment: .trailing) { halfMask(left: false) }

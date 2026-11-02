@@ -96,11 +96,18 @@ enum BrowDebugView: Int, CaseIterable, Identifiable {
 /// Picks the `BrowDebugView` the brow engine renders; shown only while developer tools are on.
 struct BrowDebugMenu: View {
     @AppStorage(BeautyBlushEngine.browDebugKey) private var view = BrowDebugView.final.rawValue
+    /// Nose-side extension of the baked overlay. Changing it invalidates the
+    /// sprite cache and re-bakes on the next camera frame.
+    @AppStorage(BrowSpriteBaker.headUKey) private var headExtension = Double(BrowSpriteBaker.defaultHeadU)
 
     var body: some View {
         Menu {
             Picker("Brow view", selection: $view) {
                 ForEach(BrowDebugView.allCases) { Text($0.title).tag($0.rawValue) }
+            }
+            Section("Center gap") {
+                Slider(value: $headExtension, in: -0.25...0, step: 0.01)
+                Text(String(format: "%.0f%% nose-side extension", -headExtension * 100))
             }
         } label: {
             Label(BrowDebugView(rawValue: view)?.title ?? "Brow view", systemImage: "ladybug")

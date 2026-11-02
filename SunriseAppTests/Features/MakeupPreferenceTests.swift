@@ -71,14 +71,17 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertGreaterThan(lift.pigmentFields[0].curvature,0)
         for placement in [youth,sun,lift] {
             let pixels=try BeautyBlushEngine.renderAtlasFixture(placement:placement)
-            let blue=(0..<(256*256)).map {pixels[$0*4+2]}.max() ?? 0
+            let count:Int=256*256
+            let blue:Float=(0..<count).map {(i:Int)->Float in pixels[i*4+2]}.max() ?? 0
+            let red:Float=(0..<count).map {(i:Int)->Float in pixels[i*4]}.max() ?? 0
             if placement.style == .sunkissed {XCTAssertGreaterThan(blue,0.15)}else{XCTAssertEqual(blue,0)}
-            XCTAssertGreaterThan((0..<(256*256)).map {pixels[$0*4]}.max() ?? 0,0.2)
+            XCTAssertGreaterThan(red,0.2)
         }
     }
     @MainActor func testCreativeBlushChoiceRetainsShadeAndTutorialStyle() {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
-        let shade=home.currentShade,intensity=home.intensity
+        XCTAssertNil(home.currentShade,"a launch starts with no makeup")
+        let shade=home.shades[.blush],intensity=home.intensities[.blush] ?? TryOnHomeModel.defaultIntensity
         home.choose(blush:.sunkissed)
         XCTAssertEqual(home.liveConfiguration.blushStyle,.sunkissed)
         XCTAssertEqual(home.enabled,[.blush]);XCTAssertEqual(home.currentShade,shade);XCTAssertEqual(home.intensity,intensity)
@@ -194,7 +197,8 @@ final class MakeupPreferenceTests:XCTestCase {
         let i=(16*32+16)*4
         XCTAssertGreaterThan(Int(makeup[i+2])-Int(makeup[i+1]),20,"GPU pigment must tint actual camera pixels")
         for c in 0..<3 {XCTAssertEqual(Int(bare[i+c]),Int(obstructed[i+c]),accuracy:1,"Occlusion must restore camera skin, not black or transparent edges")}
-        XCTAssertEqual(Int(bare[i+1]),128,accuracy:2,"sRGB camera must not be decoded twice")
+        // Mid-grey 128 shows as ARSCNView shows it: the measured tone, 0.544 + 0.02 * (0.6322 - 0.544) of full scale (139).
+        XCTAssertEqual(Int(bare[i+1]),139,accuracy:2,"camera tone must match ARSCNView, decoded once")
     }
     func testBeautyBlushConfigurationRejectsUnsafeValuesAndVisibilityRejectsStaleClock() throws {
         let config=try BeautyBlushConfiguration.load()
@@ -431,7 +435,7 @@ final class MakeupPreferenceTests:XCTestCase {
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
         let assigned=try XCTUnwrap(home.brow.selectedBlush).id
         let shade=MakeupShade(id:"custom.test",name:"Custom colour",red:0.8,green:0.2,blue:0.4,opacity:0.36)
-        home.choose(shade:shade);home.setIntensity(0.8)
+        home.choose(.blush);home.choose(shade:shade);home.setIntensity(0.8)
         XCTAssertEqual(home.brow.selectedBlush?.id,assigned)
         XCTAssertEqual(home.liveConfiguration.blushLayer.tint,SIMD3<Float>(0.8,0.2,0.4))
         home.choose(.eyebrow)
@@ -570,20 +574,26 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertFalse(tutorial.liner.hasLiner)
         home.deactivate();tutorial.deactivate()
     }
-    @MainActor func testTryOnShowsOnlySelectedToolAndUsesLaunchFitting() {
+    @MainActor func testTryOnStartsBareAndKeepsEachToolsChoiceAcrossSwitches() {
         let eyes=EyeShapeClassifier().classify(EyeMeasurements(openness:0.30,tilt:4,spacing:0.72,lidSpace:1.5))
         let home=TryOnHomeModel(plan:MakeupPlan(shape:.heart,eyeScan:eyes),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
-        XCTAssertEqual(home.enabled,[.blush])
+        XCTAssertEqual(home.enabled,[],"no makeup on any tool at launch")
         XCTAssertTrue(home.liveConfiguration.usesLaunchFit)
-        XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on)
-        home.choose(.eyebrow)
-        XCTAssertEqual(home.enabled,[.eyebrow])
-        XCTAssertTrue(home.liveConfiguration.browLayer.on);XCTAssertFalse(home.liveConfiguration.blushLayer.on)
-        home.choose(.eyeliner)
-        XCTAssertEqual(home.enabled,[.eyeliner])
         XCTAssertFalse(home.liveConfiguration.browLayer.on);XCTAssertFalse(home.liveConfiguration.blushLayer.on)
-        home.choose(.blush)
-        XCTAssertEqual(home.enabled,[.blush])
+        home.choose(.eyebrow)
+        XCTAssertEqual(home.enabled,[],"picking a tool only shows its controls")
+        home.choose(shade:home.swatches[1])
+        XCTAssertEqual(home.enabled,[],"a brow shade needs a brow picture first")
+        home.choose(browOverlay:.standard);home.choose(shade:home.swatches[1])
+        let browShade=home.shades[.eyebrow]
+        home.choose(.blush);home.choose(blush:.lifted)
+        home.choose(.eyeliner);home.choose(shade:home.swatches[0]);home.turnOff()
+        XCTAssertEqual(home.enabled,[.eyebrow,.blush],"each tool keeps its own last choice, eyeliner switched back off")
+        XCTAssertTrue(home.liveConfiguration.browLayer.on);XCTAssertTrue(home.liveConfiguration.blushLayer.on,"all chosen makeup shows together")
+        home.choose(.eyebrow)
+        XCTAssertEqual(home.shades[.eyebrow],browShade);XCTAssertFalse(home.isOff)
+        let handoff=home.tutorialHandoff
+        XCTAssertEqual(handoff.enabled,[.eyebrow,.blush]);XCTAssertEqual(handoff.blushStyle,.lifted)
         home.deactivate()
     }
     // -Nimah: Real brow contours can be fitted without pretending missing pupil/nose points exist.
@@ -795,17 +805,20 @@ final class MakeupPreferenceTests:XCTestCase {
         func lin(_ b:UInt8)->Float {let c=Float(b)/255;return c<=0.04045 ? c/12.92:pow((c+0.055)/1.055,2.4)}
         return 0.0722*lin(data[i])+0.7152*lin(data[i+1])+0.2126*lin(data[i+2])
     }
-    func testBlushCameraRoundTripIsIdentityWhateverTheTransferTag() throws {
+    /// Without makeup the camera shows the tone ARSCNView shows (the eyeliner tab), measured on device: `cameraTone` in
+    /// BeautyBlush.metal, the same for any transfer tag.
+    func testBlushCameraMatchesTheMeasuredARSCNViewTone() throws {
         guard MTLCreateSystemDefaultDevice() != nil else{throw XCTSkip("Metal unavailable")}
         let n=64,(luma,chroma)=syntheticSkin(n)
+        func tone(_ v:Float)->Float {BeautyBlushConfiguration.cameraToneOf(v)}
         for tag in [false,true] {
             let bare=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:Array(repeating:128,count:n*n*2),transfer709:tag,size:n)
             for (x,y) in [(2,2),(32,32),(44,22),(60,60)] {
-                let i=(y*n+x)*4
-                XCTAssertEqual(Int(bare[i+1]),Int(luma[y*n+x]),accuracy:1,"untouched camera must reach the screen unchanged (709 tag \(tag))")
+                let i=(y*n+x)*4,expected=tone(Float(luma[y*n+x])/255)
+                XCTAssertEqual(Int(bare[i+1]),Int((expected*255).rounded()),accuracy:1,"camera tone (709 tag \(tag))")
             }
             let warm=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,transfer709:tag,size:n)
-            let reference=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,blend:.legacy,size:n)
+            let reference=try BeautyBlushEngine.renderPixelFixture(obstructed:false,intensity:0,luma:luma,chroma:chroma,blend:.legacy,transfer709:tag,size:n)
             XCTAssertEqual(warm,reference,"intensity 0 must give the camera pixel in every blend")
         }
     }
@@ -830,7 +843,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertGreaterThan(chromaDetail(made),chromaDetail(bare)*0.7,"the skin's own colour variation must show through")
         XCTAssertGreaterThan(chromaDetail(made),chromaDetail(legacy)*1.2,"the previous blend replaced it with flat shade colour")
         let lumBare=region.map {linearLuminance(bare,$0)}.reduce(0,+),lumMade=region.map {linearLuminance(made,$0)}.reduce(0,+)
-        XCTAssertGreaterThan(lumMade/lumBare,0.75);XCTAssertLessThan(lumMade/lumBare,1.05,"blush must not glow or go muddy")
+        XCTAssertGreaterThan(lumMade/lumBare,0.92,"blush tints the skin, it must not darken it");XCTAssertLessThan(lumMade/lumBare,1.05,"or make it glow")
         // Highlight centre (0.7, 0.35): stays the brightest, least tinted point; no channel clipped to a flat 255.
         let h=(Int(0.35*Float(n))*n+Int(0.7*Float(n)))*4
         XCTAssertGreaterThan(linearLuminance(made,h),linearLuminance(bare,h)*0.85)
@@ -953,6 +966,41 @@ final class MakeupPreferenceTests:XCTestCase {
     }
     func testBlushTutorialHasTheTwoSpecSteps() {
         XCTAssertEqual(GuidedTutorialModel.blushLessons.map(\.title),["Dab a little blush inside the small circle.","Dab outward to blend it into your skin."])
+    }
+
+    func testShaderCameraToneMatchesTheSwiftTable() throws {
+        let url=try XCTUnwrap(Bundle.main.url(forResource:"BeautyBlush.metal",withExtension:"txt"))
+        let source=try String(contentsOf:url,encoding:.utf8)
+        let line=try XCTUnwrap(source.components(separatedBy:"\n").first {$0.hasPrefix("constant float cameraTone[11]")})
+        let numbers=line.split(whereSeparator:{"{},;f".contains($0)}).dropFirst().compactMap {Float($0.trimmingCharacters(in:.whitespaces))}
+        XCTAssertEqual(numbers.count,11)
+        for (a,b) in zip(numbers,BeautyBlushConfiguration.cameraTone) {XCTAssertEqual(a,b,accuracy:1e-4)}
+    }
+
+    @MainActor func testTutorialPreviewsOnlyTheToolsLeftOnInTryOn() {
+        let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.heart,origin:.analysis),plan:MakeupPlan(shape:.heart),
+            handoff:.init(tool:.blush,shades:[:],intensities:[:],blushStyle:.lifted,enabled:[.blush]))
+        XCTAssertTrue(model.liveConfiguration.showMakeupPreview,"blush was on: the Blush tab previews it")
+        model.select(.brows)
+        let brows=model.liveConfiguration
+        XCTAssertTrue(brows.showMakeupPreview,"the brow guide is drawn by the makeup engine, so it must stay on")
+        XCTAssertNil(brows.browOverlay,"the brow was off: no brow picture");XCTAssertFalse(brows.hideNaturalBrow)
+        model.deactivate()
+    }
+
+    @MainActor func testBlushComparisonSplitsLikeEyelinerOnOneCamera() {
+        let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.heart,origin:.analysis),plan:MakeupPlan(shape:.heart),
+            handoff:.init(tool:.blush,shades:[:],intensities:[:],blushStyle:.youthful,enabled:[.blush]))
+        guard model.hasGuide else {return XCTFail("blush guide expected")}
+        // look|guide, guide|look, look|plain, plain|look, plain
+        let expected:[(PigmentHalf,Bool)]=[(.left,true),(.right,true),(.left,false),(.right,false),(.none,false)]
+        for (half,guide) in expected {
+            let c=model.liveConfiguration
+            XCTAssertEqual(c.pigmentHalf,half,"\(model.compare)");XCTAssertEqual(c.showGuide,guide,"\(model.compare)")
+            XCTAssertTrue(c.showMakeupPreview,"the Metal camera stays on in \(model.compare), so the halves share one camera")
+            model.cycleCompare()
+        }
+        model.deactivate()
     }
 
 }

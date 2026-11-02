@@ -40,8 +40,14 @@ struct PreviewLayer: Equatable, Sendable {
     var tint: SIMD3<Float>? = nil
 }
 
+/// Where the blush pigment is drawn on the camera; the camera itself always fills the view, so the halves of a comparison
+/// never come from different cameras.
+enum PigmentHalf: Equatable, Sendable { case full, left, right, none }
+
 struct EyebrowConfiguration: Equatable, Sendable {
     var comparisonSplit=false
+    /// Blush only: overrides `comparisonSplit` (which means `.left`) when set.
+    var pigmentHalf: PigmentHalf? = nil
     // -Nimah: Region/style selection untuk dua modul pada shared tracking pipeline.
     var region:FaceGuideRegion = .eyebrows
     var foreheadStyle:ForeheadStyle = .hairline

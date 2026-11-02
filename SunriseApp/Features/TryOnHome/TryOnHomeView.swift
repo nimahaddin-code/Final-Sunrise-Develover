@@ -104,7 +104,7 @@ struct TryOnHomeView: View {
                 Spacer()
                 GlassCircleButton(symbol: "arrow.right", size: 48, tint: AppColors.flamingo.opacity(0.9), label: "Open tutorial") {
                     home.deactivate()
-                    onTutorial(TutorialHandoff(tool: home.tool,shades: home.shades,intensities: home.intensities,linerLook: home.linerLook,blushStyle:home.blushLook,browOverlay:home.browOverlay,hideNaturalBrow:!home.naturalBrowVisible))
+                    onTutorial(home.tutorialHandoff)
                 }
                 .disabled(!home.canTry(home.tool))
             }

@@ -15,8 +15,18 @@ struct BrowOverlay: Identifiable, Hashable, Sendable {
     var is3D = false
 
     static let all: [BrowOverlay] = [
+        // Original production overlays remain available before the new sample
+        // set; the samples are additive choices in the same picker.
         BrowOverlay(id: "overlay.1", title: String(localized: "Brow 1"), assetName: "brow-overlay-1"),
         BrowOverlay(id: "overlay.2", title: String(localized: "Brow 2"), assetName: "brow-overlay-2"),
+        BrowOverlay(id: "sample.1", title: String(localized: "Feathered arch"), assetName: "brow-sample-1"),
+        BrowOverlay(id: "sample.2", title: String(localized: "Full feather"), assetName: "brow-sample-2"),
+        BrowOverlay(id: "sample.3", title: String(localized: "Lifted feather"), assetName: "brow-sample-3"),
+        BrowOverlay(id: "sample.4", title: String(localized: "Soft feather"), assetName: "brow-sample-4"),
+        BrowOverlay(id: "sample.5", title: String(localized: "Textured arch"), assetName: "brow-sample-5"),
+        BrowOverlay(id: "sample.6", title: String(localized: "Dense natural"), assetName: "brow-sample-6"),
+        BrowOverlay(id: "sample.7", title: String(localized: "Bold arch"), assetName: "brow-sample-7"),
+        BrowOverlay(id: "sample.8", title: String(localized: "Defined natural"), assetName: "brow-sample-8"),
     ]
     static let standard = all[0]
     /// A picture is nearly opaque, so the eyebrow starts higher than the 0.65 of the shape designs.
@@ -36,7 +46,15 @@ enum BrowSpriteBaker {
     static let width = 1024, height = 512
     /// The picture's head and tail sit at these u. MediaPipe's brow rows end short of the real hair, so the picture runs a
     /// little past 0...1 at both ends and covers the natural brow's ends.
-    static let headU: Float = -0.04, tailU: Float = 1.06
+    // Extend the nose-side head slightly beyond the tracked contour so the
+    // two brow overlays meet the face naturally instead of leaving a wide
+    // center gap. The tail keeps the original conservative extension.
+    static let defaultHeadU: Float = -0.10, tailU: Float = 1.06
+    static let headUKey = "beautyBrow.headExtension"
+    static var headU: Float {
+        let value = UserDefaults.standard.object(forKey: headUKey) as? NSNumber
+        return max(-0.25, min(0, value?.floatValue ?? defaultHeadU))
+    }
     /// Columns with less than this share of the busiest column's coverage are stray hairs, not the brow's ends.
     private static let endShare: Float = 0.02
 
@@ -44,8 +62,10 @@ enum BrowSpriteBaker {
     /// chord) lies on w = 0 in chord space; the strip adds the observed brow's own offset from its chord when it samples, so the
     /// picture keeps its arch whatever the user's natural brow looks like. The span is one brow width, scaled by `tailU - headU`.
     /// `extent` is `BeautyBlushEngine.browExtent`.
-    static func bake(_ image: CGImage, extent: SIMD4<Float>, width: Int = width, height: Int = height) -> BakedBrowSprite? {
+    static func bake(_ image: CGImage, extent: SIMD4<Float>, width: Int = width, height: Int = height,
+                     headU: Float = BrowSpriteBaker.headU) -> BakedBrowSprite? {
         let w = image.width, h = image.height
+        let headU = max(extent.x, min(0, headU))
         guard w > 8, h > 8, width > 0, height > 0 else { return nil }
         var rgba = [UInt8](repeating: 0, count: w * h * 4)
         let drawn = rgba.withUnsafeMutableBytes { raw -> Bool in
@@ -126,25 +146,31 @@ final class BrowSpriteStore: @unchecked Sendable {
     private let lock = NSLock()
     private var ready: [String: BakedBrowSprite] = [:], working: Set<String> = [], failed: Set<String> = []
 
+    static func cacheKey(_ overlay: BrowOverlay) -> String {
+        "\(overlay.id):\(Int((BrowSpriteBaker.headU * 1000).rounded()))"
+    }
+
     func baked(_ overlay: BrowOverlay) -> BakedBrowSprite? {
         lock.lock(); defer { lock.unlock() }
-        return ready[overlay.id]
+        return ready[Self.cacheKey(overlay)]
     }
     func hasFailed(_ overlay: BrowOverlay) -> Bool {
         lock.lock(); defer { lock.unlock() }
-        return failed.contains(overlay.id)
+        return failed.contains(Self.cacheKey(overlay))
     }
     /// Starts baking unless it is done, running or failed.
     func prepare(_ overlay: BrowOverlay) {
+        let key = Self.cacheKey(overlay)
         lock.lock()
-        guard ready[overlay.id] == nil, !working.contains(overlay.id), !failed.contains(overlay.id) else { lock.unlock(); return }
-        working.insert(overlay.id)
+        guard ready[key] == nil, !working.contains(key), !failed.contains(key) else { lock.unlock(); return }
+        working.insert(key)
         lock.unlock()
         DispatchQueue.global(qos: .userInitiated).async { [self] in
-            let result = UIImage(named: overlay.assetName)?.cgImage.flatMap { BrowSpriteBaker.bake($0, extent: BeautyBlushEngine.browExtent) }
+            let headU = BrowSpriteBaker.headU
+            let result = UIImage(named: overlay.assetName)?.cgImage.flatMap { BrowSpriteBaker.bake($0, extent: BeautyBlushEngine.browExtent, headU: headU) }
             lock.lock()
-            working.remove(overlay.id)
-            if let result { ready[overlay.id] = result } else { failed.insert(overlay.id) }
+            working.remove(key)
+            if let result { ready[key] = result } else { failed.insert(key) }
             lock.unlock()
         }
     }

@@ -24,12 +24,21 @@ final class BrowEraser: @unchecked Sendable {
     static var vertexCount: Int { (columns + 1) * (rows + 1) }
     static let width = 256, height = 128
     /// The model is asked again at most this often; its result stays attached to the brow in between.
-    static let modelInterval: Double = 0.12
+    /// MI-GAN is a quality fallback over the push-pull fill, not a per-frame
+    /// operation. A 500 ms floor keeps Core ML readbacks from contending with
+    /// the camera compositor while movement and the refresh timeout still
+    /// trigger a fresh crop when needed.
+    static let modelInterval: Double = 0.5
     /// While the face holds still the model is asked again only this often: its answer is mapped into brow space, so it
     /// stays on the brow as the head moves, and is blended out 1.5 s after it was asked.
     static let modelRefresh: Double = 1.0
     /// How far the face crop must move, scale or turn (as a fraction of its size) for the model to be asked again sooner.
     static let modelMoveFraction: Float = 0.06
+    /// The camera compositor runs at 60 Hz, but the concealment unwrap/fill is
+    /// temporal state and does not need to be rebuilt for every camera frame.
+    /// Reusing the previous fill between updates cuts several render passes and
+    /// mipmap generations from the normal path.
+    static let fillUpdateInterval: Double = 1.0 / 30.0
 
     private struct ModelResult { let rgba: [UInt8]; let vertices: [BrowUnwrapVertex] }
     private let device: MTLDevice
@@ -51,7 +60,16 @@ final class BrowEraser: @unchecked Sendable {
     private var modelInFlight = false, pending: ModelResult?
     private var lastRequest: Double = -.infinity, modelTime: Double?, modelWeight: Float = 0
     private var lastRequestCrop: simd_float4x4?
+    private var lastEncode: Double = -.infinity
+    private var modelRequests = 0
+    private var lastModelLatencyMs: Double = -1
+    private var modelRequestStarted = 0.0
     private(set) var lastModelError: String?
+
+    var modelMetrics: (requests: Int, latencyMs: Double) {
+        lock.lock(); defer { lock.unlock() }
+        return (modelRequests, lastModelLatencyMs)
+    }
 
     /// The current fill, one slice per brow (0 right, 1 left), linear RGB in brow space.
     var fill: MTLTexture { fills[fillIndex] }
@@ -113,6 +131,7 @@ final class BrowEraser: @unchecked Sendable {
     /// Forget the previous frame (temporal blend) and any model result, e.g. after the face was lost.
     func reset() {
         lastTime = nil
+        lastEncode = -.infinity
         lock.lock(); pending = nil; modelTime = nil; modelWeight = 0; lastRequestCrop = nil; lock.unlock()
     }
 
@@ -124,6 +143,8 @@ final class BrowEraser: @unchecked Sendable {
     func encode(vertices: [BrowUnwrapVertex], cropToRaw: simd_float4x4?, uniforms: [UInt8], y: MTLTexture, cb: MTLTexture,
                 timestamp: Double, modelInterval: Double? = BrowEraser.modelInterval, command: MTLCommandBuffer) {
         guard vertices.count == Self.vertexCount * 2 else { return }
+        guard timestamp.isFinite, timestamp - lastEncode >= Self.fillUpdateInterval else { return }
+        lastEncode = timestamp
         let buffer = vertexBuffers[slot % 3]; slot += 1
         vertices.withUnsafeBytes { buffer.contents().copyMemory(from: $0.baseAddress!, byteCount: $0.count) }
         var space = Self.space
@@ -245,6 +266,7 @@ final class BrowEraser: @unchecked Sendable {
               Self.modelDue(timestamp: timestamp, lastRequest: lastRequest, crop: cropToRaw, lastCrop: lastRequestCrop, minimumInterval: minimumInterval)
         else { lock.unlock(); return }
         modelInFlight = true; lastRequest = timestamp; lastRequestCrop = cropToRaw
+        modelRequests += 1; modelRequestStarted = CACurrentMediaTime()
         lock.unlock()
         var matrix = cropToRaw
         let color = MTLRenderPassDescriptor()
@@ -274,6 +296,7 @@ final class BrowEraser: @unchecked Sendable {
                 var failure: String?
                 do { output = try self.inpainter.inpaint(rgba: rgba, hole: hole) } catch { output = nil; failure = "\(error)" }
                 self.lock.lock()
+                if self.modelRequestStarted > 0 { self.lastModelLatencyMs = max(0, CACurrentMediaTime() - self.modelRequestStarted) * 1000 }
                 self.lastModelError = failure
                 if let output { self.pending = ModelResult(rgba: output, vertices: vertices) }
                 self.modelInFlight = false

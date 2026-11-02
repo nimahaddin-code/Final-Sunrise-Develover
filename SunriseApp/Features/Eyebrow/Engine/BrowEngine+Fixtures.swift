@@ -50,7 +50,7 @@ extension BeautyBlushEngine {
         let fillDescriptor=MTLTextureDescriptor.texture2DDescriptor(pixelFormat:.rgba16Float,width:4,height:4,mipmapped:false)
         fillDescriptor.textureType = .type2DArray;fillDescriptor.arrayLength=2;fillDescriptor.usage = .shaderRead;fillDescriptor.storageMode = .shared
         guard let fill=d.makeTexture(descriptor:fillDescriptor) else {throw CocoaError(.featureUnsupported)}
-        let skinValue=Float16(BeautyBlushConfiguration.linear(180/255)).bitPattern,one=Float16(1).bitPattern
+        let skinValue=Float16(BeautyBlushConfiguration.cameraLinear(180/255)).bitPattern,one=Float16(1).bitPattern
         let fillTexels=(0..<16).flatMap {_ in [skinValue,skinValue,skinValue,one]}
         for slice in 0..<2 {fillTexels.withUnsafeBytes {fill.replace(region:MTLRegionMake2D(0,0,4,4),mipmapLevel:0,slice:slice,withBytes:$0.baseAddress!,bytesPerRow:32,bytesPerImage:128)}}
         var space=BrowEraser.space

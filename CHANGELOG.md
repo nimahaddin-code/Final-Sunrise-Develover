@@ -12,6 +12,51 @@
 - Tests: 410 -> 420 executed on an iOS 27.0 Simulator (iPhone 18 Pro; iOS 26.x simulators are below the 26.6 target), 4 skipped, 0 failures.
 - Not checked on a real device: stretch following, glass legibility over the camera. See ADR 0018.
 
+## Tutorial brow and eyeliner guides back — -Nimah (2026-10-30)
+
+After Try On started bare, the Brows tab turned its makeup preview off for a brow that was off, which stopped the makeup
+engine and with it the brow guide (drawn by that engine). Now the tab keeps the engine on and only drops the brow picture
+(`browOverlay = nil`, natural brow left alone). The face landmarker the engine starts for the blush cheek fit is stopped
+whenever the engine has nothing to draw (e.g. the Eyeliner tab), so it no longer runs beside the eyeliner's own MediaPipe
+detector. The eyeliner cause is not confirmed on a device.
+
+## Blush tutorial comparison like eyeliner, one camera — -Nimah (2026-10-30)
+
+The Blush tab uses the five compare layouts the way the eyeliner does: look | guide, guide | look, look | plain,
+plain | look, plain. The pigment is clipped to the look's half (`EyebrowConfiguration.pigmentHalf`, engine
+`Settings.pigmentHalf`: full, left, right, none; scissor in `render`), the animated guide (`BlushTutorialOverlay`) to the
+guide's half over the bare camera. The Metal camera stays on in every layout (`showMakeupPreview` true for the tab), so the
+halves never come from different cameras: `RealCameraView` (a second ARSCNView, a visible seam) is now used by the Brows
+tab only. `comparisonSplit` still means `.left` when `pigmentHalf` is nil. Device check pending.
+
+## Try On starts bare, keeps each tool's choice, shows all together — -Nimah (2026-10-30)
+
+`TryOnHomeModel.enabled` starts empty on every launch (no makeup on any tool). Picking a tool only shows its controls; a
+tool goes on when a shade, blush look, brow picture or strength is chosen for it, off with the no-makeup button, and keeps
+that state and its last choice across tool switches. All tools that are on show together. `BeautyBlushEngine` can now draw
+blush and brow in one frame: `prepareBlush` (fit, atlas, mask, visibility, smoothed mesh, tutorial outlines; before the
+encoder) and `encodeBlush` (depth prepass, pigment) are used by the blush-only `render` and by `drawBrow` when
+`Settings.withBlush` (between the camera and the brow strip). The brow path runs whenever the brow is on
+(`isBrow = needsBrow`, was `needsBrow && !needsBlush`, which dropped the brow whenever blush was on, also in the tutorial
+photo). Brow and blush keep separate tint/strength (`blushTint`, `blushIntensity`) and visibility (`blushVisibility`); with
+both on, the brow tracker's answers also feed the blush cheek fit (`addBlushSample`). `TryOnHomeModel.tutorialHandoff`
+carries `enabled`: each tutorial tab previews its tool as last chosen, and a tab for a tool that was off guides without
+a makeup preview (the eyeliner tab still shows its liner). The photo step stays Hanum's plain camera (merged 2026-10-30).
+Device check pending.
+
+## Blush skin tone fix, iOS 26.5 target — -Nimah (2026-10-30)
+
+Device feedback over three rounds (darker cheeks, then a hazy camera, then "brighter when Try On is off"). Final state:
+the Metal camera (blush and brow) now shows the tone ARSCNView shows. Measured on iPhone 17 from paired screenshots
+(Try On on with no pigment / off, same scene): neither the sRGB decode (up to 13/255 too dark in the mid-tones) nor the
+BT.709 decode (11/255 too light in the shadows, the haze) matched. A fitted 11-knot curve, `cameraTone` in
+BeautyBlush.metal and `BeautyBlushConfiguration.cameraTone` (a test keeps them equal), left under 1.5/255 of systematic
+error per brightness band on blocks not used to fit it; `decodeCamera` applies it, then the inverse of the drawable's sRGB
+encoding, whatever the transfer tag. One device, one scene, lossy screenshots: re-measure if another iPhone differs. The
+blush layer is colour-managed as sRGB. The darker cheeks came from the absorbing layer in `pigmentTarget`; the target is
+rescaled to 95% of the skin's own luminance (test: at least 92% of bare luminance). Fixtures that hand-write camera
+colours use `BeautyBlushConfiguration.cameraLinear`. `IPHONEOS_DEPLOYMENT_TARGET` 26.6 -> 26.5 so the app installs on
+iOS 26.5 phones and runs on this Mac's 26.5 Simulators (Xcode 26.6 here ships the 26.5 SDK); no 26.6 API is used.
 ## Liner hides when the head turns, zoom hint (2026-10-30)
 
 - `LinerOverlayModel.submit`: past 32 degrees of head turn (back under 25) the liner is removed at once and in-flight
@@ -71,8 +116,7 @@ Synthetic tests only; device look pending.
 ## Skin-preserving blush compositing and blush lab — -Nimah (2026-10-29)
 
 Blush stays a UV atlas on the native ARKit mesh; placement/silhouettes are unchanged. Fixed in
-`BeautyBlush.metal.txt`: camera decode is now the exact inverse of the sRGB drawable (the BT.709 decode
-lifted shadows 0.10 -> 0.16 for every Metal camera pixel, brow included); default blend colours low-frequency skin
+`BeautyBlush.metal.txt` (its camera decode stands; see the 2026-10-30 entry above); default blend colours low-frequency skin
 (`detail_radius_px`, new required JSON field, 2...16 camera px) and puts back each pixel's luminance ratio and chroma
 residual, keeping pores, highlights and freckles; out-of-gamut colours move towards their own luminance instead of
 per-channel clamping; tutorial contour is an antialiased isoline. Alpha 0 is exactly the camera pixel.

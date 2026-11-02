@@ -16,6 +16,15 @@ extension BeautyBlushEngine {
         let vertices=mesh.vertices
         hairBuffer=vertices.withUnsafeBytes {device.makeBuffer(bytes:$0.baseAddress!,length:$0.count,options:.storageModeShared)}
         hairVertexCount=vertices.count
+        // The ribbon mesh is intentionally dense for close inspection. At
+        // normal selfie distance every other ribbon is below a pixel; keep a
+        // half-density buffer for that case to reduce vertex shading and
+        // fragment overdraw without changing the close-up look.
+        let reduced = stride(from: 0, to: mesh.ribbons.count, by: 2).flatMap { i in
+            Array(vertices[(i * 6)..<(i * 6 + 6)])
+        }
+        hairLODBuffer = reduced.withUnsafeBytes { device.makeBuffer(bytes: $0.baseAddress!, length: $0.count, options: .storageModeShared) }
+        hairLODVertexCount = reduced.count
     }
     /// Where the hair mesh goes on each tracked brow: head and tail, the mesh normal between them and the way to the forehead,
     /// all lifted onto ARKit's face mesh from the brow's (steadied) landmarks.
@@ -65,7 +74,15 @@ extension BeautyBlushEngine {
             var h=HairUniforms(clipFromModel:mvp*draw.matrix,view:SIMD4(Float(size.width),Float(size.height),0.5*Float(size.height)*projectionScaleY,draw.scale),
                                look:SIMD4(light,1.5,0.04,0),probe:SIMD4(draw.probe.x,draw.probe.y,0,0))
             e.setVertexBytes(&h,length:MemoryLayout<HairUniforms>.stride,index:1);e.setFragmentBytes(&h,length:MemoryLayout<HairUniforms>.stride,index:1)
-            e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:hairVertexCount)
+            // `scale` is face-local metres per model metre. Tiny projected
+            // brows do not benefit from the full strand density.
+            if draw.scale < 0.55, let hairLODBuffer {
+                e.setVertexBuffer(hairLODBuffer,offset:0,index:0)
+                e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:hairLODVertexCount)
+                e.setVertexBuffer(hairBuffer,offset:0,index:0)
+            } else {
+                e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:hairVertexCount)
+            }
         }
         e.setDepthStencilState(noDepth)
     }
