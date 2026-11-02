@@ -66,6 +66,36 @@ enum TutorialCompare: CaseIterable {
     }
 }
 
+/// The Brows tab's bottom-left button, in the order it cycles: the look on both brows, on the user's own left brow only,
+/// on the right only, then the plain camera. (Left/right are the user's: the front camera is mirrored.)
+enum BrowCompare: CaseIterable {
+    case both, left, right, off
+
+    var next: BrowCompare {
+        let all = Self.allCases
+        return all[(all.firstIndex(of: self)! + 1) % all.count]
+    }
+    var side: EyeSide? {
+        switch self { case .left: .subjectLeft; case .right: .subjectRight; case .both, .off: nil }
+    }
+    var symbol: String {
+        switch self {
+        case .both: "circle.fill"
+        case .left: "circle.righthalf.filled"
+        case .right: "circle.lefthalf.filled"
+        case .off: "circle"
+        }
+    }
+    var label: LocalizedStringKey {
+        switch self {
+        case .both: "Look on both brows"
+        case .left: "Look on your left brow only"
+        case .right: "Look on your right brow only"
+        case .off: "Plain camera"
+        }
+    }
+}
+
 enum TutorialTab: CaseIterable, Identifiable {
     /// In the bottom bar's order.
     case blush, brows, eyeliner
@@ -93,6 +123,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     @Published private(set) var browStep = 0
     @Published private(set) var blushStep = 0
     @Published private(set) var compare = TutorialCompare.tryOnGuide
+    @Published private(set) var browCompare = BrowCompare.both
     /// After the last step: the camera shows the whole assigned look, with no guide, for taking a photo.
     @Published private(set) var photoMode = false
     private let linerStyle: LinerStyle?
@@ -160,7 +191,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         return brow.lessons
     }
 
-    func cycleCompare() { compare = compare.next }
+    func cycleCompare() { if tab == .brows { browCompare = browCompare.next } else { compare = compare.next } }
 
     /// The brow/blush preview configuration for the camera. Eyeliner is drawn by its own overlay, so the face-mesh
     /// guide is off on that tab.
@@ -168,14 +199,15 @@ enum TutorialTab: CaseIterable, Identifiable {
         if photoMode { return photoConfiguration }
         var value = brow.liveConfiguration
         // Brows and blush draw on one face mesh: a look beside the plain camera is the renderer's own left-half split.
-        value.comparisonSplit = tab != .eyeliner && compare.plainBesideLook != nil
+        value.comparisonSplit = tab == .blush && compare.plainBesideLook != nil ? compare.side(of: .tryOn) : nil
         value.showMappingFormula = tab == .brows && Self.browMappingSteps.contains(browStep)
         // The tutorial shows dashed nose-to-brow lines, not MediaPipe's landmark view.
         value.browTrackingOverlay = false
         // The filter the user picked on Try On, with its shade and strength (`applyShade`), is what the tutorial shows.
         if tab == .brows {
             value.browOverlay = handoff.browOverlay
-            value.hideNaturalBrow = compare != .plain && handoff.hideNaturalBrow
+            value.browOnlySide = browCompare.side
+            value.hideNaturalBrow = browCompare != .off && handoff.hideNaturalBrow
         }
         // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
         // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
@@ -184,9 +216,9 @@ enum TutorialTab: CaseIterable, Identifiable {
             value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil
             return value
         }
-        if !hasGuide || compare == .plain { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
+        if !hasGuide || (tab == .brows ? browCompare == .off : compare == .plain) { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
         // A look beside the plain camera has no guide outline over it.
-        else if compare.plainBesideLook != nil { value.showGuide = false; value.showMappingFormula = false }
+        else if tab != .brows && compare.plainBesideLook != nil { value.showGuide = false; value.showMappingFormula = false }
         return value
     }
 
@@ -352,6 +384,7 @@ private struct TutorialScreen: View {
         .sensoryFeedback(.selection, trigger: model.tab)
         .sensoryFeedback(.selection, trigger: model.stepIndex)
         .sensoryFeedback(.selection, trigger: model.compare)
+        .sensoryFeedback(.selection, trigger: model.browCompare)
         .sensoryFeedback(.selection, trigger: light.isOn)
         .task {
             await model.brow.prepare()
@@ -432,7 +465,7 @@ private struct TutorialScreen: View {
                                   }, reducedFrameRate: advisor.reducesLoad)
                     if model.tab == .blush && model.compare != .plain && model.hasGuide && !model.photoMode {
                         BlushTutorialOverlay(feed: camera.blushGuide, step: index)
-                            .mask(alignment: .leading) { halfMask(left: model.compare.plainBesideLook != nil) }
+                            .mask(alignment: .leading) { halfMask(left: (model.compare.side(of: .guide) ?? model.compare.side(of: .tryOn)) != .trailing) }
                     }
                     if model.photoMode {
                         LinerOverlayView(model: model.liner, isVisible: true)
@@ -446,11 +479,6 @@ private struct TutorialScreen: View {
                                            paused: advisor.pausesAnimation, dimmed: advisor.isDimmed, side: side)
                                 .id(index)
                         }
-                    } else if model.tab != .eyeliner, model.compare.plainBesideLook != nil {
-                        // The same camera without the look, covering its half.
-                        RealCameraView(session: camera.trackingManager.session)
-                            .mask(alignment: .trailing) { halfMask(left: false) }
-                            .transition(.opacity)
                     }
                 }
                 .animation(.easeInOut(duration: 0.25), value: model.compare)
@@ -645,9 +673,9 @@ private struct TutorialScreen: View {
     /// Compare on the left, the three tabs, the screen light on the right (as on Try On).
     private var tabBar: some View {
         HStack(spacing: AppSpacing.small) {
-            CameraBarButton(symbol: model.compare.symbol) { model.cycleCompare() }
+            CameraBarButton(symbol: model.tab == .brows ? model.browCompare.symbol:model.compare.symbol) { model.cycleCompare() }
                 .accessibilityLabel("Compare")
-                .accessibilityValue(model.compare.label)
+                .accessibilityValue(model.tab == .brows ? model.browCompare.label:model.compare.label)
             ForEach(TutorialTab.allCases) { tab in
                 let selected = tab == model.tab
                 Button { model.select(tab) } label: {
@@ -665,29 +693,6 @@ private struct TutorialScreen: View {
                 .accessibilityValue(light.isOn ? Text("On") : Text("Off"))
         }
     }
-}
-
-/// Plain camera picture from the shared face session, with no content: the "real" side of the comparison.
-private struct RealCameraView: UIViewRepresentable {
-    let session: ARSession
-
-    func makeUIView(context: Context) -> ARSCNView {
-        let view = ARSCNView(frame: .zero)
-        // Giving a view the session makes the view its delegate. The filtered camera's coordinator is the delegate that
-        // feeds the brow, blush and eyeliner frames, so it is put back: otherwise the filter stops updating in split view.
-        let delegate = session.delegate
-        let delegateQueue = session.delegateQueue
-        view.session = session
-        session.delegate = delegate
-        session.delegateQueue = delegateQueue
-        view.preferredFramesPerSecond = 60
-        view.scene = SCNScene()
-        view.automaticallyUpdatesLighting = false
-        view.isUserInteractionEnabled = false
-        return view
-    }
-
-    func updateUIView(_ view: ARSCNView, context: Context) {}
 }
 
 /// Blush tutorial overlay (UX spec 3.2 and 3.5), anchored to each cheek through `BlushGuideFeed`.

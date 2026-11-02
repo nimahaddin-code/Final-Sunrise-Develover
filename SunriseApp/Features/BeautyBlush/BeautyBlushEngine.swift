@@ -38,7 +38,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     struct Field {var ellipse:SIMD4<Float>;var shape:SIMD4<Float>;var limits:SIMD4<Float>}
     struct Bake {var left:Field;var right:Field;var bridge=Field(ellipse:.zero,shape:.zero,limits:.zero);var paint=SIMD4<Float>.zero;var options=SIMD4<Float>.zero;var mouth=SIMD4<Float>.zero}
     struct Settings {
-        var comparisonSplit=false;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
+        var comparisonSplit:HorizontalEdge?;var browOnlySide:EyeSide?;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()}
     /// Developer brow view (`BrowDebugView` raw value), read each frame so the developer picker applies live.
     static let browDebugKey="beautyBrow.debugView"
     /// Developer blush blend and diagnostic (`BlushBlend` / `BlushDiagnostic` raw values), read each frame; only
@@ -223,7 +223,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
             lastBindAttempt = -.infinity
         }
         settings.enabled=enabled
-        if let c {settings.comparisonSplit=c.comparisonSplit;settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
+        if let c {settings.comparisonSplit=c.comparisonSplit;settings.browOnlySide=c.browOnlySide;settings.isBrow=c.needsBrow && !c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay;settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow;let selected=settings.isBrow ? c.browLayer:c.blushLayer;settings.tint=c.layered ? selected.tint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45)):c.shadeTint ?? (settings.isBrow ? SIMD3(0.2,0.13,0.09):SIMD3(0.9,0.3,0.45));settings.intensity=c.layered ? selected.intensity:c.previewIntensity}
         if !enabled {setLayerShown(false)}
         if enabled && nextBrow,let overlay=settings.browOverlay {BrowSpriteStore.shared.prepare(overlay);if overlay.is3D {BrowHairStore.shared.prepare()}}
         let start=enabled && !segmenter.isAvailable && !segmentationStarting
@@ -360,6 +360,12 @@ final class BeautyBlushEngine:@unchecked Sendable {
             cheeks.append(.init(inner:o.inner.compactMap(view),outer:o.outer.compactMap(view),center:center,outward:outward))
         }
         return cheeks.isEmpty ? nil:BlushGuideSnapshot(cheeks:cheeks)
+    }
+    /// The half of the drawable that shows the look in the tutorial's split compare. The drawable is what the screen shows,
+    /// so leading is the left half (no right-to-left handling beyond what `HorizontalEdge` implies).
+    static func splitScissor(_ side:HorizontalEdge,width:Int,height:Int)->MTLScissorRect {
+        let half=max(1,width/2)
+        return MTLScissorRect(x:side == .leading ? 0:max(0,width-half),y:0,width:half,height:height)
     }
     static func affine(_ a:CGAffineTransform)->simd_float4x4 {
         simd_float4x4(columns:(SIMD4(Float(a.a),Float(a.b),0,0),SIMD4(Float(a.c),Float(a.d),0,0),SIMD4(0,0,1,0),SIMD4(Float(a.tx),Float(a.ty),0,1)))
@@ -519,7 +525,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
         e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
-        if s.comparisonSplit {e.setScissorRect(MTLScissorRect(x:0,y:0,width:max(1,drawable.texture.width/2),height:drawable.texture.height))}
+        if let side=s.comparisonSplit {e.setScissorRect(Self.splitScissor(side,width:drawable.texture.width,height:drawable.texture.height))}
         if let anchor,anchorID==anchor.identifier,style==s.style,let atlas,let ib=indices,let obstruction=frameMask,!vertices.isEmpty {
             let buffer=vertices[frameSlot]
             let pointer=buffer.contents().bindMemory(to:Vertex.self,capacity:rest.count)

@@ -1,3 +1,9 @@
+## Brows compare one brow at a time — Khalish (2026-11-02)
+
+The Brows tab's compare button cycles `BrowCompare` (`.both` → `.left` → `.right` → `.off`), not the split screen. `EyebrowConfiguration.browOnlySide`
+(`.subjectLeft`/`.subjectRight`, nil = both brows) makes `drawBrow` draw only that half of the strip index buffer (`BrowEngine+Draw`); `comparisonSplit`
+stays nil on Brows. `.off` is the plain camera: no hidden natural brow, guide or preview. Blush still cycles the split (`TutorialCompare`). Simulator build only; device check pending.
+
 ## Brow tracker frames via VideoToolbox — Khalish (2026-11-01)
 
 The brow tracker's 512 px BGRA frame for MediaPipe is made with `VTPixelTransferSession` (hardware scale and YCbCr to BGRA)
@@ -9,6 +15,15 @@ tracker queue, invalidated in `stop()`. Simulator build only; device timing and 
 No behaviour change: the brow's per-frame work is trimmed. Marks use a 3-slot buffer ring like the brow vertices, the developer
 menu flags are read at most twice a second, the camera colour attachments are read only when the pixel format or size changes,
 and the natural-brow unwrap grid is built only on frames where the eraser's fill is due (`BrowEraser.isDue`). Simulator build only; device check pending.
+
+## Brow split compare in Metal — Khalish (2026-11-01)
+
+The tutorial's split compare (Brows and Blush tabs) no longer stacks a second `ARSCNView` (`RealCameraView`, deleted) masked
+over half the screen. The engine draws the full camera and scissors only the look to the left half of the drawable when
+`settings.comparisonSplit`: blush as before, and now `drawBrow` too (after the background camera draw, so the brow strip with
+its hidden-natural-brow fill, the 3D hair and the marks are all cut). `comparisonSplit` is now a `HorizontalEdge?` (the half that shows the look, from `compare.side(of: .tryOn)`; nil = no split) and both
+scissors use `BeautyBlushEngine.splitScissor`, so `tryOnPlain` (look left) and `plainTryOn` (look right) are both correct. Leading
+is the left of the drawable (no RTL handling). The blush overlay is clipped to the guide's half, else the look's. No fade when the split changes. Simulator build only; device look pending.
 
 ## Brow: legacy fit off while Metal draws — Khalish (2026-11-01)
 

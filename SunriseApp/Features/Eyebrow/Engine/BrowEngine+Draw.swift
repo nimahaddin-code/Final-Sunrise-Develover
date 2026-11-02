@@ -204,6 +204,8 @@ extension BeautyBlushEngine {
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
         e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
+        // Tutorial split compare: the camera stays full frame, the brow (strip, hair, marks) is limited to the look's half, like blush.
+        if let side=s.comparisonSplit {e.setScissorRect(Self.splitScissor(side,width:drawable.texture.width,height:drawable.texture.height))}
         if let strip,let browTexture,let obstruction=frameMask ?? emptyMask,let fill=s.hideNatural ? eraser?.fill ?? emptyFill:emptyFill,
            strip.vertices.count==Self.browVertexCount*2 {
             let vb=browVertices[frameSlot]
@@ -214,7 +216,9 @@ extension BeautyBlushEngine {
             e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1);e.setFragmentTexture(browTexture,index:2);e.setFragmentTexture(obstruction,index:3)
             var space=BrowEraser.space;e.setFragmentBytes(&space,length:MemoryLayout<SIMD4<Float>>.stride,index:2)
             e.setFragmentTexture(fill,index:4);e.setFragmentTexture(s.hideNatural ? eraser?.hide ?? emptyFill:emptyFill,index:5)
-            e.drawIndexedPrimitives(type:.triangle,indexCount:Self.browIndexCount,indexType:.uint16,indexBuffer:ib,indexBufferOffset:0)
+            // Tutorial brow compare: the index buffer lists side 0 (subjectRight) then side 1 (subjectLeft), so one brow is one half.
+            let half=Self.browIndexCount/2
+            e.drawIndexedPrimitives(type:.triangle,indexCount:s.browOnlySide == nil ? Self.browIndexCount:half,indexType:.uint16,indexBuffer:ib,indexBufferOffset:s.browOnlySide == .subjectLeft ? half*MemoryLayout<UInt16>.stride:0)
         }
         if hair3D,let face,uploadFaceMesh(face,slot:frameSlot) {
             if let estimate=frame.lightEstimate {browLight += (Float(max(0.55,min(1.4,(estimate.ambientIntensity/1000).squareRoot())))-browLight)*0.1}

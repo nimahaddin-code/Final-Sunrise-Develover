@@ -8,19 +8,36 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
-    @MainActor func testTutorialRetainsBrowAndUsesSingleCameraSplit() {
+    @MainActor func testTutorialBrowCompareCyclesOneBrowAndBlushSplits() {
         let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.standardLook,
             plan:MakeupPlan(shape:.oval),handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true))
         XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
         XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
-        model.cycleCompare()
-        XCTAssertTrue(model.liveConfiguration.comparisonSplit)
-        XCTAssertFalse(model.liveConfiguration.showGuide)
-        model.cycleCompare()
+        XCTAssertNil(model.liveConfiguration.comparisonSplit)
+        XCTAssertNil(model.liveConfiguration.browOnlySide)
+        model.cycleCompare()   // look on the user's left brow only
+        XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectLeft)
+        XCTAssertNil(model.liveConfiguration.comparisonSplit)
+        XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
+        model.cycleCompare()   // look on the right brow only
+        XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectRight)
+        XCTAssertNil(model.liveConfiguration.comparisonSplit)
+        model.cycleCompare()   // plain camera
+        XCTAssertNil(model.liveConfiguration.browOnlySide)
+        XCTAssertNil(model.liveConfiguration.comparisonSplit)
         XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
         XCTAssertFalse(model.liveConfiguration.showMakeupPreview)
+        model.cycleCompare()   // look on both brows again
+        XCTAssertNil(model.liveConfiguration.browOnlySide)
+        XCTAssertNil(model.liveConfiguration.comparisonSplit)
+        XCTAssertTrue(model.liveConfiguration.hideNaturalBrow)
         model.select(.blush)
         XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
+        model.cycleCompare()   // guide on the left, look on the right: no split
+        model.cycleCompare()   // look then plain camera
+        XCTAssertEqual(model.liveConfiguration.comparisonSplit,.leading)
+        model.cycleCompare()   // plain camera then look
+        XCTAssertEqual(model.liveConfiguration.comparisonSplit,.trailing)
         model.deactivate()
     }
     @MainActor func testDetachingOldCameraDoesNotDetachNewCameraView() {

@@ -2,7 +2,7 @@ import CoreGraphics
 import Foundation
 
 /// "Left/right" = the SUBJECT's side (MediaPipe convention).
-enum EyeSide: String, Hashable {
+enum EyeSide: String, Hashable, Sendable {
     case subjectRight
     case subjectLeft
 }

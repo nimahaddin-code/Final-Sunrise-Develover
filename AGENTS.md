@@ -1,3 +1,9 @@
+## Brows compare one brow at a time — Khalish (2026-11-02)
+
+The Brows tab's compare button cycles `BrowCompare` (`.both` → `.left` → `.right` → `.off`), not the split screen. `EyebrowConfiguration.browOnlySide`
+(`.subjectLeft`/`.subjectRight`, nil = both brows) makes `drawBrow` draw only that half of the strip index buffer (`BrowEngine+Draw`); `comparisonSplit`
+stays nil on Brows. `.off` is the plain camera: no hidden natural brow, guide or preview. Blush still cycles the split (`TutorialCompare`). Simulator build only; device check pending.
+
 ## Brow tracker frames via VideoToolbox — Khalish (2026-11-01)
 
 `MediaPipeBrowTracker.bgra(from:)` scales the ARKit YCbCr frame to the 512-long-side BGRA pool buffer with a lazily created
@@ -12,6 +18,16 @@ Simulator build only; device timing and colour match not measured.
 No behaviour change: the brow's per-frame work is trimmed. Marks use a 3-slot buffer ring like the brow vertices, the developer
 menu flags are read at most twice a second, the camera colour attachments are read only when the pixel format or size changes,
 and the natural-brow unwrap grid is built only on frames where the eraser's fill is due (`BrowEraser.isDue`). Simulator build only; device check pending.
+
+## Brow split compare in Metal — Khalish (2026-11-01)
+
+The tutorial's split compare (Brows and Blush tabs) no longer stacks a second `ARSCNView` (`RealCameraView`, deleted) masked
+over half the screen. The engine draws the full camera and scissors only the look to the left half of the drawable when
+`settings.comparisonSplit`: blush as before, and now `drawBrow` too (after the background camera draw, so the brow strip with
+its hidden-natural-brow fill, the 3D hair and the marks are all cut). `comparisonSplit` is now a `HorizontalEdge?` (the half that shows the look, from `compare.side(of: .tryOn)`; nil = no split) and both
+scissors use `BeautyBlushEngine.splitScissor`, so `tryOnPlain` (look left) and `plainTryOn` (look right) are both correct. Leading
+is the left of the drawable (no RTL handling). The blush overlay is clipped to the guide's half, else the look's. No fade when the split changes. Simulator build only; device look pending.
+Since 2026-11-02 the Brows tab no longer splits (its compare button cycles one brow, see the top section); Blush still does.
 
 ## Brow: legacy fit off while Metal draws — Khalish (2026-11-01)
 
@@ -100,7 +116,7 @@ column (`BrowGeometry.section`). Device check pending.
 The tutorial's background is `AppColors.wine`, like Try On. Its bottom bar is compare (`CameraBarButton`, left), the tabs
 Blush / Brows / Eyeliner, and the screen light (right). `ScreenLight` (DesignSystem/Components) sets brightness to 1 and
 `ScreenLightGlow` draws a 24 pt `AppColors.ringLight` (#FFF4EA) frame round the camera; leaving restores the brightness,
-backgrounding suspends it and returning turns it back on. The split view's real half runs at 60 fps. Try On has no light
+backgrounding suspends it and returning turns it back on. Try On has no light
 button yet. Simulator build only; device look pending.
 
 ## Brow drawn on every ARKit frame — Khalish (2026-10-29)
@@ -146,8 +162,7 @@ the face-skin mask: a mask up to 0.6 s old keeps hands in front, an older one dr
 fading it out (the brow used to vanish whenever the segmenter fell behind). Brow tracking runs at up to 40 fps (`browMaxFramesPerSecond`, one frame per 1/40 s slot: two of every
 three 60 Hz camera frames), still skipped while MediaPipe is busy. Try On → tutorial no longer hangs: `LiveGuideView` keeps a screen whose camera
 lease was taken (`revoked`) from taking it back until it is paused. The split
-button's "real" half (`RealCameraView`) restores the ARSession delegate, because assigning a session to an `ARSCNView` makes the
-view the delegate and would stop the filter's frames. Simulator tests only; split and smoothness need a device check.
+button's "real" half was a second `ARSCNView` (`RealCameraView`, removed 2026-11-01: the engine scissors the look instead). Simulator tests only; split and smoothness need a device check.
 
 ## ARKit pose for the brow, and the 3D hair brow — Khalish (2026-10-28)
 
