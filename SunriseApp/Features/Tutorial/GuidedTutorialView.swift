@@ -531,8 +531,9 @@ private struct TutorialScreen: View {
                     }
                     .padding(.horizontal, AppSpacing.medium)
                     .frame(height: 52)
-                    .background(AppColors.snow.opacity(0.85), in: Capsule())
-                    .foregroundStyle(AppColors.wine)
+                    .background(AppColors.snow.opacity(0.8), in: Capsule())
+                    .overlay(Capsule().strokeBorder(AppColors.snow.opacity(0.6), lineWidth: 1))
+                    .foregroundStyle(Color.black)
                 }
                 .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
                 Spacer()
