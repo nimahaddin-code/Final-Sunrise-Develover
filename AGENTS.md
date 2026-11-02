@@ -1,8 +1,10 @@
-## Brows compare one brow at a time — Khalish (2026-11-02)
+## Brows compare one brow at a time; brow overlay cleanup — Khalish (2026-11-02)
 
 The Brows tab's compare button cycles `BrowCompare` (`.both` → `.left` → `.right` → `.off`), not the split screen. `EyebrowConfiguration.browOnlySide`
 (`.subjectLeft`/`.subjectRight`, nil = both brows) makes `drawBrow` draw only that half of the strip index buffer (`BrowEngine+Draw`); `comparisonSplit`
-stays nil on Brows. `.off` is the plain camera: no hidden natural brow, guide or preview. Blush still cycles the split (`TutorialCompare`). Simulator build only; device check pending.
+stays nil on Brows. `.off` is the plain camera: no hidden natural brow, guide or preview. Blush still cycles the split (`TutorialCompare`).
+Removed the eight `brow-sample-1…8` overlays and the `mirrorsForPair` flag: the `supplied.*` PNGs are already head-left/tail-right, so
+`browStrip` and the shader no longer mirror them. Simulator build only; device check pending.
 
 ## Brow tracker frames via VideoToolbox — Khalish (2026-11-01)
 

@@ -13,23 +13,19 @@ struct BrowOverlay: Identifiable, Hashable, Sendable {
     let assetName: String
     /// Drawn as a 3D hair mesh on ARKit's face pose when ARKit tracks the face; otherwise as its picture.
     var is3D = false
-    /// The supplied samples are drawn flipped along the brow on both sides
-    /// (left and right swapped).
-    var mirrorsForPair = false
 
     static let all: [BrowOverlay] = [
-        // Original production overlays remain available before the refreshed
-        // supplied sample set; opacity is controlled by the existing intensity slider.
+        // Original production overlays remain available before the supplied
+        // set; opacity is controlled by the existing intensity slider.
         BrowOverlay(id: "overlay.1", title: String(localized: "Brow 1"), assetName: "brow-overlay-1"),
         BrowOverlay(id: "overlay.2", title: String(localized: "Brow 2"), assetName: "brow-overlay-2"),
-        BrowOverlay(id: "sample.1", title: String(localized: "Feathered arch"), assetName: "brow-sample-1", mirrorsForPair: true),
-        BrowOverlay(id: "sample.2", title: String(localized: "Full feather"), assetName: "brow-sample-2", mirrorsForPair: true),
-        BrowOverlay(id: "sample.3", title: String(localized: "Lifted feather"), assetName: "brow-sample-3", mirrorsForPair: true),
-        BrowOverlay(id: "sample.4", title: String(localized: "Soft feather"), assetName: "brow-sample-4", mirrorsForPair: true),
-        BrowOverlay(id: "sample.5", title: String(localized: "Textured arch"), assetName: "brow-sample-5", mirrorsForPair: true),
-        BrowOverlay(id: "sample.6", title: String(localized: "Dense natural"), assetName: "brow-sample-6", mirrorsForPair: true),
-        BrowOverlay(id: "sample.7", title: String(localized: "Bold arch"), assetName: "brow-sample-7", mirrorsForPair: true),
-        BrowOverlay(id: "sample.8", title: String(localized: "Defined natural"), assetName: "brow-sample-8", mirrorsForPair: true),
+        BrowOverlay(id: "supplied.curved", title: String(localized: "Curved"), assetName: "brow-overlay-curved"),
+        BrowOverlay(id: "supplied.flatHorizontal", title: String(localized: "Flat horizontal"), assetName: "brow-overlay-flat-horizontal"),
+        BrowOverlay(id: "supplied.highArch", title: String(localized: "High arch"), assetName: "brow-overlay-high-arch"),
+        BrowOverlay(id: "supplied.rounded", title: String(localized: "Rounded"), assetName: "brow-overlay-rounded"),
+        BrowOverlay(id: "supplied.softAngled", title: String(localized: "Soft angled"), assetName: "brow-overlay-soft-angled"),
+        BrowOverlay(id: "supplied.softArch", title: String(localized: "Soft arch"), assetName: "brow-overlay-soft-arch"),
+        BrowOverlay(id: "supplied.upwardStraight", title: String(localized: "Upward straight"), assetName: "brow-overlay-upward-straight"),
     ]
     static let standard = all[0]
     /// A picture is nearly opaque, so the eyebrow starts higher than the 0.65 of the shape designs.
