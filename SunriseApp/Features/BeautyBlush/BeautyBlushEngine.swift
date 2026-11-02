@@ -133,6 +133,19 @@ final class BeautyBlushEngine:@unchecked Sendable {
     /// Tracking diagnostics are developer-only; publishing them at camera
     /// rate causes SwiftUI to rebuild dozens of labels unnecessarily.
     var lastTrackingPublish:Double = -.infinity
+    /// The brow tutorial's brow outlines (view-normalized), about 30 times a second while the guide is on.
+    var onBrowGuide:(@Sendable (BrowGuideSnapshot?)->Void)?
+    /// Where the tutorial's comparison cuts the picture: the face's midline (view-normalized x), so each half is one side of the
+    /// face wherever the person stands.
+    var onSplit:(@Sendable (CGFloat)->Void)?
+    var splitX:CGFloat=0.5,splitSent:CGFloat=0.5
+    @discardableResult func updateSplit(_ x:CGFloat)->CGFloat {
+        let target=min(0.8,max(0.2,x));splitX += (target-splitX)*0.4
+        if abs(splitX-splitSent)>0.002 {splitSent=splitX;onSplit?(splitX)}
+        return splitX
+    }
+    var lastBrowGuidePublish:Double = -.infinity
+    var browGuidePublished=false
     var lastError:String?
     var presentedFrames=0,pigmentFrames=0,projectionErrorPixels:Double=0
     var maskAgeMilliseconds:Double = -1
@@ -606,11 +619,19 @@ final class BeautyBlushEngine:@unchecked Sendable {
         var u=blush.u
         let pass=MTLRenderPassDescriptor();pass.colorAttachments[0].texture=drawable.texture;pass.colorAttachments[0].loadAction = .clear;pass.colorAttachments[0].storeAction = .store
         pass.depthAttachment.texture=depthTexture;pass.depthAttachment.loadAction = .clear;pass.depthAttachment.storeAction = .dontCare;pass.depthAttachment.clearDepth=1
+        var splitPixels=drawable.texture.width/2
+        if let anchor {
+            let world=SIMD3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
+            let rawSize=CGSize(width:CVPixelBufferGetWidth(frame.capturedImage),height:CVPixelBufferGetHeight(frame.capturedImage))
+            let rp=frame.camera.projectPoint(world,orientation:.landscapeRight,viewportSize:rawSize)
+            let centre=CGPoint(x:rp.x/rawSize.width,y:rp.y/rawSize.height).applying(frame.displayTransform(for:s.orientation,viewportSize:s.viewport))
+            splitPixels=Int(updateSplit(centre.x)*CGFloat(drawable.texture.width))
+        }
         guard let e=command.makeRenderCommandEncoder(descriptor:pass) else{return}
         e.setRenderPipelineState(background);e.setDepthStencilState(noDepth);e.setFragmentBytes(&u,length:MemoryLayout<Uniforms>.stride,index:0);e.setFragmentTexture(y,index:0);e.setFragmentTexture(cb,index:1)
         e.drawPrimitives(type:.triangle,vertexStart:0,vertexCount:3)
         // The camera fills the view in every comparison layout; only the pigment is limited to its half.
-        let half=drawable.texture.width/2
+        let half=splitPixels
         switch s.pigmentHalf {
         case .none:break
         case .full:encodeBlush(blush,e)

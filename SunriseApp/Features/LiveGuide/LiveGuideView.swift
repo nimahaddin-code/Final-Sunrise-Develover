@@ -62,6 +62,8 @@ struct LiveGuideView: UIViewRepresentable {
             engine.onStatus={ [weak camera] message in Task { @MainActor in camera?.update(\.beautyStatus,message) } }
             engine.onTracking={ [weak feed=camera.browTracking] snapshot in Task { @MainActor in feed?.snapshot=snapshot } }
             engine.onBlushGuide={ [weak feed=camera.blushGuide] snapshot in Task { @MainActor in if feed?.snapshot != snapshot {feed?.snapshot=snapshot} } }
+            engine.onBrowGuide={ [weak feed=camera.browGuide] snapshot in Task { @MainActor in if feed?.snapshot != snapshot {feed?.snapshot=snapshot} } }
+            engine.onSplit={ [weak feed=camera.faceSplit] x in Task { @MainActor in feed?.x=x } }
             lock.lock();beauty=engine;lock.unlock()
             let s=snapshot().0;lock.lock();let active=sessionActive;lock.unlock();engine.configure(s.visible && active ? s.eyebrows:nil)
         }

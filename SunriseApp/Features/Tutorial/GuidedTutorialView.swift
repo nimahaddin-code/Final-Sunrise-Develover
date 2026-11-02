@@ -167,19 +167,17 @@ enum TutorialTab: CaseIterable, Identifiable {
 
     /// The Brows tab's steps, as a brow is drawn with a pencil after brow mapping.
     static let browLessons = [
-        FaceGuideLesson(title: String(localized: "Brush your brows up with a spoolie"),
-                        instruction: String(localized: "Brush every hair upward and a little outward, so the real edge of your brow shows.")),
-        FaceGuideLesson(title: String(localized: "Mark three dots along the guide"),
-                        instruction: String(localized: "Make a small dot where each dashed line meets your brow: where it starts, its arch and where it ends.")),
-        FaceGuideLesson(title: String(localized: "Connect the dots into an outline"),
-                        instruction: String(localized: "Draw a light line from the start through the arch to the end along the top edge, then along the bottom.")),
-        FaceGuideLesson(title: String(localized: "Fill in with short, hair-like strokes"),
-                        instruction: String(localized: "Start at the arch and work toward the end, then go lighter toward the start.")),
-        FaceGuideLesson(title: String(localized: "Brush through to soften"),
-                        instruction: String(localized: "Brush the start upward with the spoolie so the front stays soft, then check that both brows match.")),
+        FaceGuideLesson(title: String(localized: "Brush your brows up with your spoolie."),
+                        instruction: String(localized: "Your brow hairs point up, and you can see the gaps.")),
+        FaceGuideLesson(title: String(localized: "Mark three dots along the guide."),
+                        instruction: String(localized: "Each brow has three small dots that sit on the guide's dots.")),
+        FaceGuideLesson(title: String(localized: "Fill from the middle to the tail, lightly."),
+                        instruction: String(localized: "The middle to tail is filled inside the guide. The front is still bare.")),
+        FaceGuideLesson(title: String(localized: "Brush the middle into the front to blend."),
+                        instruction: String(localized: "The front has soft colour with no hard starting edge.")),
+        FaceGuideLesson(title: String(localized: "Wipe off anything outside the guide."),
+                        instruction: String(localized: "The edges are clean, and nothing sits outside the guide.")),
     ]
-    /// The brow steps that show the mapping lines: marking the dots and outlining between them.
-    static let browMappingSteps = 1...2
 
     /// False when the tab has no reference (nothing is drawn rather than a default).
     var hasGuide: Bool { tab == .eyeliner ? linerStyle != nil : brow.hasRecommendation }
@@ -203,7 +201,8 @@ enum TutorialTab: CaseIterable, Identifiable {
         var value = brow.liveConfiguration
         // Brows and blush draw on one face mesh: a look beside the plain camera is the renderer's own left-half split.
         value.comparisonSplit = tab == .blush && compare.plainBesideLook != nil
-        value.showMappingFormula = tab == .brows && Self.browMappingSteps.contains(browStep)
+        // The brow overlay draws its own dots on the guide (`BrowTutorialOverlay`), so the engine's dashed mapping lines stay off.
+        value.showMappingFormula = false
         // The tutorial shows dashed nose-to-brow lines, not MediaPipe's landmark view.
         value.browTrackingOverlay = false
         // The filter the user picked on Try On, with its shade and strength (`applyShade`), is what the tutorial shows.
@@ -410,6 +409,8 @@ private struct TutorialScreen: View {
         .sensoryFeedback(.selection, trigger: model.compare)
         .sensoryFeedback(.selection, trigger: model.browCompare)
         .sensoryFeedback(.selection, trigger: light.isOn)
+        .onChange(of: flashOn) { _, on in light.set(on) }
+        .onChange(of: model.photoMode) { _, entered in if entered { flashOn = light.isOn } }
         .task {
             await model.brow.prepare()
             if model.brow.availability == .supported { await camera.requestPermission() }
@@ -465,6 +466,8 @@ private struct TutorialScreen: View {
             .padding(AppSpacing.small)
         }
         .animation(.easeInOut(duration: 0.25), value: lit)
+        // The flash on the photo screen is the screen light: full brightness and a warm ring round the picture.
+        .overlay { if model.photoMode { ScreenLightGlow(light: light, cornerRadius: 10) } }
         .clipShape(RoundedRectangle(cornerRadius: model.photoMode ? 10 : AppSpacing.cornerRadius, style: .continuous))
     }
 
@@ -494,7 +497,10 @@ private struct TutorialScreen: View {
                     if model.tab == .blush, model.hasGuide, !model.photoMode, let side = model.compare.side(of: .guide) {
                         // The guide's half only, over the bare camera; the look is on the other half.
                         BlushTutorialOverlay(feed: camera.blushGuide, step: index)
-                            .mask { halfMask(left: side == .leading) }
+                            .mask { FaceHalfMask(feed: camera.faceSplit, left: side == .leading) }
+                    }
+                    if model.tab == .brows, model.hasGuide, !model.photoMode, model.browCompare != .off {
+                        BrowTutorialOverlay(feed: camera.browGuide, step: index, paused: advisor.pausesAnimation)
                     }
                     if model.photoMode {
                         // Plain camera: nothing drawn on the face.
@@ -520,12 +526,6 @@ private struct TutorialScreen: View {
         }
     }
 
-    /// A mask covering the whole view, or only its left / right half.
-    private func halfMask(left: Bool) -> some View {
-        GeometryReader { proxy in
-            Rectangle().frame(width: proxy.size.width / 2).frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
-        }
-    }
 
     private func message(symbol: String, title: LocalizedStringKey, text: LocalizedStringKey,
                          actionTitle: LocalizedStringKey? = nil, action: (() -> Void)? = nil) -> some View {
@@ -600,34 +600,9 @@ private struct TutorialScreen: View {
     /// Brows: a small spaced "STEP 1 OF 5" over one short instruction in a pill, like a camera effect's caption.
     @ViewBuilder private var wording: some View {
         switch model.tab {
-        case .brows: browCaption
-        case .blush: stepCaption
+        case .brows, .blush: stepCaption
         case .eyeliner: lessonCard
         }
-    }
-
-    private var browCaption: some View {
-        VStack(spacing: AppSpacing.small) {
-            Text("Step \(index + 1) of \(lessons.count)")
-                .textCase(.uppercase)
-                .font(.subheadline.weight(.medium))
-                .tracking(3)
-                .foregroundStyle(AppColors.snow.opacity(0.8))
-                .monospacedDigit()
-            Text(lessons[index].title)
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(AppColors.snow)
-                .padding(.horizontal, AppSpacing.large).padding(.vertical, AppSpacing.small)
-                .background(AppColors.wine.opacity(0.55), in: Capsule())
-        }
-        .shadow(color: .black.opacity(0.35), radius: 3)
-        .frame(maxWidth: .infinity)
-        .padding(.bottom, AppSpacing.medium)
-        .animation(.easeInOut(duration: 0.2), value: index)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
-        .accessibilityValue(Text(lessons[index].title + ". " + lessons[index].instruction))
     }
 
     /// UX spec 1.1: "STEP 1 OF 2" (17 pt, 2 pt tracking, 70%, drop shadow), 4 pt gap, then the caption in a #370B21 rounded
@@ -808,3 +783,17 @@ private struct BlushTutorialOverlay: View {
     }
 }
 
+
+/// A mask covering the whole view, or only the part left / right of the face's midline.
+private struct FaceHalfMask: View {
+    @ObservedObject var feed: FaceSplitFeed
+    let left: Bool
+
+    var body: some View {
+        GeometryReader { proxy in
+            let cut = proxy.size.width * feed.x
+            Rectangle().frame(width: left ? cut : proxy.size.width - cut)
+                .frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
+        }
+    }
+}

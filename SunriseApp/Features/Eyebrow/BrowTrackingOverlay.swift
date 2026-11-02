@@ -23,6 +23,19 @@ struct BrowTrackingSnapshot: Equatable, Sendable {
     @Published var snapshot: BrowTrackingSnapshot?
 }
 
+/// The two brow outlines for the brow tutorial, head to tail, in view-normalized positions (0...1), left brow first.
+struct BrowGuideSnapshot: Equatable, Sendable {
+    struct Brow: Equatable, Sendable {
+        var upper: [CGPoint]
+        var lower: [CGPoint]
+    }
+    var brows: [Brow]
+}
+
+@MainActor final class BrowGuideFeed: ObservableObject {
+    @Published var snapshot: BrowGuideSnapshot?
+}
+
 /// Labels the MediaPipe landmark indices next to the points the Metal engine draws, plus a head-pose and timing
 /// readout and a colour legend. Developer view: English only, like Scan Debug.
 struct BrowTrackingOverlayView: View {

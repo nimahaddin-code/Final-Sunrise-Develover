@@ -88,9 +88,15 @@ struct PaletteColorPicker: View {
 
     var body: some View {
         VStack(spacing: AppSpacing.large) {
-            Text(photo == nil ? "Snap Your Product" : "Pick Your Colour")
-                .font(.headline)
-                .accessibilityAddTraits(.isHeader)
+            VStack(spacing: 4) {
+                Text(photo == nil ? "Capture Your Product" : "Select Your Shade")
+                    .font(.system(size: 20, weight: .semibold))
+                    .accessibilityAddTraits(.isHeader)
+                Text(photo == nil ? "Place your makeup in good lighting for the most accurate match."
+                                  : "Drag the picker to select the exact color.")
+                    .font(.system(size: 15))
+                    .multilineTextAlignment(.center)
+            }
             viewfinder
             if let error {
                 Text(error).font(AppTypography.caption).multilineTextAlignment(.center)

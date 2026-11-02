@@ -182,6 +182,7 @@
 		B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */; };
 		B82426BCCB6209B4DC3E2179 /* FaceSnapshotter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC7512B62F7A8614E0911E45 /* FaceSnapshotter.swift */; };
 		B8EAE5AAE0A46180B2B92BC2 /* LocalSavedLooksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045449C4CDF0CE2EAAA00D42 /* LocalSavedLooksStore.swift */; };
+		7C1E5A0B2D3F4A6B8C9D0E51 /* BrowTutorialOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */; };
 		7C1E5A0B2D3F4A6B8C9D0E41 /* StyleIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */; };
 		7C1E5A0B2D3F4A6B8C9D0E31 /* TutorialPrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */; };
 		B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */; };
@@ -322,6 +323,7 @@
 		676226E236A23E238E3B1C77 /* EyeCameraSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeCameraSession.swift; sourceTree = "<group>"; };
 		68347A4A84BC0644A4FE6F07 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmptyStateView.swift; sourceTree = "<group>"; };
 		6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowViewModel.swift; sourceTree = "<group>"; };
+		7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowTutorialOverlay.swift; sourceTree = "<group>"; };
 		7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleIcons.swift; sourceTree = "<group>"; };
 		7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPrepView.swift; sourceTree = "<group>"; };
 		6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPages.swift; sourceTree = "<group>"; };
@@ -911,6 +913,7 @@
 				C4AE33974D71FD4A86072E97 /* TutorialInstructions.swift */,
 				FE2B5E1913561C0593FD7840 /* TutorialView.swift */,
 				7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */,
+				7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */,
 				7F3A91C2D45E6B80A1C9E0F5 /* PhotoCaptureViews.swift */,
 				7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */,
 				513CE2D3B12E8EE4EB17E942 /* TutorialViewModel.swift */,
@@ -1261,6 +1264,7 @@
 				F69EBE2B5722EEBEF5B9B0A7 /* SavedLooksViewModel.swift in Sources */,
 				3445B0A9ADD7794489F23820 /* TutorialView.swift in Sources */,
 				7F3A91C2D45E6B80A1C9E0F4 /* GuidedTutorialView.swift in Sources */,
+				7C1E5A0B2D3F4A6B8C9D0E51 /* BrowTutorialOverlay.swift in Sources */,
 				7F3A91C2D45E6B80A1D00003 /* CameraMessage.swift in Sources */,
 				7F3A91C2D45E6B80A1D00005 /* CameraMessageEngine.swift in Sources */,
 				7F3A91C2D45E6B80A1D00007 /* CameraSignalSampler.swift in Sources */,

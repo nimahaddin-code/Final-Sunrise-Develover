@@ -269,6 +269,18 @@ extension BeautyBlushEngine {
                 onTracking?(snapshot)
             }
         }
+        if let observation {
+            let image=SIMD2(Float(observation.imageSize.width),Float(observation.imageSize.height))
+            let bridge=observation.noseBridge
+            updateSplit(CGPoint(x:CGFloat(bridge.x/image.x),y:CGFloat(bridge.y/image.y)).applying(display).x)
+        }
+        if s.guide {
+            if frame.timestamp - lastBrowGuidePublish >= 1.0 / 30.0 {
+                lastBrowGuidePublish = frame.timestamp
+                if let observation,tracked {onBrowGuide?(Self.browGuide(observation,display:display));browGuidePublished=true}
+                else if browGuidePublished {onBrowGuide?(nil);browGuidePublished=false}
+            }
+        } else if browGuidePublished {onBrowGuide?(nil);browGuidePublished=false}
         let retained=FrameLifetime(y:cy,cb:cc,frame:frame)
         let completionGate=inFlight
         command.addCompletedHandler { [weak self] cb in

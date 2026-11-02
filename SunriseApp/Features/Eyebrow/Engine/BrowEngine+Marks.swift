@@ -191,4 +191,11 @@ extension BeautyBlushEngine {
         out.append(label("\(MediaPipeBrowTracker.noseBridge)",o.noseBridge))
         return out
     }
+    /// Both brow outlines in view-normalized positions, head to tail, left brow of the screen first.
+    static func browGuide(_ o:BrowObservation,display:CGAffineTransform)->BrowGuideSnapshot {
+        let image=SIMD2(Float(o.imageSize.width),Float(o.imageSize.height))
+        func view(_ p:SIMD2<Float>)->CGPoint {CGPoint(x:CGFloat(p.x/image.x),y:CGFloat(p.y/image.y)).applying(display)}
+        let brows=o.brows.values.map {BrowGuideSnapshot.Brow(upper:$0.upper.map(view),lower:$0.lower.map(view))}
+        return BrowGuideSnapshot(brows:brows.sorted {($0.upper.first?.x ?? 0)<($1.upper.first?.x ?? 0)})
+    }
 }
