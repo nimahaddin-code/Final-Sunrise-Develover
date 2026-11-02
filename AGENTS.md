@@ -1,4 +1,4 @@
-## Folders per tool: TryOn/<Tool>/{TryOn,Engine,Tutorial}, Legacy — -Nimah (2026-11-02)
+## Folders per tool: Makeup/<Tool>/{TryOn,Engine,Tutorial}, Legacy — -Nimah (2026-11-02)
 
 Files moved, no code, flow or UI change. Live code is under `Features/TryOn/`, one folder per tool, each with `TryOn/`
 (what the Try On screen shows: pickers, looks, config), `Engine/` (what draws it on the camera) and `Tutorial/` (steps,
@@ -21,6 +21,15 @@ Split, no logic change (2026-11-02, second commit): each tool's tutorial is in i
 `Shared/Tutorial/`. The blush parts of the engine moved from `BeautyBlushEngine.swift` to
 `TryOn/Blush/Engine/BlushEngine+Draw.swift` (cheek landmark fit, guide outlines, `bind`, `prepareBlush`, `encodeBlush`), like
 the brow's `BrowEngine+*`; `Core/Engine/BeautyBlushEngine.swift` keeps state, setup, configure/submit, `render`, the mask.
+
+Top level and name (2026-11-02, third commit; files only): `Features/TryOn/` is now `Features/Makeup/` (it holds Try On
+and tutorial). `SunriseApp/` has five folders: `App/` (entry, root view, container, navigation, `Info.plist`, was
+`Configuration/`), `Engine/` (was `Core/AR` + `Core/Engine`, plus `FaceTrackingAvailability` and
+`FaceTrackingAvailabilityChecking`), `Features/`, `DesignSystem/` (theme and `GlassKit` only) and `Resources/`.
+`Core/Models/Tutorial.swift` moved to `Makeup/Shared/Tutorial/`; the rest of `Core/Models`, `Core/Services/Contracts` and
+`PreviewSupport/` went to `Legacy/Scaffold/`, the scan components and `ScanOverlay` to `Legacy/Scan/`, unused components
+to `Legacy/DesignSystem/`. `INFOPLIST_FILE` is `SunriseApp/App/Info.plist`. Paths above that say `TryOn/<Tool>` or
+`TryOn/Shared` now read `Makeup/<Tool>` and `Makeup/Shared`; `Core/Engine/` reads `Engine/`.
 
 | Old | New |
 | --- | --- |
@@ -686,22 +695,18 @@ SunriseApp.xcodeproj/     explicit PBXGroups: every new file must be added to th
 SunriseApp/
   App/                    SunriseApp entry, AppContainer (composition root), AppRootView (tabs + route destinations)
     Navigation/           AppRoute (all destinations), AppNavigator (tabs, per-tab paths, onboarding flag)
-  Core/
-    Engine/               shared makeup engine (Metal, camera, hand mask), its shaders and the MediaPipe face tracker
-    Models/               cross-feature models: MakeupReference, Tutorial, SavedLookMetadata, FaceTrackingAvailability, ScanOverlay (+ ScanSnapshot)
-    Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
+                          Info.plist (camera + photo-library-add usage strings)
+  Engine/                 shared makeup engine (Metal, camera, ARKit session, hand mask), shaders, MediaPipe face tracker
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
-    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge
+    Components/           GlassKit (frosted glass buttons and pills)
   Features/
-    TryOn/                everything the app shows: Try On, tutorial, photo
+    Makeup/               everything the app shows: Try On, tutorial, photo
       Blush/ Brow/ Eyeliner/   each with TryOn/ (pickers, looks, config), Engine/ (drawing), Tutorial/ (steps)
       Shared/             Home/ (Try On screen), Camera/, Tutorial/ (tutorial shell, photo), Rules/, Support/
     Onboarding/           welcome screen (shown once)
     Legacy/               kept but unreached: face/eye scan, Scan Debug, old try-on and tutorial, scaffold pages
-  PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
-  Configuration/          Info.plist (camera + photo-library-add usage strings)
 SunriseDebugMac/          separate Mac-only Xcode project: edits scans exported from the Scan Debug tab (see below and its README)
 SunriseAppTests/
   Features/               face shape, head pose, photo measurer, makeup recommender/personalization/texture tests
