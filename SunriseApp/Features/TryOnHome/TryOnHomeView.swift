@@ -14,6 +14,8 @@ struct TryOnHomeView: View {
     @State private var prepHandoff: TutorialHandoff?
     @StateObject private var light = ScreenLight()
     @Namespace private var toolGlass
+    /// Dark labels on the white screen of the light.
+    private var ink: Color { light.isOn ? .black : AppColors.snow }
 
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
          onTutorial: @escaping (TutorialHandoff) -> Void) {
@@ -29,21 +31,7 @@ struct TryOnHomeView: View {
                 RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(AppColors.cocoa)
                     .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
             } else {
-                TryOnLiveCard(home: home).frame(maxHeight:.infinity)
-                    .overlay { ScreenLightGlow(light: light) }
-                    .overlay(alignment: .topLeading) {
-                        Button { light.toggle() } label: {
-                            Image(systemName: "bolt.fill")
-                                .font(.system(size: 18, weight: .medium))
-                                .foregroundStyle(light.isOn ? ScreenLight.glow : AppColors.snow)
-                                .frame(width: 44, height: 44)
-                                .glassCircle(tint: light.isOn ? ScreenLight.glow.opacity(0.3) : AppColors.snow.opacity(0.18))
-                        }
-                        .buttonStyle(.plain)
-                        .padding(AppSpacing.small)
-                        .accessibilityLabel("Light")
-                        .accessibilityValue(light.isOn ? Text("On") : Text("Off"))
-                    }
+                TryOnLiveCard(home: home, light: light).frame(maxHeight:.infinity)
                     .overlay(alignment: .topTrailing) {
                         if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small) }
                         if developerTools && home.tool == .blush { BlushDebugMenu().padding(AppSpacing.small) }
@@ -66,8 +54,10 @@ struct TryOnHomeView: View {
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background { MainBackground() }
-        .foregroundStyle(AppColors.snow)
+        .background { if light.isOn { AppColors.ringLight.ignoresSafeArea() } else { MainBackground() } }
+        .animation(.easeInOut(duration: 0.25), value: light.isOn)
+        .preferredColorScheme(light.isOn ? .light : nil)
+        .foregroundStyle(ink)
         .toolbar(.hidden, for: .navigationBar)
         .overlay {
             if let handoff = prepHandoff {
@@ -133,7 +123,7 @@ struct TryOnHomeView: View {
                     Button { withAnimation(.smooth(duration: 0.3)) { home.choose(tool) } } label: {
                         Text(tool.title)
                             .font(.system(size: 18, weight: selected ? .semibold : .regular))
-                            .foregroundStyle(AppColors.snow.opacity(selected ? 1 : 0.6))
+                            .foregroundStyle(ink.opacity(selected ? 1 : 0.6))
                             .padding(.horizontal, 18)
                             .frame(minHeight: 42)
                             .modifier(SelectedToolGlass(selected: selected, namespace: toolGlass))

@@ -26,16 +26,17 @@ struct CameraMessageEngine {
     enum Limits {
         static let darkShow = 300.0, darkClear = 400.0
         static let backlitShow = 0.6, backlitClear = 0.7
-        static let closeShow = 0.25, closeClear = 0.28
-        static let farShow = 0.55, farClear = 0.50
-        static let tiltShow = 25.0, tiltClear = 20.0
+        // Wide on purpose: she should move her head freely, and only a face really pressed to the screen is flagged.
+        static let closeShow = 0.18, closeClear = 0.21
+        static let farShow = 0.65, farClear = 0.58
+        static let tiltShow = 32.0, tiltClear = 26.0
         // The filter stays on until about half the face is out of sight, so only a strong turn is flagged.
         static let yawShow = 45.0, yawClear = 38.0
         /// Tracking lost within this long after the face was last seen: blame the last known cause (too close, or turned away).
         static let lostCauseWindow = 5.0
-        static let lostCloseDistance = 0.30, lostYaw = 35.0
-        static let speedShow = 0.3, speedClear = 0.2
-        static let turnShow = 90.0, turnClear = 60.0
+        static let lostCloseDistance = 0.20, lostYaw = 35.0
+        static let speedShow = 0.45, speedClear = 0.3
+        static let turnShow = 120.0, turnClear = 80.0
     }
 
     let context: CameraGuidanceContext

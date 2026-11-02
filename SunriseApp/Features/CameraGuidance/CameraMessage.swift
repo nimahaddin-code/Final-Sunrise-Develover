@@ -16,7 +16,7 @@ enum CameraMessage: Int, CaseIterable, Comparable, Sendable {
         switch self {
         case .phoneWarm: 0
         case .faceLost: 2
-        case .movingFast: 1.5
+        case .movingFast, .tooClose: 1.5
         default: 1
         }
     }
@@ -33,7 +33,7 @@ enum CameraMessage: Int, CaseIterable, Comparable, Sendable {
         case .faceLost: "I'll wait here. Come back when you're ready."
         case .multipleFaces: "Let's keep it to just you in the frame."
         case .faceCovered: "Move your hair or hands so I can see your face."
-        case .tooClose: "Move your phone back a little."
+        case .tooClose: "Move your face a little farther from the screen."
         case .tooFar: "Pinch the screen to zoom in."
         case .tiltedPhone: "Hold your phone straight, at eye level."
         case .headTurned: "Face your phone straight on."

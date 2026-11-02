@@ -69,36 +69,6 @@ enum TutorialCompare: CaseIterable {
     }
 }
 
-/// The Brows tab's bottom-left button, in the order it cycles: the look on both brows, on the user's own left brow only,
-/// on the right only, then the plain camera. (Left/right are the user's: the front camera is mirrored.)
-enum BrowCompare: CaseIterable {
-    case both, left, right, off
-
-    var next: BrowCompare {
-        let all = Self.allCases
-        return all[(all.firstIndex(of: self)! + 1) % all.count]
-    }
-    var side: EyeSide? {
-        switch self { case .left: .subjectLeft; case .right: .subjectRight; case .both, .off: nil }
-    }
-    var symbol: String {
-        switch self {
-        case .both: "circle.fill"
-        case .left: "circle.righthalf.filled"
-        case .right: "circle.lefthalf.filled"
-        case .off: "circle"
-        }
-    }
-    var label: LocalizedStringKey {
-        switch self {
-        case .both: "Look on both brows"
-        case .left: "Look on your left brow only"
-        case .right: "Look on your right brow only"
-        case .off: "Plain camera"
-        }
-    }
-}
-
 enum TutorialTab: CaseIterable, Identifiable {
     /// In the bottom bar's order.
     case blush, brows, eyeliner
@@ -126,7 +96,6 @@ enum TutorialTab: CaseIterable, Identifiable {
     @Published private(set) var browStep = 0
     @Published private(set) var blushStep = 0
     @Published private(set) var compare = TutorialCompare.tryOnGuide
-    @Published private(set) var browCompare = BrowCompare.both
     /// After the last step: the camera shows the whole assigned look, with no guide, for taking a photo.
     @Published private(set) var photoMode = false
     private let linerStyle: LinerStyle?
@@ -163,6 +132,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     static let blushLessons = [
         FaceGuideLesson(title: String(localized: "Dab a little blush inside the small circle."), instruction: ""),
         FaceGuideLesson(title: String(localized: "Dab outward to blend it into your skin."), instruction: ""),
+        FaceGuideLesson(title: String(localized: "Buff in small circles, sweeping outward, until the edge is gone."), instruction: ""),
     ]
 
     /// The Brows tab's steps, as a brow is drawn with a pencil after brow mapping.
@@ -192,7 +162,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         return brow.lessons
     }
 
-    func cycleCompare() { if tab == .brows { browCompare = browCompare.next } else { compare = compare.next } }
+    func cycleCompare() { compare = compare.next }
 
     /// The brow/blush preview configuration for the camera. Eyeliner is drawn by its own overlay, so the face-mesh
     /// guide is off on that tab.
@@ -208,8 +178,10 @@ enum TutorialTab: CaseIterable, Identifiable {
         // The filter the user picked on Try On, with its shade and strength (`applyShade`), is what the tutorial shows.
         if tab == .brows {
             value.browOverlay = handoff.browOverlay
-            value.browOnlySide = browCompare.side
-            value.hideNaturalBrow = browCompare != .off && handoff.hideNaturalBrow
+            // The comparison cuts at the face's midline, and each brow is on one side of it: the look is drawn on the brow on
+            // its half only (the front camera is mirrored: the screen's left half is the user's right brow).
+            value.browOnlySide = compare.side(of: .tryOn).map { $0 == .leading ? EyeSide.subjectRight : .subjectLeft }
+            value.hideNaturalBrow = compare.showsTryOn && handoff.hideNaturalBrow
         }
         // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
         // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
@@ -218,7 +190,7 @@ enum TutorialTab: CaseIterable, Identifiable {
             value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil
             return value
         }
-        if !hasGuide || (tab == .brows ? browCompare == .off : compare == .plain) { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
+        if !hasGuide || compare == .plain { value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil }
         // No brow chosen on Try On: the brow guide is still drawn by the makeup engine, so it stays on, with no brow
         // picture and the natural brow left alone. (Turning the preview off stopped the engine and took the guide with it.)
         if tab == .brows && !handoff.enabled.contains(.eyebrow) { value.browOverlay = nil; value.hideNaturalBrow = false }
@@ -407,7 +379,6 @@ private struct TutorialScreen: View {
         .sensoryFeedback(.selection, trigger: model.tab)
         .sensoryFeedback(.selection, trigger: model.stepIndex)
         .sensoryFeedback(.selection, trigger: model.compare)
-        .sensoryFeedback(.selection, trigger: model.browCompare)
         .sensoryFeedback(.selection, trigger: light.isOn)
         .onChange(of: flashOn) { _, on in light.set(on) }
         .onChange(of: model.photoMode) { _, entered in if entered { flashOn = light.isOn } }
@@ -499,8 +470,9 @@ private struct TutorialScreen: View {
                         BlushTutorialOverlay(feed: camera.blushGuide, step: index)
                             .mask { FaceHalfMask(feed: camera.faceSplit, left: side == .leading) }
                     }
-                    if model.tab == .brows, model.hasGuide, !model.photoMode, model.browCompare != .off {
-                        BrowTutorialOverlay(feed: camera.browGuide, step: index, paused: advisor.pausesAnimation)
+                    if model.tab == .brows, model.hasGuide, !model.photoMode, let side = model.compare.side(of: .guide) {
+                        // The guide's brow only; the look is on the other one.
+                        BrowTutorialOverlay(feed: camera.browGuide, step: index, paused: advisor.pausesAnimation, side: side)
                     }
                     if model.photoMode {
                         // Plain camera: nothing drawn on the face.
@@ -656,9 +628,9 @@ private struct TutorialScreen: View {
     /// Compare on the left, the three tabs, the screen light on the right (as on Try On).
     private var tabBar: some View {
         HStack(spacing: AppSpacing.small) {
-            CameraBarButton(symbol: model.tab == .brows ? model.browCompare.symbol:model.compare.symbol) { model.cycleCompare() }
+            CameraBarButton(symbol: model.compare.symbol) { model.cycleCompare() }
                 .accessibilityLabel("Compare")
-                .accessibilityValue(model.tab == .brows ? model.browCompare.label:model.compare.label)
+                .accessibilityValue(model.compare.label)
             ForEach(TutorialTab.allCases) { tab in
                 let selected = tab == model.tab
                 Button { model.select(tab) } label: {
@@ -699,7 +671,11 @@ private struct BlushTutorialOverlay: View {
         TimelineView(.animation(paused: paused)) { context in
             let t = paused ? Self.animation - 0.001 : context.date.timeIntervalSinceReferenceDate
             ZStack {
-                Canvas { g, _ in draw(&g, time: t, still: paused) }
+                Canvas { g, _ in
+                    // A soft dark edge keeps the white guide readable on bright skin and under the ring light.
+                    g.addFilter(.shadow(color: .black.opacity(0.35), radius: 1.5, x: 0, y: 0))
+                    draw(&g, time: t, still: paused)
+                }
                 if let cheeks = feed.snapshot?.cheeks {
                     ForEach(cheeks.indices, id: \.self) { i in fingertip(cheeks[i], time: t, still: paused) }
                 }
@@ -735,6 +711,19 @@ private struct BlushTutorialOverlay: View {
                 g.stroke(outer, with: .color(AppColors.snow.opacity(0.95)), style: dotted)
             }
             g.stroke(inner, with: .color(AppColors.snow.opacity(step >= 1 ? 0.7 : 0.95)), style: dotted)
+            if step == 2 {
+                // The way to sweep: from the centre of the cheek out along the look's direction, dashes marching outward.
+                let end = CGPoint(x: c.center.x + (c.outward.x - c.center.x) * 1.15, y: c.center.y + (c.outward.y - c.center.y) * 1.15)
+                var line = Path(); line.move(to: c.center); line.addLine(to: end)
+                let phase = still ? 0 : -t * 18
+                g.stroke(line, with: .color(AppColors.snow.opacity(0.95)), style: StrokeStyle(lineWidth: 2.5, lineCap: .round, dash: [7, 6], dashPhase: phase))
+                let angle = atan2(end.y - c.center.y, end.x - c.center.x), head: CGFloat = 11
+                var arrow = Path()
+                arrow.move(to: CGPoint(x: end.x - head * cos(angle - 0.5), y: end.y - head * sin(angle - 0.5)))
+                arrow.addLine(to: end)
+                arrow.addLine(to: CGPoint(x: end.x - head * cos(angle + 0.5), y: end.y - head * sin(angle + 0.5)))
+                g.stroke(arrow, with: .color(AppColors.snow), style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
+            }
         }
     }
 
@@ -754,6 +743,29 @@ private struct BlushTutorialOverlay: View {
     }
 
     @ViewBuilder private func fingertip(_ c: BlushGuideSnapshot.Cheek, time t: Double, still: Bool) -> some View {
+        if step == 2 { buffing(c, time: t, still: still) } else { dabbing(c, time: t, still: still) }
+    }
+
+    /// Step 3: the fingertip sweeps outward along the look's direction twice in the 3 s, turning small circles as it goes.
+    @ViewBuilder private func buffing(_ c: BlushGuideSnapshot.Cheek, time t: Double, still: Bool) -> some View {
+        let d = CGPoint(x: c.outward.x - c.center.x, y: c.outward.y - c.center.y)
+        let xs = c.outer.map(\.x)
+        let k = max(0.7, min(1.6, ((xs.max() ?? 0) - (xs.min() ?? 0)) / 120))
+        let local = still ? Self.animation * 0.7 : t.truncatingRemainder(dividingBy: Self.cycle)
+        let p = min(1, local / Self.animation)
+        let sweep = 0.1 + 1.0 * (p * 2).truncatingRemainder(dividingBy: 1)
+        let swirl = p * 2 * .pi * 7
+        let radius = hypot(d.x, d.y) * 0.1
+        let target = CGPoint(x: c.center.x + d.x * sweep + cos(swirl) * radius, y: c.center.y + d.y * sweep + sin(swirl) * radius)
+        Image(systemName: "hand.point.up.left.fill")
+            .font(.system(size: 34 * k))
+            .foregroundStyle(AppColors.snow)
+            .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
+            .scaleEffect(0.95)
+            .position(x: target.x + 9 * k, y: target.y + 15 * k - 5 * k)
+    }
+
+    @ViewBuilder private func dabbing(_ c: BlushGuideSnapshot.Cheek, time t: Double, still: Bool) -> some View {
         let points = targets(c)
         let local = still ? Self.animation - 0.001 : t.truncatingRemainder(dividingBy: Self.cycle)
         // Which dab, how far into it (0...1), and how hard the finger presses (0 up, 1 on the skin).
@@ -765,19 +777,22 @@ private struct BlushTutorialOverlay: View {
         let target = Self.fingerPosition(points, local: local, index: index, u: u)
         let visible: Double = 1
         let ringProgress = still ? 0.6 : max(0, min(1, (u - 0.35) / 0.65))
+        // The finger and its ring scale with this cheek's size on screen (face size and distance).
+        let xs = c.outer.map(\.x)
+        let k = max(0.7, min(1.6, ((xs.max() ?? 0) - (xs.min() ?? 0)) / 120))
         ZStack {
             Circle()
                 .stroke(AppColors.flamingo, lineWidth: 2.5)
-                .frame(width: 10 + 30 * ringProgress, height: 10 + 30 * ringProgress)
+                .frame(width: (10 + 30 * ringProgress) * k, height: (10 + 30 * ringProgress) * k)
                 .opacity((still ? 0.6 : (u > 0.35 && local < Self.animation ? 1 - ringProgress : 0)) * visible)
                 .position(points[index])
             Image(systemName: "hand.point.up.left.fill")
-                .font(.system(size: 34))
+                .font(.system(size: 34 * k))
                 .foregroundStyle(AppColors.snow)
                 .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
                 .scaleEffect(1 - 0.08 * press)
                 // The symbol's fingertip is near its top left: put that point on the cheek, lifted while not pressing.
-                .position(x: target.x + 9, y: target.y + 15 - 14 * (1 - press))
+                .position(x: target.x + 9 * k, y: target.y + 15 * k - 14 * k * (1 - press))
                 .opacity(visible)
         }
     }

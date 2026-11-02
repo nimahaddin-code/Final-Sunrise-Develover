@@ -9,21 +9,24 @@ struct TryOnLiveCard: View {
     @ObservedObject var camera: FaceCameraState
     @ObservedObject var brow: EyebrowViewModel
     @StateObject private var advisor = CameraAdvisor(context: .tryOn)
-    @StateObject private var light = ScreenLight()
+    /// The screen light, owned by the Try On screen: it turns the whole screen white, not only this card.
+    @ObservedObject var light: ScreenLight
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
-    init(home: TryOnHomeModel) {
+    init(home: TryOnHomeModel, light: ScreenLight) {
         self.home = home
+        self.light = light
         camera = home.camera
         brow = home.brow
     }
 
     var body: some View {
         ZStack {
-            Color.black
+            if !light.isOn { Color.black }
             content
         }
+        .animation(.easeInOut(duration: 0.25), value: light.isOn)
         .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous))
         .overlay(alignment: .bottom) {
             if home.isComparing {
@@ -86,18 +89,21 @@ struct TryOnLiveCard: View {
                 BrowTrackingOverlayView(feed: camera.browTracking)
             }
         }
+        // The screen light: the picture's edge melts into the white screen, which is what lights the face.
+        .mask {
+            RoundedRectangle(cornerRadius: AppSpacing.cornerRadius * 2, style: .continuous)
+                .padding(light.isOn ? 26 : 0)
+                .blur(radius: light.isOn ? 26 : 0)
+        }
         // Pinch or tap the chip to zoom the picture and its overlays together; the light and captions stay put.
         .cameraZoom()
-        .overlay {
-            ScreenLightGlow(light: light)
-        }
         .overlay {
             if let status {
                 StatusPill(text: status)
             }
         }
-        .overlay(alignment: .leading) {
-            ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(.leading, AppSpacing.small)
+        .overlay(alignment: .topLeading) {
+            ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(AppSpacing.small)
         }
         .overlay(alignment: .bottom) {
             CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)

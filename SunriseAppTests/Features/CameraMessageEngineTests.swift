@@ -127,11 +127,11 @@ final class CameraMessageEngineTests: XCTestCase {
 
     func testTrackingLostRightAfterBeingCloseSaysMoveBack() {
         var engine = CameraMessageEngine(context: .tryOn)
-        var near = good(); near.distance = 0.27
+        var near = good(); near.distance = 0.19
         _ = engine.update(near, at: 0)
         var lost = CameraSignals(); lost.ambientIntensity = 800
         _ = engine.update(lost, at: 0.2)
-        XCTAssertEqual(engine.update(lost, at: 1.3), .tooClose)
+        XCTAssertEqual(engine.update(lost, at: 1.8), .tooClose)
     }
 
     func testTrackingLostRightAfterTurningAwaySaysFaceStraight() {
