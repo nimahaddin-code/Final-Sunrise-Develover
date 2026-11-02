@@ -129,8 +129,9 @@ struct LinerStepGuide: View {
         Canvas { context, size in
             guard let frame = model.frame, CACurrentMediaTime() - frame.receivedAt <= LinerOverlayRenderer.maxAge else { return }
             if let side {
-                let half = size.width / 2
-                context.clip(to: Path(CGRect(x: side == .leading ? 0 : half, y: 0, width: half, height: size.height)))
+                let cut = frame.splitX(fallback: size.width / 2)
+                context.clip(to: Path(CGRect(x: side == .leading ? 0 : cut, y: 0,
+                                             width: side == .leading ? cut : size.width - cut, height: size.height)))
             }
             // Reduce Motion: the last frame of the animation, and a still highlight at 40%.
             let loop = reduceMotion ? Self.playLength : elapsed.truncatingRemainder(dividingBy: Self.loopLength)

@@ -178,9 +178,28 @@ final class LidFollower: @unchecked Sendable {
     static let blinkHold: TimeInterval = 0.3
     /// Mean gap, in eye widths, beyond which the detector wins.
     static let maximumGap: CGFloat = 0.9
+    /// A hand mask can miss a thin finger, or a hand at the temple, so the skin itself says when the lid is pulled: the
+    /// tracked points sliding over the head faster than `skinSpeed` (eye widths per camera frame, about 0.7 eye widths
+    /// per second) for `skinFrames` frames in a row. Resting skin and the detector's own noise stay far below it.
+    static let skinSpeed: CGFloat = 0.012
+    static let skinFrames = 3
+    /// A pull is kept at least this long after the skin last moved fast, and after that until the followed points and
+    /// the detector agree again (their gap, in eye widths, is under `stretchRelease`), which is when the pull is let go.
+    static let stretchLinger: TimeInterval = 0.5
+    static let stretchRelease: CGFloat = 0.04
+    /// Detector pull-back per result while a pull is held. The detector's face prior does not follow stretched skin, so
+    /// the normal pull-back (`pullPerResult`) would undo a held stretch within a second or two.
+    static let stretchPullPerResult: CGFloat = 0.002
 
     private struct Track {
         var canonical: [CGPoint]
+        /// The detector's points at the last result (head frame), for coupling the corner to the lid points.
+        var detected: [CGPoint] = []
+        /// Whether the last result used the followed points rather than the detector's.
+        var isFollowing = false
+        /// A pull of the lid is in progress or being held (see `skinSpeed`).
+        var stretching = false
+        var stretchUntil: TimeInterval = 0
         /// Eye width in head-frame units.
         var eyeWidth: CGFloat
         var pyramid: LumaPyramid?
@@ -202,12 +221,18 @@ final class LidFollower: @unchecked Sendable {
     private var headFrame: [CGPoint]?
     /// Eyes whose points were followed by the skin (not the detector alone) in the last result, for the readout.
     private(set) var followingCount = 0
+    /// Eyes whose lid is being pulled right now (by a hand or by the skin's own motion), for the readout and the filter.
+    private(set) var stretchingCount = 0
+    /// Camera frames in a row in which the tracked skin slid over the head fast (see `skinSpeed`), written by `advance`.
+    private var skinFast: [EyeSide: Int] = [:]
 
     func reset() {
         lock.lock(); defer { lock.unlock() }
         tracks.removeAll()
+        skinFast.removeAll()
         headFrame = nil
         followingCount = 0
+        stretchingCount = 0
     }
 
     private struct Update {
@@ -227,6 +252,7 @@ final class LidFollower: @unchecked Sendable {
               let now = SimilarityTransform(from: frame, to: headAnchors) else { return }
         let scale = (now.zr * now.zr + now.zi * now.zi).squareRoot()
         var updates: [EyeSide: Update] = [:]
+        var speeds: [EyeSide: CGFloat] = [:]
         for (side, track) in snapshot where track.valid {
             var u = Update(canonical: track.canonical, pyramid: track.pyramid, transform: track.transform,
                            valid: true, generation: track.generation)
@@ -260,12 +286,21 @@ final class LidFollower: @unchecked Sendable {
                 .reduce(CGPoint.zero) { $0 + $1 } * (1 / CGFloat(found.count))
             let imagePoints = zip(from, moved).map { $1 ?? ($0 + shift) }
             u.canonical = imagePoints.map(now.applyInverse)
+            // How far the skin slid over the head since the last frame: where the points were, carried along with the
+            // head, against where they are now.
+            let rigid = track.canonical.map(now.apply)
+            speeds[side] = zip(rigid, imagePoints).map { hypot($1.x - $0.x, $1.y - $0.y) }.reduce(0, +)
+                / CGFloat(max(imagePoints.count, 1)) / widthPx
             // Keep the picture centred on the points.
             let padded = Self.bounds(imagePoints).insetBy(dx: -widthPx * 0.35, dy: -widthPx * 0.35)
             u.pyramid = current.rect.contains(padded) ? current : Self.pyramid(buffer, around: imagePoints, width: widthPx)
             u.transform = now
         }
         lock.lock(); defer { lock.unlock() }
+        for side in snapshot.keys {
+            // A frame with no reading (lost picture, blink) breaks the run.
+            skinFast[side] = (speeds[side] ?? 0) > Self.skinSpeed ? (skinFast[side] ?? 0) + 1 : 0
+        }
         for (side, u) in updates where tracks[side]?.generation == u.generation {
             tracks[side]?.canonical = u.canonical
             tracks[side]?.pyramid = u.pyramid
@@ -285,6 +320,7 @@ final class LidFollower: @unchecked Sendable {
         let scale = (toImage.zr * toImage.zr + toImage.zi * toImage.zi).squareRoot()
         var result = frame
         var following = 0
+        var stretching = 0
         for side in [EyeSide.subjectLeft, .subjectRight] {
             guard var eye = side == .subjectLeft ? frame.subjectLeft : frame.subjectRight else {
                 tracks[side] = nil
@@ -309,6 +345,8 @@ final class LidFollower: @unchecked Sendable {
             // (a closed or squeezed eye, below 75% of the normal opening, stays on the detector: no lid to pull)
             if track.openBase > 0.02, ratio < track.openBase * 0.75 || abs(ratio - track.lastRatio) > track.openBase * 0.25 {
                 track.holdUntil = now + Self.blinkHold
+                // The lid sliding in a blink is not a pull.
+                track.stretching = false; track.stretchUntil = 0
             }
             track.lastRatio = ratio
             track.eyeWidth = eyeWidth
@@ -317,39 +355,103 @@ final class LidFollower: @unchecked Sendable {
                 ? zip(track.canonical, detected).map { hypot($0.x - $1.x, $0.y - $1.y) }.reduce(0, +) / CGFloat(detected.count)
                 : .infinity
             if (hand[side] ?? 0) >= Self.handNear { track.heldUntil = now + Self.handLinger }
-            let held = now < track.heldUntil
+            // The skin sliding over the head for a few frames is a pull even when the hand mask misses the finger.
+            let slidingFor = skinFast[side] ?? 0
+            if slidingFor >= Self.skinFrames, now >= track.holdUntil {
+                track.stretching = true
+                track.stretchUntil = now + Self.stretchLinger
+            }
+            if track.stretching, now >= track.stretchUntil, slidingFor == 0, gap < Self.stretchRelease * eyeWidth {
+                track.stretching = false
+            }
+            let held = now < track.heldUntil || track.stretching
+            track.isFollowing = false
             if !held {
                 // Nothing is pulling the lid: the detector as it is. The picture stays, so following can start at once.
-                track.canonical = detected
-                track.valid = true
-                track.generation += 1
+                // While the skin is sliding the old points keep riding it, so the start of a pull is not lost before the
+                // third frame says it is one.
+                if slidingFor == 0 || !track.valid || now < track.holdUntil {
+                    track.canonical = detected
+                    track.valid = true
+                    track.generation += 1
+                }
             } else if !track.valid || now < track.holdUntil || gap > Self.maximumGap * eyeWidth {
                 track.canonical = detected
                 track.valid = true
                 track.pyramid = nil
                 track.generation += 1
+                track.stretching = false; track.stretchUntil = 0
             } else {
                 following += 1
-                track.canonical = zip(track.canonical, detected).map { $0 + ($1 - $0) * Self.pullPerResult }
+                track.isFollowing = true
+                let pull = track.stretching ? Self.stretchPullPerResult : Self.pullPerResult
+                track.canonical = zip(track.canonical, detected).map { $0 + ($1 - $0) * pull }
             }
-            let lidCount = detected.count - 2
-            // The outer corner (the wing grows from it) is hard to follow on its own: it has little texture, and the
-            // detector barely moves it when the skin there is stretched. It moves with the lid points next to it
-            // instead: wherever they are away from the detector, so is the corner.
-            if lidCount >= 3, track.canonical.count == detected.count {
-                let near = (lidCount - 3)..<lidCount
-                let offset = near.reduce(CGPoint.zero) { $0 + (track.canonical[$1] - detected[$1]) } * (1.0 / 3)
-                track.canonical[lidCount] = detected[lidCount] + offset
-            }
+            track.detected = detected
+            Self.coupleCorner(&track.canonical, detected: detected, eyeWidth: eyeWidth)
+            if track.isFollowing && track.stretching { stretching += 1 }
             tracks[side] = track
-            let followed = track.canonical.map(toImage.apply)
+            let lidCount = detected.count - 2
+            // Points that are only riding the skin until a pull is confirmed are not used yet: the detector as it is.
+            let followed = (track.isFollowing ? track.canonical : detected).map(toImage.apply)
             eye.upperLid = Array(followed[0..<lidCount])
             eye.outerCorner = followed[lidCount]
             eye.wingAnchor = followed[lidCount + 1]
             if side == .subjectLeft { result.subjectLeft = eye } else { result.subjectRight = eye }
         }
         followingCount = following
+        stretchingCount = stretching
         return result
+    }
+
+    /// The outer corner (the wing grows from it) is hard to follow on its own: it has little texture, and the detector
+    /// barely moves it when the skin there is stretched. It moves with the lid points next to it instead: wherever they
+    /// are away from the detector, so is the corner.
+    private static func coupleCorner(_ canonical: inout [CGPoint], detected: [CGPoint], eyeWidth: CGFloat) {
+        let lidCount = detected.count - 2
+        guard lidCount >= 3, canonical.count == detected.count else { return }
+        let near = (lidCount - 3)..<lidCount
+        let offset = near.reduce(CGPoint.zero) { $0 + (canonical[$1] - detected[$1]) } * (1.0 / 3)
+        canonical[lidCount] = detected[lidCount] + offset
+        // The wing's skin anchor lies beyond the corner, usually under the finger that pulls, where the picture
+        // has nothing to track. It moves with the corner (the skin there is pulled the same way); its own
+        // tracking only refines that while it agrees (a gap of up to a third of the eye width).
+        let own = canonical[lidCount + 1] - detected[lidCount + 1]
+        let cornerOffset = canonical[lidCount] - detected[lidCount]
+        let refine: CGFloat = (own - cornerOffset).length < eyeWidth * 0.33 ? 0.5 : 0
+        canonical[lidCount + 1] = detected[lidCount + 1] + cornerOffset + (own - cornerOffset) * refine
+    }
+
+    /// A result that was already fused, carried to the newest camera frame: the head moves as ARKit says, and the eyes
+    /// that are being followed take the skin's newest positions (`advance` runs on every camera frame, a detector result
+    /// only on every other). `nil` when no eye is followed, so the caller keeps what it has.
+    func refresh(_ fused: EyeLandmarkFrame, headAnchors: [CGPoint]) -> EyeLandmarkFrame? {
+        lock.lock(); defer { lock.unlock() }
+        guard let fusedAnchors = fused.context?.headAnchors, fusedAnchors.count == headAnchors.count, headAnchors.count >= 3,
+              let headFrame, headFrame.count == headAnchors.count,
+              let toNow = SimilarityTransform(from: fusedAnchors, to: headAnchors),
+              let toImage = SimilarityTransform(from: headFrame, to: headAnchors) else { return nil }
+        var result = fused
+        var refreshed = false
+        for side in [EyeSide.subjectLeft, .subjectRight] {
+            guard var eye = side == .subjectLeft ? fused.subjectLeft : fused.subjectRight else { continue }
+            eye = eye.transformed(by: toNow)
+            if let track = tracks[side], track.isFollowing, track.valid, track.canonical.count == track.detected.count {
+                var canonical = track.canonical
+                Self.coupleCorner(&canonical, detected: track.detected, eyeWidth: track.eyeWidth)
+                let followed = canonical.map(toImage.apply)
+                let lidCount = followed.count - 2
+                if eye.upperLid.count == lidCount {
+                    eye.upperLid = Array(followed[0..<lidCount])
+                    eye.outerCorner = followed[lidCount]
+                    eye.wingAnchor = followed[lidCount + 1]
+                    refreshed = true
+                }
+            }
+            if side == .subjectLeft { result.subjectLeft = eye } else { result.subjectRight = eye }
+        }
+        result.context?.headAnchors = headAnchors
+        return refreshed ? result : nil
     }
 
     private static func bounds(_ points: [CGPoint]) -> CGRect {

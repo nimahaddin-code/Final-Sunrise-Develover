@@ -8,6 +8,8 @@ enum AppRoute: Hashable {
     case browBlush(FaceGuideRegion)
     // -Nimah: The tutorial receives every tool's shade/strength from its preceding try-on.
     case recommendedTutorial(TutorialHandoff)
+    // The "get you ready" page between Try On and the tutorial.
+    case tutorialPrep(TutorialHandoff)
     case referenceImport
     case session(MakeupReference)
     case savedLookDetail(SavedLookMetadata)

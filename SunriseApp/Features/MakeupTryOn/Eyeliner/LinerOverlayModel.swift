@@ -45,12 +45,22 @@ import SwiftUI
 
     var hasLiner: Bool { spec != nil }
 
-    /// Off unless a developer switches it on: the upper lid follows the skin between detector results (a pulled lid).
-    private static var lidTrackingEnabled: Bool { UserDefaults.standard.bool(forKey: "enableLidTracking") }
-    /// `true` makes this overlay follow a pulled lid whatever the developer flag says (the tutorial's guide points).
-    /// It also smooths less (`OneEuroConfig.responsive`), so the points keep up with a lid that is stretched by hand.
-    var followsPulledLid = false { didSet { tracker.filterConfig = followsPulledLid ? .responsive : .steady } }
-    private var lidTrackingOn: Bool { followsPulledLid || Self.lidTrackingEnabled }
+    /// On by default, for Try On and the tutorial alike: the upper lid and outer corner follow the skin between detector
+    /// results, so a lid that is stretched by hand keeps its liner, dots and line.
+    var followsPulledLid = true
+    private var lidTrackingOn: Bool { followsPulledLid }
+    /// While a hand is at the eye (a stretch) the points are smoothed less (`OneEuroConfig.responsive`) so they keep up
+    /// with the moving lid; the rest of the time the steady config holds a still face still.
+    private var stretchUntil: TimeInterval = 0
+    /// The newest detector result after lid tracking, kept so every camera frame can carry the followed lid forward
+    /// (`refollow`) instead of waiting for the next result.
+    private var lastFused: EyeLandmarkFrame?
+    /// The smoothing filters need time to move forward; results and refreshes both feed them, so they share one clock.
+    private var renderClock: TimeInterval = 0
+    private func stamp(_ time: TimeInterval) -> TimeInterval {
+        renderClock = max(time, renderClock + 0.001)
+        return renderClock
+    }
 
     /// A nil style hides the overlay; screen deactivation releases the detectors.
     func setStyle(_ style: LinerStyle?, shade: MakeupShade?, intensity: Double) {
@@ -75,6 +85,9 @@ import SwiftUI
         provider.onFrame = nil
         tracker.reset()
         lidFollower.reset()
+        stretchUntil = 0
+        lastFused = nil
+        renderClock = 0
         occluder.stop()
         occluder.onMask = nil
         occlusionMask = nil
@@ -135,7 +148,7 @@ import SwiftUI
         let turned = turnedAway ? yaw > Self.turnClearDegrees : yaw > Self.turnHideDegrees
         if turned != turnedAway {
             turnedAway = turned
-            if turned { solution = nil; frame = nil; tracker.reset() }
+            if turned { solution = nil; frame = nil; lastFused = nil; tracker.reset() }
         }
         if turned { return }
         let contour = ContourInput(pixelBuffer: SendablePixelBuffer(buffer: arFrame.capturedImage),
@@ -160,9 +173,13 @@ import SwiftUI
             if !lidBusy {
                 lidBusy = true
                 let frame = SendablePixelBuffer(buffer: buffer), follower = lidFollower
+                let time = arFrame.timestamp
                 lidQueue.async { [weak self] in
                     follower.advance(frame.buffer, headAnchors: headAnchors)
-                    Task { @MainActor in self?.lidBusy = false }
+                    Task { @MainActor in
+                        self?.lidBusy = false
+                        self?.refollow(headAnchors: headAnchors, time: time)
+                    }
                 }
             }
         } else if lidFollower.followingCount > 0 {
@@ -184,6 +201,17 @@ import SwiftUI
         }
         refreshSkin(from: buffer)
         publish(context)
+    }
+
+    /// A pulled lid moves with every camera frame, but detector results come about every other one: after the follower
+    /// has looked at a frame, the newest result is carried to it (head and followed lid) and drawn again.
+    private func refollow(headAnchors: [CGPoint], time: TimeInterval) {
+        guard isStarted, !turnedAway, let spec, let fused = lastFused,
+              var newer = lidFollower.refresh(fused, headAnchors: headAnchors) else { return }
+        newer.timestamp = stamp(time)
+        let eyes = tracker.render(newer, spec: spec)
+        solution = LinerSolution(eyes: eyes, raw: newer.eyes, smoothed: tracker.lastSmoothed, references: headAnchors,
+                                 time: CACurrentMediaTime())
     }
 
     /// Re-reads the skin around the eyes every few frames, from a few camera pixels, and smooths it.
@@ -233,14 +261,21 @@ import SwiftUI
             }
         }
         lastHand = hand.values.max() ?? 0
+        if lidTrackingOn, lastHand >= LidFollower.handNear { stretchUntil = landmarks.timestamp + LidFollower.handLinger }
         let fused = lidTrackingOn ? lidFollower.fuse(landmarks, now: landmarks.timestamp, hand: hand) : landmarks
-        let eyes = tracker.render(fused, spec: spec)
+        // Quick to follow while a hand is at the eye or the follower sees the skin being pulled.
+        tracker.filterConfig = lidTrackingOn && (landmarks.timestamp < stretchUntil || lidFollower.stretchingCount > 0)
+            ? .responsive : .steady
+        lastFused = lidTrackingOn ? fused : nil
+        var rendered = fused
+        rendered.timestamp = stamp(fused.timestamp)
+        let eyes = tracker.render(rendered, spec: spec)
         solution = LinerSolution(eyes: eyes, raw: landmarks.eyes, smoothed: tracker.lastSmoothed,
                                  references: context.headAnchors.count >= 3 ? context.headAnchors : context.references.map(\.image),
                                  time: CACurrentMediaTime())
         debugStatus = String(format: "MediaPipe: face, %.0f ms, %d eye(s) drawn%@", landmarks.providerLatencyMs, eyes.count,
                              lidTrackingOn
-                                 ? ", lid tracking \(lidFollower.followingCount)/2, hand \(Int(lastHand * 100))%" : "")
+                                 ? ", lid tracking \(lidFollower.followingCount)/2, pull \(lidFollower.stretchingCount)/2, hand \(Int(lastHand * 100))%" : "")
     }
 
     /// `snapshot` with the liner on it, for photos.
@@ -268,8 +303,9 @@ struct LinerOverlayView: View {
             Canvas { context, size in
                 guard isVisible, let frame = model.frame, let shade = model.shade else { return }
                 if let visibleSide {
-                    let half = size.width / 2
-                    context.clip(to: Path(CGRect(x: visibleSide == .leading ? 0 : half, y: 0, width: half, height: size.height)))
+                    let cut = frame.splitX(fallback: size.width / 2)
+                    context.clip(to: Path(CGRect(x: visibleSide == .leading ? 0 : cut, y: 0,
+                                                 width: visibleSide == .leading ? cut : size.width - cut, height: size.height)))
                 }
                 let ink = LinerOverlayRenderer.ink(shade, skin: frame.skin)
                 let color = Color(red: ink.red, green: ink.green, blue: ink.blue)

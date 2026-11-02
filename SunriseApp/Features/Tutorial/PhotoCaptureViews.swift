@@ -42,7 +42,7 @@ struct PhotoHeader: View {
                     Image(systemName: "chevron.left")
                         .font(.headline)
                         .frame(width: 44, height: 44)
-                        .background(Circle().fill(theme.control.opacity(0.3)))
+                        .glassCircle()
                         .foregroundStyle(theme.control)
                 }
                 .accessibilityLabel("Back to tutorial")
@@ -67,7 +67,7 @@ struct PhotoControls: View {
                     .font(.title3)
                     .frame(width: 52, height: 52)
                     .foregroundStyle(theme.control)
-                    .overlay(Circle().strokeBorder(theme.control, lineWidth: 2))
+                    .glassCircle()
             }
             .accessibilityLabel("Change frame colour")
             .accessibilityValue(theme.name)
@@ -104,16 +104,15 @@ private struct PolaroidCard: View {
         GeometryReader { proxy in
             let unit = proxy.size.width / 393
             ZStack(alignment: .topLeading) {
-                Color.white
+                Color(red: 0xB4 / 255, green: 0x27 / 255, blue: 0x57 / 255)
                 Color.clear
                     .frame(width: 354 * unit, height: 414 * unit)
                     .overlay { Image(uiImage: image).resizable().scaledToFill() }
                     .clipped()
                     .offset(x: 19 * unit, y: 32 * unit)
-                Image("logo-white")
+                Image("logo-burgundy")
                     .resizable().scaledToFit()
                     .frame(width: 194 * unit)
-                    .shadow(color: .black.opacity(0.4), radius: 1.5, x: 2, y: 2)
                     .offset(x: 170 * unit, y: 462 * unit)
             }
             .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
@@ -132,53 +131,59 @@ struct PolaroidResultView: View {
     @State private var polaroid: UIImage?
 
     var body: some View {
-        GeometryReader { proxy in
-            VStack(spacing: 0) {
-                PolaroidCard(image: image)
-                    .frame(width: proxy.size.width * 0.786)
-                    .shadow(color: .black.opacity(0.5), radius: 14, x: 8, y: 12)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel("Your try-on photo")
-                    .accessibilityAddTraits(.isImage)
-                    .padding(.top, proxy.size.height * 0.13)
-                HStack(spacing: 25) {
-                    button("arrow.counterclockwise", "Retake photo", action: onRetake)
-                    if let shareable {
-                        ShareLink(item: shareable, preview: SharePreview("Try-on photo", image: shareable)) { icon("square.and.arrow.up") }
-                            .accessibilityLabel("Share photo")
-                    } else {
-                        icon("square.and.arrow.up").opacity(0.5)
-                    }
-                    button("checkmark", "Save photo") {
-                        // Done saves the polaroid to Photos (add-only permission), then closes.
-                        UIImageWriteToSavedPhotosAlbum(polaroid ?? image, nil, nil, nil)
-                        onDone()
-                    }
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            PolaroidCard(image: image)
+                .frame(maxWidth: 360)
+                .padding(.horizontal, AppSpacing.medium)
+                .rotationEffect(.degrees(-2))
+                .shadow(color: .black.opacity(0.35), radius: 12, x: 4, y: 8)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Your try-on photo")
+                .accessibilityAddTraits(.isImage)
+            Spacer(minLength: 0)
+            HStack(spacing: AppSpacing.small) {
+                Button(action: onRetake) { glassIcon("arrow.counterclockwise") }
+                    .accessibilityLabel("Retake photo")
+                Spacer()
+                if let shareable {
+                    ShareLink(item: shareable, preview: SharePreview("Try-on photo", image: shareable)) { glassIcon("square.and.arrow.up") }
+                        .accessibilityLabel("Share photo")
+                } else {
+                    glassIcon("square.and.arrow.up").opacity(0.5)
                 }
-                .padding(.top, proxy.size.height * 0.12)
-                Spacer(minLength: 0)
+                Button {
+                    // Save puts the polaroid in Photos (add-only permission), then closes.
+                    UIImageWriteToSavedPhotosAlbum(polaroid ?? image, nil, nil, nil)
+                    onDone()
+                } label: {
+                    Text("Save")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 28).frame(height: 44)
+                        .glassCapsule(tint: AppColors.glassSelected)
+                }
+                .accessibilityLabel("Save photo")
             }
-            .frame(maxWidth: .infinity)
+            .padding(.horizontal, AppSpacing.medium)
+            .padding(.bottom, AppSpacing.medium)
         }
-        .background(AppColors.wine.ignoresSafeArea())
+        .buttonStyle(.plain)
+        .background { MainBackground() }
         .task {
             // The polaroid, not the bare picture, is what gets shared.
-            let renderer = ImageRenderer(content: PolaroidCard(image: image).frame(width: 393).padding(40).background(AppColors.wine))
+            let renderer = ImageRenderer(content: PolaroidCard(image: image).frame(width: 393).padding(40).background { MainBackground() })
             renderer.scale = 3
             if let rendered = renderer.uiImage { polaroid = rendered; shareable = Image(uiImage: rendered) }
         }
     }
 
-    private func icon(_ symbol: String) -> some View {
+    private func glassIcon(_ symbol: String) -> some View {
         Image(systemName: symbol)
-            .font(.system(size: 32, weight: .medium))
-            .frame(width: 78, height: 78)
-            .background(AppColors.flamingo, in: Circle())
-            .foregroundStyle(.white)
-    }
-
-    private func button(_ symbol: String, _ label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
-        Button(action: action) { icon(symbol) }.accessibilityLabel(label)
+            .font(.system(size: 18, weight: .medium))
+            .foregroundStyle(AppColors.snow)
+            .frame(width: 44, height: 44)
+            .glassCircle()
     }
 }
 

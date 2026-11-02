@@ -7,49 +7,36 @@ struct LinerLookPicker: View {
     let onSelect: (LinerLook?) -> Void
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: AppSpacing.small) {
-                tile(isSelected: selected == nil, label: Text("No eyeliner")) { onSelect(nil) } content: {
-                    VStack(spacing: 4) {
-                        Image(systemName: "nosign").font(.title2).frame(width: 96, height: 34)
-                        Text("None").font(AppTypography.caption.weight(.semibold))
-                    }
-                }
-                ForEach(LinerLook.allCases) { look in
-                    tile(isSelected: selected == look, label: Text(look.title)) { onSelect(look) } content: {
-                        VStack(spacing: 4) {
-                            LinerLookThumbnail(look: look).frame(width: 96, height: 34)
-                            Text(look.title).font(AppTypography.caption.weight(.semibold))
-                        }
-                    }
+        GlassPickerRow(title: selected.map { Text($0.title) } ?? Text("None"), selectedID: selected.map { "\($0.id)" } ?? "none", onCenter: { id in
+            onSelect(LinerLook.allCases.first { $0.id == id })
+        }) {
+            tile(isSelected: selected == nil, isNone: true, label: Text("No eyeliner"), id: "none") { onSelect(nil) } content: {
+                EmptyView()
+            }
+            ForEach(LinerLook.allCases) { look in
+                tile(isSelected: selected == look, isNone: false, label: Text(look.title), id: "\(look.id)") { onSelect(look) } content: {
+                    LinerLookThumbnail(look: look, ink: StylePalette.brow).equatable().frame(width: 30, height: 20)
                 }
             }
-            .padding(.horizontal, 2)
         }
     }
 
-    private func tile<Content: View>(isSelected: Bool, label: Text, action: @escaping () -> Void,
-                                     @ViewBuilder content: () -> Content) -> some View {
+    private func tile<Content: View>(isSelected: Bool, isNone: Bool, label: Text, id: String, action: @escaping () -> Void,
+                                     @ViewBuilder content: @escaping () -> Content) -> some View {
         Button(action: action) {
-            content()
-                .foregroundStyle(AppColors.snow)
-                .padding(.horizontal, 12).padding(.vertical, 8)
-                .background(AppColors.flamingo.opacity(isSelected ? 0.32 : 0.16),
-                            in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .strokeBorder(AppColors.snow, lineWidth: isSelected ? 2 : 0)
-                }
+            StyleCircle(selected: isSelected, isNone: isNone, content: content)
         }
         .buttonStyle(.plain)
+        .id(id)
         .accessibilityLabel(label)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
 /// A small eye, seen from the front, with the liner of one look on it.
-struct LinerLookThumbnail: View {
+struct LinerLookThumbnail: View, Equatable {
     let look: LinerLook
+    var ink: Color = AppColors.snow
 
     /// Fractions of the eye width: the wing's length and angle (degrees, up is positive), the thickest part of the line,
     /// how much of the lower lash line is lined, and how far the line reaches in from the inner corner.
@@ -89,9 +76,9 @@ struct LinerLookThumbnail: View {
             almond.move(to: inner)
             almond.addQuadCurve(to: outer, control: control)
             almond.addQuadCurve(to: inner, control: lowerControl)
-            context.stroke(almond, with: .color(AppColors.snow.opacity(0.85)), lineWidth: 1.2)
+            context.stroke(almond, with: .color(ink.opacity(0.85)), lineWidth: 1.2)
             let iris = CGRect(x: control.x - 4.5, y: (inner.y + outer.y) / 2 - 7.5 + 2, width: 9, height: 9)
-            context.fill(Path(ellipseIn: iris), with: .color(AppColors.snow.opacity(0.85)))
+            context.fill(Path(ellipseIn: iris), with: .color(ink.opacity(0.85)))
 
             // The liner above the lash line: thin at the inner corner, thickest at the outer one.
             let steps = 14
@@ -116,7 +103,7 @@ struct LinerLookThumbnail: View {
             }
             liner.addLines(bottom.reversed())
             liner.closeSubpath()
-            context.fill(liner, with: .color(AppColors.snow))
+            context.fill(liner, with: .color(ink))
 
             if look.lower > 0 {
                 var lowerLine = Path()
@@ -126,7 +113,7 @@ struct LinerLookThumbnail: View {
                     let p = point(t, control: lowerControl)
                     i == 0 ? lowerLine.move(to: p) : lowerLine.addLine(to: p)
                 }
-                context.stroke(lowerLine, with: .color(AppColors.snow), style: StrokeStyle(lineWidth: 1.8, lineCap: .round))
+                context.stroke(lowerLine, with: .color(ink), style: StrokeStyle(lineWidth: 1.8, lineCap: .round))
             }
         }
         .accessibilityHidden(true)
