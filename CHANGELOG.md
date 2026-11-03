@@ -1,3 +1,13 @@
+## Tool-first folders: Features/Blush, Brow, Eyeliner, Screens — -Nimah (2026-11-03)
+
+Files moved, no code, flow or UI change. Each tool is at the top of `Features/`: `Blush/`, `Brow/`, `Eyeliner/`, each with
+`TryOn/`, `Engine/`, `Tutorial/`, `Info/`. Screens that show all tools are in `Features/Screens/`: `TryOn/` (was
+`Makeup/Shared/Home`), `Comparison/`, `Preparation/`, `Tutorial/`, `Feedback/`. What works behind the screens joined the
+top-level `Engine/`: `Camera/`, `Rules/`, `Info/` (`ToolInfo`), and `FaceData/` (was `Makeup/Shared/Support`: face and eye
+shape types still in use). `Features/Onboarding/` is unchanged. Owners: Blush and Feedback Nimah; Brow and Onboarding
+Khalish; Eyeliner and the other Screens Hanum; `App/`, `Engine/`, `DesignSystem/`, `Resources/` shared (tell the group
+first). Paths in older notes: `Makeup/<Tool>/` is now `Features/<Tool>/`, `Makeup/Shared/...` as listed here.
+
 ## Guided flow, Phase 0: skeleton behind a switch — -Nimah (2026-11-03)
 
 The new flow (splash, onboarding, compact opening, comparison, preparation, feedback) exists as placeholder screens,
