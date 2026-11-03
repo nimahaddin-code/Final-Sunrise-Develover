@@ -13,7 +13,8 @@ extension ToolInfo {
             ],
             products: [
                 Item(name: "Blush", detail: "Cream or powder, close to the shade you chose.",
-                     alternative: "A lip tint dabbed on lightly", symbol: "circle.lefthalf.filled")
-            ])
+                     alternative: "A lip tint dabbed on lightly", symbol: "circle.lefthalf.filled", showsShade: true)
+            ],
+            minutes: 3)
     }
 }

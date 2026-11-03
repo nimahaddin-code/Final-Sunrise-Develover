@@ -13,9 +13,10 @@ extension ToolInfo {
             ],
             products: [
                 Item(name: "Eyeliner pen", detail: "A felt tip is the easiest to start with.",
-                     alternative: "A soft eyeliner pencil", symbol: "pencil.tip"),
+                     alternative: "A soft eyeliner pencil", symbol: "pencil.tip", showsShade: true),
                 Item(name: "Micellar water", detail: "A drop on the cotton bud wipes mistakes away.",
                      alternative: "Any makeup remover", symbol: "drop")
-            ])
+            ],
+            minutes: 5)
     }
 }

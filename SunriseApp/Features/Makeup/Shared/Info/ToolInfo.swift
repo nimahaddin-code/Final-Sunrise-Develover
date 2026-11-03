@@ -10,8 +10,14 @@ struct ToolInfo: Identifiable {
         let detail: String
         /// What to use if she does not have it; nil when there is no easy stand-in.
         let alternative: String?
-        /// SF Symbol shown next to it.
+        /// SF Symbol shown next to it, until there is a picture.
         let symbol: String
+        /// False: nice to have ("if you have one"); the preparation page can list these apart.
+        var required = true
+        /// A picture in Assets.xcassets (`tool-…`, `product-…`) shown instead of the symbol; nil until there is one.
+        var imageName: String? = nil
+        /// Products only: the card shows the shade chosen on Try On.
+        var showsShade = false
         var id: String { name }
     }
 
@@ -22,6 +28,8 @@ struct ToolInfo: Identifiable {
     let lookDescription: String
     let tools: [Item]
     let products: [Item]
+    /// About how long the look takes, in minutes, for the comparison page.
+    let minutes: Int
     var id: TryOnTool { tool }
 
     /// The tool's info for the look in this handoff.

@@ -13,9 +13,11 @@ Dandan". Placeholders use `FlowPlaceholder` (DesignSystem, English developer tex
   here). `TutorialHandoff.lookPhoto` (memory only) is for the Try On photo, nil until that button exists.
 - Feedback (Nimah): `Makeup/Shared/Feedback/FeedbackView`, input `FeedbackInput` (handoff + result photo).
   `GuidedTutorialView(onFinish:)` hands the result photo over on Done instead of closing.
-- Per-tool data: `ToolInfo` (`Makeup/Shared/Info/`: look name, description, tools and products with an alternative) is
+- Per-tool data: `ToolInfo` (`Makeup/Shared/Info/`: look name, description, `minutes`, tools and products; each `Item` has
+  name, detail, alternative, symbol, `required` (false: nice to have), `imageName` (asset instead of the symbol) and
+  `showsShade` (product card shows the chosen shade)) is
   filled by each tool in `Makeup/<Tool>/Info/` (`BlushInfo`, `BrowInfo`, `EyelinerInfo`, sample wording to replace);
-  `ToolInfo.chosen(in:)` gives the tools that are on.
+  `ToolInfo.chosen(in:)` gives the tools that are on. Field rules and examples: the team page "Data Alat dan Produk".
 - `BlushLookPicker` (`Makeup/Blush/TryOn/`) is the blush look row moved out of `TryOnHomeView`, unchanged.
 Tests: `GuidedFlowTests` (331 pass). Seen on the Simulator: the splash; the rest checked by tests only, not on a device.
 

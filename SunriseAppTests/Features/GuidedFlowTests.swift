@@ -19,6 +19,9 @@ final class GuidedFlowTests: XCTestCase {
             XCTAssertFalse(info.lookName.isEmpty, "\(tool)")
             XCTAssertFalse(info.lookDescription.isEmpty, "\(tool)")
             XCTAssertFalse(info.tools.isEmpty && info.products.isEmpty, "\(tool) lists nothing to prepare")
+            XCTAssertGreaterThan(info.minutes, 0, "\(tool)")
+            XCTAssertTrue((info.tools + info.products).contains(where: \.required), "\(tool) has nothing required")
+            XCTAssertFalse(info.tools.contains(where: \.showsShade), "\(tool): only products show the shade")
             XCTAssertEqual(Set((info.tools + info.products).map(\.id)).count, info.tools.count + info.products.count,
                            "\(tool) repeats an item")
         }
