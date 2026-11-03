@@ -19,6 +19,8 @@ struct TutorialHandoff: Hashable {
     /// The tools with makeup on when Try On was left. The photo shows exactly these, each as last chosen; a tab for a
     /// tool that was off still guides, without a makeup preview.
     var enabled: Set<TryOnTool> = Set(TryOnTool.allCases)
+    /// The photo taken on Try On of the chosen look (new flow); nil until that photo button exists. Memory only.
+    var lookPhoto: UIImage? = nil
 }
 
 /// What one half of the camera shows in the comparison.
@@ -274,13 +276,17 @@ enum TutorialTab: CaseIterable, Identifiable {
 
 struct GuidedTutorialView: View {
     @StateObject private var model: GuidedTutorialModel
+    /// New flow: called with the result photo when she taps Done on it, instead of closing the tutorial.
+    var onFinish: ((UIImage) -> Void)?
 
-    init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment?, plan: MakeupPlan, handoff: TutorialHandoff) {
+    init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment?, plan: MakeupPlan, handoff: TutorialHandoff,
+         onFinish: ((UIImage) -> Void)? = nil) {
+        self.onFinish = onFinish
         _model = StateObject(wrappedValue: GuidedTutorialModel(checker: checker, assessment: assessment ?? FaceShapeAssessment(shape: .unknown),
                                                               plan: plan, handoff: handoff))
     }
 
-    var body: some View { TutorialScreen(model: model) }
+    var body: some View { TutorialScreen(model: model, onFinish: onFinish) }
 }
 
 private struct TutorialScreen: View {
@@ -297,8 +303,11 @@ private struct TutorialScreen: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
-    init(model: GuidedTutorialModel) {
+    let onFinish: ((UIImage) -> Void)?
+
+    init(model: GuidedTutorialModel, onFinish: ((UIImage) -> Void)? = nil) {
         self.model = model
+        self.onFinish = onFinish
         camera = model.camera
     }
 
@@ -337,7 +346,7 @@ private struct TutorialScreen: View {
         .foregroundStyle(AppColors.snow)
         .overlay {
             if let captured {
-                PolaroidResultView(image: captured, onRetake: { self.captured = nil }, onDone: { dismiss() })
+                PolaroidResultView(image: captured, onRetake: { self.captured = nil }, onDone: { if let onFinish { onFinish(captured) } else { dismiss() } })
                     .transition(.opacity)
             }
         }

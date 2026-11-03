@@ -1,3 +1,24 @@
+## Guided flow, Phase 0: skeleton behind a switch — -Nimah (2026-11-03)
+
+The new flow (splash, onboarding, compact opening, comparison, preparation, feedback) exists as placeholder screens,
+already wired, behind `NewFlow` (`App/NewFlow.swift`, UserDefaults `dandan.newFlow`, off by default). Switch it on with
+developer tools (long-press the logo) -> "New flow" chip on Try On: the screens after Try On follow at once, the entry
+screens from the next launch. Off, the app is exactly as before. Work split and order: the team page "Pembagian Kerja
+Dandan". Placeholders use `FlowPlaceholder` (DesignSystem, English developer text, replace the whole view).
+
+- Entry (Khalish): `Features/Onboarding/` now has `Splash/SplashView`, `Pages/OnboardingPagesView` (2 pages),
+  `CompactOpening/CompactOpeningView`, run by `EntryFlowView`; the existing welcome moved to `Welcome/OnboardingView.swift`.
+- After Try On (Hanum): routes `AppRoute.comparison` -> `.preparation` -> `.recommendedTutorial` -> `.feedback`.
+  `Makeup/Shared/Comparison/ComparisonView`, `Makeup/Shared/Preparation/PreparationScreen` (wraps `TutorialPrepView`, moved
+  here). `TutorialHandoff.lookPhoto` (memory only) is for the Try On photo, nil until that button exists.
+- Feedback (Nimah): `Makeup/Shared/Feedback/FeedbackView`, input `FeedbackInput` (handoff + result photo).
+  `GuidedTutorialView(onFinish:)` hands the result photo over on Done instead of closing.
+- Per-tool data: `ToolInfo` (`Makeup/Shared/Info/`: look name, description, tools and products with an alternative) is
+  filled by each tool in `Makeup/<Tool>/Info/` (`BlushInfo`, `BrowInfo`, `EyelinerInfo`, sample wording to replace);
+  `ToolInfo.chosen(in:)` gives the tools that are on.
+- `BlushLookPicker` (`Makeup/Blush/TryOn/`) is the blush look row moved out of `TryOnHomeView`, unchanged.
+Tests: `GuidedFlowTests` (331 pass). Seen on the Simulator: the splash; the rest checked by tests only, not on a device.
+
 ## Unused code deleted — -Nimah (2026-11-02)
 
 Checked by building, not guessed: everything in `Features/Legacy/` was deleted, then the app and tests were built and
@@ -716,9 +737,9 @@ SunriseApp/
     Components/           GlassKit (frosted glass buttons and pills)
   Features/
     Makeup/               everything the app shows: Try On, tutorial, photo
-      Blush/ Brow/ Eyeliner/   each with TryOn/ (pickers, looks, config), Engine/ (drawing), Tutorial/ (steps)
-      Shared/             Home/ (Try On screen), Camera/, Tutorial/ (tutorial shell, photo), Rules/, Support/
-    Onboarding/           welcome screen (shown once)
+      Blush/ Brow/ Eyeliner/   each with TryOn/ (pickers, looks, config), Engine/ (drawing), Tutorial/ (steps), Info/ (look, kit)
+      Shared/             Home/ (Try On), Camera/, Tutorial/, Comparison/, Preparation/, Feedback/, Info/, Rules/, Support/
+    Onboarding/           Welcome/ (shown once); Splash/, Pages/, CompactOpening/ + EntryFlowView (new flow)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
 SunriseAppTests/
   Features/               makeup engine, blush, brow, eyeliner, tutorial, camera message tests

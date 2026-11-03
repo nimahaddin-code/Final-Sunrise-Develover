@@ -6,6 +6,7 @@ struct TryOnHomeView: View {
     @StateObject private var home: TryOnHomeModel
     var onTutorial: (TutorialHandoff) -> Void
     @AppStorage(DeveloperTools.key) private var developerTools = false
+    @AppStorage(NewFlow.key) private var newFlow = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible=false
     @State private var showColours=false
@@ -92,6 +93,16 @@ struct TryOnHomeView: View {
 
     private var header: some View {
         ZStack {
+            if developerTools {
+                // Developer switch for the guided flow being built (`NewFlow`).
+                Button { newFlow.toggle() } label: {
+                    Text(verbatim: newFlow ? "New flow: on" : "New flow: off")
+                        .font(.caption.weight(.semibold))
+                        .padding(.horizontal, 10).frame(minHeight: 32)
+                        .glassCapsule(tint: newFlow ? AppColors.glassSelected : AppColors.glassLight)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
             Image("logo-burgundy")
                 .resizable().scaledToFit()
                 .frame(maxWidth: 160, maxHeight: 44)
@@ -104,7 +115,9 @@ struct TryOnHomeView: View {
                 Spacer()
                 GlassCircleButton(symbol: "arrow.right", size: 48, tint: AppColors.flamingo.opacity(0.9), label: "Open tutorial") {
                     home.deactivate()
-                    withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = home.tutorialHandoff }
+                    // New flow: comparison and preparation are their own screens, pushed by the root.
+                    if newFlow { onTutorial(home.tutorialHandoff) }
+                    else { withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = home.tutorialHandoff } }
                 }
                 .disabled(!home.canTry(home.tool))
             }
@@ -155,34 +168,13 @@ struct TryOnHomeView: View {
         case .eyebrow where home.canTry(.eyebrow):
             BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
         case .blush:
-            blushPlacementRow
+            BlushLookPicker(selected: home.isOff ? nil : home.blushLook) { look in
+                if let look { home.choose(blush: look) } else { home.turnOff() }
+            }
+            .disabled(!home.canTry(.blush))
         default:
             EmptyView()
         }
-    }
-
-    // -Nimah: Placement and shade are independent. User requested these three creative alternatives.
-    private var blushPlacementRow: some View {
-        GlassPickerRow(title: home.isOff ? Text("None") : Text(home.blushLook.title),
-                       selectedID: home.isOff ? "none" : "\(home.blushLook.id)", onCenter: { id in
-            if let look = BlushPlacementStyle.referenceLooks.first(where: { $0.id == id }) { home.choose(blush: look) } else { home.turnOff() }
-        }) {
-            Button { home.turnOff() } label: {
-                StyleCircle(selected: home.isOff, isNone: true) { EmptyView() }
-            }
-            .buttonStyle(.plain).id("none").accessibilityLabel("No makeup")
-            ForEach(BlushPlacementStyle.referenceLooks) { look in
-                let selected = !home.isOff && home.blushLook == look
-                Button { home.choose(blush: look) } label: {
-                    StyleCircle(selected: selected) { BlushStyleIcon(look: look) }
-                }
-                .buttonStyle(.plain)
-                .id("\(look.id)")
-                .accessibilityLabel(look.title)
-                .accessibilityAddTraits(selected ? .isSelected : [])
-            }
-        }
-        .disabled(!home.canTry(.blush))
     }
 
     // MARK: Shades

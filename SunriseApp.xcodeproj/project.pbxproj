@@ -7,12 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		74F2F17D8FCCC121CEFB8A41 /* FaceMeshMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6375BDBA9F065C5C5FB327E1 /* FaceMeshMeasurer.swift */; };
-		A3A721B2BAA472D2516B4213 /* EyeScanLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D17385726DDB9B3A6D243 /* EyeScanLandmarks.swift */; };
-		B3F3D772985683090A203B92 /* EyelinerTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1985CD06870F896A31580E6A /* EyelinerTutorial.swift */; };
-		EE3C7BD72A1C6F2ECBD25C95 /* BrowTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */; };
-		57E939C540F41B8C26003DE1 /* BlushTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2050995FB80EEA6772CE79ED /* BlushTutorial.swift */; };
-		BBD99B371CEA67B052D2D704 /* BlushEngine+Draw.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */; };
+		7E0BF763D279D99C37AAC774 /* GuidedFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F323752B9D2D5BFEFC07F90E /* GuidedFlowTests.swift */; };
+		BD884A1FE0C6B305A6FCD688 /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EA8DD0DDCBDE470A2CCC9F4 /* SplashView.swift */; };
+		CB43B92FF9F7FCFF3F3C3F61 /* OnboardingPagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 465CFF40BEADB95C33216AE7 /* OnboardingPagesView.swift */; };
+		CC07D9C69AAAC26A26E31B3A /* EntryFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F3680D72038F9AAC71A103 /* EntryFlowView.swift */; };
+		BC032265C9ECD91C915DB268 /* CompactOpeningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224FF6C86731C7630742B3C2 /* CompactOpeningView.swift */; };
+		BCF7707B7263BEEFF70C01E4 /* PreparationScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D11B8D2D64D194CBCCE1B4 /* PreparationScreen.swift */; };
+		66C33275CC9917AD1C38C236 /* ToolInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5610AF7666A7B25E37DB08D1 /* ToolInfo.swift */; };
+		9189AAABB287729E96060B5C /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B389B627C85B56E0A320EF9 /* FeedbackView.swift */; };
+		F94205A1B2C9AE06D568B14E /* ComparisonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8805EBBC76BEFC90F5F30F01 /* ComparisonView.swift */; };
+		975EA8A11F370F02DAEC23CF /* EyelinerInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA978F144FE29C3F1099AEBF /* EyelinerInfo.swift */; };
+		BE2588491145E5C0132375C0 /* BrowInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BF9E89D6B068476F83EC57 /* BrowInfo.swift */; };
+		6073C06ABA610D35DB264744 /* BlushLookPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CAEAC35E715B14CDC179B9 /* BlushLookPicker.swift */; };
+		F49403615C6E340AD3E06244 /* BlushInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6538E74CDEA4C040F7E83084 /* BlushInfo.swift */; };
+		4115CD97F39597A602B21EBA /* FlowPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE8D1BE9969D73DA8C2B7BA /* FlowPlaceholder.swift */; };
+		DC477A1146A2D472909C8FCA /* NewFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22349FD5446BC601B67803B0 /* NewFlow.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		033A5C6F22B5AC3CD0D490DB /* LiveGuideDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */; };
 		08141B51E306391DEED79934 /* LidFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD93F3E7DA4BDAA776A4A5A /* LidFlow.swift */; };
@@ -44,11 +53,11 @@
 		46A06406CEEB25CB293B7899 /* ForeheadGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5B6AFD13E8B16D6706FCDA /* ForeheadGuide.swift */; };
 		48573999134DD877698BA9F3 /* FaceContourMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A13571086FAC7A101835BA /* FaceContourMeasurer.swift */; };
 		4A61AA654852436A57B4838B /* LidFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832873944F90986F04549D21 /* LidFlowTests.swift */; };
-		7C1E5A0B2D3F4A6B8C9D0E11 /* LinerStretchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E12 /* LinerStretchTests.swift */; };
 		4D3D248B5F57A2BCC5B92F45 /* MakeupPersonalizationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */; };
 		4FB931EDE051A5976AE56A63 /* ForeheadGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 880B8ADAAD4B4CCC9E778686 /* ForeheadGuideTests.swift */; };
 		50990270ECCC792E5A17200F /* EyelinerRegion.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8D32CBADEAE62284CB8374 /* EyelinerRegion.swift */; };
 		513BAB4E537BC7E6398BE794 /* LiveGuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19429AD975CE1483E26A2783 /* LiveGuideView.swift */; };
+		57E939C540F41B8C26003DE1 /* BlushTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2050995FB80EEA6772CE79ED /* BlushTutorial.swift */; };
 		5811410751FADBA1C66E1183 /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1810A54CE6D4BC94E7F122D /* AppContainer.swift */; };
 		5BB89CA48CF97ABD604521AF /* EyebrowTrackingPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5F03830273DCC9E47775164 /* EyebrowTrackingPipeline.swift */; };
 		5CB96A3A7D31F2FC76679F9C /* EyebrowGuideGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */; };
@@ -65,8 +74,14 @@
 		7189D665D4AB23779ACB830A /* MediaPipeEyeLandmarkProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FD918F6AD3EFDBC821053 /* MediaPipeEyeLandmarkProvider.swift */; };
 		72410046D68478AB147FADEC /* blush-rendering.json in Resources */ = {isa = PBXBuildFile; fileRef = BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */; };
 		743170BAA00CD2471416D456 /* FaceLandmarkProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA63C523723545C9DAFDF3BC /* FaceLandmarkProvider.swift */; };
+		74F2F17D8FCCC121CEFB8A41 /* FaceMeshMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6375BDBA9F065C5C5FB327E1 /* FaceMeshMeasurer.swift */; };
 		7949BB244D59EAC66163BCBF /* EyeMeasurer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */; };
 		7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 133DCD5B481F352F758A1E3F /* Assets.xcassets */; };
+		7C1E5A0B2D3F4A6B8C9D0E11 /* LinerStretchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E12 /* LinerStretchTests.swift */; };
+		7C1E5A0B2D3F4A6B8C9D0E21 /* GlassKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E22 /* GlassKit.swift */; };
+		7C1E5A0B2D3F4A6B8C9D0E31 /* TutorialPrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */; };
+		7C1E5A0B2D3F4A6B8C9D0E41 /* StyleIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */; };
+		7C1E5A0B2D3F4A6B8C9D0E51 /* BrowTutorialOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */; };
 		7DA8D6F9D6CE3EDC61076E3F /* LinerInk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 432B2E544594984149CB89AA /* LinerInk.swift */; };
 		7F3A91C2D45E6B80A1C9E0F4 /* GuidedTutorialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */; };
 		7F3A91C2D45E6B80A1C9E0F6 /* PhotoCaptureViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F3A91C2D45E6B80A1C9E0F5 /* PhotoCaptureViews.swift */; };
@@ -91,13 +106,14 @@
 		9BBFBF26B88D5A1CB066AA9D /* FaceShapeClassifierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */; };
 		A1B2C3D4E5F60718293A4B5C /* LinerGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* LinerGeometry.swift */; };
 		A243507A38CDA620F6EA9CFC /* MakeupRecommender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507F8ABB438F67B20D0A1A2C /* MakeupRecommender.swift */; };
+		A3A721B2BAA472D2516B4213 /* EyeScanLandmarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635D17385726DDB9B3A6D243 /* EyeScanLandmarks.swift */; };
 		A3C86C57A3B3DE9202A267CF /* EyebrowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10F58ECBC93C435DE28667D /* EyebrowTests.swift */; };
-		7C1E5A0B2D3F4A6B8C9D0E21 /* GlassKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E22 /* GlassKit.swift */; };
 		AD829C69DD73C01C6DCD473D /* TryOnHomeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */; };
 		AECE21EC64B858B3E9302E8D /* EyebrowRegionMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */; };
 		B1B2C3D4E5F60718293A4B5C /* LinerGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1B2C3D4E5F60718293A4B5D /* LinerGeometryTests.swift */; };
 		B298E07ED940DDBA94F96CAE /* FaceShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C49459039CEAF042E4919F8 /* FaceShape.swift */; };
 		B3C5787F1841D0350274F90E /* FaceLandmarkProjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */; };
+		B3F3D772985683090A203B92 /* EyelinerTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1985CD06870F896A31580E6A /* EyelinerTutorial.swift */; };
 		B4A68F2B3FF0993A80DC8193 /* EyeShapeResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */; };
 		B5A0C0DE00000000000B0002 /* BrowStylePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */; };
 		B5A0C0DE00000000000C0002 /* BrowDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000000C0001 /* BrowDesign.swift */; };
@@ -124,12 +140,10 @@
 		B5A0C0DE000000000011000A /* BrowEngine+Fixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */; };
 		B5A0C0DE000000000011020C /* Brow.metal.txt in Resources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE000000000011020B /* Brow.metal.txt */; };
 		B5A0C0DE00000000001A0002 /* LinerLookPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */; };
-		7C1E5A0B2D3F4A6B8C9D0E51 /* BrowTutorialOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */; };
-		7C1E5A0B2D3F4A6B8C9D0E41 /* StyleIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */; };
-		7C1E5A0B2D3F4A6B8C9D0E31 /* TutorialPrepView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */; };
 		B955ACB99C0D6EABE87D10F1 /* PlaceholderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */; };
 		B9DE9F52EC5429FA7C407B2B /* LinerInkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C64D36919DA720D73B370998 /* LinerInkTests.swift */; };
 		BBC1AC7A0CD90B0E7BC75223 /* LandmarkSpace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E763EDC56C953EA58AFBB1 /* LandmarkSpace.swift */; };
+		BBD99B371CEA67B052D2D704 /* BlushEngine+Draw.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */; };
 		C37D0B4D531BBB231AC8A90A /* DeviceFaceTrackingChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1601274318B8DCA422ED931 /* DeviceFaceTrackingChecker.swift */; };
 		C4A5F9A53088B1E800BFECB0 /* MediaPipeTasksVision in Frameworks */ = {isa = PBXBuildFile; productRef = C4A5F9A43088B1E800BFECB0 /* MediaPipeTasksVision */; };
 		C8B9433F836C41AA8E942950 /* LinerSolution.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29017F5C551F928297695BA1 /* LinerSolution.swift */; };
@@ -157,6 +171,7 @@
 		E800000032E0F403F6771AC6 /* EyelinerPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */; };
 		E80000005D30E5A2A05DAB6C /* EyeDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7000000671282B495B3FED6 /* EyeDebugView.swift */; };
 		EB686A7BDE5EA2B0941114D4 /* TryOnLiveCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */; };
+		EE3C7BD72A1C6F2ECBD25C95 /* BrowTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */; };
 		F83E4FF1665636FA83213151 /* ARFaceTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF45679699AC7CB5E530CA1C /* ARFaceTrackingManager.swift */; };
 		F88C4B1A73633332F0DE36C2 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */; };
 /* End PBXBuildFile section */
@@ -172,12 +187,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6375BDBA9F065C5C5FB327E1 /* FaceMeshMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FaceMeshMeasurer.swift"; sourceTree = "<group>"; };
-		635D17385726DDB9B3A6D243 /* EyeScanLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EyeScanLandmarks.swift"; sourceTree = "<group>"; };
-		1985CD06870F896A31580E6A /* EyelinerTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EyelinerTutorial.swift"; sourceTree = "<group>"; };
-		B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowTutorial.swift"; sourceTree = "<group>"; };
-		2050995FB80EEA6772CE79ED /* BlushTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlushTutorial.swift"; sourceTree = "<group>"; };
-		E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlushEngine+Draw.swift"; sourceTree = "<group>"; };
+		F323752B9D2D5BFEFC07F90E /* GuidedFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GuidedFlowTests.swift"; sourceTree = "<group>"; };
+		8EA8DD0DDCBDE470A2CCC9F4 /* SplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SplashView.swift"; sourceTree = "<group>"; };
+		465CFF40BEADB95C33216AE7 /* OnboardingPagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnboardingPagesView.swift"; sourceTree = "<group>"; };
+		30F3680D72038F9AAC71A103 /* EntryFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntryFlowView.swift"; sourceTree = "<group>"; };
+		224FF6C86731C7630742B3C2 /* CompactOpeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CompactOpeningView.swift"; sourceTree = "<group>"; };
+		11D11B8D2D64D194CBCCE1B4 /* PreparationScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PreparationScreen.swift"; sourceTree = "<group>"; };
+		5610AF7666A7B25E37DB08D1 /* ToolInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolInfo.swift"; sourceTree = "<group>"; };
+		6B389B627C85B56E0A320EF9 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FeedbackView.swift"; sourceTree = "<group>"; };
+		8805EBBC76BEFC90F5F30F01 /* ComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ComparisonView.swift"; sourceTree = "<group>"; };
+		EA978F144FE29C3F1099AEBF /* EyelinerInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EyelinerInfo.swift"; sourceTree = "<group>"; };
+		F6BF9E89D6B068476F83EC57 /* BrowInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowInfo.swift"; sourceTree = "<group>"; };
+		B4CAEAC35E715B14CDC179B9 /* BlushLookPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlushLookPicker.swift"; sourceTree = "<group>"; };
+		6538E74CDEA4C040F7E83084 /* BlushInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlushInfo.swift"; sourceTree = "<group>"; };
+		2FE8D1BE9969D73DA8C2B7BA /* FlowPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FlowPlaceholder.swift"; sourceTree = "<group>"; };
+		22349FD5446BC601B67803B0 /* NewFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewFlow.swift"; sourceTree = "<group>"; };
 		06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerGeometryTests.swift; sourceTree = "<group>"; };
 		087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommendation.swift; sourceTree = "<group>"; };
 		0C2A5C04A75A9061E0632676 /* ImageToViewMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageToViewMapping.swift; sourceTree = "<group>"; };
@@ -186,7 +210,9 @@
 		133DCD5B481F352F758A1E3F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		16A13571086FAC7A101835BA /* FaceContourMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceContourMeasurer.swift; sourceTree = "<group>"; };
 		19429AD975CE1483E26A2783 /* LiveGuideView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveGuideView.swift; sourceTree = "<group>"; };
+		1985CD06870F896A31580E6A /* EyelinerTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerTutorial.swift; sourceTree = "<group>"; };
 		19A31E43DAD88366AB1ECB5C /* AppNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigator.swift; sourceTree = "<group>"; };
+		2050995FB80EEA6772CE79ED /* BlushTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlushTutorial.swift; sourceTree = "<group>"; };
 		231A9D8B5701EDA4305C3266 /* EyeLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeLandmarks.swift; sourceTree = "<group>"; };
 		26456AF703170C7814098A8E /* AppSpacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSpacing.swift; sourceTree = "<group>"; };
 		29017F5C551F928297695BA1 /* LinerSolution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerSolution.swift; sourceTree = "<group>"; };
@@ -213,11 +239,10 @@
 		5CDF09D2EC207E4F4D908C7C /* FaceFit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceFit.swift; sourceTree = "<group>"; };
 		5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTypography.swift; sourceTree = "<group>"; };
 		5F6D1A9D904A10807700F875 /* FaceShapeClassifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceShapeClassifier.swift; sourceTree = "<group>"; };
+		635D17385726DDB9B3A6D243 /* EyeScanLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScanLandmarks.swift; sourceTree = "<group>"; };
+		6375BDBA9F065C5C5FB327E1 /* FaceMeshMeasurer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceMeshMeasurer.swift; sourceTree = "<group>"; };
 		64A92B86027ED154A52F5754 /* ProductCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCamera.swift; sourceTree = "<group>"; };
 		6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowViewModel.swift; sourceTree = "<group>"; };
-		7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowTutorialOverlay.swift; sourceTree = "<group>"; };
-		7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleIcons.swift; sourceTree = "<group>"; };
-		7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPrepView.swift; sourceTree = "<group>"; };
 		6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderPages.swift; sourceTree = "<group>"; };
 		6D795F13C8C22E022040EE00 /* SunriseApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = SunriseApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		73EEC8668C59A63EE58717BF /* Tutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
@@ -225,6 +250,11 @@
 		792977CAD0396D693A58DE24 /* LinerPathBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerPathBuilder.swift; sourceTree = "<group>"; };
 		792C45EC0F1AB54F3358E303 /* HandOcclusionSegmenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandOcclusionSegmenter.swift; sourceTree = "<group>"; };
 		7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPersonalizationTests.swift; sourceTree = "<group>"; };
+		7C1E5A0B2D3F4A6B8C9D0E12 /* LinerStretchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerStretchTests.swift; sourceTree = "<group>"; };
+		7C1E5A0B2D3F4A6B8C9D0E22 /* GlassKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassKit.swift; sourceTree = "<group>"; };
+		7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialPrepView.swift; sourceTree = "<group>"; };
+		7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StyleIcons.swift; sourceTree = "<group>"; };
+		7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowTutorialOverlay.swift; sourceTree = "<group>"; };
 		7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuidedTutorialView.swift; sourceTree = "<group>"; };
 		7F3A91C2D45E6B80A1C9E0F5 /* PhotoCaptureViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureViews.swift; sourceTree = "<group>"; };
 		7F3A91C2D45E6B80A1D00002 /* CameraMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessage.swift; sourceTree = "<group>"; };
@@ -236,12 +266,10 @@
 		7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerStepGuide.swift; sourceTree = "<group>"; };
 		7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraMessageEngineTests.swift; sourceTree = "<group>"; };
 		832873944F90986F04549D21 /* LidFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LidFlowTests.swift; sourceTree = "<group>"; };
-		7C1E5A0B2D3F4A6B8C9D0E12 /* LinerStretchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerStretchTests.swift; sourceTree = "<group>"; };
 		86692327C6B7D587C8265F12 /* TrackingReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingReadiness.swift; sourceTree = "<group>"; };
 		87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerMappingTests.swift; sourceTree = "<group>"; };
 		880B8ADAAD4B4CCC9E778686 /* ForeheadGuideTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForeheadGuideTests.swift; sourceTree = "<group>"; };
 		8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeGeometry.swift; sourceTree = "<group>"; };
-		7C1E5A0B2D3F4A6B8C9D0E22 /* GlassKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassKit.swift; sourceTree = "<group>"; };
 		92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceLandmarkProjection.swift; sourceTree = "<group>"; };
 		9342DC399ECDC1D13247975B /* FaceCameraState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceCameraState.swift; sourceTree = "<group>"; };
 		98F393F180238C7106FB99C0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
@@ -284,6 +312,7 @@
 		B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BrowEngine+Fixtures.swift"; sourceTree = "<group>"; };
 		B5A0C0DE000000000011020B /* Brow.metal.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Brow.metal.txt; sourceTree = "<group>"; };
 		B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinerLookPicker.swift; sourceTree = "<group>"; };
+		B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowTutorial.swift; sourceTree = "<group>"; };
 		B8A0C7629D5BE6A59E2A595E /* TrackingReadinessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingReadinessTests.swift; sourceTree = "<group>"; };
 		BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupPreferenceTests.swift; sourceTree = "<group>"; };
 		BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeModel.swift; sourceTree = "<group>"; };
@@ -309,6 +338,7 @@
 		DAD3B579ADBE7A6A3409A9D8 /* MakeupTextureBaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupTextureBaker.swift; sourceTree = "<group>"; };
 		DE9F70FB20C8710887FFDCCC /* FaceFeatureMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceFeatureMap.swift; sourceTree = "<group>"; };
 		E10F58ECBC93C435DE28667D /* EyebrowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowTests.swift; sourceTree = "<group>"; };
+		E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BlushEngine+Draw.swift"; sourceTree = "<group>"; };
 		E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerPlanner.swift; sourceTree = "<group>"; };
 		E70000000C39BF83BDEA70CC /* EyeScan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeScan.swift; sourceTree = "<group>"; };
 		E70000003EEB62383567027B /* EyelinerPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerPlannerTests.swift; sourceTree = "<group>"; };
@@ -356,6 +386,71 @@
 			path = Navigation;
 			sourceTree = "<group>";
 		};
+		17B1500277B986E4FEDF5312 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				6375BDBA9F065C5C5FB327E1 /* FaceMeshMeasurer.swift */,
+				635D17385726DDB9B3A6D243 /* EyeScanLandmarks.swift */,
+				E7000000671282B495B3FED6 /* EyeDebugView.swift */,
+				9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */,
+				C46FF01BBC0933B3F49A571A /* FaceContourDetector.swift */,
+				5F6D1A9D904A10807700F875 /* FaceShapeClassifier.swift */,
+				F9A809519AC15D1F2A75FC7E /* MakeupTextureRenderer.swift */,
+				396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */,
+				E70000000C39BF83BDEA70CC /* EyeScan.swift */,
+				16A13571086FAC7A101835BA /* FaceContourMeasurer.swift */,
+				DE9F70FB20C8710887FFDCCC /* FaceFeatureMap.swift */,
+				5CDF09D2EC207E4F4D908C7C /* FaceFit.swift */,
+				2F7F9AFC01F64EED1135CF2A /* FaceProportions.swift */,
+				2C49459039CEAF042E4919F8 /* FaceShape.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		18627497AF4C9D7169D0009C /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				CF45679699AC7CB5E530CA1C /* ARFaceTrackingManager.swift */,
+				A7B094CA5F993727AE496FAB /* BeautyBlush.metal.txt */,
+				F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */,
+				92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */,
+				EA63C523723545C9DAFDF3BC /* FaceLandmarkProvider.swift */,
+				0D93637BD45D15F776D9F93A /* FaceTrackingAvailability.swift */,
+				EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */,
+				B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		1B09C29ACCFCACB180B48554 /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				1985CD06870F896A31580E6A /* EyelinerTutorial.swift */,
+				7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */,
+			);
+			path = Tutorial;
+			sourceTree = "<group>";
+		};
+		1C3CE0ED3B1636564FEC425F /* Makeup */ = {
+			isa = PBXGroup;
+			children = (
+				375DE02B74699D549FE5A67D /* Blush */,
+				F6E540963B4F11D68048BD37 /* Brow */,
+				FAC93097E0D4BBC359B3F7A2 /* Eyeliner */,
+				B9177E2B5CC20C3BCE92A90B /* Shared */,
+			);
+			path = Makeup;
+			sourceTree = "<group>";
+		};
+		1C3F80835C2DD0A0E760E0A6 /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */,
+				7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */,
+			);
+			path = Tutorial;
+			sourceTree = "<group>";
+		};
 		22C1BB35C6F3190923BD2E6B /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -373,12 +468,79 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		2523D2C8273DE4252AB9D467 /* Onboarding */ = {
+		23F18A7F04DCCDCEACC40223 /* Rules */ = {
+			isa = PBXGroup;
+			children = (
+				F4C68DD9443BC3C23BD1DD3F /* MakeupPlan.swift */,
+				528DBE5F90FFAE037040249C /* MakeupPreferences.swift */,
+				087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */,
+				507F8ABB438F67B20D0A1A2C /* MakeupRecommender.swift */,
+				DA7ABA5E0000000000000002 /* MakeupRuleDatabase.swift */,
+			);
+			path = Rules;
+			sourceTree = "<group>";
+		};
+		62B7992B25F4A56716B7FD80 /* Welcome */ = {
 			isa = PBXGroup;
 			children = (
 				F40D1704AC0B3B82F035DC3C /* OnboardingView.swift */,
 			);
+			path = Welcome;
+			sourceTree = "<group>";
+		};
+		78A446C3DE9EE8C9E5E60BFC /* CompactOpening */ = {
+			isa = PBXGroup;
+			children = (
+				224FF6C86731C7630742B3C2 /* CompactOpeningView.swift */,
+			);
+			path = CompactOpening;
+			sourceTree = "<group>";
+		};
+		61BFC1BA092ACB24B561E1AD /* Pages */ = {
+			isa = PBXGroup;
+			children = (
+				465CFF40BEADB95C33216AE7 /* OnboardingPagesView.swift */,
+			);
+			path = Pages;
+			sourceTree = "<group>";
+		};
+		209F0E07741B9BAC0569C4BA /* Splash */ = {
+			isa = PBXGroup;
+			children = (
+				8EA8DD0DDCBDE470A2CCC9F4 /* SplashView.swift */,
+			);
+			path = Splash;
+			sourceTree = "<group>";
+		};
+		2523D2C8273DE4252AB9D467 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				209F0E07741B9BAC0569C4BA /* Splash */,
+				61BFC1BA092ACB24B561E1AD /* Pages */,
+				30F3680D72038F9AAC71A103 /* EntryFlowView.swift */,
+				78A446C3DE9EE8C9E5E60BFC /* CompactOpening */,
+				62B7992B25F4A56716B7FD80 /* Welcome */,
+			);
 			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		DB24CAE67D533E32819A4046 /* Info */ = {
+			isa = PBXGroup;
+			children = (
+				6538E74CDEA4C040F7E83084 /* BlushInfo.swift */,
+			);
+			path = Info;
+			sourceTree = "<group>";
+		};
+		375DE02B74699D549FE5A67D /* Blush */ = {
+			isa = PBXGroup;
+			children = (
+				DB24CAE67D533E32819A4046 /* Info */,
+				C53D8F22958301CBC6230C02 /* Engine */,
+				6D2FC89E9A8CFE4DBAFF867A /* TryOn */,
+				CA39EF410D1E84C4F4A89E1F /* Tutorial */,
+			);
+			path = Blush;
 			sourceTree = "<group>";
 		};
 		44D504415A68844C6C1101A8 /* TestSupport */ = {
@@ -399,160 +561,28 @@
 			path = SunriseAppTests;
 			sourceTree = "<group>";
 		};
-		18627497AF4C9D7169D0009C /* Engine */ = {
-			isa = PBXGroup;
-			children = (
-				CF45679699AC7CB5E530CA1C /* ARFaceTrackingManager.swift */,
-				A7B094CA5F993727AE496FAB /* BeautyBlush.metal.txt */,
-				F9716ED0CEE2E6410A4313F0 /* BeautyBlushEngine.swift */,
-				92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */,
-				EA63C523723545C9DAFDF3BC /* FaceLandmarkProvider.swift */,
-				0D93637BD45D15F776D9F93A /* FaceTrackingAvailability.swift */,
-				EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */,
-				B5A0C0DE00000000000C0005 /* MediaPipeBrowTracker.swift */,
-			);
-			path = Engine;
-			sourceTree = "<group>";
-		};
-		7A1EF99F369FF90802A9EE53 /* SunriseApp */ = {
-			isa = PBXGroup;
-			children = (
-				B6C4CDC0872398FC76BC80DE /* App */,
-				E404C04285978FF9C7DE242E /* DesignSystem */,
-				AA362B7C903A0815DDE30B52 /* Features */,
-				22C1BB35C6F3190923BD2E6B /* Resources */,
-				18627497AF4C9D7169D0009C /* Engine */,
-			);
-			path = SunriseApp;
-			sourceTree = "<group>";
-		};
-		9A7281ADAA9F5DD9A22629E5 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				7C1E5A0B2D3F4A6B8C9D0E22 /* GlassKit.swift */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		A868936FDC1A8D26B1893C4D /* Features */ = {
-			isa = PBXGroup;
-			children = (
-				7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */,
-				F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */,
-				F0CCC055355A1EC0AF155313 /* MakeupRecommenderTests.swift */,
-				7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */,
-				B4BCF3A0D2A9C2618147EA0C /* MakeupTextureGeometryTests.swift */,
-				B1B2C3D4E5F60718293A4B5D /* LinerGeometryTests.swift */,
-				87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */,
-				C64D36919DA720D73B370998 /* LinerInkTests.swift */,
-				06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */,
-				E70000003EEB62383567027B /* EyelinerPlannerTests.swift */,
-				B8A0C7629D5BE6A59E2A595E /* TrackingReadinessTests.swift */,
-				E10F58ECBC93C435DE28667D /* EyebrowTests.swift */,
-				880B8ADAAD4B4CCC9E778686 /* ForeheadGuideTests.swift */,
-				BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */,
-				B5A0C0DE00000000000C0007 /* MediaPipeBrowTests.swift */,
-				B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */,
-				B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */,
-				B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */,
-				832873944F90986F04549D21 /* LidFlowTests.swift */,
-				7C1E5A0B2D3F4A6B8C9D0E12 /* LinerStretchTests.swift */,
-				CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */,
-			);
-			path = Features;
-			sourceTree = "<group>";
-		};
-		C53D8F22958301CBC6230C02 /* Engine */ = {
-			isa = PBXGroup;
-			children = (
-				E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */,
-			);
-			path = Engine;
-			sourceTree = "<group>";
-		};
 		6D2FC89E9A8CFE4DBAFF867A /* TryOn */ = {
 			isa = PBXGroup;
 			children = (
+				B4CAEAC35E715B14CDC179B9 /* BlushLookPicker.swift */,
 				3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */,
 				3A07AB7461B6903140D1D165 /* BlushPlacementGuide.swift */,
 			);
 			path = TryOn;
 			sourceTree = "<group>";
 		};
-		CA39EF410D1E84C4F4A89E1F /* Tutorial */ = {
+		6E457151E1B4B61F9EFAA27A /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				2050995FB80EEA6772CE79ED /* BlushTutorial.swift */,
+				FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */,
+				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
+				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
+				7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */,
+				BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */,
+				9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */,
+				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
 			);
-			path = Tutorial;
-			sourceTree = "<group>";
-		};
-		375DE02B74699D549FE5A67D /* Blush */ = {
-			isa = PBXGroup;
-			children = (
-				C53D8F22958301CBC6230C02 /* Engine */,
-				6D2FC89E9A8CFE4DBAFF867A /* TryOn */,
-				CA39EF410D1E84C4F4A89E1F /* Tutorial */,
-			);
-			path = Blush;
-			sourceTree = "<group>";
-		};
-		DECC604BF3ADAB308CB7501D /* Engine */ = {
-			isa = PBXGroup;
-			children = (
-				B5A0C0DE000000000011020B /* Brow.metal.txt */,
-				B5A0C0DE00000000000C0001 /* BrowDesign.swift */,
-				B5A0C0DE0000000000110003 /* BrowEngine+Draw.swift */,
-				B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */,
-				B5A0C0DE0000000000110005 /* BrowEngine+Hair.swift */,
-				B5A0C0DE0000000000110007 /* BrowEngine+Marks.swift */,
-				B5A0C0DE0000000000110001 /* BrowEngine+Tracking.swift */,
-				B5A0C0DE00000000000C000B /* BrowEraser.swift */,
-				B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */,
-				B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */,
-				B5A0C0DE00000000000C000D /* BrowInpainter.swift */,
-				B5A0C0DE00000000000C0003 /* BrowObservation.swift */,
-				9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */,
-				FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */,
-				CF9C7F6F108DEC6A46AC8A21 /* EyebrowSceneRenderer.swift */,
-				C5F03830273DCC9E47775164 /* EyebrowTrackingPipeline.swift */,
-				CF5B6AFD13E8B16D6706FCDA /* ForeheadGuide.swift */,
-				57A1B7BFE8B58BFECBF5F3E3 /* ForeheadSceneRenderer.swift */,
-			);
-			path = Engine;
-			sourceTree = "<group>";
-		};
-		982CB6D0A5C047A111079BBC /* TryOn */ = {
-			isa = PBXGroup;
-			children = (
-				B5A0C0DE00000000000E0001 /* BrowOverlay.swift */,
-				B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */,
-				B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */,
-				B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */,
-				D79C719E5AD023220CAF0749 /* EyebrowStyle.swift */,
-				6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */,
-				4A6545BC9255A551C688D4B1 /* FaceGuideFlow.swift */,
-			);
-			path = TryOn;
-			sourceTree = "<group>";
-		};
-		1C3F80835C2DD0A0E760E0A6 /* Tutorial */ = {
-			isa = PBXGroup;
-			children = (
-				B6C0AC4AC9C48F97881BF562 /* BrowTutorial.swift */,
-				7C1E5A0B2D3F4A6B8C9D0E52 /* BrowTutorialOverlay.swift */,
-			);
-			path = Tutorial;
-			sourceTree = "<group>";
-		};
-		F6E540963B4F11D68048BD37 /* Brow */ = {
-			isa = PBXGroup;
-			children = (
-				DECC604BF3ADAB308CB7501D /* Engine */,
-				982CB6D0A5C047A111079BBC /* TryOn */,
-				1C3F80835C2DD0A0E760E0A6 /* Tutorial */,
-			);
-			path = Brow;
+			path = Home;
 			sourceTree = "<group>";
 		};
 		6F2B242B43F511D168AEF554 /* Engine */ = {
@@ -581,32 +611,86 @@
 			path = Engine;
 			sourceTree = "<group>";
 		};
-		DC2C9261F7BE538AEE2F4CBA /* TryOn */ = {
+		7A1EF99F369FF90802A9EE53 /* SunriseApp */ = {
 			isa = PBXGroup;
 			children = (
-				E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */,
-				B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */,
+				B6C4CDC0872398FC76BC80DE /* App */,
+				E404C04285978FF9C7DE242E /* DesignSystem */,
+				AA362B7C903A0815DDE30B52 /* Features */,
+				22C1BB35C6F3190923BD2E6B /* Resources */,
+				18627497AF4C9D7169D0009C /* Engine */,
+			);
+			path = SunriseApp;
+			sourceTree = "<group>";
+		};
+		982CB6D0A5C047A111079BBC /* TryOn */ = {
+			isa = PBXGroup;
+			children = (
+				B5A0C0DE00000000000E0001 /* BrowOverlay.swift */,
+				B5A0C0DE00000000000E0003 /* BrowOverlayPicker.swift */,
+				B5A0C0DE00000000000B0001 /* BrowStylePicker.swift */,
+				B5A0C0DE00000000000C0009 /* BrowTrackingOverlay.swift */,
+				D79C719E5AD023220CAF0749 /* EyebrowStyle.swift */,
+				6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */,
+				4A6545BC9255A551C688D4B1 /* FaceGuideFlow.swift */,
 			);
 			path = TryOn;
 			sourceTree = "<group>";
 		};
-		1B09C29ACCFCACB180B48554 /* Tutorial */ = {
+		9A7281ADAA9F5DD9A22629E5 /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				1985CD06870F896A31580E6A /* EyelinerTutorial.swift */,
-				7F3A91C2D45E6B80A1D0000E /* LinerStepGuide.swift */,
+				2FE8D1BE9969D73DA8C2B7BA /* FlowPlaceholder.swift */,
+				7C1E5A0B2D3F4A6B8C9D0E22 /* GlassKit.swift */,
 			);
-			path = Tutorial;
+			path = Components;
 			sourceTree = "<group>";
 		};
-		FAC93097E0D4BBC359B3F7A2 /* Eyeliner */ = {
+		A868936FDC1A8D26B1893C4D /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				6F2B242B43F511D168AEF554 /* Engine */,
-				DC2C9261F7BE538AEE2F4CBA /* TryOn */,
-				1B09C29ACCFCACB180B48554 /* Tutorial */,
+				F323752B9D2D5BFEFC07F90E /* GuidedFlowTests.swift */,
+				7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */,
+				F8CAFAEACFDE4C0B40A70B11 /* FaceShapeClassifierTests.swift */,
+				F0CCC055355A1EC0AF155313 /* MakeupRecommenderTests.swift */,
+				7A55B196215C21A4854D69BF /* MakeupPersonalizationTests.swift */,
+				B4BCF3A0D2A9C2618147EA0C /* MakeupTextureGeometryTests.swift */,
+				B1B2C3D4E5F60718293A4B5D /* LinerGeometryTests.swift */,
+				87BF2D2EF9709D53B6DC6D0E /* EyelinerMappingTests.swift */,
+				C64D36919DA720D73B370998 /* LinerInkTests.swift */,
+				06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */,
+				E70000003EEB62383567027B /* EyelinerPlannerTests.swift */,
+				B8A0C7629D5BE6A59E2A595E /* TrackingReadinessTests.swift */,
+				E10F58ECBC93C435DE28667D /* EyebrowTests.swift */,
+				880B8ADAAD4B4CCC9E778686 /* ForeheadGuideTests.swift */,
+				BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */,
+				B5A0C0DE00000000000C0007 /* MediaPipeBrowTests.swift */,
+				B5A0C0DE00000000000E0005 /* BrowOverlayTests.swift */,
+				B5A0C0DE00000000000F0003 /* BrowFaceStabilizerTests.swift */,
+				B5A0C0DE00000000000F0009 /* BrowHairMeshTests.swift */,
+				832873944F90986F04549D21 /* LidFlowTests.swift */,
+				7C1E5A0B2D3F4A6B8C9D0E12 /* LinerStretchTests.swift */,
+				CA1A3608BCE2047F6C236F74 /* EyeMeasurerTests.swift */,
 			);
-			path = Eyeliner;
+			path = Features;
+			sourceTree = "<group>";
+		};
+		AA362B7C903A0815DDE30B52 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				2523D2C8273DE4252AB9D467 /* Onboarding */,
+				1C3CE0ED3B1636564FEC425F /* Makeup */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		B28B7AF69320201D1CF206EB = {
+			isa = PBXGroup;
+			children = (
+				7A1EF99F369FF90802A9EE53 /* SunriseApp */,
+				6018AF2785A5C14223064FCC /* SunriseAppTests */,
+				FBDC4F23F93125BBEEAE800C /* Products */,
+			);
 			sourceTree = "<group>";
 		};
 		B3EA1DF8F68E2BB397FFBE88 /* Camera */ = {
@@ -631,108 +715,20 @@
 			path = Camera;
 			sourceTree = "<group>";
 		};
-		6E457151E1B4B61F9EFAA27A /* Home */ = {
-			isa = PBXGroup;
-			children = (
-				FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */,
-				6A993E0C51AB4BF95BD75CAB /* PlaceholderPages.swift */,
-				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
-				7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */,
-				BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */,
-				9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */,
-				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
-			);
-			path = Home;
-			sourceTree = "<group>";
-		};
-		23F18A7F04DCCDCEACC40223 /* Rules */ = {
-			isa = PBXGroup;
-			children = (
-				F4C68DD9443BC3C23BD1DD3F /* MakeupPlan.swift */,
-				528DBE5F90FFAE037040249C /* MakeupPreferences.swift */,
-				087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */,
-				507F8ABB438F67B20D0A1A2C /* MakeupRecommender.swift */,
-				DA7ABA5E0000000000000002 /* MakeupRuleDatabase.swift */,
-			);
-			path = Rules;
-			sourceTree = "<group>";
-		};
-		17B1500277B986E4FEDF5312 /* Support */ = {
-			isa = PBXGroup;
-			children = (
-				6375BDBA9F065C5C5FB327E1 /* FaceMeshMeasurer.swift */,
-				635D17385726DDB9B3A6D243 /* EyeScanLandmarks.swift */,
-				E7000000671282B495B3FED6 /* EyeDebugView.swift */,
-				9E0309110C8D0EA6AF88ACBB /* EyeShapeResult.swift */,
-				C46FF01BBC0933B3F49A571A /* FaceContourDetector.swift */,
-				5F6D1A9D904A10807700F875 /* FaceShapeClassifier.swift */,
-				F9A809519AC15D1F2A75FC7E /* MakeupTextureRenderer.swift */,
-				396032C7FF21B1C0F17059B1 /* EyeMeasurer.swift */,
-				E70000000C39BF83BDEA70CC /* EyeScan.swift */,
-				16A13571086FAC7A101835BA /* FaceContourMeasurer.swift */,
-				DE9F70FB20C8710887FFDCCC /* FaceFeatureMap.swift */,
-				5CDF09D2EC207E4F4D908C7C /* FaceFit.swift */,
-				2F7F9AFC01F64EED1135CF2A /* FaceProportions.swift */,
-				2C49459039CEAF042E4919F8 /* FaceShape.swift */,
-			);
-			path = Support;
-			sourceTree = "<group>";
-		};
 		B6BBD85A47A3D7DF2396DB34 /* Tutorial */ = {
 			isa = PBXGroup;
 			children = (
 				7F3A91C2D45E6B80A1C9E0F3 /* GuidedTutorialView.swift */,
 				7F3A91C2D45E6B80A1C9E0F5 /* PhotoCaptureViews.swift */,
 				73EEC8668C59A63EE58717BF /* Tutorial.swift */,
-				7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */,
 			);
 			path = Tutorial;
-			sourceTree = "<group>";
-		};
-		B9177E2B5CC20C3BCE92A90B /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				B3EA1DF8F68E2BB397FFBE88 /* Camera */,
-				6E457151E1B4B61F9EFAA27A /* Home */,
-				23F18A7F04DCCDCEACC40223 /* Rules */,
-				17B1500277B986E4FEDF5312 /* Support */,
-				B6BBD85A47A3D7DF2396DB34 /* Tutorial */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
-		1C3CE0ED3B1636564FEC425F /* Makeup */ = {
-			isa = PBXGroup;
-			children = (
-				375DE02B74699D549FE5A67D /* Blush */,
-				F6E540963B4F11D68048BD37 /* Brow */,
-				FAC93097E0D4BBC359B3F7A2 /* Eyeliner */,
-				B9177E2B5CC20C3BCE92A90B /* Shared */,
-			);
-			path = Makeup;
-			sourceTree = "<group>";
-		};
-		AA362B7C903A0815DDE30B52 /* Features */ = {
-			isa = PBXGroup;
-			children = (
-				2523D2C8273DE4252AB9D467 /* Onboarding */,
-				1C3CE0ED3B1636564FEC425F /* Makeup */,
-			);
-			path = Features;
-			sourceTree = "<group>";
-		};
-		B28B7AF69320201D1CF206EB = {
-			isa = PBXGroup;
-			children = (
-				7A1EF99F369FF90802A9EE53 /* SunriseApp */,
-				6018AF2785A5C14223064FCC /* SunriseAppTests */,
-				FBDC4F23F93125BBEEAE800C /* Products */,
-			);
 			sourceTree = "<group>";
 		};
 		B6C4CDC0872398FC76BC80DE /* App */ = {
 			isa = PBXGroup;
 			children = (
+				22349FD5446BC601B67803B0 /* NewFlow.swift */,
 				0EB509C6F62AD9CF0B9F3D96 /* Navigation */,
 				C1810A54CE6D4BC94E7F122D /* AppContainer.swift */,
 				9DC0612A3CD82563E49C6CB2 /* AppRootView.swift */,
@@ -743,6 +739,80 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		779B201F44B0233D7754D6FA /* Preparation */ = {
+			isa = PBXGroup;
+			children = (
+				11D11B8D2D64D194CBCCE1B4 /* PreparationScreen.swift */,
+				7C1E5A0B2D3F4A6B8C9D0E32 /* TutorialPrepView.swift */,
+			);
+			path = Preparation;
+			sourceTree = "<group>";
+		};
+		3C645885891A3A3060B09F7E /* Comparison */ = {
+			isa = PBXGroup;
+			children = (
+				8805EBBC76BEFC90F5F30F01 /* ComparisonView.swift */,
+			);
+			path = Comparison;
+			sourceTree = "<group>";
+		};
+		679D04F6D520FA89B95A05BD /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				6B389B627C85B56E0A320EF9 /* FeedbackView.swift */,
+			);
+			path = Feedback;
+			sourceTree = "<group>";
+		};
+		450DF5659BE9315A3FB33DAE /* Info */ = {
+			isa = PBXGroup;
+			children = (
+				5610AF7666A7B25E37DB08D1 /* ToolInfo.swift */,
+			);
+			path = Info;
+			sourceTree = "<group>";
+		};
+		B9177E2B5CC20C3BCE92A90B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				450DF5659BE9315A3FB33DAE /* Info */,
+				679D04F6D520FA89B95A05BD /* Feedback */,
+				3C645885891A3A3060B09F7E /* Comparison */,
+				B3EA1DF8F68E2BB397FFBE88 /* Camera */,
+				6E457151E1B4B61F9EFAA27A /* Home */,
+				23F18A7F04DCCDCEACC40223 /* Rules */,
+				17B1500277B986E4FEDF5312 /* Support */,
+				B6BBD85A47A3D7DF2396DB34 /* Tutorial */,
+				779B201F44B0233D7754D6FA /* Preparation */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		C53D8F22958301CBC6230C02 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				E25E63473DC0FF629E6EB1BF /* BlushEngine+Draw.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		CA39EF410D1E84C4F4A89E1F /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				2050995FB80EEA6772CE79ED /* BlushTutorial.swift */,
+			);
+			path = Tutorial;
+			sourceTree = "<group>";
+		};
+		DC2C9261F7BE538AEE2F4CBA /* TryOn */ = {
+			isa = PBXGroup;
+			children = (
+				E700000003AA57EB8DEC364F /* EyelinerPlanner.swift */,
+				B5A0C0DE00000000001A0001 /* LinerLookPicker.swift */,
+			);
+			path = TryOn;
+			sourceTree = "<group>";
+		};
 		DC644578E897C547704A6C5E /* Theme */ = {
 			isa = PBXGroup;
 			children = (
@@ -751,6 +821,31 @@
 				5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */,
 			);
 			path = Theme;
+			sourceTree = "<group>";
+		};
+		DECC604BF3ADAB308CB7501D /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				B5A0C0DE000000000011020B /* Brow.metal.txt */,
+				B5A0C0DE00000000000C0001 /* BrowDesign.swift */,
+				B5A0C0DE0000000000110003 /* BrowEngine+Draw.swift */,
+				B5A0C0DE0000000000110009 /* BrowEngine+Fixtures.swift */,
+				B5A0C0DE0000000000110005 /* BrowEngine+Hair.swift */,
+				B5A0C0DE0000000000110007 /* BrowEngine+Marks.swift */,
+				B5A0C0DE0000000000110001 /* BrowEngine+Tracking.swift */,
+				B5A0C0DE00000000000C000B /* BrowEraser.swift */,
+				B5A0C0DE00000000000F0001 /* BrowFaceStabilizer.swift */,
+				B5A0C0DE00000000000F0007 /* BrowHairMesh.swift */,
+				B5A0C0DE00000000000C000D /* BrowInpainter.swift */,
+				B5A0C0DE00000000000C0003 /* BrowObservation.swift */,
+				9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */,
+				FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */,
+				CF9C7F6F108DEC6A46AC8A21 /* EyebrowSceneRenderer.swift */,
+				C5F03830273DCC9E47775164 /* EyebrowTrackingPipeline.swift */,
+				CF5B6AFD13E8B16D6706FCDA /* ForeheadGuide.swift */,
+				57A1B7BFE8B58BFECBF5F3E3 /* ForeheadSceneRenderer.swift */,
+			);
+			path = Engine;
 			sourceTree = "<group>";
 		};
 		E122CD75A643278D498BA4DE /* Navigation */ = {
@@ -768,6 +863,44 @@
 				DC644578E897C547704A6C5E /* Theme */,
 			);
 			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		6205EC349345D2FCE8EADEDD /* Info */ = {
+			isa = PBXGroup;
+			children = (
+				F6BF9E89D6B068476F83EC57 /* BrowInfo.swift */,
+			);
+			path = Info;
+			sourceTree = "<group>";
+		};
+		F6E540963B4F11D68048BD37 /* Brow */ = {
+			isa = PBXGroup;
+			children = (
+				6205EC349345D2FCE8EADEDD /* Info */,
+				DECC604BF3ADAB308CB7501D /* Engine */,
+				982CB6D0A5C047A111079BBC /* TryOn */,
+				1C3F80835C2DD0A0E760E0A6 /* Tutorial */,
+			);
+			path = Brow;
+			sourceTree = "<group>";
+		};
+		613FFC2C6E6820792EC3BFE5 /* Info */ = {
+			isa = PBXGroup;
+			children = (
+				EA978F144FE29C3F1099AEBF /* EyelinerInfo.swift */,
+			);
+			path = Info;
+			sourceTree = "<group>";
+		};
+		FAC93097E0D4BBC359B3F7A2 /* Eyeliner */ = {
+			isa = PBXGroup;
+			children = (
+				613FFC2C6E6820792EC3BFE5 /* Info */,
+				6F2B242B43F511D168AEF554 /* Engine */,
+				DC2C9261F7BE538AEE2F4CBA /* TryOn */,
+				1B09C29ACCFCACB180B48554 /* Tutorial */,
+			);
+			path = Eyeliner;
 			sourceTree = "<group>";
 		};
 		FBDC4F23F93125BBEEAE800C /* Products */ = {
@@ -893,6 +1026,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E0BF763D279D99C37AAC774 /* GuidedFlowTests.swift in Sources */,
 				7F3A91C2D45E6B80A1D00011 /* CameraMessageEngineTests.swift in Sources */,
 				0BDB05D65645A9D73C294F55 /* AppNavigatorTests.swift in Sources */,
 				D9D6D606230E23D7BC356D38 /* ServiceStubs.swift in Sources */,
@@ -923,6 +1057,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BD884A1FE0C6B305A6FCD688 /* SplashView.swift in Sources */,
+				CB43B92FF9F7FCFF3F3C3F61 /* OnboardingPagesView.swift in Sources */,
+				CC07D9C69AAAC26A26E31B3A /* EntryFlowView.swift in Sources */,
+				BC032265C9ECD91C915DB268 /* CompactOpeningView.swift in Sources */,
+				BCF7707B7263BEEFF70C01E4 /* PreparationScreen.swift in Sources */,
+				66C33275CC9917AD1C38C236 /* ToolInfo.swift in Sources */,
+				9189AAABB287729E96060B5C /* FeedbackView.swift in Sources */,
+				F94205A1B2C9AE06D568B14E /* ComparisonView.swift in Sources */,
+				975EA8A11F370F02DAEC23CF /* EyelinerInfo.swift in Sources */,
+				BE2588491145E5C0132375C0 /* BrowInfo.swift in Sources */,
+				6073C06ABA610D35DB264744 /* BlushLookPicker.swift in Sources */,
+				F49403615C6E340AD3E06244 /* BlushInfo.swift in Sources */,
+				4115CD97F39597A602B21EBA /* FlowPlaceholder.swift in Sources */,
+				DC477A1146A2D472909C8FCA /* NewFlow.swift in Sources */,
 				74F2F17D8FCCC121CEFB8A41 /* FaceMeshMeasurer.swift in Sources */,
 				A3A721B2BAA472D2516B4213 /* EyeScanLandmarks.swift in Sources */,
 				B3F3D772985683090A203B92 /* EyelinerTutorial.swift in Sources */,
@@ -1060,7 +1208,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1105,7 +1253,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 5NYWSR69FZ;
+				DEVELOPMENT_TEAM = WP97CT3PT7;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = SunriseApp/App/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
