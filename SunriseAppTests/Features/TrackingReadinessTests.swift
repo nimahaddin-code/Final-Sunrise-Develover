@@ -20,35 +20,10 @@ final class TrackingReadinessTests: XCTestCase {
         XCTAssertFalse(readiness.update(timestamp: 2.5, tracked: true, steady: false))
         XCTAssertFalse(readiness.update(timestamp: 9, tracked: true, steady: true))
     }
-    func testBlushMaskAvoidsCenterAndBackOfFaceAndIsSymmetric() {
-        XCTAssertEqual(BlushMask.weight(x: 0, y: -0.026, z: 0.04), 0)
-        XCTAssertEqual(BlushMask.weight(x: 0.043, y: -0.026, z: -0.02), 0)
-        let left = BlushMask.weight(x: -0.043, y: -0.026, z: 0.04)
-        XCTAssertGreaterThan(left, 0)
-        XCTAssertEqual(left, BlushMask.weight(x: 0.043, y: -0.026, z: 0.04))
-    }
 }
 
 // -Nimah: Regresi pemetaan titik tanpa asumsi indeks face-mesh tertentu.
 extension TrackingReadinessTests {
-    func testPlacementMappingHandlesEmptyMeshAndNeverDuplicatesAnIndex() {
-        XCTAssertTrue(PlacementDots.vertexIndices(vertices: [], step: .blush).isEmpty)
-        let vertices: [SIMD3<Float>] = [.init(-0.043,-0.015,0.036),.init(0.043,-0.015,0.036)]
-        let indices = PlacementDots.vertexIndices(vertices: vertices, step: .blush)
-        XCTAssertEqual(indices.count, 2)
-        XCTAssertEqual(Set(indices).count, indices.count)
-        XCTAssertTrue(indices.allSatisfy { vertices.indices.contains($0) })
-    }
-    func testEveryTutorialStageProvidesDistinctPlacementTargets() {
-        for step in TutorialStep.allCases {
-            let targets = PlacementDots.targets(for: step)
-            let mapped = PlacementDots.vertexIndices(vertices: targets, step: step)
-            XCTAssertFalse(targets.isEmpty)
-            XCTAssertEqual(mapped.count, targets.count)
-            XCTAssertEqual(mapped, Array(targets.indices))
-        }
-        XCTAssertNotEqual(PlacementDots.targets(for: .blush), PlacementDots.targets(for: .contour))
-    }
 }
 
 // -Nimah: Mesh sintetis hanya untuk regresi algoritme; bukan bukti akurasi wajah iPhone.

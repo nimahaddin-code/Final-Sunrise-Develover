@@ -175,7 +175,7 @@ Holly memasok hasil ke `FaceShapeAssessment(shape: .oval, origin: .analysis, con
 
 Nimah memiliki katalog preferensi, fitting eyebrow, blush placement, preview dan tutorial. Hanum tetap memiliki eyeliner; perubahan ini tidak menambahkan sesi kamera kedua atau memindahkan kepemilikan eyeliner. Integrasikan kontrak model terlebih dahulu, koordinasikan project.pbxproj, lalu uji satu shared ARSession.
 
-Source utama: Features/MakeupPreferences, Features/Eyebrow, Features/Forehead/ForeheadSceneRenderer.swift dan Features/LiveGuide/LiveGuideView.swift. Renderer area bersama dipakai ulang untuk blush. Seluruh tambahan diberi penanda -Nimah.
+Source utama: Features/MakeupPreferences, Features/Blush, Features/Brow, Features/Forehead/ForeheadSceneRenderer.swift dan Features/LiveGuide/LiveGuideView.swift. Renderer area bersama dipakai ulang untuk blush. Seluruh tambahan diberi penanda -Nimah.
 
 ## Verifikasi 22 October 2026
 

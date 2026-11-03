@@ -25,19 +25,8 @@ struct AppRootView: View {
 
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
-        case .referenceDetail(let reference): ReferenceDetailView(reference: reference)
-        // -Nimah: Integration routing; teammate feature implementations remain unchanged.
-        case .eyebrowGuide: EyebrowOverlayView(checker: container.faceTracking,assessment:assessment)
-        case .browBlush(let region): EyebrowOverlayView(checker:container.faceTracking,assessment:assessment,initialRegion:region)
         case .recommendedTutorial(let handoff):
             GuidedTutorialView(checker:container.faceTracking,assessment:assessment,plan:plan,handoff:handoff)
-        case .referenceImport: ReferenceImportView(checker: container.faceTracking, store: container.savedLooks)
-        case .session:
-            // -Nimah: Old catalog/import routes cannot reopen the superseded mixed renderer.
-            EyebrowOverlayView(checker:container.faceTracking,assessment:assessment)
-        case .savedLookDetail(let look): SavedLookDetailView(look: look, store: container.savedLooks)
-        case .makeupTryOn(let plan, let applied): MakeupTryOnView(plan: plan, applied: applied)
-        case .tutorial: BlankPageView(title: "Tutorial")
         }
     }
 }

@@ -1,3 +1,62 @@
+## Unused code deleted — -Nimah (2026-11-02)
+
+Checked by building, not guessed: everything in `Features/Legacy/` was deleted, then the app and tests were built and
+any file still needed was put back. Kept and moved to `Makeup/Shared/Support/`: `EyeScan` (`EyeShape`, used by
+`EyelinerPlanner`), `FaceShape`, `FaceProportions`, `FaceContourMeasurer`, `FaceMeshMeasurer`, `EyeMeasurer`,
+`EyeScanLandmarks`, `FaceFeatureMap`, `FaceFit`; `ScanDebugOrientation` (`AppOrientationDelegate`, portrait lock) to `App/`.
+Deleted: face/eye scan screens and classifiers, Scan Debug, `SunriseDebugMac/` (its tab was gone), old try-on and tutorial,
+Profile, catalog/import/saved looks, comparison, calibration, mocks, `PreviewSupport`, unused design components, the
+`.sunrisescan` type in Info.plist, `mediapipe-canonical-face.json` and its licence, images `AppIcon test`, `logo-grey`,
+`brow-overlay-3`. `AppRoute` keeps only `recommendedTutorial`; `AppContainer` only `faceTracking`; the old scan
+`OnboardingView` is gone (`OnboardingWelcomeScreen` stays). `MockFaceTrackingChecker` moved to the tests' `ServiceStubs`.
+Tests of deleted code were deleted (423 -> 327); two Try On/tutorial tests now build their plan with `MakeupPlan(shape:)`
+as the app does, and three navigation tests use the tutorial route. No flow or UI change.
+
+## Folders per tool: Makeup/<Tool>/{TryOn,Engine,Tutorial}, Legacy — -Nimah (2026-11-02)
+
+Files moved, no code, flow or UI change. Live code is under `Features/TryOn/`, one folder per tool, each with `TryOn/`
+(what the Try On screen shows: pickers, looks, config), `Engine/` (what draws it on the camera) and `Tutorial/` (steps,
+animations); `Shared/` holds what the tools share: `Home/` (Try On screen, live card, palette), `Camera/` (LiveGuide,
+CameraGuidance, `DeviceFaceTrackingChecker`, `TrackingReadiness`), `Tutorial/` (`GuidedTutorialView` shell, prep page,
+photo), `Rules/` (rule database, `MakeupPlan`, recommendation types), `Support/` (five files from the old scan/try-on that
+live code still uses: `FaceContourDetector`/`SendablePixelBuffer`, `FaceShapeClassifier`/`FaceShapeResult`,
+`EyeShapeResult`, `EyeDebugView`/`DeveloperTools`, `MakeupTextureRenderer`; their own dependencies still live in Legacy).
+`Core/Engine/` keeps the shared engine (`BeautyBlushEngine`, `BeautyBlush.metal.txt`, `MediaPipeBrowTracker`).
+`Features/Legacy/` holds what the app no longer reaches, kept, not deleted: `Scan/` (FaceShape, EyeShape), `ScanDebug/`,
+`OldTryOn/` (old try-on screen and renderer, `EyebrowOverlayView`, `ProfileView`, `BlushMask`, `BlushPlacementSketch`),
+`OldTutorial/`, `Reference*`, `SavedLooks/`, `Comparison/`, `FaceCalibration/`, `BlushComparison/` (orphans, not in the
+project). `Onboarding/` (welcome) stays. `SunriseDebugMac` paths follow. Types keep their names; resources load by bundle
+name. Older notes below use the old paths:
+
+Split, no logic change (2026-11-02, second commit): each tool's tutorial is in its `Tutorial/` folder as an extension of
+`GuidedTutorialModel` (`BlushTutorial.swift`: `blushLessons` and `BlushTutorialOverlay`, now internal;
+`BrowTutorial.swift`: `browLessons`; `EyelinerTutorial.swift`: `linerLessons`, `linerShowsLower`); the shell
+(`GuidedTutorialView.swift`: handoff, compare, tabs, per-tab `liveConfiguration`, screen, photo) stays in
+`Shared/Tutorial/`. The blush parts of the engine moved from `BeautyBlushEngine.swift` to
+`TryOn/Blush/Engine/BlushEngine+Draw.swift` (cheek landmark fit, guide outlines, `bind`, `prepareBlush`, `encodeBlush`), like
+the brow's `BrowEngine+*`; `Core/Engine/BeautyBlushEngine.swift` keeps state, setup, configure/submit, `render`, the mask.
+
+Top level and name (2026-11-02, third commit; files only): `Features/TryOn/` is now `Features/Makeup/` (it holds Try On
+and tutorial). `SunriseApp/` has five folders: `App/` (entry, root view, container, navigation, `Info.plist`, was
+`Configuration/`), `Engine/` (was `Core/AR` + `Core/Engine`, plus `FaceTrackingAvailability` and
+`FaceTrackingAvailabilityChecking`), `Features/`, `DesignSystem/` (theme and `GlassKit` only) and `Resources/`.
+`Core/Models/Tutorial.swift` moved to `Makeup/Shared/Tutorial/`; the rest of `Core/Models`, `Core/Services/Contracts` and
+`PreviewSupport/` went to `Legacy/Scaffold/`, the scan components and `ScanOverlay` to `Legacy/Scan/`, unused components
+to `Legacy/DesignSystem/`. `INFOPLIST_FILE` is `SunriseApp/App/Info.plist`. Paths above that say `TryOn/<Tool>` or
+`TryOn/Shared` now read `Makeup/<Tool>` and `Makeup/Shared`; `Core/Engine/` reads `Engine/`.
+
+| Old | New |
+| --- | --- |
+| `Features/TryOnHome/` | `TryOn/Shared/Home/`; brow/liner pickers in their tool's `TryOn/`; prep page in `Shared/Tutorial/` |
+| `Features/Tutorial/` | `TryOn/Shared/Tutorial/` (`GuidedTutorialView`, photo); `BrowTutorialOverlay` → `Brow/Tutorial/`, `LinerStepGuide` → `Eyeliner/Tutorial/` |
+| `Features/BeautyBlush/`, `Features/Blush/` | shared engine in `Core/Engine/`, blush drawing in `TryOn/Blush/Engine/`; config and placement in `TryOn/Blush/TryOn/` |
+| `Features/Eyebrow/`, `Features/Brow/` | `TryOn/Brow/TryOn/` (style, overlays, view model, picker) and `TryOn/Brow/Engine/` (drawing, tracking, eraser, forehead guide) |
+| `Features/MakeupTryOn/Eyeliner/` | `TryOn/Eyeliner/Engine/` (with `LinerGeometry`); `EyelinerPlanner` → `Eyeliner/TryOn/` |
+| `Features/LiveGuide/`, `Features/CameraGuidance/` | `TryOn/Shared/Camera/` |
+| `Features/MakeupPreferences/` | `TryOn/Shared/Rules/` |
+| `Features/Forehead/` | `TryOn/Brow/Engine/` |
+| `Features/FaceShape/`, `Features/EyeShape/` | `Legacy/Scan/` (except the `Support/` files above) |
+
 ## Brow tutorial demo, face-midline split, get-ready page on Try On — 2026-11-02
 
 `BrowTutorialOverlay` (Features/Tutorial) draws the brow tutorial of UX spec 3.4 on the brow outlines the engine publishes
@@ -138,7 +197,7 @@ residual, keeping pores, highlights and freckles; out-of-gamut colours move towa
 per-channel clamping; tutorial contour is an antialiased isoline. Alpha 0 is exactly the camera pixel.
 Developer tools + Blush: `BlushDebugMenu` picks blend (pigment, previous, linear alpha, multiply, soft light) and
 diagnostics (neutral, UV checker, mask, boundaries, visibility, wireframe). No MediaPipe blush renderer, Banuba or
-BytePlus exists; the orphan `Features/BeautyBlush/Comparison/` files are not in the project. See ADR 0017 and
+BytePlus exists; the orphan `Features/Blush/Comparison/` files are not in the project. See ADR 0017 and
 `Docs/blush-rendering.schema.json`. Synthetic Simulator tests only; device look pending.
 
 ## Tutorial camera handoff and welcome revision — 2026-10-29
@@ -193,7 +252,7 @@ MediaPipe. Device check pending.
 ## Brow code split out of BeautyBlush — Khalish (2026-10-29)
 
 There is still one makeup engine, `BeautyBlushEngine` (blush and brow share its camera session, Metal layer, hand mask and
-shader library). Its brow-only parts now live in `Features/Eyebrow/Engine/` as extensions: `BrowEngine+Tracking` (fps cap,
+shader library). Its brow-only parts now live in `Features/Brow/Engine/` as extensions: `BrowEngine+Tracking` (fps cap,
 `BrowLoad`, handing frames to MediaPipe), `BrowEngine+Draw` (brow strip, texture/picture, `drawBrow`), `BrowEngine+Hair`
 (3D hair), `BrowEngine+Marks` (tutorial mapping, tracking view), `BrowEngine+Fixtures` (DEBUG test helpers), plus
 `BrowEraser`/`BrowInpainter` and the brow shaders `Brow.metal.txt`. `BeautyBlushEngine.swift` keeps stored state, setup,
@@ -650,145 +709,36 @@ SunriseApp.xcodeproj/     explicit PBXGroups: every new file must be added to th
 SunriseApp/
   App/                    SunriseApp entry, AppContainer (composition root), AppRootView (tabs + route destinations)
     Navigation/           AppRoute (all destinations), AppNavigator (tabs, per-tab paths, onboarding flag)
-  Core/
-    Models/               cross-feature models: MakeupReference, Tutorial, SavedLookMetadata, FaceTrackingAvailability, ScanOverlay (+ ScanSnapshot)
-    Services/Contracts/   Sendable async service protocols (catalog, saved looks, tracking availability)
+                          Info.plist (camera + photo-library-add usage strings)
+  Engine/                 shared makeup engine (Metal, camera, ARKit session, hand mask), shaders, MediaPipe face tracker
   DesignSystem/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
-    Components/           PrimaryButton, EmptyStateView, FeaturePlaceholderView, ScanOverlayView, ScanProgressRing, ScanDoneBadge
+    Components/           GlassKit (frosted glass buttons and pills)
   Features/
-    FaceShape/            face shape scan (ARKit mesh + Vision) and photo classification. Entry: FaceAnalysis.swift
-    MakeupTryOn/          makeup recommendations and live AR try-on
-    Onboarding/           welcome screen, then the face scan
-    EyeShape/             eye shape (openness, tilt, spacing) from MediaPipe landmarks. In progress: measuring and classifying are done and tested,
-                          the scan screen, onboarding step, home card and Try On route exist; not yet checked on a real face
-    ScanDebug/            debug tab: correct the face and eye outline points from a live scan by hand and save raw + corrected as JSON (see below)
-    ReferenceCatalog/ ReferenceDetail/ ReferenceImport/ FaceCalibration/ Tutorial/ LiveGuide/ Comparison/ SavedLooks/
-                          scaffold features: mostly placeholder UI on mock data
-  PreviewSupport/         SampleData + Mock services (used by previews and the scaffold container)
+    Makeup/               everything the app shows: Try On, tutorial, photo
+      Blush/ Brow/ Eyeliner/   each with TryOn/ (pickers, looks, config), Engine/ (drawing), Tutorial/ (steps)
+      Shared/             Home/ (Try On screen), Camera/, Tutorial/ (tutorial shell, photo), Rules/, Support/
+    Onboarding/           welcome screen (shown once)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
-  Configuration/          Info.plist (camera + photo-library-add usage strings)
-SunriseDebugMac/          separate Mac-only Xcode project: edits scans exported from the Scan Debug tab (see below and its README)
 SunriseAppTests/
-  Features/               face shape, head pose, photo measurer, makeup recommender/personalization/texture tests
+  Features/               makeup engine, blush, brow, eyeliner, tutorial, camera message tests
   Navigation/             AppNavigatorTests
   TestSupport/            ServiceStubs
 ```
 
 ## Navigation
 
-- Tabs (`AppTab`): **Try On** (home), **Discover**, **My Looks**. Each tab has its own `NavigationStack` path in `AppNavigator`.
-- `AppRoute` lists every destination, and `AppRootView.destination(for:)` builds them. To add a screen: add a case,
-  add its destination, and push it with `navigator.open(route, in: tab)`. `returnToRoot(of:)` clears one tab's path only.
-- Onboarding is persisted: `AppNavigator` stores `onboardingComplete` in `UserDefaults` and shows it once.
-  To see onboarding again in the Simulator, delete the app.
+- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `TryOnHomeView`. The only route is
+  `AppRoute.recommendedTutorial(TutorialHandoff)` (Try On -> tutorial); `AppRootView.destination` builds it. To add a
+  screen: add a case, its destination, and push it with `navigator.open(route, in: .tryOn)`.
+- `AppTab` and the per-tab paths in `AppNavigator` remain, though only `.tryOn` is shown.
 
-## Features: status and how to use them
+## Features
 
-| Feature | Folder | Status | Use it through |
-| --- | --- | --- | --- |
-| Face shape | `Features/FaceShape` | Real: live ARKit scan + photo path, unit tested | `FaceAnalysis` |
-| Makeup try-on | `Features/MakeupTryOn` | Real: recommendations + live AR try-on | `MakeupPlan`, `MakeupRecommendationsView`, `AppRoute.makeupTryOn` |
-| Onboarding | `Features/Onboarding` | Real: welcome, then scan; Skip allowed | `OnboardingView(store:onFinish:)` |
-| Catalog / detail / import / calibration / tutorial / live guide / comparison / saved looks | `Features/…` | Scaffold: placeholders on mock data | mocks in `PreviewSupport`, contracts in `Core/Services/Contracts` |
-
-### Face shape — `Features/FaceShape/FaceAnalysis.swift`
-
-The only entry point for other features. Use `FaceAnalysis` and the result types `FaceShape` / `FaceShapeResult`.
-Don't call the measurers or the classifier directly, and don't change FaceShape internals from another feature.
-
-```swift
-FaceAnalysis.isLiveScanSupported                    // TrueDepth check; the photo path works on any device
-FaceAnalysis.scanScreen(store: store) { … }         // ready-made scan screen; writes the result to the store
-FaceAnalysis.makeLiveScanner()                      // FaceShapeViewModel for a custom UI: session, start(), stop(), phase
-await FaceAnalysis.faceShape(in: cgImage)           // Result<FaceShapeResult, FaceAnalysis.PhotoFailure>
-FaceAnalysis.savedResults()                         // FaceShapeStore restored from UserDefaults (latest result only)
-FaceShapeStore(latest: result)                      // in-memory store for previews and tests
-```
-
-- `FaceShape`: oval, round, square, oblong, heart, diamond, triangle. Each has `title`, `symbol`, `summary`, `blushTip`.
-- `FaceShapeResult`: `shape`, `runnerUp`, `confidence`, `scores`, `rankedShapes`, `deviation` (proportions vs. the reference face).
-- How it works, for anyone tuning it: the ARKit mesh gives proportions (length, forehead, jaw, chin relative to
-  cheekbones), and Vision's face outline corrects the jaw and chin. Only frames looking straight ahead at arm's length
-  count (`HeadPose`: ±10° yaw/pitch, 25–65 cm). The median of about 180 frames is scored against shape prototypes.
-  Tuning lives in `FaceShapeClassifier` (prototypes, `unit`) and `PhotoFaceMeasurer` (photo reference). Check
-  accuracy changes with the dataset eval.
-- Privacy: only the classified result is stored. No photos or meshes are saved or uploaded.
-- Result picture: `FaceShapeViewModel.snapshot` is the camera picture (from the `ARSCNView`, wireframe hidden) with the face outline and the
-  forehead, cheekbone and jaw widths and the length drawn on it (`FaceMeshMeasurer.guide` → `FaceGuide.overlay` → `FaceSnapshotter`), shown
-  by `FaceShapeResultView`. The widths are scaled by the Vision correction, so the lines are the widths the classifier used. In memory only.
-  It needs a device to check: the Simulator has no TrueDepth camera, so `FaceSnapshotter.capture` has only been compiled.
-
-### Makeup try-on — `Features/MakeupTryOn`
-
-- `MakeupPlan(scan: result)` builds the "Made for you" style per category (blended from nearby shapes and nudged by
-  measured proportions), followed by that shape's catalog styles. `MakeupPlan(shape:)` is for a chosen shape without a scan.
-- `MakeupRecommendationsView(store:onScanFace:)` is the Try On home tab. Open the live try-on with
-  `navigator.open(.makeupTryOn(plan: plan, applied: [...]), in: .tryOn)`.
-- Categories: eyebrow, blush, eyeliner (`MakeupCategory`). Shades come from `MakeupPalette`. Style rules live in
-  `MakeupRecommender`, and per-face fitting in `MakeupFitter` (`FaceFit.swift`).
-- Rendering: Vision locates the brows and eyes, and they're mapped onto the ARKit face mesh's UV texture. Each
-  category is drawn into its own texture (`MakeupTextureRenderer`) on its own copy of the mesh (`MakeupARView`), so
-  makeup follows the face.
-- Try-on photos are only saved when the user shares or saves them (`NSPhotoLibraryAddUsageDescription`).
-
-### Eye shape — `Features/EyeShape` (in progress)
-
-Everything is built; nothing has been run on a real face yet (the Simulator has no camera, so the scan screen shows "unavailable" there).
-Plan and decisions: `Docs/Decisions/0002-mediapipe-eye-scan.md`.
-
-- Entry point: `EyeAnalysis.scanScreen(store:continueTitle:onFinish:)` returns `EyeScanView`. It writes `FaceShapeStore.eyes`
-  (kept in `UserDefaults` under its own key, separate from the face shape) and leaves the ARKit session alone; `FaceShapeView` stops it
-  before its `onShowMakeup` runs.
-- Flow: onboarding is welcome, face scan (its result button reads "Next: scan your eyes"), eye scan, then home. Skip leaves only the
-  current step. The Try On home shows an eye card ("Scan your eye shape" or the result, with "Scan eyes again") through `AppRoute.eyeScan`.
-- `EyeScanViewModel`: phases idle / unavailable / cameraDenied / failed / scanning / finished. It takes 30 good frames (`EyeScanGuide`
-  rejects too far or close, turned head, closed eyes), classifies their median and stops the camera. The result sheet asks which eyelid
-  the person has (`EyeLid`, optional).
-- The eye shape is shown on the home screen but does **not** change the makeup recommendations yet.
-- On devices without TrueDepth the face scan is unavailable, and the home screen still needs a face shape before it shows anything, so
-  those users only reach the eye scan from onboarding.
-
-- `EyeLandmarks`: plain 2D eye points. `EyeLandmarks(normalizedMesh:imageSize:)` maps MediaPipe's 478-point mesh (`MeshIndex`). The eye
-  outlines are checked against MediaPipe's own tables in `MediaPipeEyeDetectorTests`; the brow rows and the iris-to-eye assignment (done
-  by distance, because MediaPipe's iOS right-iris table returns the left ring) are not, so **check them on a real scan on a device**.
-  `headTurn` (0 facing the camera, 1 nose over a face edge) is for gating frames; its limit is still to be chosen on a device.
-- `MediaPipeEyeDetector`: the only file that imports MediaPipe. Wraps Face Landmarker in video mode; `detect(pixelBuffer:timestampMs:)`
-  wants upright BGRA frames in increasing time order from one serial queue. The model is `Resources/face_landmarker.task`, bundled, never downloaded.
-- `EyeCameraSession`: front `AVCaptureSession` delivering upright BGRA frames off the main thread. Stop the ARKit face session
-  (`FaceShapeViewModel.stop()`) before `start()`; the two must not run together. It only checks camera permission, the mesh scan asks for it.
-- The Simulator build is arm64 only (`EXCLUDED_ARCHS[sdk=iphonesimulator*] = x86_64`): MediaPipe has no Intel-Simulator slice.
-- Result picture: `EyeScanViewModel.snapshot` is the last good frame, mirrored like the preview and cropped around the eyes, with the lines
-  from `EyeOverlay` (outlines, corner lines, opening, iris, brow, spacing), made by `EyeFrameSnapshot` on the camera queue and shown by
-  `EyeShapeResultView`. In memory only. The eyelid split in `EyeOverlay` assumes `lid` lists the upper lid, then the lower, both from
-  the outer corner (true for `MeshIndex`); check the drawn outline on a real scan.
-- `EyeMeasurer.measure(_:)` gives `EyeMeasurements` (openness, tilt, spacing, lidSpace in iris diameters). It derives the face's own axes
-  from the points, so roll, scale, mirroring and y-down images do not matter. `EyeMeasurementsSampler` takes the per-field median and skips blinks.
-- `EyeShapeClassifier` turns measurements into `EyeShapeResult` (`EyeOpenness`, `EyeTilt`, `EyeSpacing`, `mayBeHooded`, `confidence`). The eyelid
-  (`EyeLid`) cannot be seen in landmarks, so the person chooses it later; it stays `nil` until then.
-- The thresholds in `EyeShapeClassifier.Thresholds` and `EyeMeasurer.minimumOpenness` are starting guesses, not tuned on real faces.
-
-### Scan Debug — `Features/ScanDebug`
-
-A fourth tab (`AppTab.scanDebug`, "Scan Debug") for correcting outlines by hand. It runs the same `FaceShapeView` / `EyeScanView` as onboarding
-(into a throwaway `FaceShapeStore`, so real results are not changed) and takes their scan picture through the new optional `onResult` callback.
-`ScanDebugSnapshotReader` turns that picture's overlay strokes into raw points (10 face, 14 eye). Corrected stage: points drag. Final: corrected vs
-raw numbers, and Confirm writes `<face|eyes>-<name>.raw.json` and `.corrected.json` via `ScanDebugStore` (Application Support/ScanDebug; a name already
-used gets `-2`). Only coordinates are stored. Measuring uses `FaceShapeClassifier.photo` and `EyeMeasurer` / `EyeShapeClassifier`. If `FaceGuide.overlay`
-or `EyeOverlay.overlay` change their stroke order, update the reader (tests cover it). Its UI strings are English-only, not in `Localizable.xcstrings`.
-
-#### Export for Mac and the Mac editor — `SunriseDebugMac/`
-
-Scan Debug has an **Export for Mac** share button (`ScanDebugExportItem`, file format `ScanDebugExportFile`, extension `.sunrisescan`, type
-`com.sunrise.scan-debug` declared in `Info.plist`). `SunriseDebugMac/SunriseDebugMac.xcodeproj` is a separate macOS app with no scanning that opens those
-files (AirDrop), corrects the points with the mouse and writes the same raw and corrected JSON files. It compiles files from `SunriseApp/` directly, so a
-shared file (listed in its project) must not import ARKit, UIKit or MediaPipe. See `SunriseDebugMac/README.md`.
-
-### Scaffold features
-
-Catalog, detail, import, calibration, tutorial, live guide, comparison and saved looks are still the original
-scaffold. Their services are mocks composed in `AppContainer.scaffold()`, and Save throws `notImplemented` on purpose.
-Keep their placeholder labels until a real implementation is tested (see `Docs/ProductScope.md`).
+Everything the app shows is in `Features/Makeup/` (see the folder note at the top) plus `Features/Onboarding/`
+(`OnboardingWelcomeScreen`). The face/eye scan, Scan Debug, the Mac scan editor (`SunriseDebugMac/`), the old try-on and
+tutorial, catalog, saved looks and other scaffold pages were deleted on 2026-11-02; sections and notes elsewhere in this
+file that describe them are history. Get them back from git history (before commit "chore: delete unused code") if needed.
 
 ## Rules
 
@@ -796,18 +746,17 @@ Keep their placeholder labels until a real implementation is tested (see `Docs/P
   `project.pbxproj` (PBXFileReference, PBXGroup child, PBXBuildFile, Sources phase). Then build to confirm.
 - **Third-party code:** MediaPipe is the only package dependency; the MI-GAN Core ML model (ADR 0014) is the only bundled
   third-party model besides MediaPipe's own, and its MIT notice must stay in `Resources/MI-GAN-LICENSE.txt`. `import MediaPipeTasksVision` is limited to the detector wrappers
-  (`MediaPipeEyeDetector`, `MediaPipeEyeLandmarkProvider`, `HandOcclusionSegmenter`, `MediaPipeBrowTracker`); everything else
+  (`MediaPipeEyeLandmarkProvider`, `HandOcclusionSegmenter`, `MediaPipeBrowTracker`); everything else
   works on plain landmark arrays. A new dependency needs an ADR in `Docs/Decisions/`.
 - **Dependencies:** inject them through initializers. `AppContainer` is used only in `AppRootView`; features never reach into it.
-- **Shared files** (`AppRootView`, `AppRoute`, `AppNavigator`, `AppContainer`, `project.pbxproj`, Core contracts,
+- **Shared files** (`AppRootView`, `AppRoute`, `AppNavigator`, `AppContainer`, `project.pbxproj`, `Engine/`,
   design tokens, strings): keep edits small and mention them in the PR. Change contracts in their own PR (see `Docs/IntegrationContracts.md`).
 - **Concurrency:** strict mode is on. Keep Vision and image work off the main actor (`Task.detached`). Use `Sendable`
   snapshots across actors, and `nonisolated` ARSession delegate methods with `MainActor.assumeIsolated`.
 - **UI:** use `AppColors` / `AppSpacing` / `AppTypography` and Dynamic Type text styles. User-facing strings go in
   `Localizable.xcstrings`, with English as the source language.
-- **Privacy:** no networking, analytics or uploads. Never persist camera frames or face meshes. The one exception is `Features/FaceShape/ScanSnapshots.swift`: one small JPEG per scan (face, eyes) in Application Support, excluded from backup, shown on the profile (`TryOnHome/ProfileView`); a new scan replaces it. A new permission needs an Info.plist usage string.
-- **Privacy:** no networking, analytics or uploads. The one exception to "never write pictures" is Scan Debug's **Export for Mac**: only when tapped, it hands the scan picture and points to the system share sheet as a `.sunrisescan` file (`ScanDebugExportItem`); the app writes nothing itself. Never persist photos, camera frames or face meshes. The scan result pictures
-  (`ScanSnapshot`) are held in a view model for the result screen only; never write them to disk, `FaceShapeStore` or the photo library. A new permission needs an Info.plist usage string.
+- **Privacy:** no networking, analytics or uploads. Never persist photos, camera frames or face meshes; the tutorial photo
+  stays in memory and leaves the app only through the share sheet. A new permission needs an Info.plist usage string.
 - **Honesty:** don't describe mock or sample data as real user results, and don't claim AR works on the strength of a Simulator run.
 - **Git:** branch from `main` as `feature/…`, `fix/…` or `chore/…`. Use conventional commits (`feat:`, `fix:`, `docs:`, `chore:`).
   Keep refactors separate from features.

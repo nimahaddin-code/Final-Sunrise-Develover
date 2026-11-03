@@ -1,3 +1,50 @@
+## Unused code deleted — -Nimah (2026-11-02)
+
+Checked by building, not guessed: everything in `Features/Legacy/` was deleted, then the app and tests were built and
+any file still needed was put back. Kept and moved to `Makeup/Shared/Support/`: `EyeScan` (`EyeShape`, used by
+`EyelinerPlanner`), `FaceShape`, `FaceProportions`, `FaceContourMeasurer`, `FaceMeshMeasurer`, `EyeMeasurer`,
+`EyeScanLandmarks`, `FaceFeatureMap`, `FaceFit`; `ScanDebugOrientation` (`AppOrientationDelegate`, portrait lock) to `App/`.
+Deleted: face/eye scan screens and classifiers, Scan Debug, `SunriseDebugMac/` (its tab was gone), old try-on and tutorial,
+Profile, catalog/import/saved looks, comparison, calibration, mocks, `PreviewSupport`, unused design components, the
+`.sunrisescan` type in Info.plist, `mediapipe-canonical-face.json` and its licence, images `AppIcon test`, `logo-grey`,
+`brow-overlay-3`. `AppRoute` keeps only `recommendedTutorial`; `AppContainer` only `faceTracking`; the old scan
+`OnboardingView` is gone (`OnboardingWelcomeScreen` stays). `MockFaceTrackingChecker` moved to the tests' `ServiceStubs`.
+Tests of deleted code were deleted (423 -> 327); two Try On/tutorial tests now build their plan with `MakeupPlan(shape:)`
+as the app does, and three navigation tests use the tutorial route. No flow or UI change.
+
+## Folders per tool: Makeup/<Tool>/{TryOn,Engine,Tutorial}, Legacy — -Nimah (2026-11-02)
+
+Files moved, no code, flow or UI change. Live code is under `Features/TryOn/`, one folder per tool, each with `TryOn/`
+(what the Try On screen shows: pickers, looks, config), `Engine/` (what draws it on the camera) and `Tutorial/` (steps,
+animations); `Shared/` holds what the tools share: `Home/` (Try On screen, live card, palette), `Camera/` (LiveGuide,
+CameraGuidance, `DeviceFaceTrackingChecker`, `TrackingReadiness`), `Tutorial/` (`GuidedTutorialView` shell, prep page,
+photo), `Rules/` (rule database, `MakeupPlan`, recommendation types), `Support/` (five files from the old scan/try-on that
+live code still uses: `FaceContourDetector`/`SendablePixelBuffer`, `FaceShapeClassifier`/`FaceShapeResult`,
+`EyeShapeResult`, `EyeDebugView`/`DeveloperTools`, `MakeupTextureRenderer`; their own dependencies still live in Legacy).
+`Core/Engine/` keeps the shared engine (`BeautyBlushEngine`, `BeautyBlush.metal.txt`, `MediaPipeBrowTracker`).
+`Features/Legacy/` holds what the app no longer reaches, kept, not deleted: `Scan/` (FaceShape, EyeShape), `ScanDebug/`,
+`OldTryOn/` (old try-on screen and renderer, `EyebrowOverlayView`, `ProfileView`, `BlushMask`, `BlushPlacementSketch`),
+`OldTutorial/`, `Reference*`, `SavedLooks/`, `Comparison/`, `FaceCalibration/`, `BlushComparison/` (orphans, not in the
+project). `Onboarding/` (welcome) stays. `SunriseDebugMac` paths follow. Types keep their names; resources load by bundle
+name. Older notes below use the old paths:
+
+
+Split, no logic change (2026-11-02, second commit): each tool's tutorial is in its `Tutorial/` folder as an extension of
+`GuidedTutorialModel` (`BlushTutorial.swift`: `blushLessons` and `BlushTutorialOverlay`, now internal;
+`BrowTutorial.swift`: `browLessons`; `EyelinerTutorial.swift`: `linerLessons`, `linerShowsLower`); the shell
+(`GuidedTutorialView.swift`: handoff, compare, tabs, per-tab `liveConfiguration`, screen, photo) stays in
+`Shared/Tutorial/`. The blush parts of the engine moved from `BeautyBlushEngine.swift` to
+`TryOn/Blush/Engine/BlushEngine+Draw.swift` (cheek landmark fit, guide outlines, `bind`, `prepareBlush`, `encodeBlush`), like
+the brow's `BrowEngine+*`; `Core/Engine/BeautyBlushEngine.swift` keeps state, setup, configure/submit, `render`, the mask.
+
+Top level and name (2026-11-02, third commit; files only): `Features/TryOn/` is now `Features/Makeup/` (it holds Try On
+and tutorial). `SunriseApp/` has five folders: `App/` (entry, root view, container, navigation, `Info.plist`, was
+`Configuration/`), `Engine/` (was `Core/AR` + `Core/Engine`, plus `FaceTrackingAvailability` and
+`FaceTrackingAvailabilityChecking`), `Features/`, `DesignSystem/` (theme and `GlassKit` only) and `Resources/`.
+`Core/Models/Tutorial.swift` moved to `Makeup/Shared/Tutorial/`; the rest of `Core/Models`, `Core/Services/Contracts` and
+`PreviewSupport/` went to `Legacy/Scaffold/`, the scan components and `ScanOverlay` to `Legacy/Scan/`, unused components
+to `Legacy/DesignSystem/`. `INFOPLIST_FILE` is `SunriseApp/App/Info.plist`. Paths above that say `TryOn/<Tool>` or
+`TryOn/Shared` now read `Makeup/<Tool>` and `Makeup/Shared`; `Core/Engine/` reads `Engine/`.
 ## Brow tutorial demo, face-midline split, prep overlay (2026-11-02)
 
 - Brow tutorial steps and captions follow UX spec 3.4, with animated tools over each brow. Split comparison follows the face.

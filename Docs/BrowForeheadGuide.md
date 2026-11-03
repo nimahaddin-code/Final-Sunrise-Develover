@@ -31,8 +31,8 @@ Tahap tracking memperlihatkan sparse mesh vertices; itu bukan semua landmark sem
 ## Struktur
 
 - Core/AR: shared session, snapshot, Vision, projection.
-- Features/Eyebrow/FaceGuideFlow.swift: fase dan instruksi.
-- Features/Eyebrow: mapper, outline generator, pipeline, renderer, view model dan camera-first UI.
+- Features/Brow/FaceGuideFlow.swift: fase dan instruksi.
+- Features/Brow: mapper, outline generator, pipeline, renderer, view model dan camera-first UI.
 - Features/Forehead/ForeheadGuide.swift: kategori, lima style, batas dan mesh binding.
 - Features/Forehead/ForeheadSceneRenderer.swift: dashed/dots area renderer dan sparse tracking points.
 - SunriseAppTests/Features/ForeheadGuideTests.swift: closed boundaries, mesh limits, deformation, phase/region separation dan native neutral mesh gate.

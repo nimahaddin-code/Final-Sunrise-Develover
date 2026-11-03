@@ -44,7 +44,7 @@ Core/AR/
   ARFaceTrackingManager.swift       satu configured session + lease ownership, tracking state
   FaceLandmarkProvider.swift        snapshot frame, protocol provider, implementasi Vision
   FaceLandmarkProjection.swift      normalized image ↔ raw ray ↔ face triangle
-Features/Eyebrow/
+Features/Brow/ (dulu Features/Eyebrow/)
   EyebrowRegionMapper.swift         region/side/confidence + anatomy gates
   EyebrowStyle.swift                style, dots/dashed/both, configuration
   EyebrowGuideGenerator.swift       intended curves + attachment/strokes

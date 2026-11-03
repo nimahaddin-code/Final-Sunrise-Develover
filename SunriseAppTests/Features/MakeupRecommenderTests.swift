@@ -18,13 +18,6 @@ final class MakeupRecommenderTests:XCTestCase {
         XCTAssertEqual(Set(ids).count,1)
         XCTAssertEqual(ids[0],EyeShape.allCases.map { "liner.eye.\($0.rawValue)" }+["liner.eye.neutral"])
     }
-    @MainActor func testStaleLegacyRequestCannotActivateBrowBlush() {
-        let old=MakeupRecommendation(id:"old.brow",name:"Old",detail:"",style:.eyebrow(BrowStyle(archPosition:0.6,archHeight:0.1,thickness:0.2,tailExtension:0,angularity:0,shade:MakeupPalette.taupe)))
-        let model=MakeupTryOnViewModel(plan:MakeupPlan(shape:.oval),applied:[old])
-        XCTAssertTrue(model.selection.isEmpty)
-        model.select(old,in:.eyebrow)
-        XCTAssertTrue(model.selection.isEmpty)
-    }
     @MainActor func testNimahStudioReusesScanAndOpensRequestedRegion() {
         let model=EyebrowViewModel(checker:MockFaceTrackingChecker(),assessment:.init(shape:.oval,origin:.analysis,confidence:0.8),initialRegion:.blush)
         model.nextAfterScan()
@@ -36,14 +29,6 @@ final class MakeupRecommenderTests:XCTestCase {
         XCTAssertEqual(model.phase,.chooseStyle)
         XCTAssertEqual(model.configuration.region,.blush)
         XCTAssertEqual(model.assessment.origin,.manual)
-    }
-    @MainActor func testChosenShadeOutlivesSwitchingLinerStyles() {
-        let items=MakeupRecommender.recommendations(for:.round,in:.eyeliner)
-        let model=MakeupTryOnViewModel(plan:MakeupPlan(shape:.round),applied:[])
-        model.select(MakeupPalette.navy,in:.eyeliner)
-        model.select(items[1],in:.eyeliner)
-        XCTAssertEqual(model.shade(for:.eyeliner),MakeupPalette.navy)
-        model.stop()
     }
     func testLinerRecoloringKeepsShape() {
         let style=EyelinerPlanner.catalog[0].style
