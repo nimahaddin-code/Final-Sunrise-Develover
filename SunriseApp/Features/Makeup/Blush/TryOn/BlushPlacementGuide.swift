@@ -9,21 +9,21 @@ enum BlushPlacementStyle:String,CaseIterable,Identifiable,Sendable {
     var id:String { rawValue }
     var title:String {
         switch self {
-        case .youthful:return "Youthful"
-        case .sunkissed:return "Sunkissed"
-        case .lifted:return "Lifted"
-        case .apple:return "Apple of cheeks"
-        case .cheekbone:return "Cheekbone"
-        case .outerSweep:return "Outer sweep"
-        case .highLift:return "High cheekbone"
-        case .wideHorizontal:return "Horizontal blend"
-        case .centerCheek:return "Center cheek"
-        case .centerDown:return "Center · blend down"
-        case .upperInner:return "Upper inner cheek"
-        case .templeSweep:return "Temple sweep"
-        case .diagonalBlend:return "Diagonal blend"
-        case .placementDots:return "Placement dots"
-        case .innerCheek:return "Blend inward"
+        case .youthful:return String(localized: "Youthful")
+        case .sunkissed:return String(localized: "Sunkissed")
+        case .lifted:return String(localized: "Lifted")
+        case .apple:return String(localized: "Apple of cheeks")
+        case .cheekbone:return String(localized: "Cheekbone")
+        case .outerSweep:return String(localized: "Outer sweep")
+        case .highLift:return String(localized: "High cheekbone")
+        case .wideHorizontal:return String(localized: "Horizontal blend")
+        case .centerCheek:return String(localized: "Center cheek")
+        case .centerDown:return String(localized: "Center · blend down")
+        case .upperInner:return String(localized: "Upper inner cheek")
+        case .templeSweep:return String(localized: "Temple sweep")
+        case .diagonalBlend:return String(localized: "Diagonal blend")
+        case .placementDots:return String(localized: "Placement dots")
+        case .innerCheek:return String(localized: "Blend inward")
         }
     }
     var instruction:String {
