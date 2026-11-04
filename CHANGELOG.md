@@ -1,3 +1,11 @@
+## Prep page: brow kit list — Khalish (2026-11-04)
+
+The "Let's get you ready" page (`TutorialPrepView`) drops "Phone at eye level". "Your makeup kit" now lists the brow
+tutorial's tools, picture left and name right: Spoolie, Brow pencil, Cotton bud (image sets `kit-spoolie`,
+`kit-brow-pencil`, `kit-cotton-bud`, CC0 SVGs from SVG Repo; sources in `Resources/KitImages-SOURCES.txt`). The spoolie
+picture is a mascara wand (no spoolie in that pack). New strings have Indonesian drafts (`needs_review`). Simulator render
+only, no device check.
+
 ## English and Indonesian — Khalish (2026-11-03)
 
 Two languages: English (source) and Indonesian (`id`). Strings are in `Resources/Localizable.xcstrings`, the camera and
