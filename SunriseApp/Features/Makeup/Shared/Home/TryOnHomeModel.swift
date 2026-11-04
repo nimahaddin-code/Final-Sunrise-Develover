@@ -85,7 +85,8 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// The tool the shade row and intensity bar currently control. The launch
     /// state is normalized in `activate()` so cold and warm starts match.
     @Published private(set) var blushLook:BlushPlacementStyle = .youthful
-    @Published private(set) var tool: TryOnTool = .eyebrow
+    @Published private(set) var tool: TryOnTool
+    private let startTool: TryOnTool
     /// The tools with makeup on. Every launch starts bare (no makeup on any tool); a tool goes on when a shade, look,
     /// brow picture or strength is chosen for it and stays as left when another tool is picked. All of them are drawn
     /// together, and the tutorial and its photo get exactly this set.
@@ -122,7 +123,9 @@ final class LinerFrameRelay: @unchecked Sendable {
     private var appliedEyes:EyeShapeResult?
     private var observationBag = Set<AnyCancellable>()
 
-    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
+    init(tool: TryOnTool = .eyebrow, plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
+        startTool = tool
+        self.tool = tool
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
         // A thin natural line is used without an eye scan, so the colour can still be tried.
         linerIsNeutral = plan.eyeliner.isNeutral
@@ -269,9 +272,9 @@ final class LinerFrameRelay: @unchecked Sendable {
     func activate() {
         // -Nimah: A late permission response must not revive the home camera behind a scan/tutorial.
         guard !active else { return }
-        // Cold and warm starts show the eyebrow tool with the no-overlay tile
+        // Cold and warm starts show the tool this screen was opened for, with the brow's no-overlay tile
         // selected. Choosing a brow overlay enables it; other tools keep their choice.
-        tool = .eyebrow
+        tool = startTool
         enabled.remove(.eyebrow)
         browOverlay = nil
         active=true

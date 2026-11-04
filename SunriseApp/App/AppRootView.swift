@@ -11,8 +11,7 @@ struct AppRootView: View {
             } else {
         // Preserve staging’s scan-free home after the one-time welcome.
         NavigationStack(path: $navigator.tryOnPath) {
-            TryOnHomeView(plan: plan, assessment: assessment, checker: container.faceTracking,
-                          onTutorial: { handoff in navigator.open(.recommendedTutorial(handoff),in:.tryOn) })
+            FeatureHomeView { tool in navigator.open(.tryOn(tool), in: .tryOn) }
                 .navigationDestination(for: AppRoute.self, destination: destination)
             }
         }
@@ -25,6 +24,9 @@ struct AppRootView: View {
 
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
+        case .tryOn(let tool):
+            TryOnHomeView(tool: tool, plan: plan, assessment: assessment, checker: container.faceTracking,
+                          onTutorial: { handoff in navigator.open(.recommendedTutorial(handoff), in: .tryOn) })
         case .recommendedTutorial(let handoff):
             GuidedTutorialView(checker:container.faceTracking,assessment:assessment,plan:plan,handoff:handoff)
         }

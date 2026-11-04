@@ -39,6 +39,11 @@ final class AppNavigatorTests: XCTestCase {
         XCTAssertTrue(navigator.discoverPath.isEmpty)
         XCTAssertTrue(navigator.savedPath.isEmpty)
     }
+    @MainActor func testOpeningTryOnForOneToolPushesThatRoute() {
+        let navigator = AppNavigator()
+        navigator.open(.tryOn(.blush), in: .tryOn)
+        XCTAssertEqual(navigator.tryOnPath, [.tryOn(.blush)])
+    }
     private func tutorial(_ tool: TryOnTool) -> AppRoute {
         .recommendedTutorial(TutorialHandoff(tool: tool, shades: [:], intensities: [:]))
     }

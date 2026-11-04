@@ -1,3 +1,14 @@
+## Feature homepage, one tool per Try On — Khalish (2026-11-05)
+
+After the welcome the app opens on `FeatureHomeView` (`Makeup/Shared/Home/`): three cards, Blush, Eyeliner, Eyebrow
+(`TryOnTool.allCases`), no camera. A card pushes `AppRoute.tryOn(tool)`, which builds `TryOnHomeView(tool:)`; the camera
+starts there and stops when going back. Try On has no tool strip any more (back button instead), and
+`TryOnHomeModel(tool:)` starts on and `activate()` returns to that tool (`startTool`; default `.eyebrow` for tests), so only
+that tool can be switched on and drawn; the tutorial and photo get only it. The model logic is otherwise unchanged and still
+supports several tools (`choose(_:)` stays for tests): "one tool" is enforced by the screens, not the model. The tutorial's
+tab bar shows the tool's name instead of three tabs (`GuidedTutorialModel.select` stays). New strings have Indonesian
+drafts (`needs_review`). Simulator only (homepage, card -> Try On -> back); camera, tutorial and photo need a device check.
+
 ## English and Indonesian — Khalish (2026-11-03)
 
 Two languages: English (source) and Indonesian (`id`). Strings are in `Resources/Localizable.xcstrings`, the camera and
@@ -740,8 +751,9 @@ SunriseAppTests/
 
 ## Navigation
 
-- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `TryOnHomeView`. The only route is
-  `AppRoute.recommendedTutorial(TutorialHandoff)` (Try On -> tutorial); `AppRootView.destination` builds it. To add a
+- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `FeatureHomeView` (three tool
+  cards, no camera). Routes: `AppRoute.tryOn(TryOnTool)` (card -> Try On for that one tool) and
+  `AppRoute.recommendedTutorial(TutorialHandoff)` (Try On -> tutorial); `AppRootView.destination` builds both. To add a
   screen: add a case, its destination, and push it with `navigator.open(route, in: .tryOn)`.
 - `AppTab` and the per-tab paths in `AppNavigator` remain, though only `.tryOn` is shown.
 
