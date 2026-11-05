@@ -1,3 +1,17 @@
+## Feedback v1: blush target area on the result photo — -Nimah (2026-11-05)
+
+`FeedbackView` (`Features/Screens/Feedback/`) is no longer a placeholder: one large photo with a Look | Result switch
+(opens on Result), the blush target area (the tutorial's small circle and outer line, same dotted white stroke) drawn on
+the result photo, tap the photo to hide or show the lines, and a caption. No look photo yet: the Look side says so until
+Try On's photo button (Hanum) fills `TutorialHandoff.lookPhoto`. No face seen at the shutter: the photo shows without lines
+and says why. Blush off on Try On: no lines or caption. No measuring yet (v2 reads `makeup-feedback.database.json`).
+The tutorial now hands over `TutorialPhoto` (image + `blushOutline`, in the photo's 0...1 coordinates) instead of a
+bare `UIImage`; `FeedbackInput(handoff:photo:)`. Shared-screen change (Hanum's `GuidedTutorialView`): with blush on
+(`GuidedTutorialModel.measuresBlushInPhoto`), the photo configuration keeps the engine on with region blush,
+`showGuide` and `pigmentHalf = .none` (no blush pigment encoded: the photo is still the plain camera) so the outlines are
+measured on the shutter frame; the tutorial overlay stays hidden in photo mode. All in memory. Simulator tests only: the
+screen and the line placement on a real photo are not yet seen on a device.
+
 ## Tool-first folders: Features/Blush, Brow, Eyeliner, Screens — -Nimah (2026-11-03)
 
 Files moved, no code, flow or UI change. Each tool is at the top of `Features/`: `Blush/`, `Brow/`, `Eyeliner/`, each with
