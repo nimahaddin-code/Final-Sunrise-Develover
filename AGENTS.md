@@ -1,3 +1,12 @@
+## Three-page onboarding — Khalish (2026-11-04)
+
+`OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`) is now three swipeable pages in one `TabView`: the welcome
+(logo, Get Started), "TRY IT ON, LIVE" (blush, brows, eyeliner) and "LEARN IT, STEP BY STEP" (tutorial and photo, photos stay on
+the phone), with Next, Skip on pages 2-3, three progress dots, and Start Try On calling `onStart`. The old four dots and scan hint
+are gone. `AppNavigator.currentWelcomeVersion` stays 2, so only devices that have not yet dismissed the welcome see it. New strings
+are in `Resources/Localizable.xcstrings` with Indonesian drafts (`needs_review`); "Step 1 of 4" and the scan hint were removed.
+Simulator only, no device check.
+
 ## English and Indonesian — Khalish (2026-11-03)
 
 Two languages: English (source) and Indonesian (`id`). Strings are in `Resources/Localizable.xcstrings`, the camera and

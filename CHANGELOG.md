@@ -1,3 +1,8 @@
+## Three-page onboarding — Khalish (2026-11-04)
+
+The welcome is now three swipeable pages in one `TabView` (welcome, "TRY IT ON, LIVE", "LEARN IT, STEP BY STEP"), with Next, Skip on
+pages 2-3, three progress dots, and Start Try On calling `onStart`. `currentWelcomeVersion` stays 2. Simulator only, no device check.
+
 ## English and Indonesian — Khalish (2026-11-03)
 
 Two languages: English (source) and Indonesian (`id`). Strings are in `Resources/Localizable.xcstrings`, the camera and
