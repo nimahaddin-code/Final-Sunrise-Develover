@@ -1,3 +1,12 @@
+## Homepage redesign: card slider — Khalish (2026-11-06)
+
+`FeatureHomeView` is now a light page (`AppColors.homeCanvas` #FFFBF8, text `AppColors.plumInk`) with a horizontal card slider in
+the order Eyeliner, Blush, Brows, starting on Blush (the others peek in at the sides). The cards are the image sets
+`home-card-eyeliner`, `home-card-blush`, `home-card-brows`. Title, step and minute chips, blurb and the three dots follow the
+shown card; steps come from `GuidedTutorialModel.*Lessons.count`, minutes from `ToolInfo.minutes`. "Start Lesson" calls
+`onSelect` for the shown tool (same route as before: `AppRoute.tryOn(tool)`). New strings have Indonesian drafts
+(`needs_review`). Simulator only, no device check.
+
 ## Feature homepage, one tool per Try On — Khalish (2026-11-05)
 
 After the welcome the app opens on `FeatureHomeView` (`Features/Screens/TryOn/`): three cards, Blush, Eyeliner, Eyebrow
@@ -800,8 +809,8 @@ SunriseAppTests/
 
 ## Navigation
 
-- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `FeatureHomeView` (three tool
-  cards, no camera). Routes: `AppRoute.tryOn(TryOnTool)` (card -> Try On for that one tool) and
+- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `FeatureHomeView` (a slider of
+  three tool cards, no camera). Routes: `AppRoute.tryOn(TryOnTool)` (card -> Try On for that one tool) and
   `AppRoute.recommendedTutorial(TutorialHandoff)` (Try On -> tutorial); `AppRootView.destination` builds both. To add a
   screen: add a case, its destination, and push it with `navigator.open(route, in: .tryOn)`.
 - `AppTab` and the per-tab paths in `AppNavigator` remain, though only `.tryOn` is shown.

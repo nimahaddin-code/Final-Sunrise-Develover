@@ -35,6 +35,10 @@ enum AppColors {
     static let glassPale = Color(red: 0xFF / 255, green: 0xF1 / 255, blue: 0xF5 / 255).opacity(0.78)
     /// Tint of the pale mauve add-colour button and the start of the intensity track (#D9A6BD).
     static let glassLight = Color(red: 0xD9 / 255, green: 0xA6 / 255, blue: 0xBD / 255).opacity(0.6)
+    /// Page background of the feature homepage (#FFFBF8).
+    static let homeCanvas = Color(red: 0xFF / 255, green: 0xFB / 255, blue: 0xF8 / 255)
+    /// Dark plum text and the selected page dot on the feature homepage (#2A1A20).
+    static let plumInk = Color(red: 0x2A / 255, green: 0x1A / 255, blue: 0x20 / 255)
 }
 
 /// Full-screen burgundy page background: the `main-bg` asset over wine.
