@@ -1,22 +1,32 @@
 import SwiftUI
 
-/// The page between Try On and the tutorial: four things to have ready, then "Go to Tutorial". Plain SwiftUI, no camera.
+/// The page between Try On and the tutorial: three things to have ready, then "Go to Tutorial". Plain SwiftUI, no camera.
 struct TutorialPrepView: View {
     let onBack: () -> Void
     let onStart: () -> Void
+
+    private struct KitItem: Identifiable {
+        let id: String
+        let image: String
+        let name: LocalizedStringKey
+    }
 
     private struct Tip: Identifiable {
         let id: String
         let symbol: String
         let title: LocalizedStringKey
-        let detail: LocalizedStringKey
+        let detail: LocalizedStringKey?
+        var items: [KitItem] = []
     }
 
     private let tips = [
         Tip(id: "face", symbol: "drop", title: "Clean, bare face", detail: "Wash up and moisturise so makeup sits nicely."),
         Tip(id: "light", symbol: "sun.max", title: "Bright, soft light", detail: "Face a window, or switch on the flash later."),
-        Tip(id: "kit", symbol: "paintbrush.pointed", title: "Your makeup kit", detail: "Spoolie, brow pencil, blush or eyeliner depends on which."),
-        Tip(id: "phone", symbol: "iphone", title: "Phone at eye level", detail: "Lean it on something so both hands stay free.")
+        Tip(id: "kit", symbol: "paintbrush.pointed", title: "Your makeup kit", detail: nil, items: [
+            KitItem(id: "spoolie", image: "kit-spoolie", name: "Spoolie"),
+            KitItem(id: "pencil", image: "kit-brow-pencil", name: "Brow pencil"),
+            KitItem(id: "cotton", image: "kit-cotton-bud", name: "Cotton bud")
+        ])
     ]
 
     var body: some View {
@@ -68,7 +78,26 @@ struct TutorialPrepView: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(tip.title).font(.system(size: 17, weight: .semibold))
-                Text(tip.detail).font(.system(size: 15))
+                if let detail = tip.detail {
+                    Text(detail).font(.system(size: 15))
+                }
+                if !tip.items.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(tip.items) { item in
+                            HStack(spacing: 12) {
+                                Image(item.image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(6)
+                                    .frame(width: 44, height: 44)
+                                    .background(AppColors.flamingo.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                    .accessibilityHidden(true)
+                                Text(item.name).font(.system(size: 15))
+                            }
+                        }
+                    }
+                    .padding(.top, 6)
+                }
             }
             .foregroundStyle(AppColors.wine)
             .frame(maxWidth: .infinity, alignment: .leading)

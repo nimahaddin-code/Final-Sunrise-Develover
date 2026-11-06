@@ -23,7 +23,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSCameraUsageDescription</key>
-	<string>The camera is used to track your face, estimate your face and eye shape, and photograph a makeup palette so you can pick a colour. Only the resulting shapes and one small photo from each scan are kept on this device; nothing is uploaded.</string>
+	<string>The camera shows makeup on your face live and can photograph a makeup palette so you can pick a colour. Nothing is saved or uploaded.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Lets you save photos of your makeup try-on to your library.</string>
 	<key>UIApplicationSceneManifest</key>

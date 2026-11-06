@@ -620,24 +620,18 @@ private struct TutorialScreen: View {
 
     // MARK: Tabs
 
-    /// Compare on the left, the three tabs, the screen light on the right (as on Try On).
+    /// Compare on the left, the name of the tool being taught, the screen light on the right (as on Try On).
     private var tabBar: some View {
         HStack(spacing: AppSpacing.small) {
             CameraBarButton(symbol: model.compare.symbol) { model.cycleCompare() }
                 .accessibilityLabel("Compare")
                 .accessibilityValue(model.compare.label)
-            ForEach(TutorialTab.allCases) { tab in
-                let selected = tab == model.tab
-                Button { model.select(tab) } label: {
-                    Text(tab.title)
-                        .font(.title3.weight(selected ? .semibold : .regular))
-                        .foregroundStyle(ink.opacity(selected ? 1 : 0.55))
-                        .lineLimit(1).minimumScaleFactor(0.8)
-                        .frame(maxWidth: .infinity, minHeight: 56)
-                }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(selected ? .isSelected : [])
-            }
+            Text(model.tab.title)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(ink)
+                .lineLimit(1).minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .accessibilityAddTraits(.isHeader)
             CameraBarButton(symbol: light.isOn ? "bolt.fill" : "bolt.slash.fill") { light.toggle() }
                 .accessibilityLabel("Light")
                 .accessibilityValue(light.isOn ? Text("On") : Text("Off"))

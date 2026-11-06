@@ -39,6 +39,7 @@
 		24D41B3F4A893C06684C3C07 /* EyebrowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */; };
 		256F015F65C61FE4DD9B6591 /* MakeupPreferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */; };
 		28A2D07D18A74048D374D78E /* MakeupRecommendation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */; };
+		A11CA1E000000000000000F2 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A11CA1E000000000000000F1 /* InfoPlist.xcstrings */; };
 		2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 98F393F180238C7106FB99C0 /* Localizable.xcstrings */; };
 		3063A4C8D849393B67C7EA9E /* BlushPlacementGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A07AB7461B6903140D1D165 /* BlushPlacementGuide.swift */; };
 		30ACDA4CE4F7397B938416B4 /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26456AF703170C7814098A8E /* AppSpacing.swift */; };
@@ -65,6 +66,7 @@
 		601CB711F407BB508AE96EDE /* HandOcclusion.swift in Sources */ = {isa = PBXBuildFile; fileRef = A64DA4C04FEDB41433C2EFE1 /* HandOcclusion.swift */; };
 		614F096B937A6AC4C8AAB4C0 /* BeautyBlushConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF70D0A5E75B40E855ECB86 /* BeautyBlushConfiguration.swift */; };
 		61802B9A9C3D59B870EFDC76 /* EyeGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */; };
+		A1F0C0DE5E1F00000000FE02 /* FeatureHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F0C0DE5E1F00000000FE01 /* FeatureHomeView.swift */; };
 		65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */; };
 		66ABECA0E68ED4FBDD399A7A /* MakeupRecommenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0CCC055355A1EC0AF155313 /* MakeupRecommenderTests.swift */; };
 		67129ECB6F6B3907B6557698 /* MakeupPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528DBE5F90FFAE037040249C /* MakeupPreferences.swift */; };
@@ -272,7 +274,9 @@
 		8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeGeometry.swift; sourceTree = "<group>"; };
 		92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceLandmarkProjection.swift; sourceTree = "<group>"; };
 		9342DC399ECDC1D13247975B /* FaceCameraState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceCameraState.swift; sourceTree = "<group>"; };
+		A11CA1E000000000000000F1 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		98F393F180238C7106FB99C0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A1F0C0DE5E1F00000000FE01 /* FeatureHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureHomeView.swift; sourceTree = "<group>"; };
 		9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeView.swift; sourceTree = "<group>"; };
 		9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blush-wash-mask.png"; sourceTree = "<group>"; };
 		9D7729D7358DFFF14FC0325A /* EyebrowGuideGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowGuideGenerator.swift; sourceTree = "<group>"; };
@@ -476,6 +480,7 @@
 				9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */,
 				B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */,
 				BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */,
+				A11CA1E000000000000000F1 /* InfoPlist.xcstrings */,
 				98F393F180238C7106FB99C0 /* Localizable.xcstrings */,
 				CD73965C5395C3CFB4F69902 /* face_landmarker.task */,
 				AA605D264DFFC483849D92C1 /* selfie_multiclass_256x256.tflite */,
@@ -805,6 +810,7 @@
 				64A92B86027ED154A52F5754 /* ProductCamera.swift */,
 				7C1E5A0B2D3F4A6B8C9D0E42 /* StyleIcons.swift */,
 				BEBA692C7BF72A1F310C5EA8 /* TryOnHomeModel.swift */,
+				A1F0C0DE5E1F00000000FE01 /* FeatureHomeView.swift */,
 				9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */,
 				C154BABB4BE50CEF4FCFBEB1 /* TryOnLiveCard.swift */,
 			);
@@ -970,6 +976,7 @@
 			knownRegions = (
 				en,
 				Base,
+				id,
 			);
 			mainGroup = B28B7AF69320201D1CF206EB;
 			packageReferences = (
@@ -997,6 +1004,7 @@
 				E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */,
 				B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */,
 				72410046D68478AB147FADEC /* blush-rendering.json in Resources */,
+				A11CA1E000000000000000F2 /* InfoPlist.xcstrings in Resources */,
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
 				CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */,
 				349F2CBF0A4352FF1D05B64A /* selfie_multiclass_256x256.tflite in Resources */,
@@ -1084,6 +1092,7 @@
 				513BAB4E537BC7E6398BE794 /* LiveGuideView.swift in Sources */,
 				91D0BE9D95201FF3451E8D68 /* OnboardingView.swift in Sources */,
 				AD829C69DD73C01C6DCD473D /* TryOnHomeModel.swift in Sources */,
+				A1F0C0DE5E1F00000000FE02 /* FeatureHomeView.swift in Sources */,
 				65D7CFE39255E5FB991EB172 /* TryOnHomeView.swift in Sources */,
 				5EACAFE85A34478286170FE4 /* PaletteColorPicker.swift in Sources */,
 				B5A0C0DE00000000000B0002 /* BrowStylePicker.swift in Sources */,

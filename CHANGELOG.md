@@ -9,8 +9,39 @@ The tutorial now hands over `TutorialPhoto` (image + `blushOutline`, in the phot
 bare `UIImage`; `FeedbackInput(handoff:photo:)`. Shared-screen change (Hanum's `GuidedTutorialView`): with blush on
 (`GuidedTutorialModel.measuresBlushInPhoto`), the photo configuration keeps the engine on with region blush,
 `showGuide` and `pigmentHalf = .none` (no blush pigment encoded: the photo is still the plain camera) so the outlines are
-measured on the shutter frame; the tutorial overlay stays hidden in photo mode. All in memory. Simulator tests only: the
+measured on the shutter frame; the tutorial overlay stays hidden in photo mode. New texts have Indonesian drafts (`needs_review`). All in memory. Simulator tests only: the
 screen and the line placement on a real photo are not yet seen on a device.
+
+## Feature homepage, one tool per Try On — Khalish (2026-11-05)
+
+The app now opens (after the welcome) on a homepage with three cards: Blush, Eyeliner, Eyebrow. A card opens Try On for that
+tool only; the camera starts only then. Try On lost its tool strip (back button to the homepage), and the tutorial shows only
+that tool, with no tabs. Simulator only, no device check.
+
+## Prep page: brow kit list — Khalish (2026-11-04)
+
+The "Let's get you ready" page (`TutorialPrepView`) drops "Phone at eye level". "Your makeup kit" now lists the brow
+tutorial's tools, picture left and name right: Spoolie, Brow pencil, Cotton bud (image sets `kit-spoolie`,
+`kit-brow-pencil`, `kit-cotton-bud`, CC0 SVGs from SVG Repo; sources in `Resources/KitImages-SOURCES.txt`). The spoolie
+picture is a mascara wand (no spoolie in that pack). New strings have Indonesian drafts (`needs_review`). Simulator render
+only, no device check.
+
+## Three-page onboarding — Khalish (2026-11-04)
+
+The welcome is now three swipeable pages in one `TabView` (welcome, "TRY IT ON, LIVE", "LEARN IT, STEP BY STEP"), with Next, Skip on
+pages 2-3, three progress dots, and Start Try On calling `onStart`. `currentWelcomeVersion` stays 2. Simulator only, no device check.
+
+## English and Indonesian — Khalish (2026-11-03)
+
+Two languages: English (source) and Indonesian (`id`). Strings are in `Resources/Localizable.xcstrings`, the camera and
+photo-library permission prompts in `Resources/InfoPlist.xcstrings`; `knownRegions` has `id`. The Indonesian was drafted by AI
+and every entry is `needs_review` until a native speaker checks it. Developer-only strings (eye debug readout, brow debug
+menu, format-only keys such as `%lld`) are `shouldTranslate: false`. New UI text: write English in code with `Text("...")` or
+`String(localized:)`; an enum title that returns `String` must use `String(localized:)`, or it is never translated. Shade names come
+from `makeup-reference.database.json` and are manual catalog keys (`extractionState: manual`): add a key when adding a palette.
+`xcodebuild` does not write new keys back into the catalog: build in Xcode, or run
+`xcrun xcstringstool sync SunriseApp/Resources/Localizable.xcstrings --stringsdata <the build's .stringsdata files>` and
+check the diff. Test with the scheme's App Language or `-AppleLanguages (id)`. Simulator only, no device check.
 
 ## Tool-first folders: Features/Blush, Brow, Eyeliner, Screens — -Nimah (2026-11-03)
 
