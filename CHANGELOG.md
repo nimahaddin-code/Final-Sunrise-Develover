@@ -1,3 +1,41 @@
+## Encouraging tutorial wording — 2026-11-06
+
+Every tutorial step now has a short instruction and a friendly line of encouragement (blush 3, brows 5, eyeliner 3 steps;
+same order and count, so the guide animations still match). Blush and brow lessons carry the encouragement in
+`FaceGuideLesson.instruction`; eyeliner adds `LinerTutorialStep.cheer`. The steps sheet shows it under each title, comes back
+up when the second side starts with "One side done! Now let's give the other side the same love." (`TutorialStepsSheet.note`),
+and the after photo says "Both sides done. Look at you! Let's take your after photo." Old step strings removed from the catalog.
+
+## Feature-shaped capture frame, steps sheet title fixed — 2026-11-06
+
+The capture frame is an ID-card style cut-out shaped like the feature (`FeatureFrameShape`): one rounded rectangle round
+both eyes for eyeliner, two brow bands for brows, two tilted ovals for blush, with corner brackets round the area. The tutorial
+steps sheet keeps its "Steps" title fixed above the list and scrolls only as far as the current step needs, so it opens at
+the title; dragging the sheet resizes it before the list scrolls. The tutorial camera card's picture now uses the card's own corner radius (it was
+masked at twice the radius, so black showed in the corners), and the steps list leaves room under its last step.
+Positions are still placeholders; not checked on a device.
+
+## One-tool E2E flow: home, capture, brief, per-side tutorial, feedback placeholder — 2026-11-05
+
+The app no longer opens on Try On. After the welcome, `FeaturePickerView` (home, "Pick a Feature": Brows / Blush / Liner)
+starts a run for one tool: `AppRoute.tryOn(tool)` (`TryOnHomeView` for that tool only, back button, Continue once a style is
+on) -> `capture(.desired, handoff)` (`FeatureCaptureView`: camera with the chosen look and the feature's frame, shutter,
+Retake/Next) -> `lookBrief(handoff)` (`LookBriefView`: that photo, the style name, what to prepare from `TryOnTool.kit`,
+"Go to Tutorial"; replaces `TutorialPrepView`, deleted) -> `recommendedTutorial(handoff, attempt:)` (`GuidedTutorialView`
+with `onFinished`: that tool only, every step on the screen's left half (user's right side) then the right half, guide
+beside the plain camera, compare toggles the desired look on the other half; `TutorialStepsSheet` opens half height at the
+start, drag up/down or the Steps button; Done pushes the next capture) -> `capture(.result, handoff)` (plain camera, same
+frame) -> `feedback(handoff)` (`FeedbackView`: loading with percentage, then feedback; "Back to tutorial" =
+`AppNavigator.restartTutorial()`, a new `attempt` from step 1; "Done" returns home). Photos live in `MakeupFlowStore`
+(memory only, cleared on Done and on a new pick). Feedback goes through `MakeupFeedbackProviding`
+(`AppContainer.feedback`); `PlaceholderFeedbackProvider` waits ~2 s and returns fixed text, it never looks at the photos:
+plug the real comparison in there. Placeholders until design: tile icons (SF Symbols), the frame position
+(`TryOnTool.captureRegion`, nothing checks the feature is inside), kit copy, the steps' GIFs (grey boxes), brief and feedback
+layout. Without a usable camera (Simulator) capture offers "Continue without photo" so the flow runs end to end. New files:
+`Makeup/Shared/Flow/` (`MakeupFlow`, `FeaturePickerView`, `FeatureCaptureView`, `LookBriefView`, `FeedbackView`) and
+`Shared/Tutorial/TutorialStepsSheet`. `TutorialCompare` gained `guidePlain`/`plainGuide` (never in the compare cycle).
+Not checked on a device: whether `ARSCNView.snapshot()` includes the Metal blush/brow layer in the desired-look photo.
+
 ## Unused code deleted — -Nimah (2026-11-02)
 
 Checked by building, not guessed: everything in `Features/Legacy/` was deleted, then the app and tests were built and

@@ -28,6 +28,24 @@ import Foundation
         }
     }
 
+    /// The flow's own back buttons (the navigation bar is hidden).
+    func goBack(in tab: AppTab) {
+        selectedTab = tab
+        switch tab {
+        case .discover: if !discoverPath.isEmpty { discoverPath.removeLast() }
+        case .myLooks: if !savedPath.isEmpty { savedPath.removeLast() }
+        case .tryOn: if !tryOnPath.isEmpty { tryOnPath.removeLast() }
+        }
+    }
+
+    /// Feedback's "Back to tutorial": drops the screens after the tutorial and starts it again from its first step
+    /// (a new `attempt` is a new screen). Does nothing when no tutorial is open.
+    func restartTutorial() {
+        guard let index = tryOnPath.lastIndex(where: { if case .recommendedTutorial = $0 { true } else { false } }),
+              case .recommendedTutorial(let handoff, let attempt) = tryOnPath[index] else { return }
+        tryOnPath = Array(tryOnPath[..<index]) + [.recommendedTutorial(handoff, attempt: attempt + 1)]
+    }
+
     func returnToRoot(of tab: AppTab) {
         selectedTab = tab
         switch tab {

@@ -1,0 +1,202 @@
+import SwiftUI
+import UIKit
+
+/// "Take a picture": the live camera with the face feature's frame, a shutter, then Retake / Next. `.desired` draws the
+/// look chosen on Try On (the picture the result is compared with); `.result` is the plain camera after the tutorial.
+/// Without a usable camera (Simulator, no TrueDepth, permission denied) it can continue without a photo, so the flow
+/// still runs end to end.
+struct FeatureCaptureView: View {
+    let stage: CaptureStage
+    let handoff: TutorialHandoff
+    @ObservedObject var store: MakeupFlowStore
+    let onBack: () -> Void
+    let onNext: () -> Void
+    @StateObject private var home: TryOnHomeModel
+    @State private var captured: UIImage?
+    @State private var visible = false
+    @Environment(\.scenePhase) private var scenePhase
+
+    init(stage: CaptureStage, handoff: TutorialHandoff, plan: MakeupPlan, assessment: FaceShapeAssessment,
+         checker: any FaceTrackingAvailabilityChecking, store: MakeupFlowStore,
+         onBack: @escaping () -> Void, onNext: @escaping () -> Void) {
+        self.stage = stage
+        self.handoff = handoff
+        self.store = store
+        self.onBack = onBack
+        self.onNext = onNext
+        _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment, checker: checker, focus: handoff.tool))
+    }
+
+    var body: some View {
+        VStack(spacing: AppSpacing.medium) {
+            ZStack {
+                Text("Take a picture")
+                    .font(.title2.weight(.semibold))
+                    .accessibilityAddTraits(.isHeader)
+                HStack {
+                    GlassCircleButton(symbol: "chevron.left", size: 44, tint: AppColors.glassLight, label: "Back") {
+                        home.deactivate()
+                        onBack()
+                    }
+                    Spacer()
+                }
+            }
+            CaptureCameraCard(home: home, tool: handoff.tool, captured: captured, active: visible && scenePhase == .active)
+                .frame(maxHeight: .infinity)
+            VStack(spacing: 2) {
+                Text(handoff.styleTitle).font(.title3.weight(.semibold))
+                Text(stage == .desired ? "Your desired look" : "Both sides done. Look at you! Let's take your after photo.")
+                    .multilineTextAlignment(.center)
+                    .font(.subheadline)
+                    .foregroundStyle(AppColors.snow.opacity(0.75))
+            }
+            CaptureControls(camera: home.camera, brow: home.brow, captured: $captured, onShoot: shoot, onNext: next)
+        }
+        .foregroundStyle(AppColors.snow)
+        .padding(.horizontal, AppSpacing.medium)
+        .padding(.bottom, AppSpacing.small)
+        .background { MainBackground() }
+        .toolbar(.hidden, for: .navigationBar)
+        .navigationBarBackButtonHidden()
+        .sensoryFeedback(.success, trigger: captured != nil)
+        // Retake: back to the live camera.
+        .onChange(of: captured == nil) { _, retake in if retake && visible { activate() } }
+        .onAppear { visible = true; activate() }
+        .onDisappear { visible = false; home.deactivate() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active && visible { activate() } else { home.deactivate() }
+        }
+    }
+
+    private func activate() {
+        guard captured == nil else { return }
+        home.activate()
+        if stage == .desired { home.apply(handoff) }
+    }
+
+    /// The camera picture as shown. The eyeliner is a SwiftUI overlay, so it is drawn into the picture here.
+    private func shoot() {
+        guard var image = home.camera.view?.snapshot() else { return }
+        if stage == .desired && handoff.tool == .eyeliner { image = home.liner.composed(image) }
+        captured = image
+        // The still replaces the camera until Retake.
+        home.deactivate()
+    }
+
+    private func next() {
+        store.store(captured, for: stage)
+        home.deactivate()
+        onNext()
+    }
+}
+
+/// Shutter; Retake and Next once taken; "Continue without photo" when there is no usable camera.
+private struct CaptureControls: View {
+    @ObservedObject var camera: FaceCameraState
+    @ObservedObject var brow: EyebrowViewModel
+    @Binding var captured: UIImage?
+    let onShoot: () -> Void
+    let onNext: () -> Void
+
+    private var noCamera: Bool {
+        if case .unsupported = brow.availability { return true }
+        return camera.denied || camera.failure != nil
+    }
+
+    var body: some View {
+        if captured != nil {
+            HStack(spacing: AppSpacing.medium) {
+                Button { captured = nil } label: {
+                    Image(systemName: "arrow.counterclockwise")
+                        .font(.title3.weight(.medium))
+                        .frame(width: 60, height: 60)
+                        .glassCircle()
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Retake photo")
+                FlowPrimaryButton(title: "Next", action: onNext)
+            }
+        } else if !noCamera {
+            FlowPrimaryButton(title: "Take picture", symbol: "camera", action: onShoot)
+                .disabled(!camera.authorized)
+        } else {
+            // Simulator or no camera: keep the flow going without a photo.
+            FlowPrimaryButton(title: "Continue without photo", action: onNext)
+        }
+    }
+}
+
+/// The camera card of the capture screen, or the still once taken, with the feature frame over either.
+private struct CaptureCameraCard: View {
+    @ObservedObject var home: TryOnHomeModel
+    @ObservedObject var camera: FaceCameraState
+    @ObservedObject var brow: EyebrowViewModel
+    let tool: TryOnTool
+    let captured: UIImage?
+    let active: Bool
+    @Environment(\.openURL) private var openURL
+
+    init(home: TryOnHomeModel, tool: TryOnTool, captured: UIImage?, active: Bool) {
+        self.home = home
+        camera = home.camera
+        brow = home.brow
+        self.tool = tool
+        self.captured = captured
+        self.active = active
+    }
+
+    var body: some View {
+        ZStack {
+            Color.black
+            if let captured {
+                Image(uiImage: captured).resizable().scaledToFill()
+            } else {
+                content
+            }
+            FeatureFrameOverlay(tool: tool, highlight: captured == nil ? AppColors.snow : AppColors.flamingo,
+                                showsHint: captured == nil)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous))
+    }
+
+    @ViewBuilder private var content: some View {
+        switch brow.availability {
+        case .notChecked:
+            ProgressView().tint(AppColors.snow)
+        case .unsupported:
+            message(symbol: "faceid", title: "Camera unavailable", text: "The photo needs an iPhone with a TrueDepth front camera.")
+        case .supported:
+            if camera.denied {
+                VStack(spacing: AppSpacing.medium) {
+                    message(symbol: "camera", title: "I need your camera to be your mirror.", text: "Nothing is saved or uploaded.")
+                    Button("Turn on camera") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                    }
+                    .buttonStyle(.borderedProminent).tint(AppColors.flamingo)
+                }
+            } else if camera.failure != nil {
+                message(symbol: "exclamationmark.triangle", title: "Camera stopped", text: "Face tracking stopped unexpectedly.")
+            } else if camera.authorized {
+                ZStack {
+                    LiveGuideView(camera: camera, referenceID: "eyebrows", active: home.active && active,
+                                  eyebrowConfiguration: home.liveConfiguration, onFrame: { [relay = home.relay] frame, face in
+                                      relay.deliver(frame, face)
+                                  })
+                    LinerOverlayView(model: home.liner, isVisible: true)
+                }
+            } else {
+                ProgressView().tint(AppColors.snow)
+            }
+        }
+    }
+
+    private func message(symbol: String, title: LocalizedStringKey, text: LocalizedStringKey) -> some View {
+        VStack(spacing: AppSpacing.small) {
+            Image(systemName: symbol).font(.largeTitle).accessibilityHidden(true)
+            Text(title).font(AppTypography.heading)
+            Text(text).font(AppTypography.body).multilineTextAlignment(.center)
+        }
+        .foregroundStyle(AppColors.snow)
+        .padding(AppSpacing.large)
+    }
+}

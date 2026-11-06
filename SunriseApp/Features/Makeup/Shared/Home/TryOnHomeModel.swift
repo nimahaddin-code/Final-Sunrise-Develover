@@ -210,9 +210,24 @@ final class LinerFrameRelay: @unchecked Sendable {
     }
 
     /// What the tutorial starts from: every tool's last choice, and which tools have makeup on.
+    /// With `focusTool` set (one tool per flow), only that tool goes on to the capture, tutorial and feedback.
     var tutorialHandoff: TutorialHandoff {
         TutorialHandoff(tool: tool, shades: shades, intensities: intensities, linerLook: linerLook, blushStyle: blushLook,
-                        browOverlay: browOverlay, hideNaturalBrow: !naturalBrowVisible, enabled: enabled)
+                        browOverlay: browOverlay, hideNaturalBrow: !naturalBrowVisible,
+                        enabled: focusTool.map { enabled.intersection([$0]) } ?? enabled)
+    }
+
+    /// Puts back what Try On chose, for the capture screen of the desired look. Call after `activate()`, which resets
+    /// the eyebrow to no overlay.
+    func apply(_ handoff: TutorialHandoff) {
+        shades.merge(handoff.shades) { _, new in new }
+        intensities.merge(handoff.intensities) { _, new in new }
+        if let style = handoff.blushStyle, style.isReferenceLook { blushLook = style }
+        linerLook = handoff.linerLook
+        browOverlay = handoff.browOverlay
+        naturalBrowVisible = !handoff.hideNaturalBrow
+        enabled = handoff.enabled.filter { canTry($0) && ($0 != .eyebrow || browOverlay != nil) }
+        syncLiner()
     }
 
     /// Selecting a tool only shows its controls; every tool keeps the makeup chosen for it, on or off.

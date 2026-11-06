@@ -42,6 +42,29 @@ final class AppNavigatorTests: XCTestCase {
     private func tutorial(_ tool: TryOnTool) -> AppRoute {
         .recommendedTutorial(TutorialHandoff(tool: tool, shades: [:], intensities: [:]))
     }
+    @MainActor func testBackToTutorialDropsLaterScreensAndRestartsTheTutorial() {
+        let navigator = AppNavigator()
+        let handoff = TutorialHandoff(tool: .blush, shades: [:], intensities: [:])
+        for route in [AppRoute.tryOn(.blush), .capture(.desired, handoff), .lookBrief(handoff), .recommendedTutorial(handoff),
+                      .capture(.result, handoff), .feedback(handoff)] {
+            navigator.open(route, in: .tryOn)
+        }
+        navigator.restartTutorial()
+        XCTAssertEqual(navigator.tryOnPath, [.tryOn(.blush), .capture(.desired, handoff), .lookBrief(handoff),
+                                             .recommendedTutorial(handoff, attempt: 1)])
+        navigator.returnToRoot(of: .tryOn)
+        XCTAssertTrue(navigator.tryOnPath.isEmpty)
+    }
+    @MainActor func testRestartWithoutTutorialAndBackAtRootDoNothing() {
+        let navigator = AppNavigator()
+        navigator.goBack(in: .tryOn)
+        XCTAssertTrue(navigator.tryOnPath.isEmpty)
+        navigator.open(.tryOn(.eyeliner), in: .tryOn)
+        navigator.restartTutorial()
+        XCTAssertEqual(navigator.tryOnPath, [.tryOn(.eyeliner)])
+        navigator.goBack(in: .tryOn)
+        XCTAssertTrue(navigator.tryOnPath.isEmpty)
+    }
     @MainActor func testFinishingDiscoverFlowPreservesSavedTabHistory() {
         let navigator = AppNavigator()
         let savedRoute = tutorial(.blush)

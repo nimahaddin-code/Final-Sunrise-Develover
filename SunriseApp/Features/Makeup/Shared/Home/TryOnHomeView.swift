@@ -1,26 +1,26 @@
 import SwiftUI
 
-/// The app's first screen, about one tool: header, live camera card with its shape row, a shade row and an intensity bar.
-/// The arrow opens the tutorial. Every tool uses the standard look; there is no face or eye scan.
+/// Try On for the one tool picked on the home screen: header, live camera card with its shape row, a shade row, an
+/// intensity bar and Continue (to the desired-look photo). Every tool uses the standard look; there is no face or eye scan.
 struct TryOnHomeView: View {
     @StateObject private var home: TryOnHomeModel
-    var onTutorial: (TutorialHandoff) -> Void
+    var onBack: () -> Void
+    var onContinue: (TutorialHandoff) -> Void
     @AppStorage(DeveloperTools.key) private var developerTools = false
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible=false
     @State private var showColours=false
     @State private var paletteSource = PaletteSource.camera
-    /// The "get you ready" page, drawn over Try On (not a pushed route) until she starts the tutorial or goes back.
-    @State private var prepHandoff: TutorialHandoff?
     @StateObject private var light = ScreenLight()
     /// Dark labels on the white screen of the light.
     private var ink: Color { light.isOn ? .black : AppColors.snow }
 
     /// One screen per tool: `tool` is the only makeup it shows, with its shape, colour and intensity.
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
-         tool: TryOnTool = .blush, onTutorial: @escaping (TutorialHandoff) -> Void) {
+         tool: TryOnTool, onBack: @escaping () -> Void, onContinue: @escaping (TutorialHandoff) -> Void) {
         _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment, checker: checker, focus: tool))
-        self.onTutorial = onTutorial
+        self.onBack = onBack
+        self.onContinue = onContinue
     }
 
     var body: some View {
@@ -50,6 +50,13 @@ struct TryOnHomeView: View {
             IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
                          tint: home.currentShade?.color ?? AppColors.flamingo)
                 .disabled(!home.canTry(home.tool))
+            // A style must be on before the photo of the desired look.
+            FlowPrimaryButton(title: "Continue") {
+                let handoff = home.tutorialHandoff
+                home.deactivate()
+                onContinue(handoff)
+            }
+            .disabled(!home.canTry(home.tool) || home.isOff)
         }
         .padding(.horizontal, AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
@@ -58,15 +65,6 @@ struct TryOnHomeView: View {
         .preferredColorScheme(light.isOn ? .light : nil)
         .foregroundStyle(ink)
         .toolbar(.hidden, for: .navigationBar)
-        .overlay {
-            if let handoff = prepHandoff {
-                TutorialPrepView(onBack: {
-                    withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = nil }
-                    if isVisible && !showColours { home.activate() }
-                }, onStart: { onTutorial(handoff) })
-                .transition(.move(edge: .trailing))
-            }
-        }
         .sensoryFeedback(.selection, trigger: light.isOn)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
         .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
@@ -75,14 +73,12 @@ struct TryOnHomeView: View {
         .onAppear {
             isVisible=true
             light.resume()
-            // Coming back from the tutorial: the get-ready page is done with.
-            prepHandoff = nil
             if !showColours { home.activate() }
         }
         .onDisappear { isVisible=false; home.deactivate(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
             // Pause the camera off-screen; resume through the same guarded path.
-            if phase == .active && isVisible && !showColours && prepHandoff == nil { home.activate(); light.resume() } else { home.deactivate(); light.suspend() }
+            if phase == .active && isVisible && !showColours { home.activate(); light.resume() } else { home.deactivate(); light.suspend() }
         }
     }
 
@@ -99,12 +95,8 @@ struct TryOnHomeView: View {
                 .onLongPressGesture(minimumDuration: 1.2) { developerTools.toggle() }
                 .sensoryFeedback(.impact, trigger: developerTools)
             HStack {
+                GlassCircleButton(symbol: "chevron.left", size: 48, tint: AppColors.glassLight, label: "Back to features", action: onBack)
                 Spacer()
-                GlassCircleButton(symbol: "arrow.right", size: 48, tint: AppColors.flamingo.opacity(0.9), label: "Open tutorial") {
-                    home.deactivate()
-                    withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = home.tutorialHandoff }
-                }
-                .disabled(!home.canTry(home.tool))
             }
         }
         .buttonStyle(.plain)

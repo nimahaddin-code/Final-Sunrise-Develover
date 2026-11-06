@@ -1,3 +1,26 @@
+## One-tool E2E flow: home, capture, brief, per-side tutorial, feedback placeholder — 2026-11-05
+
+The app no longer opens on Try On. After the welcome, `FeaturePickerView` (home, "Pick a Feature": Brows / Blush / Liner)
+starts a run for one tool: `AppRoute.tryOn(tool)` (`TryOnHomeView` for that tool only, back button, Continue once a style is
+on) -> `capture(.desired, handoff)` (`FeatureCaptureView`: camera with the chosen look and the feature's frame, shutter,
+Retake/Next) -> `lookBrief(handoff)` (`LookBriefView`: that photo, the style name, what to prepare from `TryOnTool.kit`,
+"Go to Tutorial"; replaces `TutorialPrepView`, deleted) -> `recommendedTutorial(handoff, attempt:)` (`GuidedTutorialView`
+with `onFinished`: that tool only, every step on the screen's left half (user's right side) then the right half, guide
+beside the plain camera, compare toggles the desired look on the other half; `TutorialStepsSheet` opens half height at the
+start with its title fixed above the scrolling steps, each step an instruction plus a line of encouragement
+(lesson `instruction`, `LinerTutorialStep.cheer`), back up with a cheer when the second side starts; drag up/down or the Steps button; Done pushes the next capture) -> `capture(.result, handoff)` (plain camera, same
+frame) -> `feedback(handoff)` (`FeedbackView`: loading with percentage, then feedback; "Back to tutorial" =
+`AppNavigator.restartTutorial()`, a new `attempt` from step 1; "Done" returns home). Photos live in `MakeupFlowStore`
+(memory only, cleared on Done and on a new pick). Feedback goes through `MakeupFeedbackProviding`
+(`AppContainer.feedback`); `PlaceholderFeedbackProvider` waits ~2 s and returns fixed text, it never looks at the photos:
+plug the real comparison in there. Placeholders until design: tile icons (SF Symbols), the frame position
+(`TryOnTool.captureRegion`; ID-card style cut-out shaped like the feature, `FeatureFrameShape`: one rectangle round both eyes,
+two brows or two cheeks, plus corner brackets; nothing checks the feature is inside), kit copy, the steps' GIFs (grey boxes), brief and feedback
+layout. Without a usable camera (Simulator) capture offers "Continue without photo" so the flow runs end to end. New files:
+`Makeup/Shared/Flow/` (`MakeupFlow`, `FeaturePickerView`, `FeatureCaptureView`, `LookBriefView`, `FeedbackView`) and
+`Shared/Tutorial/TutorialStepsSheet`. `TutorialCompare` gained `guidePlain`/`plainGuide` (never in the compare cycle).
+Not checked on a device: whether `ARSCNView.snapshot()` includes the Metal blush/brow layer in the desired-look photo.
+
 ## Unused code deleted — -Nimah (2026-11-02)
 
 Checked by building, not guessed: everything in `Features/Legacy/` was deleted, then the app and tests were built and
@@ -728,9 +751,10 @@ SunriseAppTests/
 
 ## Navigation
 
-- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `TryOnHomeView`. The only route is
-  `AppRoute.recommendedTutorial(TutorialHandoff)` (Try On -> tutorial); `AppRootView.destination` builds it. To add a
-  screen: add a case, its destination, and push it with `navigator.open(route, in: .tryOn)`.
+- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `FeaturePickerView` (home). Routes
+  (`AppRoute`): `tryOn`, `capture`, `lookBrief`, `recommendedTutorial`, `feedback` (order in the top section);
+  `AppRootView.destination` builds them. To add a screen: add a case, its destination, and push it with
+  `navigator.open(route, in: .tryOn)`; `goBack(in:)`, `restartTutorial()` and `returnToRoot(of:)` move back.
 - `AppTab` and the per-tab paths in `AppNavigator` remain, though only `.tryOn` is shown.
 
 ## Features
