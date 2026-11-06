@@ -1,3 +1,11 @@
+## Prep page: brow kit list — Khalish (2026-11-04)
+
+`TutorialPrepView` (`Features/Screens/Preparation/`) shows three cards; "Phone at eye level" is gone. The kit card's `Tip.items`
+(`KitItem`: image name + label) lists Spoolie, Brow pencil, Cotton bud, picture left, name right. Pictures are vector image
+sets `kit-spoolie` (a mascara wand), `kit-brow-pencil`, `kit-cotton-bud`: CC0 SVGs from one SVG Repo pack, sources in
+`Resources/KitImages-SOURCES.txt`. To change an item: edit the `items` array and its image set. Brow only; blush and
+eyeliner tools are not listed. Simulator render only, no device check.
+
 ## Three-page onboarding — Khalish (2026-11-04)
 
 `OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`) is now three swipeable pages in one `TabView`: the welcome
