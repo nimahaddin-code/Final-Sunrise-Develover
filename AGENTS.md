@@ -1,3 +1,13 @@
+## Brow Try On layout — Khalish (2026-11-06)
+
+Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
+back and the screen light sit over the camera's top corners (`browTopButtons`), no tutorial arrow (`TryOnLiveCard(showsLightButton: false)`, no dark-scene pulse there), a palette
+button above `BrowOverlayPicker` swaps it for the shade row and intensity bar inside the camera card (`showsShades`, `shadeControls`; the button turns into an X), and a
+"Continue" button at the bottom opens the tutorial like the arrow. Back, light and palette use Apple's plain glass
+(`.glassEffect(.regular.interactive())`, `ScreenLightButton(plainGlass:)`); camera messages sit under the top buttons
+(`TryOnLiveCard(captionAtTop:)`). All tools: the camera picture's mask now has the card's corner radius (was double, which
+left black corners). Blush and eyeliner unchanged. Simulator only.
+
 ## Homepage redesign: card slider — Khalish (2026-11-06)
 
 `FeatureHomeView` is now a light page (`AppColors.homeCanvas` #FFFBF8, text `AppColors.plumInk`) with a horizontal card slider in

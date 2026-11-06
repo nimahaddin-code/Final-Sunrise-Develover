@@ -1,3 +1,8 @@
+## Brow Try On layout — Khalish (2026-11-06)
+
+Brow Try On only: light #FAF2EA page, screen light top right instead of the tutorial arrow, a palette button above the
+brow pictures that swaps them for shades and intensity (turns into an X), and a "Continue" button at the bottom. Simulator only.
+
 ## Homepage redesign: card slider — Khalish (2026-11-06)
 
 The feature homepage is now a light page with a swipeable slider of tool cards (Eyeliner, Blush, Brows; opens on Blush), the
