@@ -8,19 +8,19 @@ struct TryOnHomeView: View {
     @AppStorage(DeveloperTools.key) private var developerTools = false
     @AppStorage(NewFlow.key) private var newFlow = false
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dismiss) private var dismiss
     @State private var isVisible=false
     @State private var showColours=false
     @State private var paletteSource = PaletteSource.camera
     /// The "get you ready" page, drawn over Try On (not a pushed route) until she starts the tutorial or goes back.
     @State private var prepHandoff: TutorialHandoff?
     @StateObject private var light = ScreenLight()
-    @Namespace private var toolGlass
     /// Dark labels on the white screen of the light.
     private var ink: Color { light.isOn ? .black : AppColors.snow }
 
-    init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
+    init(tool: TryOnTool, plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
          onTutorial: @escaping (TutorialHandoff) -> Void) {
-        _home = StateObject(wrappedValue: TryOnHomeModel(plan: plan, assessment: assessment, checker: checker))
+        _home = StateObject(wrappedValue: TryOnHomeModel(tool: tool, plan: plan, assessment: assessment, checker: checker))
         self.onTutorial = onTutorial
     }
 
@@ -39,7 +39,6 @@ struct TryOnHomeView: View {
                     }
                     .overlay(alignment: .bottom) { stylePicker.padding(.bottom, AppSpacing.small) }
             }
-            toolStrip
             if home.tool == .eyebrow && home.canTry(.eyebrow) && !EyebrowConfiguration.showsBrowTracking {
                 BrowStylePicker(styles: home.brow.browStyleChoices, selected: home.brow.configuration.style,
                                 onSelect: home.brow.chooseBrowStyle)
@@ -112,6 +111,7 @@ struct TryOnHomeView: View {
                 .onLongPressGesture(minimumDuration: 1.2) { developerTools.toggle() }
                 .sensoryFeedback(.impact, trigger: developerTools)
             HStack {
+                GlassCircleButton(symbol: "chevron.left", size: 48, tint: AppColors.glassLight, label: "Back") { dismiss() }
                 Spacer()
                 GlassCircleButton(symbol: "arrow.right", size: 48, tint: AppColors.flamingo.opacity(0.9), label: "Open tutorial") {
                     home.deactivate()
@@ -123,31 +123,6 @@ struct TryOnHomeView: View {
             }
         }
         .buttonStyle(.plain)
-    }
-
-    // MARK: Tools
-
-    /// The three tools as text; the chosen one sits on a glass capsule that slides to the next one.
-    private var toolStrip: some View {
-        GlassEffectContainer(spacing: 12) {
-            HStack(spacing: 12) {
-                ForEach(TryOnTool.allCases) { tool in
-                    let selected = tool == home.tool
-                    Button { withAnimation(.smooth(duration: 0.3)) { home.choose(tool) } } label: {
-                        Text(tool.title)
-                            .font(.system(size: 18, weight: selected ? .semibold : .regular))
-                            .foregroundStyle(ink.opacity(selected ? 1 : 0.6))
-                            .padding(.horizontal, 18)
-                            .frame(minHeight: 42)
-                            .modifier(SelectedToolGlass(selected: selected, namespace: toolGlass))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(tool.title)
-                    .accessibilityAddTraits(selected ? .isSelected : [])
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: Liner look
@@ -221,22 +196,6 @@ struct TryOnHomeView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Add a colour from a product")
-    }
-}
-
-/// The chosen tool's glass capsule. Every tool gets the same id, so changing the choice slides one capsule across.
-private struct SelectedToolGlass: ViewModifier {
-    let selected: Bool
-    let namespace: Namespace.ID
-
-    func body(content: Content) -> some View {
-        if selected {
-            content
-                .glassCapsule(tint: AppColors.glassSelected)
-                .glassEffectID("selected-tool", in: namespace)
-        } else {
-            content
-        }
     }
 }
 

@@ -1,3 +1,9 @@
+## Feature homepage, one tool per Try On — Khalish (2026-11-05)
+
+The app now opens (after the welcome) on a homepage with three cards: Blush, Eyeliner, Eyebrow. A card opens Try On for that
+tool only; the camera starts only then. Try On lost its tool strip (back button to the homepage), and the tutorial shows only
+that tool, with no tabs. Simulator only, no device check.
+
 ## Prep page: brow kit list — Khalish (2026-11-04)
 
 The "Let's get you ready" page (`TutorialPrepView`) drops "Phone at eye level". "Your makeup kit" now lists the brow
