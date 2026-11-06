@@ -48,7 +48,7 @@ enum MakeupPalette {
     // -Nimah: Chosen JSON palette, decoded once with the geometry rules.
     static func databaseShades(category:String)->[MakeupShade] {
         (MakeupRuleDatabase.shared?.palettes ?? []).filter { $0.category==category }.map {
-            MakeupShade(id:$0.id,name:LocalizedStringResource("\($0.name)"),red:$0.color.value[0],green:$0.color.value[1],blue:$0.color.value[2],opacity:1)
+            MakeupShade(id:$0.id,name:LocalizedStringResource(String.LocalizationValue($0.name)),red:$0.color.value[0],green:$0.color.value[1],blue:$0.color.value[2],opacity:1)
         }
     }
     // -Nimah: Approximate sRGB previews inspired by the supplied photos, not measured product colours.

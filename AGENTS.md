@@ -1,3 +1,15 @@
+## English and Indonesian — Khalish (2026-11-03)
+
+Two languages: English (source) and Indonesian (`id`). Strings are in `Resources/Localizable.xcstrings`, the camera and
+photo-library permission prompts in `Resources/InfoPlist.xcstrings`; `knownRegions` has `id`. The Indonesian was drafted by AI
+and every entry is `needs_review` until a native speaker checks it. Developer-only strings (eye debug readout, brow debug
+menu, format-only keys such as `%lld`) are `shouldTranslate: false`. New UI text: write English in code with `Text("...")` or
+`String(localized:)`; an enum title that returns `String` must use `String(localized:)`, or it is never translated. Shade names come
+from `makeup-reference.database.json` and are manual catalog keys (`extractionState: manual`): add a key when adding a palette.
+`xcodebuild` does not write new keys back into the catalog: build in Xcode, or run
+`xcrun xcstringstool sync SunriseApp/Resources/Localizable.xcstrings --stringsdata <the build's .stringsdata files>` and
+check the diff. Test with the scheme's App Language or `-AppleLanguages (id)`. Simulator only, no device check.
+
 ## Tool-first folders: Features/Blush, Brow, Eyeliner, Screens — -Nimah (2026-11-03)
 
 Files moved, no code, flow or UI change. Each tool is at the top of `Features/`: `Blush/`, `Brow/`, `Eyeliner/`, each with

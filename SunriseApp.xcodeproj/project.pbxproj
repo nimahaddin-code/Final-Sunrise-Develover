@@ -39,6 +39,7 @@
 		24D41B3F4A893C06684C3C07 /* EyebrowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8BAEAF8AB95FED113534A6 /* EyebrowViewModel.swift */; };
 		256F015F65C61FE4DD9B6591 /* MakeupPreferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBBD5B695A0CBBC0FF714575 /* MakeupPreferenceTests.swift */; };
 		28A2D07D18A74048D374D78E /* MakeupRecommendation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */; };
+		A11CA1E000000000000000F2 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A11CA1E000000000000000F1 /* InfoPlist.xcstrings */; };
 		2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 98F393F180238C7106FB99C0 /* Localizable.xcstrings */; };
 		3063A4C8D849393B67C7EA9E /* BlushPlacementGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A07AB7461B6903140D1D165 /* BlushPlacementGuide.swift */; };
 		30ACDA4CE4F7397B938416B4 /* AppSpacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26456AF703170C7814098A8E /* AppSpacing.swift */; };
@@ -272,6 +273,7 @@
 		8B9309B2A6284F76F3E4AD56 /* EyeGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeGeometry.swift; sourceTree = "<group>"; };
 		92EBB7356D813A77140C6444 /* FaceLandmarkProjection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceLandmarkProjection.swift; sourceTree = "<group>"; };
 		9342DC399ECDC1D13247975B /* FaceCameraState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FaceCameraState.swift; sourceTree = "<group>"; };
+		A11CA1E000000000000000F1 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		98F393F180238C7106FB99C0 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		9C3AC7A926ACFEC35B6056D5 /* TryOnHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TryOnHomeView.swift; sourceTree = "<group>"; };
 		9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "blush-wash-mask.png"; sourceTree = "<group>"; };
@@ -476,6 +478,7 @@
 				9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */,
 				B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */,
 				BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */,
+				A11CA1E000000000000000F1 /* InfoPlist.xcstrings */,
 				98F393F180238C7106FB99C0 /* Localizable.xcstrings */,
 				CD73965C5395C3CFB4F69902 /* face_landmarker.task */,
 				AA605D264DFFC483849D92C1 /* selfie_multiclass_256x256.tflite */,
@@ -970,6 +973,7 @@
 			knownRegions = (
 				en,
 				Base,
+				id,
 			);
 			mainGroup = B28B7AF69320201D1CF206EB;
 			packageReferences = (
@@ -997,6 +1001,7 @@
 				E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */,
 				B5A0C0DE00000000000F0006 /* brow-hair-3d.obj in Resources */,
 				72410046D68478AB147FADEC /* blush-rendering.json in Resources */,
+				A11CA1E000000000000000F2 /* InfoPlist.xcstrings in Resources */,
 				2E1D4D1717EDA3997289816D /* Localizable.xcstrings in Resources */,
 				CAD7754F69D7C7822BCC4CB4 /* face_landmarker.task in Resources */,
 				349F2CBF0A4352FF1D05B64A /* selfie_multiclass_256x256.tflite in Resources */,
