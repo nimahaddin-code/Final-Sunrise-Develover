@@ -1,3 +1,9 @@
+## Onboarding: only the picture swipes — 2026-11-07
+
+`OnboardingWelcomeScreen`: the wordmark, title, text, dots and button are one fixed frame; a page-style `TabView` holds only the three pictures.
+Title and text crossfade with the page (all three reserve the height), the active dot is one capsule that morphs, the button label crossfades
+between "Next" and "Get started". No string changes.
+
 ## Merge: E2E-Flow into staging — 2026-11-07
 
 origin/staging (tool-first folders, card-slider home, brow Try On layout, three-page onboarding, Indonesian, `NewFlow`
@@ -51,6 +57,12 @@ layout. Without a usable camera (Simulator) capture offers "Continue without pho
 `Makeup/Shared/Flow/` (`MakeupFlow`, `FeaturePickerView`, `FeatureCaptureView`, `LookBriefView`, `FeedbackView`) and
 `Shared/Tutorial/TutorialStepsSheet`. `TutorialCompare` gained `guidePlain`/`plainGuide` (never in the compare cycle).
 Not checked on a device: whether `ARSCNView.snapshot()` includes the Metal blush/brow layer in the desired-look photo.
+
+## New onboarding: light splash and three pages — Khalish (2026-11-06)
+
+The welcome is now a light page with a splash and three swipeable pages (try it on, step by step, compare), ending in "Get started".
+Photos are placeholders until the image sets `onb-*` are filled. New strings have Indonesian drafts (`needs_review`). Simulator only.
+
 ## Brow Try On layout — Khalish (2026-11-06)
 
 Brow Try On only: light #FAF2EA page, screen light top right instead of the tutorial arrow, a palette button above the

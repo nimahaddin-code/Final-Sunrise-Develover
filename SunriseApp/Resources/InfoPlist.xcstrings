@@ -3,7 +3,28 @@
   "strings" : {
     "CFBundleDisplayName" : {
       "comment" : "App name shown under the icon.",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SunriseApp"
+          }
+        }
+      },
       "shouldTranslate" : false
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "SunriseApp"
+          }
+        }
+      }
     },
     "NSCameraUsageDescription" : {
       "comment" : "Camera permission prompt.",

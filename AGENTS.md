@@ -36,6 +36,17 @@ layout. Without a usable camera (Simulator) capture offers "Continue without pho
 `Makeup/Shared/Flow/` (`MakeupFlow`, `FeaturePickerView`, `FeatureCaptureView`, `LookBriefView`, `FeedbackView`) and
 `Shared/Tutorial/TutorialStepsSheet`. `TutorialCompare` gained `guidePlain`/`plainGuide` (never in the compare cycle).
 Not checked on a device: whether `ARSCNView.snapshot()` includes the Metal blush/brow layer in the desired-look photo.
+
+## New onboarding: light splash and three pages — Khalish (2026-11-06)
+
+`OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`, rewritten in place, same `onStart`) is now a white page
+with a soft pink/grey glow: a splash ("dandan" wordmark + "makeup made for your face", auto-advances after 1.6 s or on tap), then
+three pages in one `TabView`: "Try it on before you put it on", "Step by step, at your own pace", "See how you did, side by side"
+(button "Get started" calls `onStart`; no Skip). Pictures are image sets to fill with PNGs: `onb-tryon-1/2/3`, `onb-step-1/2/3`,
+`onb-compare-before`, `onb-compare-after` (empty until added; a grey placeholder shows). Tokens: `AppColors.dandanPink`,
+`onboardingInk`, `onboardingBody`. The silk image `onboarding-silk` and the old welcome strings were removed; new strings have
+Indonesian drafts (`needs_review`). `AppNavigator.currentWelcomeVersion` stays 2. Only the picture swipes; title, text, dots and button stay, the text crossfades and the active dot animates. Simulator only, no device check.
+
 ## Brow Try On layout — Khalish (2026-11-06)
 
 Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
@@ -75,6 +86,8 @@ sets `kit-spoolie` (a mascara wand), `kit-brow-pencil`, `kit-cotton-bud`: CC0 SV
 eyeliner tools are not listed. Simulator render only, no device check.
 
 ## Three-page onboarding — Khalish (2026-11-04)
+
+Superseded by the 2026-11-06 section above.
 
 `OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`) is now three swipeable pages in one `TabView`: the welcome
 (logo, Get Started), "TRY IT ON, LIVE" (blush, brows, eyeliner) and "LEARN IT, STEP BY STEP" (tutorial and photo, photos stay on
