@@ -65,6 +65,9 @@ the order Eyeliner, Blush, Brows, starting on Blush (the others peek in at the s
 shown card; steps come from `GuidedTutorialModel.*Lessons.count`, minutes from `ToolInfo.minutes`. "Start Lesson" calls
 `onSelect` for the shown tool (same route as before: `AppRoute.tryOn(tool)`). New strings have Indonesian drafts
 (`needs_review`). Simulator only, no device check.
+2026-11-07 restyle: title "Hi, fellas!", background `OnboardingGlow` (shared with onboarding), step and minute chips inside each
+card at the bottom left (no chips under the name), active dot `AppColors.dandanPink` (#FF2D8E), dark "Start lesson" button
+(`AppColors.buttonInk` #1C1C1C). `AppColors.homeCanvas` is no longer used here.
 
 ## Feature homepage, one tool per Try On — Khalish (2026-11-05)
 

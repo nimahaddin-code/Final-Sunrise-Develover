@@ -4,6 +4,12 @@
 Title and text crossfade with the page (all three reserve the height), the active dot is one capsule that morphs, the button label crossfades
 between "Next" and "Get started". No string changes.
 
+## Homepage restyle to match onboarding — 2026-11-07
+
+`FeatureHomeView`: onboarding glow background (`OnboardingGlow` now internal), "Hi, fellas!" title, step/minute chips inside each
+card (bottom left, "1 step" / "2 steps" by grammar agreement), active dot #FF2D8E (`AppColors.dandanPink`), dark "Start lesson"
+button (`AppColors.buttonInk`). Strings renamed/added in `Localizable.xcstrings` with Indonesian drafts (`needs_review`).
+
 ## Merge: E2E-Flow into staging — 2026-11-07
 
 origin/staging (tool-first folders, card-slider home, brow Try On layout, three-page onboarding, Indonesian, `NewFlow`
