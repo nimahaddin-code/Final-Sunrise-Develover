@@ -207,15 +207,31 @@ enum TutorialTab: CaseIterable, Identifiable {
         value.comparisonSplit = false
         value.browLayer = PreviewLayer(on: false, intensity: 0, tint: nil)
         value.blushLayer = PreviewLayer(on: false, intensity: 0, tint: nil)
+        // Blush chosen on Try On: the engine keeps measuring the blush target outlines on the face but draws no pigment
+        // (`pigmentHalf = .none` encodes no blush at all), so the photo stays the plain camera and the feedback screen can
+        // draw the target area on it. The tutorial overlay that shows these outlines is hidden in photo mode.
+        if measuresBlushInPhoto {
+            value.region = .blush
+            if let style = handoff.blushStyle { value.blushStyle = style }
+            value.showMakeupPreview = true
+            value.showGuide = true
+            value.pigmentHalf = PigmentHalf.none
+        }
         return value
     }
+
+    /// True when the photo should carry the blush target outlines (blush was on when Try On was left).
+    var measuresBlushInPhoto: Bool { handoff.enabled.contains(.blush) && brow.selectedBlush != nil }
 
     func enterPhoto() { photoMode = true; syncLiner() }
     func leavePhoto() { photoMode = false; syncLiner() }
 
-    /// The camera picture as shown, with the liner on it. Nil until the camera has produced a picture.
-    func takePhoto() -> UIImage? {
-        camera.view?.snapshot()
+    /// The camera picture as shown, with the liner on it, and the blush target outlines measured on that frame (in the
+    /// photo's 0...1 coordinates). Nil until the camera has produced a picture.
+    func takePhoto() -> TutorialPhoto? {
+        guard let view = camera.view else { return nil }
+        let outline = measuresBlushInPhoto ? camera.blushGuide.snapshot?.normalized(in: view.bounds.size) : nil
+        return TutorialPhoto(image: view.snapshot(), blushOutline: outline)
     }
 
     func select(_ new: TutorialTab) {
@@ -277,10 +293,10 @@ enum TutorialTab: CaseIterable, Identifiable {
 struct GuidedTutorialView: View {
     @StateObject private var model: GuidedTutorialModel
     /// New flow: called with the result photo when she taps Done on it, instead of closing the tutorial.
-    var onFinish: ((UIImage) -> Void)?
+    var onFinish: ((TutorialPhoto) -> Void)?
 
     init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment?, plan: MakeupPlan, handoff: TutorialHandoff,
-         onFinish: ((UIImage) -> Void)? = nil) {
+         onFinish: ((TutorialPhoto) -> Void)? = nil) {
         self.onFinish = onFinish
         _model = StateObject(wrappedValue: GuidedTutorialModel(checker: checker, assessment: assessment ?? FaceShapeAssessment(shape: .unknown),
                                                               plan: plan, handoff: handoff))
@@ -296,16 +312,16 @@ private struct TutorialScreen: View {
     @State private var theme = PhotoTheme.pink
     @State private var flashOn = false
     @State private var flashing = false
-    @State private var captured: UIImage?
+    @State private var captured: TutorialPhoto?
     @StateObject private var advisor = CameraAdvisor(context: .tutorial)
     @StateObject private var light = ScreenLight()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
-    let onFinish: ((UIImage) -> Void)?
+    let onFinish: ((TutorialPhoto) -> Void)?
 
-    init(model: GuidedTutorialModel, onFinish: ((UIImage) -> Void)? = nil) {
+    init(model: GuidedTutorialModel, onFinish: ((TutorialPhoto) -> Void)? = nil) {
         self.model = model
         self.onFinish = onFinish
         camera = model.camera
@@ -346,7 +362,7 @@ private struct TutorialScreen: View {
         .foregroundStyle(AppColors.snow)
         .overlay {
             if let captured {
-                PolaroidResultView(image: captured, onRetake: { self.captured = nil }, onDone: { if let onFinish { onFinish(captured) } else { dismiss() } })
+                PolaroidResultView(image: captured.image, onRetake: { self.captured = nil }, onDone: { if let onFinish { onFinish(captured) } else { dismiss() } })
                     .transition(.opacity)
             }
         }
