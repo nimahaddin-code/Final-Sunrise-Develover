@@ -1,3 +1,12 @@
+## Indonesian rewritten in the brand voice — -Nimah (2026-11-07)
+
+The Indonesian of every string the app still shows (122 in `Localizable.xcstrings`, the camera and photo prompts in
+`InfoPlist.xcstrings`) is rewritten in the voice of `Docs/GayaBahasa.md`: a big sister who is good at makeup, "kamu",
+casual ("yuk", "aja", "nggak"), short sentences, makeup terms kept in English (blush, shade, wing, spoolie). Look, shade
+and style names are unchanged. All stay `needs_review`. The 128 strings from deleted screens (scan, calibration, saved
+looks) were left as they are. `Docs/GayaBahasa.md` is a prompt to paste into an AI for new Indonesian copy. Text only, no
+code change; the screens were not checked for longer lines.
+
 ## Brow Try On layout — Khalish (2026-11-06)
 
 Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):

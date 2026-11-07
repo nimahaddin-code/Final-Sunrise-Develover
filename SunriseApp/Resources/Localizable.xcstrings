@@ -113,7 +113,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kelopak rata dengan lipatan yang hampir tidak terlihat."
+            "value" : "Kelopak rata, lipatannya hampir nggak kelihatan."
           }
         }
       }
@@ -123,7 +123,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bentuk eyeliner yang cocok untuk matamu."
+            "value" : "Bentuk eyeliner yang pas buat matamu."
           }
         }
       }
@@ -150,7 +150,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Semburat blush lembut yang pas di pipimu."
+            "value" : "Rona blush lembut di posisi yang pas buat pipimu."
           }
         }
       }
@@ -162,7 +162,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dahi lebih lebar yang mengerucut ke rahang sempit dan dagu lancip."
+            "value" : "Dahi lebih lebar, makin ke bawah makin ramping sampai dagu yang lancip."
           }
         }
       }
@@ -227,7 +227,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tambah warna dari produk"
+            "value" : "Ambil warna dari produkmu"
           }
         }
       }
@@ -285,7 +285,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Izinkan akses kamera di Pengaturan untuk memotret produkmu."
+            "value" : "Izinkan kamera di Pengaturan dulu, ya, biar bisa foto produkmu."
           }
         }
       }
@@ -421,7 +421,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kembali ke Try On"
+            "value" : "Balik ke Try On"
           }
         }
       }
@@ -433,7 +433,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kembali ke tutorial"
+            "value" : "Balik ke tutorial"
           }
         }
       }
@@ -445,7 +445,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Proporsi seimbang: sedikit lebih panjang daripada lebar, dengan rahang sedikit lebih sempit dari dahi."
+            "value" : "Proporsinya seimbang: sedikit lebih panjang dari lebarnya, rahang sedikit lebih ramping dari dahi."
           }
         }
       }
@@ -457,7 +457,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Seimbang, dengan sudut luar yang meruncing lembut."
+            "value" : "Seimbang, sudut luarnya meruncing lembut."
           }
         }
       }
@@ -645,7 +645,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Blush belum bisa ditampilkan"
+            "value" : "Blush-nya belum bisa tampil"
           }
         }
       }
@@ -806,7 +806,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sisir bagian tengah ke arah depan agar menyatu."
+            "value" : "Sisir dari tengah ke depan biar nge-blend."
           }
         }
       }
@@ -818,7 +818,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sisir alismu ke atas dengan spoolie."
+            "value" : "Sisir alismu ke atas pakai spoolie, ya."
           }
         }
       }
@@ -830,7 +830,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Usap dengan gerakan melingkar kecil ke arah luar sampai tepinya tersamar."
+            "value" : "Usap memutar kecil-kecil ke arah luar, sampai pinggirannya hilang."
           }
         }
       }
@@ -976,7 +976,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tulang pipi adalah bagian terlebar, dengan dahi dan rahang lebih sempit."
+            "value" : "Tulang pipi paling lebar, dahi dan rahangnya lebih ramping."
           }
         }
       }
@@ -1099,7 +1099,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Memilih warna makeup"
+            "value" : "Lagi pilih warna makeup"
           }
         }
       }
@@ -1133,7 +1133,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Wajah bersih tanpa makeup"
+            "value" : "Wajah bersih, tanpa makeup"
           }
         }
       }
@@ -1143,7 +1143,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tutup warna"
+            "value" : "Tutup pilihan warna"
           }
         }
       }
@@ -1177,7 +1177,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bandingkan"
+            "value" : "Bandingin"
           }
         }
       }
@@ -1189,7 +1189,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bandingkan tanpa makeup"
+            "value" : "Bandingin sama tanpa makeup"
           }
         }
       }
@@ -1336,7 +1336,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Foto ini tidak bisa dibuka. Coba gambar lain."
+            "value" : "Foto ini nggak bisa dibuka. Coba foto lain, ya."
           }
         }
       }
@@ -1348,7 +1348,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Foto gagal diambil. Coba lagi."
+            "value" : "Fotonya gagal diambil. Coba sekali lagi, ya."
           }
         }
       }
@@ -1382,7 +1382,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Warna kustom"
+            "value" : "Warna pilihanmu"
           }
         }
       }
@@ -1418,7 +1418,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tepuk ke arah luar agar menyatu dengan kulitmu."
+            "value" : "Tepuk-tepuk ke arah luar biar nyatu sama kulitmu."
           }
         }
       }
@@ -1505,7 +1505,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Berlian"
+            "value" : "Diamond"
           }
         }
       }
@@ -1558,7 +1558,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Geser pemilih untuk memilih warna yang pas."
+            "value" : "Geser penanda ke warna yang kamu mau."
           }
         }
       }
@@ -1570,7 +1570,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "SETIAP WAJAH,\nCARANYA SENDIRI"
+            "value" : "SETIAP WAJAH,\nPUNYA CARANYA SENDIRI"
           }
         }
       }
@@ -1582,7 +1582,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Setiap alis punya tiga titik kecil yang pas dengan titik panduan."
+            "value" : "Tiap alis punya tiga titik kecil yang pas di titik panduan."
           }
         }
       }
@@ -1611,7 +1611,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jarak sedang"
+            "value" : "Jaraknya pas"
           }
         }
       }
@@ -1730,7 +1730,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pindai mata"
+            "value" : "Scan mata"
           }
         }
       }
@@ -1771,7 +1771,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Alis belum tersedia"
+            "value" : "Alis belum bisa dipakai"
           }
         }
       }
@@ -1794,7 +1794,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Eyeliner disesuaikan dengan pindai matamu"
+            "value" : "Eyeliner yang disesuaikan sama matamu"
           }
         }
       }
@@ -1806,7 +1806,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Menghadap jendela, atau nyalakan flash nanti."
+            "value" : "Hadap ke jendela, atau nyalakan flash nanti."
           }
         }
       }
@@ -1853,7 +1853,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pelacakan wajah berhenti tiba-tiba."
+            "value" : "Kamera berhenti mengenali wajahmu. Coba lagi, ya."
           }
         }
       }
@@ -1865,7 +1865,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Hadapkan ponselmu lurus ke wajah."
+            "value" : "Hadapkan wajahmu lurus ke HP."
           }
         }
       }
@@ -1877,7 +1877,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Isi dari tengah sampai ekor alis, tipis-tipis."
+            "value" : "Isi dari tengah sampai ujung alis, tipis-tipis aja."
           }
         }
       }
@@ -1958,7 +1958,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ikuti tutorial langkah demi langkah di wajahmu sendiri, lalu foto tampilanmu. Foto tetap tersimpan di ponselmu."
+            "value" : "Ikuti tutorialnya langsung di wajahmu, terus foto hasilnya. Fotonya cuma ada di HP-mu."
           }
         }
       }
@@ -1970,7 +1970,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dahi, tulang pipi, dan rahang lebarnya hampir sama, dengan garis rahang tegas dan bersudut."
+            "value" : "Dahi, tulang pipi, dan rahang lebarnya mirip, dengan garis rahang yang tegas."
           }
         }
       }
@@ -1994,7 +1994,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Dari sudut dalam, sambungkan titik-titik menjadi garis tipis."
+            "value" : "Dari sudut dalam, sambungkan titik-titiknya jadi garis tipis."
           }
         }
       }
@@ -2044,7 +2044,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mulai"
+            "value" : "Yuk, Mulai"
           }
         }
       }
@@ -2090,7 +2090,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Halo semuanya!"
+            "value" : "Hai, kamu!"
           }
         }
       }
@@ -2124,7 +2124,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pegang ponselmu lurus, sejajar mata."
+            "value" : "Pegang HP-mu lurus, sejajar mata."
           }
         }
       }
@@ -2158,7 +2158,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Aku belum bisa melihatmu. Pegang ponselmu seperti cermin."
+            "value" : "Aku belum lihat wajahmu nih. Pegang HP-mu kayak lagi ngaca."
           }
         }
       }
@@ -2170,7 +2170,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kameramu perlu jadi cermin."
+            "value" : "Izinkan kamera dulu, ya, biar jadi cermin kamu."
           }
         }
       }
@@ -2182,7 +2182,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Aku tunggu di sini. Kembali kalau sudah siap."
+            "value" : "Aku tungguin di sini. Balik lagi kalau udah siap, ya."
           }
         }
       }
@@ -2211,7 +2211,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Intensitas"
+            "value" : "Ketebalan"
           }
         }
       }
@@ -2223,7 +2223,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Agak gelap. Ketuk lampu atau menghadap jendela."
+            "value" : "Agak gelap nih. Tap lampunya atau hadap ke jendela."
           }
         }
       }
@@ -2235,7 +2235,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Di atas ujung hidung dan di luar pupil, disesuaikan dengan pipimu."
+            "value" : "Di atas ujung hidung dan di luar garis pupil, ukurannya ngikutin pipimu."
           }
         }
       }
@@ -2247,7 +2247,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Di luar pupilmu."
+            "value" : "Tetap di luar garis pupilmu."
           }
         }
       }
@@ -2257,7 +2257,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "PELAJARI LANGKAH DEMI LANGKAH"
+            "value" : "BELAJAR PELAN-PELAN, SATU-SATU"
           }
         }
       }
@@ -2269,7 +2269,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Panjang dan lebar hampir sama, dengan pipi penuh dan rahang membulat lembut."
+            "value" : "Panjang dan lebarnya mirip, pipinya penuh dan rahangnya membulat lembut."
           }
         }
       }
@@ -2299,7 +2299,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Yuk bersiap"
+            "value" : "Yuk, siap-siap dulu"
           }
         }
       }
@@ -2311,7 +2311,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cukup kamu saja di dalam frame ya."
+            "value" : "Cukup kamu aja di kamera, ya."
           }
         }
       }
@@ -2345,7 +2345,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ketebalan garis, awal, dan sayap dipilih dari bentuk matamu."
+            "value" : "Tebal garis, titik mulai, dan wing-nya dipilih dari bentuk matamu."
           }
         }
       }
@@ -2392,7 +2392,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Panduan langsung belum tersedia"
+            "value" : "Panduan live belum bisa dipakai"
           }
         }
       }
@@ -2404,7 +2404,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Try On langsung butuh iPhone dengan kamera depan TrueDepth."
+            "value" : "Try On live butuh iPhone dengan kamera depan TrueDepth (yang ada Face ID)."
           }
         }
       }
@@ -2416,7 +2416,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Try On langsung belum tersedia"
+            "value" : "Try On live belum bisa dipakai"
           }
         }
       }
@@ -2551,7 +2551,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Lihat lurus ke kamera untuk menempatkan makeup"
+            "value" : "Lihat lurus ke kamera, biar makeup-nya pas posisinya"
           }
         }
       }
@@ -2596,7 +2596,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Khusus untukmu"
+            "value" : "Pas buat kamu"
           }
         }
       }
@@ -2619,7 +2619,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Makeup sementara tidak tersedia"
+            "value" : "Makeup-nya lagi nggak bisa tampil sebentar"
           }
         }
       }
@@ -2678,7 +2678,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tandai tiga titik di sepanjang panduan."
+            "value" : "Bikin tiga titik di sepanjang panduan."
           }
         }
       }
@@ -2714,7 +2714,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jauhkan wajahmu sedikit dari layar."
+            "value" : "Mundur sedikit dari layar, ya."
           }
         }
       }
@@ -2726,7 +2726,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Singkirkan rambut atau tanganmu agar wajahmu terlihat."
+            "value" : "Geser rambut atau tanganmu dulu, biar wajahmu kelihatan."
           }
         }
       }
@@ -2856,7 +2856,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tidak keduanya"
+            "value" : "Bukan dua-duanya"
           }
         }
       }
@@ -2895,7 +2895,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Pelan-pelan saja, biar aku bisa mengikuti."
+            "value" : "Pelan-pelan aja, biar aku bisa ngikutin."
           }
         }
       }
@@ -2907,7 +2907,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tanpa overlay alis"
+            "value" : "Tanpa alis"
           }
         }
       }
@@ -3010,7 +3010,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Belum ada rekomendasi tersimpan untuk bentuk wajah ini"
+            "value" : "Belum ada rekomendasi buat bentuk wajah ini"
           }
         }
       }
@@ -3049,7 +3049,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tidak ada yang disimpan atau diunggah."
+            "value" : "Nggak ada yang disimpan atau di-upload."
           }
         }
       }
@@ -3061,7 +3061,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jelas lebih panjang daripada lebar, dengan sisi yang cukup lurus."
+            "value" : "Lebih panjang dari lebarnya, sisi wajahnya cukup lurus."
           }
         }
       }
@@ -3144,7 +3144,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Buka Studio Alis & Blush untuk preferensi penempatan."
+            "value" : "Buka Studio Alis & Blush buat atur posisinya."
           }
         }
       }
@@ -3156,7 +3156,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Terbuka dan bulat, dengan bagian putih lebih terlihat di atas atau bawah iris."
+            "value" : "Terbuka dan bulat, bagian putih matanya lebih kelihatan di atas atau bawah iris."
           }
         }
       }
@@ -3307,7 +3307,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cubit layar untuk memperbesar."
+            "value" : "Cubit layar buat zoom."
           }
         }
       }
@@ -3349,7 +3349,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Taruh makeupmu di tempat terang agar warnanya paling akurat."
+            "value" : "Taruh produkmu di tempat yang terang, biar warnanya paling mirip."
           }
         }
       }
@@ -3359,7 +3359,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Titik penempatan"
+            "value" : "Titik panduan"
           }
         }
       }
@@ -3407,7 +3407,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Menyiapkan tampilan makeup"
+            "value" : "Lagi siapin makeup-nya…"
           }
         }
       }
@@ -3465,7 +3465,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Foto produk. Geser pin ke sebuah warna."
+            "value" : "Foto produk. Geser pin ke warna yang kamu mau."
           }
         }
       }
@@ -3601,7 +3601,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ulangi"
+            "value" : "Ulang"
           }
         }
       }
@@ -3937,7 +3937,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Lihat perona, alis, dan eyeliner di wajahmu secara langsung. Pilih warna dan intensitas yang kamu suka."
+            "value" : "Lihat blush, alis, dan eyeliner langsung di wajahmu. Pilih shade dan ketebalan yang kamu suka."
           }
         }
       }
@@ -4003,7 +4003,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Menunjukkan cara kerja dandan"
+            "value" : "Lihat cara kerja dandan"
           }
         }
       }
@@ -4179,7 +4179,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mulai Pelajaran"
+            "value" : "Mulai Belajar"
           }
         }
       }
@@ -4189,7 +4189,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mulai Coba"
+            "value" : "Mulai Try On"
           }
         }
       }
@@ -4201,7 +4201,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mulai dari sudut dalam dan tandai titik di sepanjang panduan."
+            "value" : "Mulai dari sudut dalam, terus bikin titik-titik di sepanjang panduan."
           }
         }
       }
@@ -4213,7 +4213,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mulai di sini"
+            "value" : "Mulai dari sini"
           }
         }
       }
@@ -4261,7 +4261,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mulai di atas sudut dalam matamu dan melengkung melewati tepi luar irismu."
+            "value" : "Mulai di atas sudut dalam mata, melengkung di atas pinggir luar iris."
           }
         }
       }
@@ -4273,7 +4273,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mulai di atas sudut dalam matamu, melengkung melewati tepi luar iris, dan berakhir di garis dari hidung ke sudut luar matamu."
+            "value" : "Mulai di atas sudut dalam mata, melengkung di atas pinggir luar iris, dan berakhir di garis dari hidung ke sudut luar mata."
           }
         }
       }
@@ -4313,7 +4313,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Masih agak gelap. Coba menghadap lampu atau jendela."
+            "value" : "Masih agak gelap. Coba hadap ke lampu atau jendela."
           }
         }
       }
@@ -4381,7 +4381,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "COBA LANGSUNG"
+            "value" : "COBA LANGSUNG, LIVE"
           }
         }
       }
@@ -4417,7 +4417,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Foto produk"
+            "value" : "Foto produknya"
           }
         }
       }
@@ -4498,7 +4498,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kamera tidak tersedia. Kamu bisa pilih foto saja."
+            "value" : "Kamera lagi nggak bisa dipakai. Pilih dari foto aja, ya."
           }
         }
       }
@@ -4510,7 +4510,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Lipatan dekat garis bulu mata dan lipatan kulit menutupi sebagian kelopak."
+            "value" : "Lipatannya dekat bulu mata, dan sebagian kelopaknya tertutup lipatan."
           }
         }
       }
@@ -4522,7 +4522,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Tepinya rapi, dan tidak ada yang keluar dari panduan."
+            "value" : "Pinggirannya rapi, nggak ada yang keluar dari panduan."
           }
         }
       }
@@ -4534,7 +4534,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bagian depan berwarna lembut tanpa tepi awal yang tegas."
+            "value" : "Bagian depan warnanya lembut, nggak ada garis awal yang tegas."
           }
         }
       }
@@ -4546,7 +4546,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jarak antara sudut dalam matamu kurang dari satu lebar mata."
+            "value" : "Jarak antar sudut dalam matamu kurang dari satu lebar mata."
           }
         }
       }
@@ -4558,7 +4558,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Jarak antara sudut dalam matamu lebih dari satu lebar mata."
+            "value" : "Jarak antar sudut dalam matamu lebih dari satu lebar mata."
           }
         }
       }
@@ -4581,7 +4581,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Rahang lebih lebar dari dahi, membuat wajah bagian bawah terlihat lebih penuh."
+            "value" : "Rahang lebih lebar dari dahi, jadi wajah bagian bawah kelihatan lebih penuh."
           }
         }
       }
@@ -4593,7 +4593,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Panduan langsung butuh iPhone dengan kamera depan TrueDepth."
+            "value" : "Panduan live butuh iPhone dengan kamera depan TrueDepth (yang ada Face ID)."
           }
         }
       }
@@ -4621,7 +4621,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bagian tengah sampai ekor sudah terisi di dalam panduan. Bagian depan masih kosong."
+            "value" : "Tengah sampai ujung udah terisi di dalam panduan. Bagian depan masih kosong."
           }
         }
       }
@@ -4633,7 +4633,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sudut luar lebih tinggi daripada sudut dalam."
+            "value" : "Sudut luar matamu lebih tinggi dari sudut dalam."
           }
         }
       }
@@ -4645,7 +4645,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sudut luar lebih rendah daripada sudut dalam."
+            "value" : "Sudut luar matamu lebih rendah dari sudut dalam."
           }
         }
       }
@@ -4692,7 +4692,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Garis tipis dan rata di sepanjang garis bulu mata atas, tanpa sayap."
+            "value" : "Garis tipis dan rata di sepanjang bulu mata atas, tanpa wing."
           }
         }
       }
@@ -4808,7 +4808,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Menghadaplah ke arah cahaya."
+            "value" : "Coba putar badan biar cahayanya di depanmu."
           }
         }
       }
@@ -4929,7 +4929,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Cuci muka dan pakai pelembap supaya makeup menempel rata."
+            "value" : "Cuci muka dan pakai pelembap dulu, biar makeup-nya nempel cantik."
           }
         }
       }
@@ -4939,7 +4939,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mau belajar apa hari ini?"
+            "value" : "Hari ini mau belajar apa?"
           }
         }
       }
@@ -4975,7 +4975,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Mata berjauhan terlihat seimbang tanpa sayap, jadi eyeliner berhenti di sudut luar."
+            "value" : "Mata yang berjauhan udah seimbang tanpa wing, jadi eyeliner-nya berhenti di sudut luar."
           }
         }
       }
@@ -5005,7 +5005,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bersihkan yang keluar dari panduan."
+            "value" : "Hapus yang keluar dari panduan, ya."
           }
         }
       }
@@ -5017,7 +5017,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Saat mata terbuka, lipatan kulit di bawah alis menutupi kelopak, sehingga lipatan tersembunyi atau sebagian besar kelopak tertutup."
+            "value" : "Saat mata terbuka, kulit di bawah alis turun menutupi kelopak, jadi lipatannya tersembunyi atau kelopaknya hampir tertutup."
           }
         }
       }
@@ -5029,7 +5029,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Saat mata terbuka, kamu bisa melihat garis lipatan di kelopak atas, dengan sedikit kulit kelopak di antara lipatan dan bulu matamu."
+            "value" : "Saat mata terbuka, kelihatan garis lipatan di kelopak atas, dengan sedikit kulit kelopak antara lipatan dan bulu mata."
           }
         }
       }
@@ -5089,7 +5089,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "PANDUAN MAKEUP\nPERSONALMU"
+            "value" : "TEMAN BELAJAR\nMAKEUP-MU"
           }
         }
       }
@@ -5101,7 +5101,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kamu bilang kelopakmu hooded, jadi garisnya tipis dan sayapnya kecil dan terangkat."
+            "value" : "Kelopakmu hooded, jadi garisnya dibuat tipis dan wing-nya kecil sedikit naik."
           }
         }
       }
@@ -5113,7 +5113,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kamu bilang kelopakmu monolid, jadi garisnya makin tebal ke ujung luar agar tetap terlihat saat mata terbuka."
+            "value" : "Kelopakmu monolid, jadi garisnya makin tebal ke ujung luar biar tetap kelihatan saat mata terbuka."
           }
         }
       }
@@ -5125,7 +5125,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bulu alismu mengarah ke atas, dan celahnya terlihat."
+            "value" : "Bulu alismu udah ke atas, dan celah-celahnya kelihatan."
           }
         }
       }
@@ -5155,7 +5155,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Bentuk matamu belum cukup jelas untuk memilih garis lebih tebal, jadi dipakai garis natural yang tipis."
+            "value" : "Bentuk matamu belum kebaca jelas, jadi kita pakai garis natural yang tipis dulu."
           }
         }
       }
@@ -5167,7 +5167,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Matamu berbentuk almond, jadi eyeliner mengikuti lengkung alami dan menebal ke sayap kecil."
+            "value" : "Matamu almond, jadi eyeliner-nya ngikutin lengkung alami matamu dan makin tebal ke wing kecil."
           }
         }
       }
@@ -5179,7 +5179,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Matamu berdekatan, jadi sudut dalam dibuat tipis dan eyeliner menebal ke ujung luar."
+            "value" : "Matamu berdekatan, jadi sudut dalamnya tipis aja dan eyeliner-nya makin tebal ke ujung luar."
           }
         }
       }
@@ -5191,7 +5191,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Matamu bulat, jadi eyeliner mulai sedikit dari sudut dalam dan memanjangkan sudut luar."
+            "value" : "Matamu bulat, jadi eyeliner-nya mulai agak ke dalam dari sudut dalam dan memanjang di sudut luar."
           }
         }
       }
@@ -5203,7 +5203,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Matamu berjauhan, jadi eyeliner paling tegas di sudut dalam."
+            "value" : "Matamu berjauhan, jadi eyeliner-nya paling tegas di sudut dalam."
           }
         }
       }
@@ -5215,7 +5215,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Matamu tidak terukur dengan jelas, jadi ini garis natural yang tipis. Pindai lagi dengan mata rileks dan terbuka untuk eyeliner yang lebih pas."
+            "value" : "Matamu belum kebaca jelas, jadi ini garis natural yang tipis dulu. Coba scan lagi dengan mata rileks dan terbuka, biar eyeliner-nya lebih pas."
           }
         }
       }
@@ -5227,7 +5227,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sudut luar matamu naik, jadi sayapnya pendek dan rata."
+            "value" : "Sudut luar matamu naik, jadi wing-nya pendek dan datar aja."
           }
         }
       }
@@ -5329,7 +5329,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Perlengkapan makeupmu"
+            "value" : "Perlengkapan makeup-mu"
           }
         }
       }
@@ -5358,7 +5358,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Sudut luar matamu turun, jadi sayap mengikuti garis bulu mata bawah ke arah ujung alismu."
+            "value" : "Sudut luar matamu turun, jadi wing-nya ngikutin bulu mata bawah ke arah ujung alis."
           }
         }
       }
@@ -5370,7 +5370,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Ponselmu mulai hangat. Istirahat sebentar yuk."
+            "value" : "HP-mu mulai panas. Istirahat sebentar, yuk."
           }
         }
       }
@@ -5434,7 +5434,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kelopak atasmu halus tanpa garis lipatan sama sekali, dari bulu mata sampai tulang alis."
+            "value" : "Kelopak atasmu mulus tanpa garis lipatan, dari bulu mata sampai tulang alis."
           }
         }
       }
