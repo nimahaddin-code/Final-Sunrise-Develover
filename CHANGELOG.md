@@ -1,3 +1,15 @@
+## Onboarding page art (pages 1-3) — Khalish (2026-11-07)
+
+Page 1 (`artOne`, `OnboardingView.swift`) is now a face photo on the front card with makeup stickers around it; the two cards
+behind are blank white (`blankCard`). Image sets: `onb-tryon-1` (face photo, already rounded and rotated 4 degrees clockwise, transparent
+corners; the white card behind it takes the same angle), stickers `onb-sticker-brow-1` (thin brow, left), `onb-sticker-brow-2` (thick brow,
+top right), `onb-sticker-blush` (used twice, both cheeks), `onb-sticker-lips`. A sticker is drawn only if its image exists (`sticker(_:width:)`),
+positioned as a fraction of the card size. `onb-tryon-2` and `onb-tryon-3` were removed.
+Pages 2 and 3 pictures are all derived from that one face photo: `onb-step-1` (cheek and mouth corner crop), `onb-step-2` (same kind of crop
+with a pink dot on the cheek apple), `onb-step-3` (whole face), `onb-compare-after` (face square crop, with blush), `onb-compare-before`
+(same crop, blush reduced by image editing, no code). The "before" is a placeholder, not a real bare-face photo: replace it, and the
+other crops, with proper photos when available. Simulator only (iPhone 17 Pro, 17e), no device check.
+
 ## One Try On layout for every tool, per-tool `TryOnFeature` — 2026-11-07
 
 `TryOnHomeView` has one layout for all tools, the former brow one: full-page camera, back and light in the top safe area,

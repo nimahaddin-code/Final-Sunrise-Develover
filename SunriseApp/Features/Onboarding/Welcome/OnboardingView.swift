@@ -170,22 +170,43 @@ struct OnboardingWelcomeScreen: View {
             let artHeight = max(height * 0.40, 300)
             let cardWidth = min(width * 0.50, artHeight * 0.64)
             let cardHeight = cardWidth * 1.55
+            let photoHeight = cardWidth * 600 / 515
             ZStack {
-                photoCard(name: "onb-tryon-3", width: cardWidth * 0.86, height: cardHeight * 0.86)
-                    .rotationEffect(.degrees(-12)).offset(x: -cardWidth * 0.46, y: 4)
-                photoCard(name: "onb-tryon-2", width: cardWidth * 0.93, height: cardHeight * 0.93)
+                blankCard(width: cardWidth * 0.86, height: photoHeight * 0.92)
+                    .rotationEffect(.degrees(-12)).offset(x: -cardWidth * 0.42, y: 4)
+                blankCard(width: cardWidth * 0.93, height: photoHeight * 0.96)
                     .rotationEffect(.degrees(-8)).offset(x: -cardWidth * 0.14, y: 2)
-                photoCard(name: "onb-tryon-1", width: cardWidth, height: cardHeight)
-                    .overlay(alignment: .bottomTrailing) {
-                        HStack(spacing: 6) {
-                            Circle().fill(AppColors.dandanPink).frame(width: 8, height: 8)
-                            Text("Try on live").font(.system(size: 14, weight: .semibold)).foregroundStyle(.white)
-                        }
-                        .padding(.horizontal, 12).padding(.vertical, 8)
-                        .background(ink, in: Capsule())
-                        .offset(x: 6, y: -18)
+                // The photo PNG is already rotated 4 degrees (transparent corners); the white card behind it takes the same angle.
+                ZStack {
+                    RoundedRectangle(cornerRadius: 28, style: .continuous).fill(.white)
+                        .frame(width: cardWidth * 0.925 + 16, height: photoHeight * 0.947 + 16)
+                        .rotationEffect(.degrees(4))
+                        .shadow(color: .black.opacity(0.16), radius: 14, y: 8)
+                    Image("onb-tryon-1").resizable().scaledToFit()
+                        .frame(width: cardWidth, height: photoHeight)
+                }
+                .overlay(alignment: .bottomTrailing) {
+                    HStack(spacing: 6) {
+                        Circle().fill(AppColors.dandanPink).frame(width: 8, height: 8)
+                        Text("Try on live").font(.system(size: 14, weight: .semibold)).foregroundStyle(.white)
                     }
-                    .rotationEffect(.degrees(-4)).offset(x: cardWidth * 0.36)
+                    .padding(.horizontal, 12).padding(.vertical, 8)
+                    .background(ink, in: Capsule())
+                    .offset(x: 6, y: -18)
+                }
+                .offset(x: cardWidth * 0.30)
+                // Stickers sit around the front card's centre, as fractions of its size.
+                let sx = cardWidth * 0.30
+                sticker("onb-sticker-brow-2", width: cardWidth * 0.40)
+                    .offset(x: sx + cardWidth * 0.42, y: -photoHeight * 0.39)
+                sticker("onb-sticker-brow-1", width: cardWidth * 0.32)
+                    .offset(x: sx - cardWidth * 0.33, y: -photoHeight * 0.20)
+                sticker("onb-sticker-blush", width: cardWidth * 0.27)
+                    .offset(x: sx - cardWidth * 0.26, y: photoHeight * 0.07)
+                sticker("onb-sticker-blush", width: cardWidth * 0.30)
+                    .offset(x: sx + cardWidth * 0.42, y: photoHeight * 0.09)
+                sticker("onb-sticker-lips", width: cardWidth * 0.29)
+                    .offset(x: sx - cardWidth * 0.25, y: photoHeight * 0.29)
                 HStack(spacing: 6) {
                     ForEach([0xE98BB5, 0xD07A70, 0xC9555E, 0xE79A70], id: \.self) { hex in
                         Circle().fill(Color(hex: hex)).frame(width: 16, height: 16)
@@ -201,13 +222,18 @@ struct OnboardingWelcomeScreen: View {
         }
     }
 
-    private func photoCard(name: String, width: CGFloat, height: CGFloat) -> some View {
-        OnboardingPhoto(name: name)
-            .frame(width: width - 16, height: height - 16)
-            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-            .padding(8)
-            .background(.white, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+    private func blankCard(width: CGFloat, height: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 28, style: .continuous).fill(.white)
+            .frame(width: width, height: height)
             .shadow(color: .black.opacity(0.16), radius: 14, y: 8)
+    }
+
+    @ViewBuilder
+    private func sticker(_ name: String, width: CGFloat) -> some View {
+        if UIImage(named: name) != nil {
+            Image(name).resizable().scaledToFit().frame(width: width)
+                .shadow(color: .black.opacity(0.18), radius: 4, y: 2)
+        }
     }
 
     // MARK: Page 2: step by step
