@@ -15,8 +15,12 @@ struct TryOnHomeView: View {
     /// The "get you ready" page, drawn over Try On (not a pushed route) until she starts the tutorial or goes back.
     @State private var prepHandoff: TutorialHandoff?
     @StateObject private var light = ScreenLight()
-    /// Dark labels on the white screen of the light.
-    private var ink: Color { light.isOn ? .black : AppColors.snow }
+    /// Brow only: the shade row and intensity bar, opened by the palette button over the brow pictures.
+    @State private var showsShades = false
+    /// Brow Try On has its own layout: light page, flash top right, palette button, Continue at the bottom.
+    private var isBrow: Bool { home.tool == .eyebrow }
+    /// Dark labels on the white screen of the light and on the light brow page.
+    private var ink: Color { light.isOn ? .black : isBrow ? AppColors.plumInk : AppColors.snow }
 
     init(tool: TryOnTool, plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
          onTutorial: @escaping (TutorialHandoff) -> Void) {
@@ -26,15 +30,17 @@ struct TryOnHomeView: View {
 
     var body: some View {
         VStack(spacing: AppSpacing.small) {
-            header
+            // Brow: no logo row; back and light sit over the camera's top corners so the camera fills the space.
+            if !isBrow { header }
             // -Nimah: Dismantle the face camera while the palette picker owns the rear camera.
             if showColours {
                 RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(AppColors.cocoa)
                     .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
             } else {
-                TryOnLiveCard(home: home, light: light).frame(maxHeight:.infinity)
+                TryOnLiveCard(home: home, light: light, showsLightButton: !isBrow, captionAtTop: isBrow).frame(maxHeight:.infinity)
+                    .overlay(alignment: .top) { if isBrow { browTopButtons } }
                     .overlay(alignment: .topTrailing) {
-                        if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small) }
+                        if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small).padding(.top, 56) }
                         if developerTools && home.tool == .blush { BlushDebugMenu().padding(AppSpacing.small) }
                     }
                     .overlay(alignment: .bottom) { stylePicker.padding(.bottom, AppSpacing.small) }
@@ -47,14 +53,19 @@ struct TryOnHomeView: View {
             if !home.canTry(home.tool) {
                 Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
             }
-            shadeRow.disabled(!home.canTry(home.tool))
-            IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
-                         tint: home.currentShade?.color ?? AppColors.flamingo)
-                .disabled(!home.canTry(home.tool))
+            // Brow: shades and intensity replace the brow pictures inside the camera card (see `stylePicker`).
+            if !isBrow { shadeControls }
+            if isBrow { continueButton }
         }
-        .padding(.horizontal, AppSpacing.medium)
+        // Brow: the camera runs edge to edge; Continue keeps its own side inset.
+        .padding(.horizontal, isBrow ? 0 : AppSpacing.medium)
         .padding(.bottom, AppSpacing.small)
-        .background { if light.isOn { AppColors.ringLight.ignoresSafeArea() } else { MainBackground() } }
+        .background {
+            if light.isOn { AppColors.ringLight.ignoresSafeArea() }
+            else if isBrow { AppColors.browCanvas.ignoresSafeArea() }
+            else { MainBackground() }
+        }
+        .animation(.easeInOut(duration: 0.25), value: showsShades)
         .animation(.easeInOut(duration: 0.25), value: light.isOn)
         .preferredColorScheme(light.isOn ? .light : nil)
         .foregroundStyle(ink)
@@ -114,15 +125,66 @@ struct TryOnHomeView: View {
                 GlassCircleButton(symbol: "chevron.left", size: 48, tint: AppColors.glassLight, label: "Back") { dismiss() }
                 Spacer()
                 GlassCircleButton(symbol: "arrow.right", size: 48, tint: AppColors.flamingo.opacity(0.9), label: "Open tutorial") {
-                    home.deactivate()
-                    // New flow: comparison and preparation are their own screens, pushed by the root.
-                    if newFlow { onTutorial(home.tutorialHandoff) }
-                    else { withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = home.tutorialHandoff } }
+                    openTutorial()
                 }
                 .disabled(!home.canTry(home.tool))
             }
         }
         .buttonStyle(.plain)
+    }
+
+    /// Brow: back (left) and the screen light (right) over the top corners of the camera card.
+    private var browTopButtons: some View {
+        HStack {
+            Button { dismiss() } label: {
+                Image(systemName: "chevron.left")
+                    .font(.title2.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .frame(width: 48, height: 48)
+                    .glassEffect(.regular.interactive(), in: .circle)
+            }
+            .accessibilityLabel("Back")
+            Spacer()
+            ScreenLightButton(light: light, pulse: 0, plainGlass: true)
+        }
+        .buttonStyle(.plain)
+        .padding(AppSpacing.small)
+    }
+
+    private func openTutorial() {
+        home.deactivate()
+        // New flow: comparison and preparation are their own screens, pushed by the root.
+        if newFlow { onTutorial(home.tutorialHandoff) }
+        else { withAnimation(.easeInOut(duration: 0.3)) { prepHandoff = home.tutorialHandoff } }
+    }
+
+    /// Brow only: full-width pink button under everything, opening the tutorial like the other tools' arrow.
+    private var continueButton: some View {
+        Button { openTutorial() } label: {
+            Text("Continue")
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(AppColors.flamingo, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, AppSpacing.medium * 2)
+        .padding(.top, AppSpacing.small)
+        .disabled(!home.canTry(.eyebrow))
+    }
+
+    /// Brow only: opens the shade row and intensity bar; shows an X while they are open.
+    private var paletteToggle: some View {
+        Button { showsShades.toggle() } label: {
+            Image(systemName: showsShades ? "xmark" : "paintpalette")
+                .font(.title3.weight(.medium))
+                .foregroundStyle(.primary)
+                .frame(width: 48, height: 48)
+                .glassEffect(.regular.interactive(), in: .circle)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(showsShades ? "Close colours" : "Colours")
     }
 
     // MARK: Liner look
@@ -141,7 +203,14 @@ struct TryOnHomeView: View {
         case .eyeliner:
             linerLookPicker
         case .eyebrow where home.canTry(.eyebrow):
-            BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
+            VStack(spacing: AppSpacing.small) {
+                paletteToggle
+                if showsShades {
+                    shadeControls.padding(.horizontal, AppSpacing.small)
+                } else {
+                    BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
+                }
+            }
         case .blush:
             BlushLookPicker(selected: home.isOff ? nil : home.blushLook) { look in
                 if let look { home.choose(blush: look) } else { home.turnOff() }
@@ -153,6 +222,14 @@ struct TryOnHomeView: View {
     }
 
     // MARK: Shades
+
+    /// The shade row and intensity bar: under the card for blush and eyeliner, in place of the brow pictures for brows.
+    @ViewBuilder private var shadeControls: some View {
+        shadeRow.disabled(!home.canTry(home.tool))
+        IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),
+                     tint: home.currentShade?.color ?? AppColors.flamingo)
+            .disabled(!home.canTry(home.tool))
+    }
 
     private func openPalette(_ source: PaletteSource) {
         home.deactivate()
@@ -177,7 +254,13 @@ struct TryOnHomeView: View {
                 Circle().fill(shade.color)
                     .frame(width: 48, height: 48)
                     .glassCircle(tint: shade.color.opacity(0.55))
-                .overlay { if selected { Circle().strokeBorder(AppColors.snow, lineWidth: 2.5) } }
+                .overlay {
+                    if selected {
+                        Circle().strokeBorder(AppColors.snow, lineWidth: 2.5)
+                        Image(systemName: "checkmark").font(.system(size: 18, weight: .bold)).foregroundStyle(AppColors.snow)
+                            .shadow(color: .black.opacity(0.35), radius: 2)
+                    }
+                }
                 .frame(minHeight: 48)
             }
             .buttonStyle(.plain)

@@ -65,10 +65,12 @@ struct GlassChoiceCircle<Content: View>: View {
 struct StyleCircle<Content: View>: View {
     let selected: Bool
     var isNone = false
+    /// Size of the chosen circle when the picker magnifies it (brow); nil keeps every circle at 40.
+    var selectedSide: CGFloat? = nil
     @ViewBuilder var content: () -> Content
 
     var body: some View {
-        let side: CGFloat = 40
+        let side: CGFloat = selected ? (selectedSide ?? 40) : 40
         ZStack {
             if isNone {
                 Image(systemName: "nosign").font(.system(size: 20, weight: .regular)).foregroundStyle(AppColors.snow)
@@ -80,7 +82,7 @@ struct StyleCircle<Content: View>: View {
                     .clipShape(Circle())
             }
         }
-        .overlay(Circle().strokeBorder(AppColors.snow, lineWidth: 2).opacity(selected ? 1 : 0))
+        .overlay(Circle().strokeBorder(AppColors.snow, lineWidth: selectedSide == nil ? 2 : 3).opacity(selected ? 1 : 0))
         .frame(width: side, height: side)
         .animation(.smooth(duration: 0.25), value: selected)
     }
@@ -93,6 +95,10 @@ struct GlassPickerRow<Content: View>: View {
     let title: Text
     let selectedID: String
     var onCenter: (String) -> Void = { _ in }
+    /// Height of the row; taller when the chosen circle is magnified.
+    var rowHeight: CGFloat = 48
+    /// Width of the chosen circle, so the first and last ones can sit exactly in the middle.
+    var selectedWidth: CGFloat = 40
     @ViewBuilder var content: () -> Content
     @State private var position: String?
 
@@ -103,9 +109,9 @@ struct GlassPickerRow<Content: View>: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) { content() }
                         .scrollTargetLayout()
-                        .frame(minHeight: 48)
+                        .frame(minHeight: rowHeight)
                 }
-                .contentMargins(.horizontal, max(geo.size.width / 2 - 20, 0), for: .scrollContent)
+                .contentMargins(.horizontal, max(geo.size.width / 2 - selectedWidth / 2, 0), for: .scrollContent)
                 .scrollPosition(id: $position, anchor: .center)
                 .scrollTargetBehavior(.viewAligned)
                 .onAppear { position = selectedID }
@@ -117,7 +123,7 @@ struct GlassPickerRow<Content: View>: View {
                 }
                 .sensoryFeedback(.selection, trigger: position)
             }
-            .frame(height: 48)
+            .frame(height: rowHeight)
         }
     }
 }
