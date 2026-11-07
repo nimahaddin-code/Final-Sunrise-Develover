@@ -17,7 +17,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Kamera menampilkan makeup di wajahmu secara langsung dan bisa memotret palet makeup agar kamu bisa memilih warna. Tidak ada yang disimpan atau diunggah."
+            "value" : "Kamera dipakai buat nampilin makeup langsung di wajahmu dan foto palet makeup biar kamu bisa pilih warna. Nggak ada yang disimpan atau di-upload."
           }
         }
       }
@@ -34,7 +34,7 @@
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Memungkinkanmu menyimpan foto Try On makeup-mu ke pustaka foto."
+            "value" : "Biar kamu bisa simpan foto Try On ke galeri."
           }
         }
       }
