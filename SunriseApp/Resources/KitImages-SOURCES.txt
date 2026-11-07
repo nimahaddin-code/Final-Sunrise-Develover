@@ -1,0 +1,6 @@
+Makeup kit pictures on the tutorial prep page (TutorialPrepView), from SVG Repo, one pack, uploader "SVG Repo".
+Each page states "LICENSE: CC0 License" (checked 2026-11-04). CC0 needs no attribution; kept here for traceability.
+
+kit-spoolie      mascara.svg         https://www.svgrepo.com/svg/277352/mascara
+kit-brow-pencil  eyebrow-pencil.svg  https://www.svgrepo.com/svg/277334/eyebrow-pencil
+kit-cotton-bud   cotton-swab.svg     https://www.svgrepo.com/svg/277336/cotton-swab

@@ -5,15 +5,19 @@ struct AppRootView: View {
     @StateObject private var navigator = AppNavigator()
     /// The photos of the current run; cleared when a new feature is picked and when the flow ends.
     @StateObject private var flow = MakeupFlowStore()
+    /// Splash, onboarding and the compact opening run once per launch, and only when the new flow was on at launch.
+    @State private var showEntry = UserDefaults.standard.bool(forKey: NewFlow.key)
 
     var body: some View {
         Group {
-            if navigator.needsWelcome {
+            if showEntry {
+                EntryFlowView { showEntry = false; navigator.dismissWelcome() }
+            } else if navigator.needsWelcome {
                 OnboardingWelcomeScreen {navigator.dismissWelcome()}
             } else {
         // One feature at a time: home -> Try On -> photo -> brief -> tutorial -> photo -> feedback -> home.
         NavigationStack(path: $navigator.tryOnPath) {
-            FeaturePickerView { tool in
+            FeatureHomeView { tool in
                 flow.reset()
                 navigator.open(.tryOn(tool), in: .tryOn)
             }

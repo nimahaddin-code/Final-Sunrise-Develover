@@ -628,6 +628,16 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertEqual(handoff.enabled,[.eyebrow,.blush]);XCTAssertEqual(handoff.blushStyle,.lifted)
         home.deactivate()
     }
+    @MainActor func testTryOnOpenedForOneToolStaysOnIt() {
+        let home=TryOnHomeModel(tool:.blush,plan:MakeupPlan(shape:.heart),assessment:.init(shape:.heart,origin:.analysis),checker:MockFaceTrackingChecker())
+        XCTAssertEqual(home.tool,.blush)
+        home.activate()
+        XCTAssertEqual(home.tool,.blush,"activate keeps the tool the screen was opened for")
+        home.choose(blush:.lifted)
+        XCTAssertEqual(home.enabled,[.blush])
+        XCTAssertEqual(home.tutorialHandoff.tool,.blush);XCTAssertEqual(home.tutorialHandoff.enabled,[.blush])
+        home.deactivate()
+    }
     // -Nimah: Real brow contours can be fitted without pretending missing pupil/nose points exist.
     func testLaunchFitAcceptsMeasuredBrowsWithoutOptionalFormulaPoints() throws {
         struct Provider:FaceLandmarkProviding {

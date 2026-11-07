@@ -1,0 +1,44 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "comment" : "App name shown under the icon.",
+      "shouldTranslate" : false
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Camera permission prompt.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera shows makeup on your face live and can photograph a makeup palette so you can pick a colour. Nothing is saved or uploaded."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kamera menampilkan makeup di wajahmu secara langsung dan bisa memotret palet makeup agar kamu bisa memilih warna. Tidak ada yang disimpan atau diunggah."
+          }
+        }
+      }
+    },
+    "NSPhotoLibraryAddUsageDescription" : {
+      "comment" : "Permission prompt for saving try-on photos.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lets you save photos of your makeup try-on to your library."
+          }
+        },
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Memungkinkanmu menyimpan foto Try On makeup-mu ke pustaka foto."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
