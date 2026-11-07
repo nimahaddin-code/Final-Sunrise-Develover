@@ -66,6 +66,8 @@ struct ScreenLightGlow: View {
 struct ScreenLightButton: View {
     @ObservedObject var light: ScreenLight
     var pulse: Int
+    /// True: Apple's plain glass and label colour while off, instead of the app's wine glass and white icon.
+    var plainGlass = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var pulsing = false
 
@@ -74,8 +76,7 @@ struct ScreenLightButton: View {
             Image(systemName: "bolt.fill")
                 .font(.system(size: 20, weight: .medium))
                 .frame(width: 48, height: 48)
-                .glassCircle(tint: light.isOn ? AppColors.snow.opacity(0.7) : nil)
-                .foregroundStyle(light.isOn ? Color(red: 0.96, green: 0.28, blue: 0.49) : AppColors.snow)
+                .modifier(LightGlass(on: light.isOn, plain: plainGlass))
                 // Reduce Motion: a pink outline instead of a pulse.
                 .overlay(Circle().strokeBorder(AppColors.flamingo, lineWidth: 3).opacity(pulsing && reduceMotion ? 1 : 0))
                 .scaleEffect(pulsing && !reduceMotion ? 1.25 : 1)
@@ -143,5 +144,23 @@ private struct RaisedNoise: View {
             }
         }
         .allowsHitTesting(false)
+    }
+}
+
+/// The light button's surface: white glass with a pink bolt while on; off, the app's wine glass with a white bolt, or
+/// Apple's plain glass with the label colour (`plain`).
+private struct LightGlass: ViewModifier {
+    let on: Bool
+    let plain: Bool
+
+    func body(content: Content) -> some View {
+        if on {
+            content.glassCircle(tint: AppColors.snow.opacity(0.7))
+                .foregroundStyle(Color(red: 0.96, green: 0.28, blue: 0.49))
+        } else if plain {
+            content.glassEffect(.regular.interactive(), in: .circle).foregroundStyle(.primary)
+        } else {
+            content.glassCircle().foregroundStyle(AppColors.snow)
+        }
     }
 }

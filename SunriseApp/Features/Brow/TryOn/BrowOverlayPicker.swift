@@ -6,14 +6,16 @@ struct BrowOverlayPicker: View {
     let overlays: [BrowOverlay]
     let selected: BrowOverlay?
     let onSelect: (BrowOverlay?) -> Void
+    /// The chosen brow is shown magnified, larger than the others (40).
+    private static let magnified: CGFloat = 60
 
     var body: some View {
         GlassPickerRow(title: selected.map { Text($0.title) } ?? Text("None"), selectedID: selected?.assetName ?? "none", onCenter: { id in
             onSelect(overlays.first { $0.assetName == id })
-        }) {
+        }, rowHeight: Self.magnified + 4, selectedWidth: Self.magnified) {
             // First: no overlay picture. The natural brow stays as the "Natural brow" toggle has it.
             Button { onSelect(nil) } label: {
-                StyleCircle(selected: selected == nil, isNone: true) { EmptyView() }
+                StyleCircle(selected: selected == nil, isNone: true, selectedSide: Self.magnified) { EmptyView() }
             }
             .buttonStyle(.plain)
             .id("none")
@@ -22,7 +24,7 @@ struct BrowOverlayPicker: View {
             ForEach(overlays) { overlay in
                 let isSelected = overlay == selected
                 Button { onSelect(overlay) } label: {
-                    StyleCircle(selected: isSelected) { BrowStyleIcon(assetName: overlay.assetName) }
+                    StyleCircle(selected: isSelected, selectedSide: Self.magnified) { BrowStyleIcon(assetName: overlay.assetName) }
                 }
                 .buttonStyle(.plain)
                 .id(overlay.assetName)

@@ -11,12 +11,18 @@ struct TryOnLiveCard: View {
     @StateObject private var advisor = CameraAdvisor(context: .tryOn)
     /// The screen light, owned by the Try On screen: it turns the whole screen white, not only this card.
     @ObservedObject var light: ScreenLight
+    /// False when the screen puts the light button elsewhere (brow Try On: top right of the header).
+    var showsLightButton = true
+    /// True: camera messages show near the top (under the screen's own buttons) instead of above the bottom controls.
+    var captionAtTop = false
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
-    init(home: TryOnHomeModel, light: ScreenLight) {
+    init(home: TryOnHomeModel, light: ScreenLight, showsLightButton: Bool = true, captionAtTop: Bool = false) {
         self.home = home
         self.light = light
+        self.showsLightButton = showsLightButton
+        self.captionAtTop = captionAtTop
         camera = home.camera
         brow = home.brow
     }
@@ -91,7 +97,7 @@ struct TryOnLiveCard: View {
         }
         // The screen light: the picture's edge melts into the white screen, which is what lights the face.
         .mask {
-            RoundedRectangle(cornerRadius: AppSpacing.cornerRadius * 2, style: .continuous)
+            RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous)
                 .padding(light.isOn ? 26 : 0)
                 .blur(radius: light.isOn ? 26 : 0)
         }
@@ -103,11 +109,11 @@ struct TryOnLiveCard: View {
             }
         }
         .overlay(alignment: .topLeading) {
-            ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(AppSpacing.small)
+            if showsLightButton { ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(AppSpacing.small) }
         }
-        .overlay(alignment: .bottom) {
+        .overlay(alignment: captionAtTop ? .top : .bottom) {
             CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
-                .padding(.bottom, 100)
+                .padding(captionAtTop ? .top : .bottom, captionAtTop ? 72 : 100)
         }
     }
 
