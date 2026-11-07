@@ -37,8 +37,8 @@ struct AppRootView: View {
                           })
         case .recommendedTutorial(let handoff):
             GuidedTutorialView(checker:container.faceTracking,assessment:assessment,plan:plan,handoff:handoff,
-                               onFinish: newFlow ? { result in
-                                   navigator.open(.feedback(FeedbackInput(handoff: handoff, result: result)), in: .tryOn)
+                               onFinish: newFlow ? { photo in
+                                   navigator.open(.feedback(FeedbackInput(handoff: handoff, photo: photo)), in: .tryOn)
                                } : nil)
         case .comparison(let handoff):
             ComparisonView(handoff: handoff) { navigator.open(.preparation(handoff), in: .tryOn) }

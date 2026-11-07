@@ -1,3 +1,30 @@
+## Feedback v1: blush target area on the result photo — -Nimah (2026-11-05)
+
+`FeedbackView` (`Features/Screens/Feedback/`) is no longer a placeholder: one large photo with a Look | Result switch
+(opens on Result), the blush target area (the tutorial's small circle and outer line, same dotted white stroke) drawn on
+the result photo, tap the photo to hide or show the lines, and a caption. No look photo yet: the Look side says so until
+Try On's photo button (Hanum) fills `TutorialHandoff.lookPhoto`. No face seen at the shutter: the photo shows without lines
+and says why. Blush off on Try On: no lines or caption. No measuring yet (v2 reads `makeup-feedback.database.json`).
+The tutorial now hands over `TutorialPhoto` (image + `blushOutline`, in the photo's 0...1 coordinates) instead of a
+bare `UIImage`; `FeedbackInput(handoff:photo:)`. Shared-screen change (Hanum's `GuidedTutorialView`): with blush on
+(`GuidedTutorialModel.measuresBlushInPhoto`), the photo configuration keeps the engine on with region blush,
+`showGuide` and `pigmentHalf = .none` (no blush pigment encoded: the photo is still the plain camera) so the outlines are
+measured on the shutter frame; the tutorial overlay stays hidden in photo mode. New texts have Indonesian drafts (`needs_review`). All in memory. Simulator tests only: the
+screen and the line placement on a real photo are not yet seen on a device.
+
+## Blush look and kit data; kit pictures — -Nimah (2026-11-05)
+
+`BlushInfo` (`Features/Blush/Info/`) is real data now, not sample wording: one beginner sentence per look (Youthful,
+Sunkissed, Lifted; other styles get a general one), 1 minute for every look, and one kit for all three: fingertips
+(required, symbol), makeup sponge (optional), cream or liquid blush (required, shows the chosen shade; powder or lip tint
+as the stand-in) and loose powder (optional). Texts use `String(localized:)`, with Indonesian drafts in `Localizable.xcstrings`
+(`needs_review`), written in the brand voice of `Docs/GayaBahasa.md` (casual "kamu", big-sister tone; a prompt to
+paste into an AI for new Indonesian copy). Kit pictures: PNG, transparent background, square,
+600 x 600, product centred, named `kit-<tool>-<item>` (`kit-blush-sponge`, `kit-blush-blush`, `kit-blush-powder`; brow
+`kit-brow-…`, eyeliner `kit-liner-…`). The three blush pictures are flat drawn illustrations, unbranded, to be replaced
+by real photos under the same names. `GuidedFlowTests.testEveryItemPictureIsInTheAssets` fails when an `imageName` has
+no asset. Simulator tests only.
+
 ## Brow Try On layout — Khalish (2026-11-06)
 
 Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
