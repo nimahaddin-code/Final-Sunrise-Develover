@@ -1,3 +1,23 @@
+## One Try On layout for every tool, per-tool `TryOnFeature` — 2026-11-07
+
+`TryOnHomeView` has one layout for all tools, the former brow one: full-page camera, back and light in the top safe area,
+palette button, look row (or shades and intensity) and Continue (glass tinted `AppColors.buttonInk`) at the bottom over the
+dark gradient that starts right under the palette button (one clear-to-85% ramp, the button itself on the bare camera;
+`controlsCard`, `topButtons`). Blush and eyeliner lose the logo header, page padding, light button with dark-scene
+pulse and pink Continue, and gain the palette button. The view has no tool branches: a tool adds only its look row and debug
+menu through `TryOnFeature` (`Features/Screens/TryOn/TryOnFeature.swift`), implemented in `Features/Blush/TryOn/BlushTryOnFeature`,
+`Features/Brow/TryOn/BrowTryOnFeature` and `Features/Eyeliner/TryOn/EyelinerTryOnFeature`; `TryOnTool.tryOnFeature` is the one
+switch. New tool: add a `TryOnTool` case, a feature in its folder, and its case in that switch. Developer tools: long-press the
+back button (1.2 s; the logo is gone); the "New flow" chip sits under the top buttons while they are on. Simulator build only:
+the layout and the eyeliner overlay on the full-page camera are not checked on a device.
+Camera off (no TrueDepth, permission denied, camera stopped): `CardMessage` sits on the homepage's `OnboardingGlow` with
+`AppColors.plumInk` text; `TryOnLiveCard` reports it (`TryOnCameraOffKey`) so the controls drop the gradient and go
+dark-on-light. `GlassPickerRow`'s title now takes the screen's colour (was always white), and the row no longer clips
+(`scrollClipDisabled`): the glass "none" circle's shadow, cut at the row's top and bottom, showed as a grey square.
+Camera messages: only `CameraGuidanceCaption` (the advisor) shows on Try On, just under back and light
+(`TryOnLiveCard(captionTopInset:)` = top safe area + the button row). The old `StatusPill` (engine `beautyStatus`, "Look straight at
+the camera to place your makeup") is removed; its string stays in the catalog, unused. Not checked on a device. Seen on the Simulator (blush).
+
 ## Merge: E2E-Flow into staging — 2026-11-07
 
 origin/staging (tool-first folders, card-slider home, brow Try On layout, three-page onboarding, Indonesian, `NewFlow`
@@ -36,8 +56,23 @@ layout. Without a usable camera (Simulator) capture offers "Continue without pho
 `Makeup/Shared/Flow/` (`MakeupFlow`, `FeaturePickerView`, `FeatureCaptureView`, `LookBriefView`, `FeedbackView`) and
 `Shared/Tutorial/TutorialStepsSheet`. `TutorialCompare` gained `guidePlain`/`plainGuide` (never in the compare cycle).
 Not checked on a device: whether `ARSCNView.snapshot()` includes the Metal blush/brow layer in the desired-look photo.
+
+## New onboarding: light splash and three pages — Khalish (2026-11-06)
+
+`OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`, rewritten in place, same `onStart`) is now a white page
+with a soft pink/grey glow: a splash ("dandan" wordmark + "makeup made for your face", auto-advances after 1.6 s or on tap), then
+three pages in one `TabView`: "Try it on before you put it on", "Step by step, at your own pace", "See how you did, side by side"
+(button "Get started" calls `onStart`; no Skip). Pictures are image sets to fill with PNGs: `onb-tryon-1/2/3`, `onb-step-1/2/3`,
+`onb-compare-before`, `onb-compare-after` (empty until added; a grey placeholder shows). Tokens: `AppColors.dandanPink`,
+`onboardingInk`, `onboardingBody`. The silk image `onboarding-silk` and the old welcome strings were removed; new strings have
+Indonesian drafts (`needs_review`). `AppNavigator.currentWelcomeVersion` stays 2. Only the picture swipes; title, text, dots and button stay, the text crossfades and the active dot animates. Simulator only, no device check.
+
 ## Brow Try On layout — Khalish (2026-11-06)
 
+Update 2026-11-07: the camera fills the whole page (under the status bar and home indicator) and the palette button, brow pictures
+(or shades) and Continue sit at the bottom over a dark gradient (clear to 85% black, no card; `browControlsCard`); back and light stay in the top safe area.
+Continue (`.glassEffect` tinted `AppColors.buttonInk`, the homepage button colour) uses system Liquid Glass, like back, light and palette, so the
+buttons follow Settings > Display > Liquid Glass (Clear/Tinted); page behind the camera is black.
 Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
 back and the screen light sit over the camera's top corners (`browTopButtons`), no tutorial arrow (`TryOnLiveCard(showsLightButton: false)`, no dark-scene pulse there), a palette
 button above `BrowOverlayPicker` swaps it for the shade row and intensity bar inside the camera card (`showsShades`, `shadeControls`; the button turns into an X), and a
@@ -54,6 +89,9 @@ the order Eyeliner, Blush, Brows, starting on Blush (the others peek in at the s
 shown card; steps come from `GuidedTutorialModel.*Lessons.count`, minutes from `ToolInfo.minutes`. "Start Lesson" calls
 `onSelect` for the shown tool (same route as before: `AppRoute.tryOn(tool)`). New strings have Indonesian drafts
 (`needs_review`). Simulator only, no device check.
+2026-11-07 restyle: title "Hi, fellas!", background `OnboardingGlow` (shared with onboarding), step and minute chips inside each
+card at the bottom left (no chips under the name), active dot `AppColors.dandanPink` (#FF2D8E), dark "Start lesson" button
+(`AppColors.buttonInk` #1C1C1C). `AppColors.homeCanvas` is no longer used here.
 
 ## Feature homepage, one tool per Try On — Khalish (2026-11-05)
 
@@ -75,6 +113,8 @@ sets `kit-spoolie` (a mascara wand), `kit-brow-pencil`, `kit-cotton-bud`: CC0 SV
 eyeliner tools are not listed. Simulator render only, no device check.
 
 ## Three-page onboarding — Khalish (2026-11-04)
+
+Superseded by the 2026-11-06 section above.
 
 `OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`) is now three swipeable pages in one `TabView`: the welcome
 (logo, Get Started), "TRY IT ON, LIVE" (blush, brows, eyeliner) and "LEARN IT, STEP BY STEP" (tutorial and photo, photos stay on

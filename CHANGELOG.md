@@ -1,3 +1,40 @@
+## One Try On layout for every tool, per-tool `TryOnFeature` — 2026-11-07
+
+`TryOnHomeView` has one layout for all tools, the former brow one: full-page camera, back and light in the top safe area,
+palette button, look row (or shades and intensity) and Continue (glass tinted `AppColors.buttonInk`) at the bottom over the
+dark gradient that starts right under the palette button (one clear-to-85% ramp, the button itself on the bare camera;
+`controlsCard`, `topButtons`). Blush and eyeliner lose the logo header, page padding, light button with dark-scene
+pulse and pink Continue, and gain the palette button. The view has no tool branches: a tool adds only its look row and debug
+menu through `TryOnFeature` (`Features/Screens/TryOn/TryOnFeature.swift`), implemented in `Features/Blush/TryOn/BlushTryOnFeature`,
+`Features/Brow/TryOn/BrowTryOnFeature` and `Features/Eyeliner/TryOn/EyelinerTryOnFeature`; `TryOnTool.tryOnFeature` is the one
+switch. New tool: add a `TryOnTool` case, a feature in its folder, and its case in that switch. Developer tools: long-press the
+back button (1.2 s; the logo is gone); the "New flow" chip sits under the top buttons while they are on. Simulator build only:
+the layout and the eyeliner overlay on the full-page camera are not checked on a device.
+Camera off (no TrueDepth, permission denied, camera stopped): `CardMessage` sits on the homepage's `OnboardingGlow` with
+`AppColors.plumInk` text; `TryOnLiveCard` reports it (`TryOnCameraOffKey`) so the controls drop the gradient and go
+dark-on-light. `GlassPickerRow`'s title now takes the screen's colour (was always white), and the row no longer clips
+(`scrollClipDisabled`): the glass "none" circle's shadow, cut at the row's top and bottom, showed as a grey square.
+Camera messages: only `CameraGuidanceCaption` (the advisor) shows on Try On, just under back and light
+(`TryOnLiveCard(captionTopInset:)` = top safe area + the button row). The old `StatusPill` (engine `beautyStatus`, "Look straight at
+the camera to place your makeup") is removed; its string stays in the catalog, unused. Not checked on a device. Seen on the Simulator (blush).
+
+## Onboarding: only the picture swipes — 2026-11-07
+
+`OnboardingWelcomeScreen`: the wordmark, title, text, dots and button are one fixed frame; a page-style `TabView` holds only the three pictures.
+Title and text crossfade with the page (all three reserve the height), the active dot is one capsule that morphs, the button label crossfades
+between "Next" and "Get started". No string changes.
+
+## Brow Try On: full-page camera, bottom card — 2026-11-07
+
+Brow only (`TryOnHomeView`): the camera fills the page edge to edge; the palette button, brow pictures or shades, and Continue are in a fixed
+dark-glass card pinned to the bottom (`browControlsCard`, top corners 28 pt, background under the home indicator). Blush and eyeliner unchanged.
+
+## Homepage restyle to match onboarding — 2026-11-07
+
+`FeatureHomeView`: onboarding glow background (`OnboardingGlow` now internal), "Hi, fellas!" title, step/minute chips inside each
+card (bottom left, "1 step" / "2 steps" by grammar agreement), active dot #FF2D8E (`AppColors.dandanPink`), dark "Start lesson"
+button (`AppColors.buttonInk`). Strings renamed/added in `Localizable.xcstrings` with Indonesian drafts (`needs_review`).
+
 ## Merge: E2E-Flow into staging — 2026-11-07
 
 origin/staging (tool-first folders, card-slider home, brow Try On layout, three-page onboarding, Indonesian, `NewFlow`
@@ -51,6 +88,12 @@ layout. Without a usable camera (Simulator) capture offers "Continue without pho
 `Makeup/Shared/Flow/` (`MakeupFlow`, `FeaturePickerView`, `FeatureCaptureView`, `LookBriefView`, `FeedbackView`) and
 `Shared/Tutorial/TutorialStepsSheet`. `TutorialCompare` gained `guidePlain`/`plainGuide` (never in the compare cycle).
 Not checked on a device: whether `ARSCNView.snapshot()` includes the Metal blush/brow layer in the desired-look photo.
+
+## New onboarding: light splash and three pages — Khalish (2026-11-06)
+
+The welcome is now a light page with a splash and three swipeable pages (try it on, step by step, compare), ending in "Get started".
+Photos are placeholders until the image sets `onb-*` are filled. New strings have Indonesian drafts (`needs_review`). Simulator only.
+
 ## Brow Try On layout — Khalish (2026-11-06)
 
 Brow Try On only: light #FAF2EA page, screen light top right instead of the tutorial arrow, a palette button above the
