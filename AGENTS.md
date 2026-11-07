@@ -7,25 +7,6 @@ and style names are unchanged. All stay `needs_review`. The 128 strings from del
 looks) were left as they are. `Docs/GayaBahasa.md` is a prompt to paste into an AI for new Indonesian copy. Text only, no
 code change; the screens were not checked for longer lines.
 
-## Brow Try On layout — Khalish (2026-11-06)
-
-Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
-back and the screen light sit over the camera's top corners (`browTopButtons`), no tutorial arrow (`TryOnLiveCard(showsLightButton: false)`, no dark-scene pulse there), a palette
-button above `BrowOverlayPicker` swaps it for the shade row and intensity bar inside the camera card (`showsShades`, `shadeControls`; the button turns into an X), and a
-"Continue" button at the bottom opens the tutorial like the arrow. Back, light and palette use Apple's plain glass
-(`.glassEffect(.regular.interactive())`, `ScreenLightButton(plainGlass:)`); camera messages sit under the top buttons
-(`TryOnLiveCard(captionAtTop:)`). All tools: the camera picture's mask now has the card's corner radius (was double, which
-left black corners). Blush and eyeliner unchanged. Simulator only.
-
-## Homepage redesign: card slider — Khalish (2026-11-06)
-
-`FeatureHomeView` is now a light page (`AppColors.homeCanvas` #FFFBF8, text `AppColors.plumInk`) with a horizontal card slider in
-the order Eyeliner, Blush, Brows, starting on Blush (the others peek in at the sides). The cards are the image sets
-`home-card-eyeliner`, `home-card-blush`, `home-card-brows`. Title, step and minute chips, blurb and the three dots follow the
-shown card; steps come from `GuidedTutorialModel.*Lessons.count`, minutes from `ToolInfo.minutes`. "Start Lesson" calls
-`onSelect` for the shown tool (same route as before: `AppRoute.tryOn(tool)`). New strings have Indonesian drafts
-(`needs_review`). Simulator only, no device check.
-
 ## Feedback v1: blush target area on the result photo — -Nimah (2026-11-05)
 
 `FeedbackView` (`Features/Screens/Feedback/`) is no longer a placeholder: one large photo with a Look | Result switch
@@ -52,6 +33,25 @@ paste into an AI for new Indonesian copy). Kit pictures: PNG, transparent backgr
 `kit-brow-…`, eyeliner `kit-liner-…`). The three blush pictures are flat drawn illustrations, unbranded, to be replaced
 by real photos under the same names. `GuidedFlowTests.testEveryItemPictureIsInTheAssets` fails when an `imageName` has
 no asset. Simulator tests only.
+
+## Brow Try On layout — Khalish (2026-11-06)
+
+Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
+back and the screen light sit over the camera's top corners (`browTopButtons`), no tutorial arrow (`TryOnLiveCard(showsLightButton: false)`, no dark-scene pulse there), a palette
+button above `BrowOverlayPicker` swaps it for the shade row and intensity bar inside the camera card (`showsShades`, `shadeControls`; the button turns into an X), and a
+"Continue" button at the bottom opens the tutorial like the arrow. Back, light and palette use Apple's plain glass
+(`.glassEffect(.regular.interactive())`, `ScreenLightButton(plainGlass:)`); camera messages sit under the top buttons
+(`TryOnLiveCard(captionAtTop:)`). All tools: the camera picture's mask now has the card's corner radius (was double, which
+left black corners). Blush and eyeliner unchanged. Simulator only.
+
+## Homepage redesign: card slider — Khalish (2026-11-06)
+
+`FeatureHomeView` is now a light page (`AppColors.homeCanvas` #FFFBF8, text `AppColors.plumInk`) with a horizontal card slider in
+the order Eyeliner, Blush, Brows, starting on Blush (the others peek in at the sides). The cards are the image sets
+`home-card-eyeliner`, `home-card-blush`, `home-card-brows`. Title, step and minute chips, blurb and the three dots follow the
+shown card; steps come from `GuidedTutorialModel.*Lessons.count`, minutes from `ToolInfo.minutes`. "Start Lesson" calls
+`onSelect` for the shown tool (same route as before: `AppRoute.tryOn(tool)`). New strings have Indonesian drafts
+(`needs_review`). Simulator only, no device check.
 
 ## Feature homepage, one tool per Try On — Khalish (2026-11-05)
 

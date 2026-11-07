@@ -7,17 +7,6 @@ and style names are unchanged. All stay `needs_review`. The 128 strings from del
 looks) were left as they are. `Docs/GayaBahasa.md` is a prompt to paste into an AI for new Indonesian copy. Text only, no
 code change; the screens were not checked for longer lines.
 
-## Brow Try On layout — Khalish (2026-11-06)
-
-Brow Try On only: light #FAF2EA page, screen light top right instead of the tutorial arrow, a palette button above the
-brow pictures that swaps them for shades and intensity (turns into an X), and a "Continue" button at the bottom. Simulator only.
-
-## Homepage redesign: card slider — Khalish (2026-11-06)
-
-The feature homepage is now a light page with a swipeable slider of tool cards (Eyeliner, Blush, Brows; opens on Blush), the
-shown tool's name, steps and minutes, a short line, and a "Start Lesson" button that opens Try On for that tool. New
-strings have Indonesian drafts (`needs_review`). Simulator only, no device check.
-
 ## Feedback v1: blush target area on the result photo — -Nimah (2026-11-05)
 
 `FeedbackView` (`Features/Screens/Feedback/`) is no longer a placeholder: one large photo with a Look | Result switch
@@ -44,6 +33,17 @@ paste into an AI for new Indonesian copy). Kit pictures: PNG, transparent backgr
 `kit-brow-…`, eyeliner `kit-liner-…`). The three blush pictures are flat drawn illustrations, unbranded, to be replaced
 by real photos under the same names. `GuidedFlowTests.testEveryItemPictureIsInTheAssets` fails when an `imageName` has
 no asset. Simulator tests only.
+
+## Brow Try On layout — Khalish (2026-11-06)
+
+Brow Try On only: light #FAF2EA page, screen light top right instead of the tutorial arrow, a palette button above the
+brow pictures that swaps them for shades and intensity (turns into an X), and a "Continue" button at the bottom. Simulator only.
+
+## Homepage redesign: card slider — Khalish (2026-11-06)
+
+The feature homepage is now a light page with a swipeable slider of tool cards (Eyeliner, Blush, Brows; opens on Blush), the
+shown tool's name, steps and minutes, a short line, and a "Start Lesson" button that opens Try On for that tool. New
+strings have Indonesian drafts (`needs_review`). Simulator only, no device check.
 
 ## Feature homepage, one tool per Try On — Khalish (2026-11-05)
 
