@@ -1,3 +1,23 @@
+## One Try On layout for every tool, per-tool `TryOnFeature` — 2026-11-07
+
+`TryOnHomeView` has one layout for all tools, the former brow one: full-page camera, back and light in the top safe area,
+palette button, look row (or shades and intensity) and Continue (glass tinted `AppColors.buttonInk`) at the bottom over the
+dark gradient that starts right under the palette button (one clear-to-85% ramp, the button itself on the bare camera;
+`controlsCard`, `topButtons`). Blush and eyeliner lose the logo header, page padding, light button with dark-scene
+pulse and pink Continue, and gain the palette button. The view has no tool branches: a tool adds only its look row and debug
+menu through `TryOnFeature` (`Features/Screens/TryOn/TryOnFeature.swift`), implemented in `Features/Blush/TryOn/BlushTryOnFeature`,
+`Features/Brow/TryOn/BrowTryOnFeature` and `Features/Eyeliner/TryOn/EyelinerTryOnFeature`; `TryOnTool.tryOnFeature` is the one
+switch. New tool: add a `TryOnTool` case, a feature in its folder, and its case in that switch. Developer tools: long-press the
+back button (1.2 s; the logo is gone); the "New flow" chip sits under the top buttons while they are on. Simulator build only:
+the layout and the eyeliner overlay on the full-page camera are not checked on a device.
+Camera off (no TrueDepth, permission denied, camera stopped): `CardMessage` sits on the homepage's `OnboardingGlow` with
+`AppColors.plumInk` text; `TryOnLiveCard` reports it (`TryOnCameraOffKey`) so the controls drop the gradient and go
+dark-on-light. `GlassPickerRow`'s title now takes the screen's colour (was always white), and the row no longer clips
+(`scrollClipDisabled`): the glass "none" circle's shadow, cut at the row's top and bottom, showed as a grey square.
+Camera messages: only `CameraGuidanceCaption` (the advisor) shows on Try On, just under back and light
+(`TryOnLiveCard(captionTopInset:)` = top safe area + the button row). The old `StatusPill` (engine `beautyStatus`, "Look straight at
+the camera to place your makeup") is removed; its string stays in the catalog, unused. Not checked on a device. Seen on the Simulator (blush).
+
 ## Merge: E2E-Flow into staging — 2026-11-07
 
 origin/staging (tool-first folders, card-slider home, brow Try On layout, three-page onboarding, Indonesian, `NewFlow`
@@ -49,6 +69,10 @@ Indonesian drafts (`needs_review`). `AppNavigator.currentWelcomeVersion` stays 2
 
 ## Brow Try On layout — Khalish (2026-11-06)
 
+Update 2026-11-07: the camera fills the whole page (under the status bar and home indicator) and the palette button, brow pictures
+(or shades) and Continue sit at the bottom over a dark gradient (clear to 85% black, no card; `browControlsCard`); back and light stay in the top safe area.
+Continue (`.glassEffect` tinted `AppColors.buttonInk`, the homepage button colour) uses system Liquid Glass, like back, light and palette, so the
+buttons follow Settings > Display > Liquid Glass (Clear/Tinted); page behind the camera is black.
 Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
 back and the screen light sit over the camera's top corners (`browTopButtons`), no tutorial arrow (`TryOnLiveCard(showsLightButton: false)`, no dark-scene pulse there), a palette
 button above `BrowOverlayPicker` swaps it for the shade row and intensity bar inside the camera card (`showsShades`, `shadeControls`; the button turns into an X), and a

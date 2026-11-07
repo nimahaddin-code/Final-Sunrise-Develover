@@ -1,7 +1,9 @@
 import SwiftUI
 
-/// Try On for the one tool picked on the home screen: header, live camera card with its shape row, a shade row, an
-/// intensity bar and Continue (to the desired-look photo). Every tool uses the standard look; there is no face or eye scan.
+/// Try On for the one tool picked on the home screen. The camera fills the whole page; back and the screen light sit in
+/// the top safe area, and the palette button, the tool's look row (or the shades and intensity bar) and Continue (to the
+/// desired-look photo) sit at the bottom over a dark gradient. The tool only supplies its look row and debug menu
+/// (`TryOnTool.tryOnFeature`). There is no face or eye scan.
 struct TryOnHomeView: View {
     @StateObject private var home: TryOnHomeModel
     var onBack: () -> Void
@@ -13,12 +15,12 @@ struct TryOnHomeView: View {
     @State private var showColours=false
     @State private var paletteSource = PaletteSource.camera
     @StateObject private var light = ScreenLight()
-    /// Brow only: the shade row and intensity bar, opened by the palette button over the brow pictures.
+    /// The shade row and intensity bar, opened by the palette button over the look row.
     @State private var showsShades = false
-    /// Brow Try On has its own layout: light page, flash top right, palette button, Continue at the bottom.
-    private var isBrow: Bool { home.tool == .eyebrow }
-    /// Dark labels on the white screen of the light and on the light brow page.
-    private var ink: Color { light.isOn ? .black : isBrow ? AppColors.plumInk : AppColors.snow }
+    /// The camera card shows a message on the light glow (`TryOnCameraOffKey`): controls go dark-on-light, no gradient.
+    @State private var cameraOff = false
+    /// Dark labels on the white screen of the light.
+    private var ink: Color { light.isOn ? .black : AppColors.plumInk }
 
     /// One screen per tool: `tool` is the only makeup it shows, with its shape, colour and intensity.
     init(plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking,
@@ -29,41 +31,12 @@ struct TryOnHomeView: View {
     }
 
     var body: some View {
-        VStack(spacing: AppSpacing.small) {
-            // Brow: no logo row; back and light sit over the camera's top corners so the camera fills the space.
-            if !isBrow { header }
-            // -Nimah: Dismantle the face camera while the palette picker owns the rear camera.
-            if showColours {
-                RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(AppColors.cocoa)
-                    .overlay(Text("Choosing makeup colour")).frame(maxHeight:.infinity)
-            } else {
-                TryOnLiveCard(home: home, light: light, showsLightButton: !isBrow, captionAtTop: isBrow).frame(maxHeight:.infinity)
-                    .overlay(alignment: .top) { if isBrow { browTopButtons } }
-                    .overlay(alignment: .topTrailing) {
-                        if developerTools && home.tool == .eyebrow { BrowDebugMenu().padding(AppSpacing.small).padding(.top, 56) }
-                        if developerTools && home.tool == .blush { BlushDebugMenu().padding(AppSpacing.small) }
-                    }
-                    .overlay(alignment: .bottom) { stylePicker.padding(.bottom, AppSpacing.small) }
-            }
-            if home.tool == .eyebrow && home.canTry(.eyebrow) && !EyebrowConfiguration.showsBrowTracking {
-                BrowStylePicker(styles: home.brow.browStyleChoices, selected: home.brow.configuration.style,
-                                onSelect: home.brow.chooseBrowStyle)
-            }
-            // -Nimah: Old installs may have analysis but no persisted fit; never silently show an empty tool.
-            if !home.canTry(home.tool) {
-                Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
-            }
-            // Brow: shades and intensity replace the brow pictures inside the camera card (see `stylePicker`).
-            if !isBrow { shadeControls }
-            continueButton
-        }
-        // Brow: the camera runs edge to edge; Continue keeps its own side inset.
-        .padding(.horizontal, isBrow ? 0 : AppSpacing.medium)
-        .padding(.bottom, AppSpacing.small)
+        // Read the top safe area here: the camera ignores it, but its messages must sit under the top buttons.
+        GeometryReader { proxy in content(safeTop: proxy.safeAreaInsets.top) }
         .background {
             if light.isOn { AppColors.ringLight.ignoresSafeArea() }
-            else if isBrow { AppColors.browCanvas.ignoresSafeArea() }
-            else { MainBackground() }
+            // Black behind the full-page camera so its rounded corners blend into the screen's.
+            else { Color.black.ignoresSafeArea() }
         }
         .animation(.easeInOut(duration: 0.25), value: showsShades)
         .animation(.easeInOut(duration: 0.25), value: light.isOn)
@@ -87,10 +60,90 @@ struct TryOnHomeView: View {
         }
     }
 
-    // MARK: Header
+    /// The camera fills the whole page; back and light sit in the top safe area; the controls sit over the bottom of it.
+    private func content(safeTop: CGFloat) -> some View {
+        ZStack(alignment: .bottom) {
+            // -Nimah: Dismantle the face camera while the palette picker owns the rear camera.
+            if showColours {
+                RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(AppColors.cocoa)
+                    .overlay(Text("Choosing makeup colour")).ignoresSafeArea()
+            } else {
+                TryOnLiveCard(home: home, light: light, showsLightButton: false,
+                              captionTopInset: safeTop + Self.topButtonsHeight + AppSpacing.small)
+                    .ignoresSafeArea()
+                    .onPreferenceChange(TryOnCameraOffKey.self) { value in
+                        MainActor.assumeIsolated { cameraOff = value }
+                    }
+            }
+            controlsCard
+        }
+        .overlay(alignment: .top) { if !showColours { topButtons } }
+        .overlay(alignment: .topTrailing) {
+            if developerTools && !showColours, let menu = home.tool.tryOnFeature.debugMenu() {
+                menu.padding(AppSpacing.small).padding(.top, 56)
+            }
+        }
+    }
 
-    private var header: some View {
-        ZStack {
+    /// Controls pinned to the bottom. The palette button sits on the bare camera; the dark gradient starts just below it
+    /// and runs under the home indicator.
+    private var controlsCard: some View {
+        VStack(spacing: AppSpacing.small) {
+            // -Nimah: Old installs may have analysis but no persisted fit; never silently show an empty tool.
+            if home.canTry(home.tool) { paletteToggle }
+            VStack(spacing: AppSpacing.small) {
+                if home.canTry(home.tool) {
+                    if showsShades {
+                        shadeControls.padding(.horizontal, AppSpacing.medium)
+                    } else {
+                        home.tool.tryOnFeature.lookPicker(home: home)
+                    }
+                } else {
+                    Text(home.recommendationTitle).font(AppTypography.caption).multilineTextAlignment(.center)
+                }
+                continueButton
+            }
+            .padding(.top, AppSpacing.small)
+            .padding(.bottom, AppSpacing.small)
+            .frame(maxWidth: .infinity)
+            .background {
+                // One gradient, from clear right under the palette button to dark at the bottom edge. None over the
+                // light camera-off page.
+                if !cameraOff {
+                    LinearGradient(colors: [.black.opacity(0), .black.opacity(0.85)], startPoint: .top, endPoint: .bottom)
+                        .ignoresSafeArea(edges: .bottom)
+                        .allowsHitTesting(false)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .foregroundStyle(cameraOff ? AppColors.plumInk : AppColors.snow)
+        .environment(\.colorScheme, cameraOff ? .light : .dark)
+    }
+
+    // MARK: Top buttons
+
+    /// Back and light (48 pt) with `AppSpacing.small` around them, from the top of the safe area.
+    private static let topButtonsHeight: CGFloat = 48 + AppSpacing.small * 2
+
+    /// Back (left) and the screen light (right) over the top corners of the camera; with developer tools on, the
+    /// "New flow" switch sits just below. A long press on back toggles developer mode (landmark dots, hand mask).
+    private var topButtons: some View {
+        VStack(alignment: .leading, spacing: AppSpacing.small) {
+            HStack {
+                Button(action: onBack) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2.weight(.medium))
+                        .foregroundStyle(.primary)
+                        .frame(width: 48, height: 48)
+                        .glassEffect(.regular.interactive(), in: .circle)
+                }
+                .accessibilityLabel("Back to features")
+                .simultaneousGesture(LongPressGesture(minimumDuration: 1.2).onEnded { _ in developerTools.toggle() })
+                .sensoryFeedback(.impact, trigger: developerTools)
+                Spacer()
+                ScreenLightButton(light: light, pulse: 0, plainGlass: true)
+            }
             if developerTools {
                 // Developer switch for the entry screens being built (`NewFlow`).
                 Button { newFlow.toggle() } label: {
@@ -99,43 +152,13 @@ struct TryOnHomeView: View {
                         .padding(.horizontal, 10).frame(minHeight: 32)
                         .glassCapsule(tint: newFlow ? AppColors.glassSelected : AppColors.glassLight)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            Image("logo-burgundy")
-                .resizable().scaledToFit()
-                .frame(maxWidth: 160, maxHeight: 44)
-                .accessibilityLabel("dandan")
-                .accessibilityAddTraits(.isHeader)
-                // Long press: developer mode (landmark dots, hand mask) in builds without a toolbar button.
-                .onLongPressGesture(minimumDuration: 1.2) { developerTools.toggle() }
-                .sensoryFeedback(.impact, trigger: developerTools)
-            HStack {
-                GlassCircleButton(symbol: "chevron.left", size: 48, tint: AppColors.glassLight, label: "Back to features", action: onBack)
-                Spacer()
-            }
-        }
-        .buttonStyle(.plain)
-    }
-
-    /// Brow: back (left) and the screen light (right) over the top corners of the camera card.
-    private var browTopButtons: some View {
-        HStack {
-            Button(action: onBack) {
-                Image(systemName: "chevron.left")
-                    .font(.title2.weight(.medium))
-                    .foregroundStyle(.primary)
-                    .frame(width: 48, height: 48)
-                    .glassEffect(.regular.interactive(), in: .circle)
-            }
-            .accessibilityLabel("Back to features")
-            Spacer()
-            ScreenLightButton(light: light, pulse: 0, plainGlass: true)
         }
         .buttonStyle(.plain)
         .padding(AppSpacing.small)
     }
 
-    /// Full-width pink button under everything, on to the photo of the desired look. A style must be on first.
+    /// Full-width button at the bottom, on to the photo of the desired look. A style must be on first.
     private var continueButton: some View {
         Button {
             let handoff = home.tutorialHandoff
@@ -147,16 +170,17 @@ struct TryOnHomeView: View {
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(AppColors.flamingo, in: Capsule())
+                // System glass tinted with the homepage's dark button colour, so it follows the Liquid Glass setting.
+                .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
         }
         .buttonStyle(.plain)
-        // Brow: the page has no side padding, so the button keeps its own inset.
-        .padding(.horizontal, isBrow ? AppSpacing.medium * 2 : 0)
+        // The page has no side padding, so the button keeps its own inset.
+        .padding(.horizontal, AppSpacing.medium)
         .padding(.top, AppSpacing.small)
         .disabled(!home.canTry(home.tool) || home.isOff)
     }
 
-    /// Brow only: opens the shade row and intensity bar; shows an X while they are open.
+    /// Opens the shade row and intensity bar; shows an X while they are open.
     private var paletteToggle: some View {
         Button { showsShades.toggle() } label: {
             Image(systemName: showsShades ? "xmark" : "paintpalette")
@@ -169,43 +193,9 @@ struct TryOnHomeView: View {
         .accessibilityLabel(showsShades ? "Close colours" : "Colours")
     }
 
-    // MARK: Liner look
-
-    /// The six liner looks as pictures, scrolling sideways; the first tile switches the liner off.
-    private var linerLookPicker: some View {
-        LinerLookPicker(selected: home.isOff ? nil : home.linerLook) { look in
-            if let look { home.setLinerLook(look) } else { home.turnOff() }
-        }
-        .disabled(!home.canTry(.eyeliner))
-    }
-
-    /// The look choices of the selected tool, as glass circles over the bottom of the camera card.
-    @ViewBuilder private var stylePicker: some View {
-        switch home.tool {
-        case .eyeliner:
-            linerLookPicker
-        case .eyebrow where home.canTry(.eyebrow):
-            VStack(spacing: AppSpacing.small) {
-                paletteToggle
-                if showsShades {
-                    shadeControls.padding(.horizontal, AppSpacing.small)
-                } else {
-                    BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:))
-                }
-            }
-        case .blush:
-            BlushLookPicker(selected: home.isOff ? nil : home.blushLook) { look in
-                if let look { home.choose(blush: look) } else { home.turnOff() }
-            }
-            .disabled(!home.canTry(.blush))
-        default:
-            EmptyView()
-        }
-    }
-
     // MARK: Shades
 
-    /// The shade row and intensity bar: under the card for blush and eyeliner, in place of the brow pictures for brows.
+    /// The shade row and intensity bar, in place of the look row while the palette button is open.
     @ViewBuilder private var shadeControls: some View {
         shadeRow.disabled(!home.canTry(home.tool))
         IntensityBar(value: Binding(get: { home.intensity }, set: home.setIntensity),

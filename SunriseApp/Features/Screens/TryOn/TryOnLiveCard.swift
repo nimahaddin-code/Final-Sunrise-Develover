@@ -13,16 +13,16 @@ struct TryOnLiveCard: View {
     @ObservedObject var light: ScreenLight
     /// False when the screen puts the light button elsewhere (brow Try On: top right of the header).
     var showsLightButton = true
-    /// True: camera messages show near the top (under the screen's own buttons) instead of above the bottom controls.
-    var captionAtTop = false
+    /// Camera messages: this far from the card's top (under the screen's own buttons); nil: above the bottom controls.
+    var captionTopInset: CGFloat?
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
 
-    init(home: TryOnHomeModel, light: ScreenLight, showsLightButton: Bool = true, captionAtTop: Bool = false) {
+    init(home: TryOnHomeModel, light: ScreenLight, showsLightButton: Bool = true, captionTopInset: CGFloat? = nil) {
         self.home = home
         self.light = light
         self.showsLightButton = showsLightButton
-        self.captionAtTop = captionAtTop
+        self.captionTopInset = captionTopInset
         camera = home.camera
         brow = home.brow
     }
@@ -55,6 +55,16 @@ struct TryOnLiveCard: View {
         .accessibilityElement(children: .contain)
         .accessibilityAction(named: "Compare without makeup") { home.isComparing.toggle() }
         .animation(.easeInOut(duration: 0.2), value: home.isComparing)
+        .preference(key: TryOnCameraOffKey.self, value: cameraOff)
+    }
+
+    /// The card shows a message (`CardMessage`) instead of the camera.
+    private var cameraOff: Bool {
+        switch brow.availability {
+        case .notChecked: false
+        case .unsupported: true
+        case .supported: camera.denied || camera.failure != nil
+        }
     }
 
     @ViewBuilder private var content: some View {
@@ -103,17 +113,12 @@ struct TryOnLiveCard: View {
         }
         // Pinch or tap the chip to zoom the picture and its overlays together; the light and captions stay put.
         .cameraZoom()
-        .overlay {
-            if let status {
-                StatusPill(text: status)
-            }
-        }
         .overlay(alignment: .topLeading) {
             if showsLightButton { ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(AppSpacing.small) }
         }
-        .overlay(alignment: captionAtTop ? .top : .bottom) {
+        .overlay(alignment: captionTopInset == nil ? .bottom : .top) {
             CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
-                .padding(captionAtTop ? .top : .bottom, captionAtTop ? 72 : 100)
+                .padding(captionTopInset == nil ? .bottom : .top, captionTopInset ?? 100)
         }
     }
 
@@ -130,35 +135,9 @@ struct TryOnLiveCard: View {
         return value
     }
 
-    /// Brow/blush status for the selected tool only. Blush shows a prompt until the live camera has fitted the cheeks,
-    /// then the renderer's status; the eyebrow follows MediaPipe landmarks, so the renderer reports when it has a face.
-    /// Eyeliner follows the eyes on its own, so it never shows these messages.
-    private var status: String? {
-        guard home.tool == .blush || home.tool == .eyebrow, home.canTry(home.tool), !home.isOff else { return nil }
-        if home.tool == .eyebrow { return camera.beautyStatus }
-        return camera.eyebrowGuideReady ? camera.beautyStatus : String(localized: "Look straight at the camera to place your makeup")
-    }
 
     private func openSettings() {
         if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
-    }
-}
-
-private struct StatusPill: View {
-    let text: String
-
-    var body: some View {
-        VStack {
-            Text(text)
-                .font(AppTypography.body)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, AppSpacing.medium).padding(.vertical, AppSpacing.small)
-                .background(AppColors.wine.opacity(0.85), in: Capsule())
-                .foregroundStyle(AppColors.snow)
-                .padding(.top, AppSpacing.medium)
-                .accessibilityAddTraits(.updatesFrequently)
-            Spacer()
-        }
     }
 }
 
@@ -179,11 +158,19 @@ private struct CardMessage: View {
                     .buttonStyle(.borderedProminent).tint(AppColors.flamingo)
             }
         }
-        .foregroundStyle(AppColors.snow)
+        .foregroundStyle(AppColors.plumInk)
         .padding(AppSpacing.large)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.cocoa)
+        // Camera off: the homepage's light glow instead of a dark card.
+        .background { OnboardingGlow() }
     }
+}
+
+/// True while the card shows a message instead of the camera (no TrueDepth, permission denied, camera stopped), so the
+/// screen can draw its controls for the light background.
+struct TryOnCameraOffKey: PreferenceKey {
+    static let defaultValue = false
+    static func reduce(value: inout Bool, nextValue: () -> Bool) { value = value || nextValue() }
 }
 
 /// Digital zoom for the live camera card: pinch, or tap the chip to step through 1x / 1.5x / 2x / 3x. Everything inside
@@ -215,8 +202,9 @@ struct CameraZoomModifier: ViewModifier {
                     Text(String(format: current.rounded() == current ? "%.0f×" : "%.1f×", current))
                         .font(.footnote.weight(.semibold).monospacedDigit())
                         .padding(.horizontal, 10).padding(.vertical, 8)
-                        .background(AppColors.wine.opacity(0.75), in: Capsule())
                         .foregroundStyle(AppColors.snow)
+                        // Same dark glass as the brow Continue button (homepage button colour).
+                        .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
                 }
                 .buttonStyle(.plain)
                 .padding(.trailing, AppSpacing.small)
