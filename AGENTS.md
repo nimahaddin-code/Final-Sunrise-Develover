@@ -11,8 +11,93 @@ paste into an AI for new Indonesian copy). Kit pictures: PNG, transparent backgr
 by real photos under the same names. `GuidedFlowTests.testEveryItemPictureIsInTheAssets` fails when an `imageName` has
 no asset. Simulator tests only.
 
+## Onboarding page art (pages 1-3) — Khalish (2026-11-07)
+
+Page 1 (`artOne`, `OnboardingView.swift`) is now a face photo on the front card with makeup stickers around it; the two cards
+behind are blank white (`blankCard`). Image sets: `onb-tryon-1` (face photo, already rounded and rotated 4 degrees clockwise, transparent
+corners; the white card behind it takes the same angle), stickers `onb-sticker-brow-1` (thin brow, left), `onb-sticker-brow-2` (thick brow,
+top right), `onb-sticker-blush` (used twice, both cheeks), `onb-sticker-lips`. A sticker is drawn only if its image exists (`sticker(_:width:)`),
+positioned as a fraction of the card size. `onb-tryon-2` and `onb-tryon-3` were removed.
+Pages 2 and 3 pictures are all derived from that one face photo: `onb-step-1` (cheek and mouth corner crop), `onb-step-2` (same kind of crop
+with a pink dot on the cheek apple), `onb-step-3` (whole face), `onb-compare-after` (face square crop, with blush), `onb-compare-before`
+(same crop, blush reduced by image editing, no code). The "before" is a placeholder, not a real bare-face photo: replace it, and the
+other crops, with proper photos when available. Simulator only (iPhone 17 Pro, 17e), no device check.
+
+## One Try On layout for every tool, per-tool `TryOnFeature` — 2026-11-07
+
+`TryOnHomeView` has one layout for all tools, the former brow one: full-page camera, back and light in the top safe area,
+palette button, look row (or shades and intensity) and Continue (glass tinted `AppColors.buttonInk`) at the bottom over the
+dark gradient that starts right under the palette button (one clear-to-85% ramp, the button itself on the bare camera;
+`controlsCard`, `topButtons`). Blush and eyeliner lose the logo header, page padding, light button with dark-scene
+pulse and pink Continue, and gain the palette button. The view has no tool branches: a tool adds only its look row and debug
+menu through `TryOnFeature` (`Features/Screens/TryOn/TryOnFeature.swift`), implemented in `Features/Blush/TryOn/BlushTryOnFeature`,
+`Features/Brow/TryOn/BrowTryOnFeature` and `Features/Eyeliner/TryOn/EyelinerTryOnFeature`; `TryOnTool.tryOnFeature` is the one
+switch. New tool: add a `TryOnTool` case, a feature in its folder, and its case in that switch. Developer tools: long-press the
+back button (1.2 s; the logo is gone); the "New flow" chip sits under the top buttons while they are on. Simulator build only:
+the layout and the eyeliner overlay on the full-page camera are not checked on a device.
+Camera off (no TrueDepth, permission denied, camera stopped): `CardMessage` sits on the homepage's `OnboardingGlow` with
+`AppColors.plumInk` text; `TryOnLiveCard` reports it (`TryOnCameraOffKey`) so the controls drop the gradient and go
+dark-on-light. `GlassPickerRow`'s title now takes the screen's colour (was always white), and the row no longer clips
+(`scrollClipDisabled`): the glass "none" circle's shadow, cut at the row's top and bottom, showed as a grey square.
+Camera messages: only `CameraGuidanceCaption` (the advisor) shows on Try On, just under back and light
+(`TryOnLiveCard(captionTopInset:)` = top safe area + the button row). The old `StatusPill` (engine `beautyStatus`, "Look straight at
+the camera to place your makeup") is removed; its string stays in the catalog, unused. Not checked on a device. Seen on the Simulator (blush).
+
+## Merge: E2E-Flow into staging — 2026-11-07
+
+origin/staging (tool-first folders, card-slider home, brow Try On layout, three-page onboarding, Indonesian, `NewFlow`
+skeleton) merged with the E2E one-tool flow. Up to home follows staging: splash/onboarding/compact opening behind `NewFlow`
+(entry only now), the welcome, then `FeatureHomeView`. After home follows E2E: `tryOn` -> `capture(.desired)` ->
+`lookBrief` -> `recommendedTutorial(handoff, attempt:)` -> `capture(.result)` -> `feedback`, always on. Removed from staging:
+the placeholder routes `comparison`/`preparation`/`feedback(FeedbackInput)`, `ComparisonView`, `PreparationScreen`, its
+`FeedbackView`/`FeedbackInput`/`LookPhoto`, `TutorialPrepView` (E2E's `LookBriefView` replaces it; the `kit-*` image sets stay,
+unused), `TutorialHandoff.lookPhoto` and `GuidedTutorialView(onFinish:)` (E2E's `onFinished` + capture screen take the
+photo). Removed from E2E: `FeaturePickerView` (staging's home). E2E's flow files moved to `Features/Screens/Flow/`,
+`TutorialStepsSheet` to `Features/Screens/Tutorial/`. `TryOnHomeModel(tool:)` takes an optional tool (nil: every tool, as
+the tests use); with one, only it reaches the handoff (E2E's `focusTool`). Try On keeps staging's brow layout; every tool now
+ends with the pink Continue (to the desired-look photo), and Back goes home. The tutorial bar shows the side and Steps
+(per-side, E2E) or the tool's name (staging). Strings: staging's catalog plus E2E's new keys (no Indonesian for those yet).
+Simulator build only.
+
+## One-tool E2E flow: home, capture, brief, per-side tutorial, feedback placeholder — 2026-11-05
+
+The app no longer opens on Try On. After the welcome, `FeaturePickerView` (home, "Pick a Feature": Brows / Blush / Liner)
+starts a run for one tool: `AppRoute.tryOn(tool)` (`TryOnHomeView` for that tool only, back button, Continue once a style is
+on) -> `capture(.desired, handoff)` (`FeatureCaptureView`: camera with the chosen look and the feature's frame, shutter,
+Retake/Next) -> `lookBrief(handoff)` (`LookBriefView`: that photo, the style name, what to prepare from `TryOnTool.kit`,
+"Go to Tutorial"; replaces `TutorialPrepView`, deleted) -> `recommendedTutorial(handoff, attempt:)` (`GuidedTutorialView`
+with `onFinished`: that tool only, every step on the screen's left half (user's right side) then the right half, guide
+beside the plain camera, compare toggles the desired look on the other half; `TutorialStepsSheet` opens half height at the
+start with its title fixed above the scrolling steps, each step an instruction plus a line of encouragement
+(lesson `instruction`, `LinerTutorialStep.cheer`), back up with a cheer when the second side starts; drag up/down or the Steps button; Done pushes the next capture) -> `capture(.result, handoff)` (plain camera, same
+frame) -> `feedback(handoff)` (`FeedbackView`: loading with percentage, then feedback; "Back to tutorial" =
+`AppNavigator.restartTutorial()`, a new `attempt` from step 1; "Done" returns home). Photos live in `MakeupFlowStore`
+(memory only, cleared on Done and on a new pick). Feedback goes through `MakeupFeedbackProviding`
+(`AppContainer.feedback`); `PlaceholderFeedbackProvider` waits ~2 s and returns fixed text, it never looks at the photos:
+plug the real comparison in there. Placeholders until design: tile icons (SF Symbols), the frame position
+(`TryOnTool.captureRegion`; ID-card style cut-out shaped like the feature, `FeatureFrameShape`: one rectangle round both eyes,
+two brows or two cheeks, plus corner brackets; nothing checks the feature is inside), kit copy, the steps' GIFs (grey boxes), brief and feedback
+layout. Without a usable camera (Simulator) capture offers "Continue without photo" so the flow runs end to end. New files:
+`Makeup/Shared/Flow/` (`MakeupFlow`, `FeaturePickerView`, `FeatureCaptureView`, `LookBriefView`, `FeedbackView`) and
+`Shared/Tutorial/TutorialStepsSheet`. `TutorialCompare` gained `guidePlain`/`plainGuide` (never in the compare cycle).
+Not checked on a device: whether `ARSCNView.snapshot()` includes the Metal blush/brow layer in the desired-look photo.
+
+## New onboarding: light splash and three pages — Khalish (2026-11-06)
+
+`OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`, rewritten in place, same `onStart`) is now a white page
+with a soft pink/grey glow: a splash ("dandan" wordmark + "makeup made for your face", auto-advances after 1.6 s or on tap), then
+three pages in one `TabView`: "Try it on before you put it on", "Step by step, at your own pace", "See how you did, side by side"
+(button "Get started" calls `onStart`; no Skip). Pictures are image sets to fill with PNGs: `onb-tryon-1` (page 1, see the 2026-11-07 section above), `onb-step-1/2/3`,
+`onb-compare-before`, `onb-compare-after` (empty until added; a grey placeholder shows). Tokens: `AppColors.dandanPink`,
+`onboardingInk`, `onboardingBody`. The silk image `onboarding-silk` and the old welcome strings were removed; new strings have
+Indonesian drafts (`needs_review`). `AppNavigator.currentWelcomeVersion` stays 2. Only the picture swipes; title, text, dots and button stay, the text crossfades and the active dot animates. Simulator only, no device check.
+
 ## Brow Try On layout — Khalish (2026-11-06)
 
+Update 2026-11-07: the camera fills the whole page (under the status bar and home indicator) and the palette button, brow pictures
+(or shades) and Continue sit at the bottom over a dark gradient (clear to 85% black, no card; `browControlsCard`); back and light stay in the top safe area.
+Continue (`.glassEffect` tinted `AppColors.buttonInk`, the homepage button colour) uses system Liquid Glass, like back, light and palette, so the
+buttons follow Settings > Display > Liquid Glass (Clear/Tinted); page behind the camera is black.
 Brow only (`TryOnHomeView`, `isBrow`): page background `AppColors.browCanvas` (#FAF2EA, dark text), no logo row (so no long-press for developer tools here):
 back and the screen light sit over the camera's top corners (`browTopButtons`), no tutorial arrow (`TryOnLiveCard(showsLightButton: false)`, no dark-scene pulse there), a palette
 button above `BrowOverlayPicker` swaps it for the shade row and intensity bar inside the camera card (`showsShades`, `shadeControls`; the button turns into an X), and a
@@ -29,6 +114,9 @@ the order Eyeliner, Blush, Brows, starting on Blush (the others peek in at the s
 shown card; steps come from `GuidedTutorialModel.*Lessons.count`, minutes from `ToolInfo.minutes`. "Start Lesson" calls
 `onSelect` for the shown tool (same route as before: `AppRoute.tryOn(tool)`). New strings have Indonesian drafts
 (`needs_review`). Simulator only, no device check.
+2026-11-07 restyle: title "Hi, fellas!", background `OnboardingGlow` (shared with onboarding), step and minute chips inside each
+card at the bottom left (no chips under the name), active dot `AppColors.dandanPink` (#FF2D8E), dark "Start lesson" button
+(`AppColors.buttonInk` #1C1C1C). `AppColors.homeCanvas` is no longer used here.
 
 ## Feature homepage, one tool per Try On — Khalish (2026-11-05)
 
@@ -50,6 +138,8 @@ sets `kit-spoolie` (a mascara wand), `kit-brow-pencil`, `kit-cotton-bud`: CC0 SV
 eyeliner tools are not listed. Simulator render only, no device check.
 
 ## Three-page onboarding — Khalish (2026-11-04)
+
+Superseded by the 2026-11-06 section above.
 
 `OnboardingWelcomeScreen` (`Features/Onboarding/Welcome/OnboardingView.swift`) is now three swipeable pages in one `TabView`: the welcome
 (logo, Get Started), "TRY IT ON, LIVE" (blush, brows, eyeliner) and "LEARN IT, STEP BY STEP" (tutorial and photo, photos stay on
@@ -832,10 +922,11 @@ SunriseAppTests/
 
 ## Navigation
 
-- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`), then `FeatureHomeView` (a slider of
-  three tool cards, no camera). Routes: `AppRoute.tryOn(TryOnTool)` (card -> Try On for that one tool) and
-  `AppRoute.recommendedTutorial(TutorialHandoff)` (Try On -> tutorial); `AppRootView.destination` builds both. To add a
-  screen: add a case, its destination, and push it with `navigator.open(route, in: .tryOn)`.
+- The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`; with `NewFlow` on, the entry screens
+  first), then `FeatureHomeView` (a slider of three tool cards, no camera). Routes (`AppRoute`): `tryOn`, `capture`,
+  `lookBrief`, `recommendedTutorial`, `feedback` (order in the top section); `AppRootView.destination` builds them. To add a
+  screen: add a case, its destination, and push it with `navigator.open(route, in: .tryOn)`; `goBack(in:)`,
+  `restartTutorial()` and `returnToRoot(of:)` move back.
 - `AppTab` and the per-tab paths in `AppNavigator` remain, though only `.tryOn` is shown.
 
 ## Features

@@ -3,8 +3,8 @@ import SwiftUI
 struct AppRootView: View {
     let container: AppContainer
     @StateObject private var navigator = AppNavigator()
-    /// The guided flow being built; off by default (see `NewFlow`).
-    @AppStorage(NewFlow.key) private var newFlow = false
+    /// The photos of the current run; cleared when a new feature is picked and when the flow ends.
+    @StateObject private var flow = MakeupFlowStore()
     /// Splash, onboarding and the compact opening run once per launch, and only when the new flow was on at launch.
     @State private var showEntry = UserDefaults.standard.bool(forKey: NewFlow.key)
 
@@ -15,9 +15,12 @@ struct AppRootView: View {
             } else if navigator.needsWelcome {
                 OnboardingWelcomeScreen {navigator.dismissWelcome()}
             } else {
-        // Preserve staging’s scan-free home after the one-time welcome.
+        // One feature at a time: home -> Try On -> photo -> brief -> tutorial -> photo -> feedback -> home.
         NavigationStack(path: $navigator.tryOnPath) {
-            FeatureHomeView { tool in navigator.open(.tryOn(tool), in: .tryOn) }
+            FeatureHomeView { tool in
+                flow.reset()
+                navigator.open(.tryOn(tool), in: .tryOn)
+            }
                 .navigationDestination(for: AppRoute.self, destination: destination)
             }
         }
@@ -31,21 +34,30 @@ struct AppRootView: View {
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
         case .tryOn(let tool):
-            TryOnHomeView(tool: tool, plan: plan, assessment: assessment, checker: container.faceTracking,
-                          onTutorial: { handoff in
-                              navigator.open(newFlow ? .comparison(handoff) : .recommendedTutorial(handoff), in: .tryOn)
-                          })
-        case .recommendedTutorial(let handoff):
+            TryOnHomeView(plan: plan, assessment: assessment, checker: container.faceTracking, tool: tool,
+                          onBack: { navigator.goBack(in: .tryOn) },
+                          onContinue: { handoff in navigator.open(.capture(.desired, handoff), in: .tryOn) })
+        case .capture(let stage, let handoff):
+            FeatureCaptureView(stage: stage, handoff: handoff, plan: plan, assessment: assessment, checker: container.faceTracking,
+                               store: flow, onBack: { navigator.goBack(in: .tryOn) }, onNext: {
+                navigator.open(stage == .desired ? .lookBrief(handoff) : .feedback(handoff), in: .tryOn)
+            })
+        case .lookBrief(let handoff):
+            LookBriefView(handoff: handoff, photo: flow.desired, onBack: { navigator.goBack(in: .tryOn) },
+                          onStart: { navigator.open(.recommendedTutorial(handoff), in: .tryOn) })
+        case .recommendedTutorial(let handoff, _):
             GuidedTutorialView(checker:container.faceTracking,assessment:assessment,plan:plan,handoff:handoff,
-                               onFinish: newFlow ? { result in
-                                   navigator.open(.feedback(FeedbackInput(handoff: handoff, result: result)), in: .tryOn)
-                               } : nil)
-        case .comparison(let handoff):
-            ComparisonView(handoff: handoff) { navigator.open(.preparation(handoff), in: .tryOn) }
-        case .preparation(let handoff):
-            PreparationScreen(handoff: handoff) { navigator.open(.recommendedTutorial(handoff), in: .tryOn) }
-        case .feedback(let input):
-            FeedbackView(input: input) { navigator.returnToRoot(of: .tryOn) }
+                               onFinished: { navigator.open(.capture(.result, handoff), in: .tryOn) })
+        case .feedback(let handoff):
+            FeedbackView(handoff: handoff, store: flow, provider: container.feedback,
+                         onBackToTutorial: {
+                             flow.result = nil
+                             navigator.restartTutorial()
+                         },
+                         onDone: {
+                             flow.reset()
+                             navigator.returnToRoot(of: .tryOn)
+                         })
         }
     }
 }

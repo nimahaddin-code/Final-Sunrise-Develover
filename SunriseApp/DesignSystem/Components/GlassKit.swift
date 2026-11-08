@@ -104,13 +104,16 @@ struct GlassPickerRow<Content: View>: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            title.font(.system(size: 15, weight: .regular)).foregroundStyle(AppColors.snow)
+            // Colour comes from the screen: white over the camera, dark on Try On's light camera-off page.
+            title.font(.system(size: 15, weight: .regular))
             GeometryReader { geo in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) { content() }
                         .scrollTargetLayout()
                         .frame(minHeight: rowHeight)
                 }
+                // Unclipped: the glass "none" circle's shadow reaches past the row and showed as a grey square when cut.
+                .scrollClipDisabled()
                 .contentMargins(.horizontal, max(geo.size.width / 2 - selectedWidth / 2, 0), for: .scrollContent)
                 .scrollPosition(id: $position, anchor: .center)
                 .scrollTargetBehavior(.viewAligned)

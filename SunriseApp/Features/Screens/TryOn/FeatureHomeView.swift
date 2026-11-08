@@ -1,8 +1,8 @@
 import SwiftUI
 
-/// The first page after the welcome: a light page with a swipeable slider of tool cards (Eyeliner, Blush, Brows; Blush
-/// first in view), the selected tool's name, steps, minutes and a line about it, and "Start Lesson" for the selected tool.
-/// Plain SwiftUI, no camera.
+/// The first page after the welcome: the onboarding glow with "Hi, fellas!", a swipeable slider of tool cards (Eyeliner,
+/// Blush, Brows; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
+/// about it, and a dark "Start lesson" button for the selected tool. Plain SwiftUI, no camera.
 struct FeatureHomeView: View {
     let onSelect: (TryOnTool) -> Void
 
@@ -17,12 +17,12 @@ struct FeatureHomeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Hi fellas!")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(AppColors.wine)
+                Text("Hi, fellas!")
+                    .font(.system(size: 34, weight: .bold))
+                    .foregroundStyle(AppColors.onboardingInk)
                 Text("What do you want to learn today?")
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundStyle(AppColors.plumInk)
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(AppColors.onboardingInk)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, AppSpacing.large)
@@ -41,10 +41,6 @@ struct FeatureHomeView: View {
                 Text(name(current))
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(AppColors.plumInk)
-                HStack(spacing: 8) {
-                    chip(Text("\(steps(current)) steps"), fill: chipFill(current))
-                    chip(Text("\(minutes(current)) min"), fill: chipFill(current))
-                }
                 Text(blurb(current))
                     .font(.system(size: 15))
                     .foregroundStyle(Self.bodyText)
@@ -57,22 +53,23 @@ struct FeatureHomeView: View {
 
             Button { onSelect(current) } label: {
                 HStack(spacing: 8) {
-                    Text("Start Lesson")
+                    Text("Start lesson")
                     Image(systemName: "arrow.right").accessibilityHidden(true)
                 }
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .background(AppColors.flamingo, in: Capsule())
-                .shadow(color: AppColors.flamingo.opacity(0.35), radius: 14, y: 6)
+                .background(AppColors.buttonInk, in: Capsule())
+                .shadow(color: .black.opacity(0.18), radius: 12, y: 6)
             }
             .buttonStyle(.plain)
             .padding(.horizontal, AppSpacing.large)
             .padding(.bottom, AppSpacing.medium)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background { AppColors.homeCanvas.ignoresSafeArea() }
+        .background { OnboardingGlow() }
+        .preferredColorScheme(.light)
         .toolbar(.hidden, for: .navigationBar)
     }
 
@@ -85,6 +82,13 @@ struct FeatureHomeView: View {
                     Button { withAnimation(.snappy) { selected = tool } } label: {
                         Image(Self.imageName(tool))
                             .resizable().scaledToFit()
+                            .overlay(alignment: .bottomLeading) {
+                                HStack(spacing: 6) {
+                                    chip(Text("^[\(steps(tool)) step](inflect: true)"))
+                                    chip(Text("\(minutes(tool)) min"))
+                                }
+                                .padding(16)
+                            }
                     }
                     .buttonStyle(.plain)
                     // The container already excludes the content margins below, so this is cardWidthFraction of the slider.
@@ -111,7 +115,7 @@ struct FeatureHomeView: View {
         HStack(spacing: 6) {
             ForEach(Self.order) { tool in
                 Capsule()
-                    .fill(selected == tool ? AppColors.plumInk : Self.dotGrey)
+                    .fill(selected == tool ? AppColors.dandanPink : Self.dotGrey)
                     .frame(width: selected == tool ? 22 : 7, height: 7)
             }
         }
@@ -119,13 +123,13 @@ struct FeatureHomeView: View {
         .accessibilityHidden(true)
     }
 
-    private func chip(_ text: Text, fill: Color) -> some View {
+    private func chip(_ text: Text) -> some View {
         text
             .font(.system(size: 13, weight: .semibold))
             .foregroundStyle(AppColors.plumInk)
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .background(fill, in: Capsule())
+            .background(Color.white.opacity(0.7), in: Capsule())
     }
 
     // MARK: Per-tool content
@@ -138,15 +142,6 @@ struct FeatureHomeView: View {
         case .eyeliner: "home-card-eyeliner"
         case .blush: "home-card-blush"
         case .eyebrow: "home-card-brows"
-        }
-    }
-
-    /// Chip fill tinted to the tool's card: eyeliner #EAE3F2, blush #F9E5EF, brows #FAF2EA.
-    private func chipFill(_ tool: TryOnTool) -> Color {
-        switch tool {
-        case .eyeliner: Color(red: 0xEA / 255, green: 0xE3 / 255, blue: 0xF2 / 255)
-        case .blush: Color(red: 0xF9 / 255, green: 0xE5 / 255, blue: 0xEF / 255)
-        case .eyebrow: Color(red: 0xFA / 255, green: 0xF2 / 255, blue: 0xEA / 255)
         }
     }
 

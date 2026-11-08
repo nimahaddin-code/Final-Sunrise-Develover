@@ -85,8 +85,9 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// The tool the shade row and intensity bar currently control. The launch
     /// state is normalized in `activate()` so cold and warm starts match.
     @Published private(set) var blushLook:BlushPlacementStyle = .youthful
-    @Published private(set) var tool: TryOnTool
-    private let startTool: TryOnTool
+    @Published private(set) var tool: TryOnTool = .eyebrow
+    /// When set, the screen is about this one tool: `activate()` returns to it instead of the eyebrow.
+    private let focusTool: TryOnTool?
     /// The tools with makeup on. Every launch starts bare (no makeup on any tool); a tool goes on when a shade, look,
     /// brow picture or strength is chosen for it and stays as left when another tool is picked. All of them are drawn
     /// together, and the tutorial and its photo get exactly this set.
@@ -123,9 +124,10 @@ final class LinerFrameRelay: @unchecked Sendable {
     private var appliedEyes:EyeShapeResult?
     private var observationBag = Set<AnyCancellable>()
 
-    init(tool: TryOnTool = .eyebrow, plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
-        startTool = tool
-        self.tool = tool
+    /// `tool` set: the screen is about that one tool (see `focusTool`). Nil: every tool, starting on the eyebrow.
+    init(tool: TryOnTool? = nil, plan: MakeupPlan, assessment: FaceShapeAssessment, checker: any FaceTrackingAvailabilityChecking) {
+        focusTool = tool
+        self.tool = tool ?? .eyebrow
         let recommendation = plan.madeForYou.first { $0.category == .eyeliner }
         // A thin natural line is used without an eye scan, so the colour can still be tried.
         linerIsNeutral = plan.eyeliner.isNeutral
@@ -208,9 +210,24 @@ final class LinerFrameRelay: @unchecked Sendable {
     }
 
     /// What the tutorial starts from: every tool's last choice, and which tools have makeup on.
+    /// With `focusTool` set (one tool per flow), only that tool goes on to the capture, tutorial and feedback.
     var tutorialHandoff: TutorialHandoff {
         TutorialHandoff(tool: tool, shades: shades, intensities: intensities, linerLook: linerLook, blushStyle: blushLook,
-                        browOverlay: browOverlay, hideNaturalBrow: !naturalBrowVisible, enabled: enabled)
+                        browOverlay: browOverlay, hideNaturalBrow: !naturalBrowVisible,
+                        enabled: focusTool.map { enabled.intersection([$0]) } ?? enabled)
+    }
+
+    /// Puts back what Try On chose, for the capture screen of the desired look. Call after `activate()`, which resets
+    /// the eyebrow to no overlay.
+    func apply(_ handoff: TutorialHandoff) {
+        shades.merge(handoff.shades) { _, new in new }
+        intensities.merge(handoff.intensities) { _, new in new }
+        if let style = handoff.blushStyle, style.isReferenceLook { blushLook = style }
+        linerLook = handoff.linerLook
+        browOverlay = handoff.browOverlay
+        naturalBrowVisible = !handoff.hideNaturalBrow
+        enabled = handoff.enabled.filter { canTry($0) && ($0 != .eyebrow || browOverlay != nil) }
+        syncLiner()
     }
 
     /// Selecting a tool only shows its controls; every tool keeps the makeup chosen for it, on or off.
@@ -274,7 +291,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         guard !active else { return }
         // Cold and warm starts show the tool this screen was opened for, with the brow's no-overlay tile
         // selected. Choosing a brow overlay enables it; other tools keep their choice.
-        tool = startTool
+        tool = focusTool ?? .eyebrow
         enabled.remove(.eyebrow)
         browOverlay = nil
         active=true

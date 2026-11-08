@@ -1,9 +1,8 @@
 import Foundation
 
-/// The guided flow being built (splash, onboarding, compact opening, comparison, preparation, feedback) stays behind this
-/// switch until its screens are designed, so the app on everyone's phone is unchanged. Turn it on with developer tools
-/// (long-press the logo on Try On), then "New flow". The entry screens show from the next launch; the screens after Try
-/// On show at once.
+/// The entry screens being built (splash, onboarding pages, compact opening) stay behind this switch until they are
+/// designed. Turn it on with developer tools (long-press the logo on Try On), then "New flow"; they show from the next
+/// launch. The screens after Try On (photo, brief, tutorial, photo, feedback) are always on.
 enum NewFlow {
     static let key = "dandan.newFlow"
 }

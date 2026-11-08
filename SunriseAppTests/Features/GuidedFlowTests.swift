@@ -1,4 +1,4 @@
-// -Nimah: Phase 0 of the guided flow: each tool's info, and the routes between the new screens.
+// -Nimah: Phase 0 of the guided flow: each tool's info, and the switch for the entry screens.
 import XCTest
 @testable import SunriseApp
 
@@ -52,19 +52,6 @@ final class GuidedFlowTests: XCTestCase {
         let chosen = ToolInfo.chosen(in: handoff(enabled: [.eyebrow, .blush]))
         XCTAssertEqual(chosen.map(\.tool), TryOnTool.allCases.filter { [.eyebrow, .blush].contains($0) })
         XCTAssertTrue(ToolInfo.chosen(in: handoff(enabled: [])).isEmpty)
-    }
-
-    @MainActor func testNewFlowRoutesStackInOrderAndReturnToTryOn() {
-        let navigator = AppNavigator(defaults: UserDefaults(suiteName: "GuidedFlowTests")!)
-        let value = handoff(enabled: [.blush])
-        let feedback = AppRoute.feedback(FeedbackInput(handoff: value, result: UIImage()))
-        for route in [AppRoute.comparison(value), .preparation(value), .recommendedTutorial(value), feedback] {
-            navigator.open(route, in: .tryOn)
-        }
-        XCTAssertEqual(navigator.tryOnPath.count, 4)
-        XCTAssertEqual(navigator.tryOnPath.last, feedback)
-        navigator.returnToRoot(of: .tryOn)
-        XCTAssertTrue(navigator.tryOnPath.isEmpty)
     }
 
     func testNewFlowIsOffUnlessSwitchedOn() {

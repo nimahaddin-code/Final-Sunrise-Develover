@@ -19,8 +19,6 @@ struct TutorialHandoff: Hashable {
     /// The tools with makeup on when Try On was left. The photo shows exactly these, each as last chosen; a tab for a
     /// tool that was off still guides, without a makeup preview.
     var enabled: Set<TryOnTool> = Set(TryOnTool.allCases)
-    /// The photo taken on Try On of the chosen look (new flow); nil until that photo button exists. Memory only.
-    var lookPhoto: UIImage? = nil
 }
 
 /// What one half of the camera shows in the comparison.
@@ -28,18 +26,30 @@ enum TutorialHalf { case tryOn, guide, plain }
 
 /// What the bottom-left button shows, in the order it cycles: the finished look on one half and the step guide on the
 /// other (either way round), the look beside the plain camera (either way round), then the plain camera alone.
+/// `guidePlain` / `plainGuide` are the one-side-at-a-time tutorial's layouts (the guide on the side being done, nothing
+/// on the other); the compare button never cycles to them.
 enum TutorialCompare: CaseIterable {
-    case tryOnGuide, guideTryOn, tryOnPlain, plainTryOn, plain
+    case tryOnGuide, guideTryOn, tryOnPlain, plainTryOn, plain, guidePlain, plainGuide
+
+    static let cycle: [TutorialCompare] = [.tryOnGuide, .guideTryOn, .tryOnPlain, .plainTryOn, .plain]
 
     var next: TutorialCompare {
-        let all = Self.allCases
-        return all[(all.firstIndex(of: self)! + 1) % all.count]
+        guard let index = Self.cycle.firstIndex(of: self) else { return Self.cycle[0] }
+        return Self.cycle[(index + 1) % Self.cycle.count]
     }
     var left: TutorialHalf {
-        switch self { case .tryOnGuide, .tryOnPlain: .tryOn; case .guideTryOn: .guide; case .plainTryOn, .plain: .plain }
+        switch self {
+        case .tryOnGuide, .tryOnPlain: .tryOn
+        case .guideTryOn, .guidePlain: .guide
+        case .plainTryOn, .plain, .plainGuide: .plain
+        }
     }
     var right: TutorialHalf {
-        switch self { case .guideTryOn, .plainTryOn: .tryOn; case .tryOnGuide: .guide; case .tryOnPlain, .plain: .plain }
+        switch self {
+        case .guideTryOn, .plainTryOn: .tryOn
+        case .tryOnGuide, .plainGuide: .guide
+        case .tryOnPlain, .plain, .guidePlain: .plain
+        }
     }
     var showsGuide: Bool { left == .guide || right == .guide }
     var showsTryOn: Bool { left == .tryOn || right == .tryOn }
@@ -58,6 +68,8 @@ enum TutorialCompare: CaseIterable {
         case .tryOnPlain: "circle.lefthalf.filled"
         case .plainTryOn: "circle.righthalf.filled"
         case .plain: "circle"
+        case .guidePlain: "rectangle.lefthalf.inset.filled"
+        case .plainGuide: "rectangle.righthalf.inset.filled"
         }
     }
     var label: LocalizedStringKey {
@@ -67,6 +79,8 @@ enum TutorialCompare: CaseIterable {
         case .tryOnPlain: "Look on the left, plain camera on the right"
         case .plainTryOn: "Plain camera on the left, look on the right"
         case .plain: "Plain camera"
+        case .guidePlain: "Guide on the left"
+        case .plainGuide: "Guide on the right"
         }
     }
 }
@@ -100,13 +114,21 @@ enum TutorialTab: CaseIterable, Identifiable {
     @Published private(set) var compare = TutorialCompare.tryOnGuide
     /// After the last step: the camera shows the whole assigned look, with no guide, for taking a photo.
     @Published private(set) var photoMode = false
+    /// One side at a time (the one-tool flow): every step on `side`, then every step again on the other side.
+    let perSide: Bool
+    /// The half of the screen being done. The front camera is mirrored, so `.leading` is the user's right side.
+    @Published private(set) var side = HorizontalEdge.leading
+    /// Per side: the desired look on the other half instead of the plain camera.
+    @Published private(set) var showsLookBeside = false
     private let linerStyle: LinerStyle?
     private var bag = Set<AnyCancellable>()
     // -Nimah: Hidden tutorial tabs must not start a second detector during navigation.
     private var active = false
 
-    init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment, plan: MakeupPlan, handoff: TutorialHandoff) {
+    init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment, plan: MakeupPlan, handoff: TutorialHandoff,
+         perSide: Bool = false) {
         self.handoff = handoff
+        self.perSide = perSide
         let start = TutorialTab(tool: handoff.tool)
         tab = start
         if case .eyeliner(let style)? = plan.madeForYou.first(where: { $0.category == .eyeliner })?.style {
@@ -122,6 +144,7 @@ enum TutorialTab: CaseIterable, Identifiable {
             BrowSpriteStore.shared.prepare(overlay)
             if overlay.is3D { BrowHairStore.shared.prepare() }
         }
+        if perSide { compare = Self.sideLayout(side: .leading, lookBeside: false) }
         // The brow model owns the step index for brows/blush; forward its changes so the screen redraws.
         brow.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
@@ -143,7 +166,30 @@ enum TutorialTab: CaseIterable, Identifiable {
         return brow.lessons
     }
 
-    func cycleCompare() { compare = compare.next }
+    func cycleCompare() {
+        guard perSide else { compare = compare.next; return }
+        showsLookBeside.toggle()
+        compare = Self.sideLayout(side: side, lookBeside: showsLookBeside)
+    }
+
+    /// The guide on the side being done; the plain camera, or the desired look, on the other.
+    private static func sideLayout(side: HorizontalEdge, lookBeside: Bool) -> TutorialCompare {
+        switch (side, lookBeside) {
+        case (.leading, false): .guidePlain
+        case (.leading, true): .guideTryOn
+        case (.trailing, false): .plainGuide
+        case (.trailing, true): .tryOnGuide
+        }
+    }
+
+    /// True on the second side's last step (or the last step when not per side): Next finishes the tutorial.
+    var isFinalStep: Bool { stepIndex + 1 >= lessons.count && (!perSide || side == .trailing) }
+
+    private func moveTo(side new: HorizontalEdge, step: Int) {
+        side = new
+        compare = Self.sideLayout(side: new, lookBeside: showsLookBeside)
+        switch tab { case .eyeliner: linerStep = step; case .brows: browStep = step; case .blush: blushStep = step }
+    }
 
     /// The brow/blush preview configuration for the camera. Eyeliner is drawn by its own overlay, so the face-mesh
     /// guide is off on that tab.
@@ -163,6 +209,8 @@ enum TutorialTab: CaseIterable, Identifiable {
             // its half only (the front camera is mirrored: the screen's left half is the user's right brow).
             value.browOnlySide = compare.side(of: .tryOn).map { $0 == .leading ? EyeSide.subjectRight : .subjectLeft }
             value.hideNaturalBrow = compare.showsTryOn && handoff.hideNaturalBrow
+            // No look half (e.g. the guide beside the plain camera): no brow picture on either brow.
+            if !compare.showsTryOn { value.browOverlay = nil }
         }
         // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
         // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
@@ -234,6 +282,7 @@ enum TutorialTab: CaseIterable, Identifiable {
 
     /// Next step. Returns true when the last step was already showing, so the screen should close.
     func advance() -> Bool {
+        if perSide && stepIndex + 1 >= lessons.count && side == .leading { moveTo(side: .trailing, step: 0); return false }
         guard stepIndex + 1 < lessons.count else { return true }
         switch tab { case .eyeliner: linerStep += 1; case .brows: browStep += 1; case .blush: blushStep += 1 }
         return false
@@ -241,6 +290,7 @@ enum TutorialTab: CaseIterable, Identifiable {
 
     /// Previous step. Returns true when already on the first step, so the screen should close.
     func retreat() -> Bool {
+        if perSide && stepIndex == 0 && side == .trailing { moveTo(side: .leading, step: lessons.count - 1); return false }
         guard stepIndex > 0 else { return true }
         switch tab { case .eyeliner: linerStep -= 1; case .brows: browStep -= 1; case .blush: blushStep -= 1 }
         return false
@@ -274,24 +324,30 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 }
 
+/// With `onFinished` (the one-tool flow): only the handed-over tool, one side then the other, a steps sheet open at the
+/// start, and Done calls `onFinished` instead of opening the photo step.
 struct GuidedTutorialView: View {
     @StateObject private var model: GuidedTutorialModel
-    /// New flow: called with the result photo when she taps Done on it, instead of closing the tutorial.
-    var onFinish: ((UIImage) -> Void)?
+    private let onFinished: (() -> Void)?
 
     init(checker: any FaceTrackingAvailabilityChecking, assessment: FaceShapeAssessment?, plan: MakeupPlan, handoff: TutorialHandoff,
-         onFinish: ((UIImage) -> Void)? = nil) {
-        self.onFinish = onFinish
+         onFinished: (() -> Void)? = nil) {
         _model = StateObject(wrappedValue: GuidedTutorialModel(checker: checker, assessment: assessment ?? FaceShapeAssessment(shape: .unknown),
-                                                              plan: plan, handoff: handoff))
+                                                              plan: plan, handoff: handoff, perSide: onFinished != nil))
+        self.onFinished = onFinished
     }
 
-    var body: some View { TutorialScreen(model: model, onFinish: onFinish) }
+    var body: some View { TutorialScreen(model: model, onFinished: onFinished) }
 }
 
 private struct TutorialScreen: View {
     @ObservedObject var model: GuidedTutorialModel
+    let onFinished: (() -> Void)?
     @ObservedObject private var camera: FaceCameraState
+    /// The step-by-step sheet (one-tool flow). Opens by itself once, at the start.
+    @State private var showsSteps = false
+    @State private var stepsDetent = PresentationDetent.medium
+    @State private var openedSteps = false
     @State private var visible = false
     @State private var theme = PhotoTheme.pink
     @State private var flashOn = false
@@ -303,17 +359,17 @@ private struct TutorialScreen: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
-    let onFinish: ((UIImage) -> Void)?
-
-    init(model: GuidedTutorialModel, onFinish: ((UIImage) -> Void)? = nil) {
+    init(model: GuidedTutorialModel, onFinished: (() -> Void)?) {
         self.model = model
-        self.onFinish = onFinish
+        self.onFinished = onFinished
         camera = model.camera
     }
 
     private var lessons: [FaceGuideLesson] { model.lessons }
     private var index: Int { min(model.stepIndex, lessons.count - 1) }
-    private var isLast: Bool { index + 1 >= lessons.count }
+    private var isLast: Bool { model.isFinalStep }
+    /// The side being done, as the user sees it in the mirrored camera.
+    private var sideTitle: LocalizedStringKey { model.side == .leading ? "Right side" : "Left side" }
     /// The screen light is on: white screen, dark labels (the design's "tutorial w flash").
     private var lit: Bool { light.isOn && !model.photoMode }
     private var ink: Color { lit ? .black : AppColors.snow }
@@ -346,7 +402,7 @@ private struct TutorialScreen: View {
         .foregroundStyle(AppColors.snow)
         .overlay {
             if let captured {
-                PolaroidResultView(image: captured, onRetake: { self.captured = nil }, onDone: { if let onFinish { onFinish(captured) } else { dismiss() } })
+                PolaroidResultView(image: captured, onRetake: { self.captured = nil }, onDone: { dismiss() })
                     .transition(.opacity)
             }
         }
@@ -365,8 +421,23 @@ private struct TutorialScreen: View {
             await model.brow.prepare()
             if model.brow.availability == .supported { await camera.requestPermission() }
         }
-        .onAppear { visible = true; model.activate(); advisor.start(); light.resume() }
-        .onDisappear { visible = false; model.deactivate(); advisor.stop(); light.turnOff() }
+        .sheet(isPresented: $showsSteps) {
+            TutorialStepsSheet(steps: stepTexts, current: index, sideTitle: model.perSide ? sideTitle : nil,
+                               note: model.perSide && model.side == .trailing ? "One side done! Now let's give the other side the same love." : nil)
+                .presentationDetents([.medium, .large], selection: $stepsDetent)
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                .presentationContentInteraction(.resizes)
+                .presentationDragIndicator(.visible)
+        }
+        .onAppear {
+            visible = true; model.activate(); advisor.start(); light.resume()
+            if model.perSide && !openedSteps { openedSteps = true; showsSteps = true }
+        }
+        // The second side starts: the sheet comes back up with its cheer and the steps from the top.
+        .onChange(of: model.side) { _, side in
+            if model.perSide && side == .trailing && visible { stepsDetent = .medium; showsSteps = true }
+        }
+        .onDisappear { visible = false; showsSteps = false; model.deactivate(); advisor.stop(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active && visible {
                 model.activate(); advisor.start(); light.resume()
@@ -374,6 +445,23 @@ private struct TutorialScreen: View {
             } else {
                 model.deactivate(); advisor.stop(); light.suspend()
             }
+        }
+    }
+
+    /// Closes the steps sheet first: navigating while it is up can leave the push or pop undone.
+    private func leave(_ action: @escaping () -> Void) {
+        guard showsSteps else { action(); return }
+        showsSteps = false
+        Task { try? await Task.sleep(for: .milliseconds(350)); action() }
+    }
+
+    /// The steps sheet's rows: each step's instruction and its line of encouragement.
+    private var stepTexts: [TutorialStepsSheet.Step] {
+        if model.tab == .eyeliner, model.hasGuide {
+            return LinerTutorialStep.allCases.map { TutorialStepsSheet.Step(title: Text($0.caption), detail: Text($0.cheer)) }
+        }
+        return lessons.map { lesson in
+            TutorialStepsSheet.Step(title: Text(lesson.title), detail: lesson.instruction.isEmpty ? nil : Text(lesson.instruction))
         }
     }
 
@@ -403,7 +491,8 @@ private struct TutorialScreen: View {
             // Light on: the picture fades softly into the white screen instead of ending in a hard edge.
             cameraContent
                 .mask {
-                    RoundedRectangle(cornerRadius: AppSpacing.cornerRadius * 2, style: .continuous)
+                    // Same corners as the card's clip when the light is off, so no black shows in them.
+                    RoundedRectangle(cornerRadius: lit ? AppSpacing.cornerRadius * 2 : AppSpacing.cornerRadius, style: .continuous)
                         .padding(lit ? 26 : 0)
                         .blur(radius: lit ? 26 : 0)
                 }
@@ -497,7 +586,7 @@ private struct TutorialScreen: View {
     private var header: some View {
         HStack {
             Button {
-                if model.retreat() { dismiss() }
+                if model.retreat() { leave(dismiss.callAsFunction) }
             } label: {
                 Image(systemName: "chevron.left")
                     .font(.body.weight(.semibold))
@@ -508,7 +597,9 @@ private struct TutorialScreen: View {
             .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
             Spacer()
             Button {
-                if model.advance() { model.enterPhoto() }
+                if model.advance() {
+                    if let onFinished { leave(onFinished) } else { model.enterPhoto() }
+                }
             } label: {
                 HStack(spacing: 6) {
                     Text(isLast ? "Done" : "Next")
@@ -560,7 +651,7 @@ private struct TutorialScreen: View {
     /// rectangle (15 pt, -0.43 tracking, 22 pt lines, radius 18, padding 22 x 4, hugging the text up to 300 pt wide).
     private var stepCaption: some View {
         VStack(spacing: 4) {
-            Text("Step \(index + 1) of \(lessons.count)")
+            (model.perSide ? Text("\(Text(sideTitle)) · Step \(index + 1) of \(lessons.count)") : Text("Step \(index + 1) of \(lessons.count)"))
                 .textCase(.uppercase)
                 .font(.body)
                 .tracking(2)
@@ -610,12 +701,27 @@ private struct TutorialScreen: View {
             CameraBarButton(symbol: model.compare.symbol) { model.cycleCompare() }
                 .accessibilityLabel("Compare")
                 .accessibilityValue(model.compare.label)
-            Text(model.tab.title)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(ink)
-                .lineLimit(1).minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity, minHeight: 56)
-                .accessibilityAddTraits(.isHeader)
+            if model.perSide {
+                // One tool only: the side being done, and the steps sheet.
+                Button { stepsDetent = .medium; showsSteps = true } label: {
+                    VStack(spacing: 2) {
+                        Text(sideTitle).font(.title3.weight(.semibold))
+                        Label("Steps", systemImage: "list.bullet").font(.footnote)
+                    }
+                    .foregroundStyle(ink)
+                    .frame(maxWidth: .infinity, minHeight: 56)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(sideTitle))
+                .accessibilityHint("Shows all steps")
+            } else {
+                Text(model.tab.title)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(ink)
+                    .lineLimit(1).minimumScaleFactor(0.8)
+                    .frame(maxWidth: .infinity, minHeight: 56)
+                    .accessibilityAddTraits(.isHeader)
+            }
             CameraBarButton(symbol: light.isOn ? "bolt.fill" : "bolt.slash.fill") { light.toggle() }
                 .accessibilityLabel("Light")
                 .accessibilityValue(light.isOn ? Text("On") : Text("Off"))

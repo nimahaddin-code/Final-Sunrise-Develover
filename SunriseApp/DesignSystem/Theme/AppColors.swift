@@ -41,6 +41,14 @@ enum AppColors {
     static let browCanvas = Color(red: 0xFA / 255, green: 0xF2 / 255, blue: 0xEA / 255)
     /// Dark plum text and the selected page dot on the feature homepage (#2A1A20).
     static let plumInk = Color(red: 0x2A / 255, green: 0x1A / 255, blue: 0x20 / 255)
+    /// Brand pink of the "dandan" wordmark and the active onboarding dot (#FF2D8E).
+    static let dandanPink = Color(red: 0xFF / 255, green: 0x2D / 255, blue: 0x8E / 255)
+    /// Headings on the light onboarding pages (#111111).
+    static let onboardingInk = Color(red: 0x11 / 255, green: 0x11 / 255, blue: 0x11 / 255)
+    /// Body text on the light onboarding pages (#6B6B6B).
+    static let onboardingBody = Color(red: 0x6B / 255, green: 0x6B / 255, blue: 0x6B / 255)
+    /// Dark capsule buttons: onboarding and the homepage (#1C1C1C).
+    static let buttonInk = Color(red: 0x1C / 255, green: 0x1C / 255, blue: 0x1C / 255)
 }
 
 /// Full-screen burgundy page background: the `main-bg` asset over wine.

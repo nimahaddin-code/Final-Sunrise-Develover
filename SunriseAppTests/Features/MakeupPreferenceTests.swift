@@ -8,6 +8,32 @@ import Metal
 @testable import SunriseApp
 
 final class MakeupPreferenceTests:XCTestCase {
+    @MainActor func testPerSideTutorialDoesEveryStepOnOneSideThenTheOther() {
+        let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.standardLook,plan:MakeupPlan(shape:.oval),
+            handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true),perSide:true)
+        let steps=model.lessons.count
+        // The guide on the screen's left half (the user's right brow), nothing drawn on the other brow.
+        XCTAssertEqual(model.compare,.guidePlain)
+        XCTAssertNil(model.liveConfiguration.browOverlay)
+        XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
+        for _ in 1..<steps { XCTAssertFalse(model.advance()) }
+        XCTAssertFalse(model.isFinalStep)
+        XCTAssertFalse(model.advance())   // first side done: the other side, from step 1
+        XCTAssertEqual(model.side,.trailing)
+        XCTAssertEqual(model.stepIndex,0)
+        XCTAssertEqual(model.compare,.plainGuide)
+        model.cycleCompare()   // the desired look on the finished side
+        XCTAssertEqual(model.compare,.tryOnGuide)
+        XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
+        XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectRight)
+        XCTAssertFalse(model.retreat())   // back to the first side's last step
+        XCTAssertEqual(model.side,.leading)
+        XCTAssertEqual(model.stepIndex,steps-1)
+        XCTAssertFalse(model.advance())
+        for _ in 1..<steps { XCTAssertFalse(model.advance()) }
+        XCTAssertTrue(model.isFinalStep)
+        XCTAssertTrue(model.advance())
+    }
     @MainActor func testTutorialBrowCompareFollowsTheFiveStatesOnePerBrow() {
         let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.standardLook,
             plan:MakeupPlan(shape:.oval),handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true))
@@ -981,7 +1007,7 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertNil(BeautyBlushEngine.projectGuide(outlines,vertices:region.restVertices,mvp:behind,viewport:CGSize(width:200,height:200)))
     }
     func testBlushTutorialHasTheTwoSpecSteps() {
-        XCTAssertEqual(GuidedTutorialModel.blushLessons.map(\.title),["Dab a little blush inside the small circle.","Dab outward to blend it into your skin.","Buff in small circles, sweeping outward, until the edge is gone."])
+        XCTAssertEqual(GuidedTutorialModel.blushLessons.map(\.title),["Tap a little blush into the small circle.","Now dab outward, blending into your skin.","Buff in small circles, sweeping out, until the edge melts away."])
     }
 
     func testShaderCameraToneMatchesTheSwiftTable() throws {
