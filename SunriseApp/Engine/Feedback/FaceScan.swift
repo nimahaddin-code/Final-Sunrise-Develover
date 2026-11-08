@@ -39,11 +39,11 @@ struct FaceScan: Sendable {
 }
 
 extension FaceScan {
-    /// Six fixed points per mesh triangle, as barycentric weights. Same pattern for every photo.
-    static let pattern: [SIMD3<Float>] = [
-        SIMD3(2 / 3, 1 / 6, 1 / 6), SIMD3(1 / 6, 2 / 3, 1 / 6), SIMD3(1 / 6, 1 / 6, 2 / 3),
-        SIMD3(1 / 6, 5 / 12, 5 / 12), SIMD3(5 / 12, 1 / 6, 5 / 12), SIMD3(5 / 12, 5 / 12, 1 / 6)
-    ]
+    /// Ten fixed points per mesh triangle (barycentric i/6, j/6, k/6 with i, j, k >= 1), dense enough for a liner line on
+    /// the small eyelid triangles. Same pattern for every photo.
+    static let pattern: [SIMD3<Float>] = (1...4).flatMap { i in
+        (1...(5 - i)).map { j in SIMD3(Float(i) / 6, Float(j) / 6, Float(6 - i - j) / 6) }
+    }
 
     /// Measures the face in the view's current camera frame. Nil when no face is tracked.
     @MainActor static func measure(view: ARSCNView, outline: BlushGuideSnapshot?, rendered: ScreenPixels?) -> FaceScan? {
@@ -185,6 +185,24 @@ struct ScreenPixels: @unchecked Sendable {
                                bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue),
                                provider: provider, decode: nil, shouldInterpolate: true, intent: .defaultIntent) else { return nil }
         return UIImage(cgImage: cg, scale: scale, orientation: .up)
+    }
+}
+
+extension ScreenPixels {
+    /// Pixels of an image (e.g. the camera with the eyeliner drawn in), drawn into BGRA like the engine's read-back.
+    init?(image: UIImage) {
+        guard let cg = image.cgImage, let space = CGColorSpace(name: CGColorSpace.sRGB) else { return nil }
+        let w = cg.width, h = cg.height, row = w * 4
+        var bytes = [UInt8](repeating: 0, count: row * h)
+        let drawn = bytes.withUnsafeMutableBytes { buffer -> Bool in
+            guard let context = CGContext(data: buffer.baseAddress, width: w, height: h, bitsPerComponent: 8, bytesPerRow: row, space: space,
+                                          bitmapInfo: CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)
+            else { return false }
+            context.draw(cg, in: CGRect(x: 0, y: 0, width: w, height: h))
+            return true
+        }
+        guard drawn else { return nil }
+        self.init(width: w, height: h, bytesPerRow: row, bytes: bytes)
     }
 }
 

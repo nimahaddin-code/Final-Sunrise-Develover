@@ -107,11 +107,14 @@ struct FeatureCaptureView: View {
             if stage == .desired, let makeup = view as? BeautyBlushARView, let engine = makeup.beauty, !makeup.beautyLayer.isHidden {
                 pixels = await engine.readScreen()
             }
-            let scan = handoff.tool == .blush
-                ? FaceScan.measure(view: view, outline: home.camera.blushGuide.snapshot, rendered: pixels) : nil
             var image = pixels?.image(scale: view.window?.screen.scale ?? 3) ?? view.snapshot()
-            if stage == .desired && handoff.tool == .eyeliner { image = home.liner.composed(image) }
-            scanned = scan
+            if stage == .desired && handoff.tool == .eyeliner {
+                image = home.liner.composed(image)
+                // The eyeliner is drawn by SwiftUI, not the engine: its target is read from the composed picture.
+                pixels = ScreenPixels(image: image)
+            }
+            scanned = FaceScan.measure(view: view, outline: handoff.tool == .blush ? home.camera.blushGuide.snapshot : nil,
+                                       rendered: pixels)
             captured = image
             // The still replaces the camera until Retake.
             home.deactivate()

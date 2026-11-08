@@ -22,59 +22,25 @@ enum BlushFeedback {
 
     static func evaluate(_ input: BlushFeedbackInput, database: FeedbackDatabase, language: FeedbackLanguage) -> MakeupFeedback {
         let composer = FeedbackComposer(database: database, language: language)
-        let photoName: [Bool: String] = language == .id ? [true: "Try On", false: "hasil"] : [true: "Try On", false: "result"]
 
         // 1. Photo checks. A blocking one stops the measuring and asks for a retake.
-        var blocking: [MakeupFeedback.Item] = [], notes: [MakeupFeedback.Item] = []
-        func report(_ id: String, _ values: [String: String] = [:]) {
-            guard let rule = database.captureRule(id) else { return }
-            let text = rule.message.text(language)
-            let item = MakeupFeedback.Item(title: text.title, say: composer.fill(text.say, values), steps: text.steps ?? [],
-                                           band: rule.blocking ? .large : .slight)
-            if rule.blocking { if !blocking.contains(item) { blocking.append(item) } } else { notes.append(item) }
-        }
-        guard input.hadBeforePhoto else {
-            report("capture.no_before_photo")
-            return MakeupFeedback(score: nil, headline: "", comments: [], items: notes)
-        }
-        for (isBefore, scan) in [(true, input.before), (false, input.after)] {
-            let photo = ["photo": photoName[isBefore]!]
-            guard let scan else { report("capture.no_face", photo); continue }
-            if abs(scan.yaw) > 8 { report("capture.turned", photo.merging(["value": FeedbackComposer.degrees(Double(scan.yaw))]) { $1 }) }
-            if abs(scan.pitch) > 8 {
-                let down = scan.pitch > 0
-                let direction = language == .id ? (down ? "menunduk" : "mendongak") : (down ? "tilted down" : "tilted up")
-                report("capture.tilted_up_down", photo.merging(["direction": direction, "value": FeedbackComposer.degrees(Double(scan.pitch))]) { $1 })
-            }
-            if abs(scan.roll) > 5 { report("capture.rolled", photo.merging(["value": FeedbackComposer.degrees(Double(scan.roll))]) { $1 }) }
-            if scan.smile > 0.3 { report("capture.smiling", photo) }
-            if scan.jawOpen > 0.25 { report("capture.mouth_open", photo) }
-            if let skin = meanSkinLightness(scan), skin < 35 { report("capture.too_dark", photo) }
-        }
-        guard blocking.isEmpty, let before = input.before, let after = input.after,
+        guard input.hadBeforePhoto else { return noBeforePhoto(composer) }
+        var check = FeedbackPhotoCheck(before: input.before, after: input.after, tool: "blush", composer: composer)
+        guard check.blocking.isEmpty, let before = input.before, let after = input.after,
               before.samples.count == after.samples.count, !before.samples.isEmpty else {
-            return MakeupFeedback(score: nil, headline: "", comments: [], items: blocking.isEmpty ? notes : blocking)
+            return MakeupFeedback(score: nil, headline: "", comments: [], items: check.blocking.isEmpty ? check.notes : check.blocking)
         }
-        if abs(before.yaw - after.yaw) > 6 || abs(before.pitch - after.pitch) > 6 { report("capture.pose_mismatch") }
 
         // 2. Same light in both photos: shift the result's colours so the forehead and chin match.
         let both = before.samples.indices.filter { before.samples[$0].visible && after.samples[$0].visible }
-        let reference = both.filter {
-            let p = before.samples[$0].position
-            return (p.y > before.eyeY + 25 && abs(p.x) < 25) || (p.y < before.eyeY - 100 && abs(p.x) < 18)
-        }
-        var shift = Lab.zero
-        if reference.count >= 10 {
-            let b = reference.reduce(Lab.zero) { $0 + before.samples[$1].lab } / Float(reference.count)
-            let a = reference.reduce(Lab.zero) { $0 + after.samples[$1].lab } / Float(reference.count)
-            shift = b - a
-            if abs(shift.x) > 12 || abs(shift.y) > 6 || abs(shift.z) > 6 { report("capture.lighting_mismatch") }
-        }
+        let light = FeedbackSkin.shift(before: before, after: after, both: both)
+        let shift = light.shift
+        if light.mismatch { check.report("capture.lighting_mismatch", tool: "blush", composer) }
 
         // 3. Each cheek against its target.
         guard let outline = before.outline ?? after.outline, !outline.cheeks.isEmpty else {
-            report("capture.no_face", ["photo": photoName[true]!])
-            return MakeupFeedback(score: nil, headline: "", comments: [], items: blocking + notes)
+            check.report("capture.no_face", ["photo": "Try On"], tool: "blush", composer)
+            return MakeupFeedback(score: nil, headline: "", comments: [], items: check.blocking + check.notes)
         }
         let screens = before.outline != nil ? before.samples.map(\.screen) : after.samples.map(\.screen)
         let shadeHue = input.shade.map { s -> Float in
@@ -169,17 +135,17 @@ enum BlushFeedback {
                 let text = p.message.text(language)
                 items.append(.init(title: text.title,
                                    say: composer.fill(text.say, ["part": cheekWords["both"] ?? "", "value": FeedbackComposer.mm(max(worst, 0.5))]),
-                                   steps: [], band: .ok))
+                                   steps: [], band: .ok, rule: p.id))
             }
             if !hits.contains(where: { $0.rule.hasPrefix("blush.symmetry") && $0.band != .ok }), measured.count == 2,
                let p = praise.first(where: { $0.id == "blush.praise.balance" }) {
                 let text = p.message.text(language)
-                items.append(.init(title: text.title, say: text.say, steps: [], band: .ok))
+                items.append(.init(title: text.title, say: text.say, steps: [], band: .ok, rule: p.id))
             }
         }
         let score = composer.score(entries)
         return MakeupFeedback(score: score.map { $0 / 100 }, headline: score.map { composer.label(score: $0) } ?? "",
-                              comments: [], items: items + notes)
+                              comments: [], items: items + check.notes)
     }
 
     // MARK: Measuring one cheek
@@ -311,12 +277,10 @@ enum BlushFeedback {
                      strength: strength, area: blushArea)
     }
 
-    static func meanSkinLightness(_ scan: FaceScan) -> Float? {
-        let skin = scan.samples.filter {
-            $0.visible && (($0.position.y > scan.eyeY + 25 && abs($0.position.x) < 25) || ($0.position.y < scan.eyeY - 100 && abs($0.position.x) < 18))
-        }
-        guard skin.count >= 10 else { return nil }
-        return skin.reduce(0) { $0 + $1.lab.x } / Float(skin.count)
+    static func noBeforePhoto(_ composer: FeedbackComposer) -> MakeupFeedback {
+        var check = FeedbackPhotoCheck()
+        check.report("capture.no_before_photo", tool: "", composer)
+        return MakeupFeedback(score: nil, headline: "", comments: [], items: check.notes)
     }
 
     /// Point in polygon (even-odd).

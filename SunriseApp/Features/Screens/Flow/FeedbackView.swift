@@ -29,7 +29,8 @@ struct FeedbackView: View {
             guard feedback == nil else { return }
             let request = MakeupFeedbackRequest(tool: handoff.tool, styleTitle: handoff.styleTitle,
                                                 desired: store.desired, result: store.result,
-                                                blushStyle: handoff.blushStyle, shade: handoff.shades[.blush],
+                                                blushStyle: handoff.blushStyle, linerLook: handoff.linerLook,
+                                                shade: handoff.shades[handoff.tool],
                                                 desiredScan: store.desiredScan, resultScan: store.resultScan)
             feedback = await provider.feedback(for: request) { value in progress = value }
         }

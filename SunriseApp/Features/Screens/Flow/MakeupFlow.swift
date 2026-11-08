@@ -116,6 +116,7 @@ struct MakeupFeedbackRequest: @unchecked Sendable {
     let desired: UIImage?
     let result: UIImage?
     var blushStyle: BlushPlacementStyle? = nil
+    var linerLook: LinerLook? = nil
     var shade: MakeupShade? = nil
     var desiredScan: FaceScan? = nil
     var resultScan: FaceScan? = nil
@@ -128,6 +129,8 @@ struct MakeupFeedback: Sendable, Equatable {
         var say: String
         var steps: [String]
         var band: FeedbackBand
+        /// The database id of the rule, praise or photo check (for tests and calibration).
+        var rule: String = ""
     }
 
     /// 0...1 when the comparison gives one.
@@ -157,21 +160,27 @@ struct PlaceholderFeedbackProvider: MakeupFeedbackProviding {
     }
 }
 
-/// -Nimah: the real comparison for blush (`BlushFeedback`); the other tools still get the placeholder.
+/// -Nimah: the measured comparison for every tool (`BlushFeedback`, `BrowFeedback`, `EyelinerFeedback`); the placeholder
+/// only when the database cannot be read.
 struct MeasuredFeedbackProvider: MakeupFeedbackProviding {
     var fallback: any MakeupFeedbackProviding = PlaceholderFeedbackProvider()
 
     func feedback(for request: MakeupFeedbackRequest, progress: @escaping @MainActor @Sendable (Double) -> Void) async -> MakeupFeedback {
-        guard request.tool == .blush, let database = FeedbackDatabase.load() else {
-            return await fallback.feedback(for: request, progress: progress)
-        }
+        guard let database = FeedbackDatabase.load() else { return await fallback.feedback(for: request, progress: progress) }
         await progress(0.1)
-        let input = BlushFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
+        let language = FeedbackLanguage.current
+        let tool = request.tool
+        let blush = BlushFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
                                        style: request.blushStyle,
                                        shade: request.shade.map { SIMD3($0.red, $0.green, $0.blue) })
-        let language = FeedbackLanguage.current
-        let result = await Task.detached(priority: .userInitiated) {
-            BlushFeedback.evaluate(input, database: database, language: language)
+        let line = LineFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
+                                     look: request.linerLook?.rawValue)
+        let result = await Task.detached(priority: .userInitiated) { () -> MakeupFeedback in
+            switch tool {
+            case .blush: BlushFeedback.evaluate(blush, database: database, language: language)
+            case .eyebrow: BrowFeedback.evaluate(line, database: database, language: language)
+            case .eyeliner: EyelinerFeedback.evaluate(line, database: database, language: language)
+            }
         }.value
         // A short, steady finish so the loading screen does not flash.
         for step in 2...10 {
