@@ -1,3 +1,11 @@
+## Indonesian rewritten in the brand voice — -Nimah (2026-11-09)
+
+Every string the app shows now has Indonesian in the voice of `Docs/GayaBahasa.md` (a big sister who is good at makeup,
+"kamu", casual "yuk/aja/nggak", short sentences, makeup terms kept in English): 133 drafts rewritten, the 61 E2E-flow
+strings that had none translated (the tutorial's cheers keep their warm tone), and the camera and photo prompts in
+`InfoPlist.xcstrings`. Look, shade and style names are unchanged; strings from deleted screens were left alone. All
+`needs_review`. Text only; screens not yet checked in Indonesian for longer lines.
+
 ## Blush kit on the E2E get-ready page — -Nimah (2026-11-09)
 
 Staging's E2E flow lists the kit from `TryOnTool.kit` (`Features/Screens/Flow/MakeupFlow.swift`); its blush list was a
