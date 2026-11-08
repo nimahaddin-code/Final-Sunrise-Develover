@@ -39,51 +39,87 @@ extension TutorialHandoff {
 }
 
 extension TryOnTool {
-    /// Where the face feature must sit in the capture frame, as fractions of the camera card. Placeholder positions until
-    /// the design is final; nothing checks yet that the feature really is inside.
-    var captureRegion: CGRect {
-        switch self {
-        case .eyebrow: CGRect(x: 0.08, y: 0.22, width: 0.84, height: 0.18)
-        case .eyeliner: CGRect(x: 0.08, y: 0.28, width: 0.84, height: 0.15)
-        case .blush: CGRect(x: 0.06, y: 0.36, width: 0.88, height: 0.26)
-        }
-    }
-
-    var captureHint: LocalizedStringKey {
-        switch self {
-        case .eyebrow: "Fit both brows inside the frame"
-        case .eyeliner: "Fit both eyes inside the frame"
-        case .blush: "Fit both cheeks inside the frame"
-        }
-    }
-
-    /// The tools and products to have ready before the tutorial. Placeholder list until the design team's copy arrives.
-    var kit: [MakeupKitItem] {
+    /// What to have ready before the tutorial, as the brief lists it: the must-haves (cards) and what to keep nearby for
+    /// mistakes (rows). Copy from the design; pictures are the `kit-*` image sets (an SF Symbol until one is filled).
+    var mustHave: [MakeupKitItem] {
         switch self {
         case .blush: [
-            MakeupKitItem(id: "blush", symbol: "circle.hexagongrid.fill", title: "Blush", detail: "Powder or cream, in the shade you tried."),
-            MakeupKitItem(id: "brush", symbol: "paintbrush.pointed", title: "Fluffy brush or fingertips", detail: "To dab and blend."),
-            MakeupKitItem(id: "mirror", symbol: "iphone", title: "Phone at eye level", detail: "Lean it on something so both hands stay free.")
+            MakeupKitItem(id: "blush", kind: .product, symbol: "paintpalette.fill", title: "Blush", detail: "Powder or cream",
+                          info: .init(imageName: "kit-blush",
+                                      text: "Colour for your cheeks. It comes as a powder in a compact, or a cream in a stick or small pot.",
+                                      tip: "You'll tap it on the top of your cheeks.")),
+            MakeupKitItem(id: "brush", kind: .tool, symbol: "paintbrush.pointed.fill", title: "Fluffy brush", detail: "Or your fingertips",
+                          info: .init(imageName: "kit-fluffy-brush",
+                                      text: "A big, soft, round brush. It spreads blush lightly, so you get a soft glow with no hard edges.",
+                                      tip: "No brush? Your fingertips work too."))
         ]
         case .eyebrow: [
-            MakeupKitItem(id: "spoolie", symbol: "scribble.variable", title: "Spoolie", detail: "To brush the hairs up and blend."),
-            MakeupKitItem(id: "pencil", symbol: "pencil", title: "Brow pencil", detail: "Close to the shade you tried."),
-            MakeupKitItem(id: "bud", symbol: "drop", title: "Cotton bud", detail: "To clean up the edges.")
+            MakeupKitItem(id: "pencil", kind: .product, symbol: "pencil", title: "Brow pencil", detail: "Lighter than your hair",
+                          info: .init(imageName: "kit-brow-pencil",
+                                      text: "A thin pencil for filling in brows. Pick a shade a little lighter than your hair so it looks natural.",
+                                      tip: "Use short, hair-like strokes, not one line.")),
+            MakeupKitItem(id: "spoolie", kind: .tool, symbol: "paintbrush.pointed.fill", title: "Spoolie", detail: "Combs brow hairs up",
+                          info: .init(imageName: "kit-spoolie",
+                                      text: "A small spiral brush, like a clean mascara wand. It combs brow hairs up and softens pencil lines.",
+                                      tip: "Brush up before you fill, and again after."))
         ]
         case .eyeliner: [
-            MakeupKitItem(id: "liner", symbol: "pencil.tip", title: "Eyeliner", detail: "Pen, gel or pencil, in the shade you tried."),
-            MakeupKitItem(id: "bud", symbol: "drop", title: "Cotton bud", detail: "With a little micellar water for mistakes."),
-            MakeupKitItem(id: "light", symbol: "sun.max", title: "Bright, soft light", detail: "Face a window, or switch on the screen light.")
+            MakeupKitItem(id: "liner", kind: .product, symbol: "pencil", title: "Liquid liner", detail: "A felt-tip pen is easiest to control",
+                          info: .init(imageName: "kit-liquid-liner",
+                                      text: "Eyeliner in a pen. The felt tip draws a thin, dark line right along your upper lashes.",
+                                      tip: "Hold it like a pen and draw short strokes."))
         ]
         }
+    }
+
+    var nearby: [MakeupKitItem] {
+        let face: LocalizedStringKey = switch self {
+        case .blush: "no old makeup on"
+        case .eyebrow: "no oil on the brows"
+        case .eyeliner: "no oil all around the eyes"
+        }
+        let wipe = switch self {
+        case .blush: MakeupKitItem(id: "pads", kind: .forMistakes, symbol: "circle", title: "Cotton pads", detail: "to apply the micellar water")
+        case .eyebrow: MakeupKitItem(id: "buds", kind: .forMistakes, symbol: "circle", title: "Cotton buds", detail: "to wipe small edges")
+        case .eyeliner: MakeupKitItem(id: "buds", kind: .forMistakes, symbol: "circle", title: "Cotton buds", detail: "pointed ones fix small lines")
+        }
+        return [
+            MakeupKitItem(id: "face", kind: .forMistakes, symbol: "face.smiling", title: "Clean, dry face", detail: face),
+            MakeupKitItem(id: "micellar", kind: .forMistakes, symbol: "drop", title: "Micellar water", detail: "wipes off mistakes",
+                          info: .init(imageName: "kit-micellar-water",
+                                      text: "A gentle cleansing water. Put a little on a cotton pad or bud and wipe a mistake away.",
+                                      tip: "Wipe softly, let it dry, then try again.")),
+            wipe
+        ]
     }
 }
 
 struct MakeupKitItem: Identifiable {
+    enum Kind {
+        case product, tool, forMistakes
+
+        var label: LocalizedStringKey {
+            switch self {
+            case .product: "Product"
+            case .tool: "Tool"
+            case .forMistakes: "For mistakes"
+            }
+        }
+    }
+
+    /// What the item's popup shows: its picture, what it is, and a tip.
+    struct Info {
+        let imageName: String
+        let text: LocalizedStringKey
+        let tip: LocalizedStringKey
+    }
+
     let id: String
+    let kind: Kind
     let symbol: String
     let title: LocalizedStringKey
     let detail: LocalizedStringKey
+    var info: Info? = nil
 }
 
 // MARK: Feedback
@@ -169,107 +205,43 @@ struct FlowPlaceholderBox: View {
     }
 }
 
-/// The frame the face feature must sit in, like an ID-card photo frame: the card dimmed except for a cut-out shaped like
-/// the feature (one rectangle round both eyes, two brows or two cheeks), its outline, corner brackets round the area, and the hint below.
-struct FeatureFrameOverlay: View {
-    let tool: TryOnTool
-    var highlight: Color = AppColors.snow
-    var showsHint = true
+
+/// The chosen style's name with a dot of its shade: glass over the capture camera, pale pink on the brief.
+struct StylePill: View {
+    let handoff: TutorialHandoff
+    var onGlass = false
+
+    private var dot: Color {
+        if let shade = handoff.shades[handoff.tool] { return Color(red: shade.red, green: shade.green, blue: shade.blue) }
+        return switch handoff.tool {
+        case .blush: Color(red: 0xF4 / 255, green: 0x9A / 255, blue: 0xB8 / 255)
+        case .eyebrow: Color(red: 0x6B / 255, green: 0x4A / 255, blue: 0x35 / 255)
+        case .eyeliner: AppColors.buttonInk
+        }
+    }
 
     var body: some View {
-        GeometryReader { proxy in
-            let region = tool.captureRegion
-            let rect = CGRect(x: region.minX * proxy.size.width, y: region.minY * proxy.size.height,
-                              width: region.width * proxy.size.width, height: region.height * proxy.size.height)
-            let cutout = FeatureFrameShape.path(for: tool, in: rect)
-            ZStack(alignment: .topLeading) {
-                Path { path in
-                    path.addRect(CGRect(origin: .zero, size: proxy.size))
-                    path.addPath(cutout)
-                }
-                .fill(Color.black.opacity(0.6), style: FillStyle(eoFill: true))
-                cutout.stroke(highlight, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, lineJoin: .round))
-                FeatureFrameShape.corners(around: rect.insetBy(dx: -10, dy: -14))
-                    .stroke(highlight, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-                if showsHint {
-                    Text(tool.captureHint)
-                        .font(.footnote.weight(.semibold))
-                        .foregroundStyle(AppColors.snow)
-                        .padding(.horizontal, 12).padding(.vertical, 6)
-                        .background(AppColors.captionFill.opacity(0.85), in: Capsule())
-                        .frame(width: proxy.size.width)
-                        .offset(y: rect.maxY + 26)
-                }
-            }
+        HStack(spacing: 6) {
+            Circle().fill(dot).frame(width: 9, height: 9)
+                .overlay(Circle().strokeBorder(.white.opacity(0.6), lineWidth: onGlass ? 1 : 0))
+            Text(verbatim: handoff.styleTitle).lineLimit(1)
         }
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
+        .font(.system(size: 13, weight: .semibold))
+        .foregroundStyle(onGlass ? AppColors.snow : AppColors.onboardingInk)
+        .padding(.horizontal, 12)
+        .frame(minHeight: 30)
+        .background {
+            if !onGlass { Capsule().fill(AppColors.dandanPink.opacity(0.1)) }
+        }
+        .modifier(PillGlass(on: onGlass))
+        .accessibilityElement(children: .combine)
     }
 }
 
-/// Feature outlines for the capture frame: a rectangle round both eyes, else one shape per side of the face, drawn inside the tool's capture region. The camera
-/// is mirrored, so the left shape on screen is the user's right side; each pair is symmetric about the region's middle.
-enum FeatureFrameShape {
-    static func path(for tool: TryOnTool, in rect: CGRect) -> Path {
-        // Both eyes in one rounded rectangle.
-        if tool == .eyeliner { return Path(roundedRect: rect, cornerRadius: 24, style: .continuous) }
-        var path = Path()
-        for leading in [true, false] {
-            switch tool {
-            case .eyeliner: break
-            case .eyebrow: path.addPath(brow(in: rect, leading: leading))
-            case .blush: path.addPath(cheek(in: rect, leading: leading))
-            }
-        }
-        return path
-    }
+private struct PillGlass: ViewModifier {
+    let on: Bool
 
-    /// A brow band: thick, rounded head by the nose, rising to the arch about two thirds out, tapering to the tail.
-    static func brow(in rect: CGRect, leading: Bool) -> Path {
-        let width = rect.width * 0.42
-        let height = min(width / 3.2, rect.height)
-        let box = side(of: rect, width: width, height: height, leading: leading)
-        // x runs from the tail (0) to the head (1).
-        let point = { (x: CGFloat, y: CGFloat) in
-            CGPoint(x: leading ? box.minX + x * box.width : box.maxX - x * box.width, y: box.minY + y * box.height)
-        }
-        var path = Path()
-        path.move(to: point(0, 0.62))
-        path.addCurve(to: point(0.34, 0.02), control1: point(0.08, 0.36), control2: point(0.2, 0.04))
-        path.addCurve(to: point(1, 0.42), control1: point(0.56, 0), control2: point(0.86, 0.18))
-        path.addCurve(to: point(0.98, 0.96), control1: point(1.04, 0.6), control2: point(1.03, 0.86))
-        path.addCurve(to: point(0.34, 0.5), control1: point(0.8, 0.82), control2: point(0.56, 0.5))
-        path.addCurve(to: point(0, 0.62), control1: point(0.18, 0.5), control2: point(0.06, 0.56))
-        path.closeSubpath()
-        return path
-    }
-
-    /// A cheek oval tilted up toward the temple.
-    static func cheek(in rect: CGRect, leading: Bool) -> Path {
-        let width = rect.width * 0.36
-        let height = min(width * 0.62, rect.height)
-        let box = side(of: rect, width: width, height: height, leading: leading)
-        let tilt = CGAffineTransform(translationX: box.midX, y: box.midY)
-            .rotated(by: (leading ? 1 : -1) * .pi / 14)
-            .translatedBy(x: -box.midX, y: -box.midY)
-        return Path(ellipseIn: box).applying(tilt)
-    }
-
-    /// ID-card style corner brackets round the capture area.
-    static func corners(around rect: CGRect) -> Path {
-        let arm = min(rect.width, rect.height) * 0.22
-        var path = Path()
-        for (corner, dx, dy) in [(CGPoint(x: rect.minX, y: rect.minY), 1.0, 1.0), (CGPoint(x: rect.maxX, y: rect.minY), -1.0, 1.0),
-                                 (CGPoint(x: rect.minX, y: rect.maxY), 1.0, -1.0), (CGPoint(x: rect.maxX, y: rect.maxY), -1.0, -1.0)] {
-            path.move(to: CGPoint(x: corner.x, y: corner.y + dy * arm))
-            path.addLine(to: corner)
-            path.addLine(to: CGPoint(x: corner.x + dx * arm, y: corner.y))
-        }
-        return path
-    }
-
-    /// One side's box: the outer edge on the region's edge, vertically centred.
-    private static func side(of rect: CGRect, width: CGFloat, height: CGFloat, leading: Bool) -> CGRect {
-        CGRect(x: leading ? rect.minX : rect.maxX - width, y: rect.midY - height / 2, width: width, height: height)
+    func body(content: Content) -> some View {
+        if on { content.glassEffect(.regular, in: .capsule) } else { content }
     }
 }

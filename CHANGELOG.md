@@ -1,3 +1,18 @@
+## Before photo, "Your final look" brief and item popups — 2026-11-08
+
+Restyled to the design (screens 09, 10, 10a/10b). `FeatureCaptureView` (both stages): full-page camera, back, the style
+pill (`StylePill`: shade dot + `styleTitle`, shared with the brief) and the screen light in the top safe area, a dashed
+white oval for the whole face (`FaceOvalGuide`; replaces the per-feature frame, `FeatureFrameOverlay`/`FeatureFrameShape`
+and `TryOnTool.captureRegion`/`captureHint` deleted), the hint pill and a white ring shutter; Retake + dark glass Next
+once taken. `LookBriefView`: light page on `OnboardingGlow`, "Your final look" (black, expanded width), the desired photo
+cropped to the feature (`LookBriefView.crop`, placeholder fractions), "What to prepare", MUST HAVE cards and KEEP NEARBY ·
+FOR MISTAKES rows, dark "Start tutorial". Items come from `TryOnTool.mustHave` / `nearby` (`MakeupKitItem` with `kind` and
+optional `info`; replaces `kit`); an item with `info` shows a dotted pink underline and ⓘ and opens `KitItemSheet`
+(kind, name, picture, text, sparkle tip, "Got it"). Pictures: the design team's product photos in `kit-blush`,
+`kit-fluffy-brush`, `kit-liquid-liner`, `kit-micellar-water`, `kit-spoolie`, `kit-brow-pencil` (the last two replace the
+SVG Repo drawings); a missing picture falls back to the item's SF Symbol. New strings are not yet synced into `Localizable.xcstrings` (no Indonesian). Simulator only (iPhone 17
+Pro): brief and popup seen with a sample photo, capture seen in its no-camera state; the crop and oval need a device check.
+
 ## Onboarding page art (pages 1-3) — Khalish (2026-11-07)
 
 Page 1 (`artOne`, `OnboardingView.swift`) is now a face photo on the front card with makeup stickers around it; the two cards
