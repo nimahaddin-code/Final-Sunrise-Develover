@@ -1,3 +1,11 @@
+## Blush kit on the E2E get-ready page — -Nimah (2026-11-09)
+
+Staging's E2E flow lists the kit from `TryOnTool.kit` (`Features/Screens/Flow/MakeupFlow.swift`); its blush list was a
+placeholder. Blush now takes `ToolInfo.blush(...).kitItems`, the `BlushInfo` kit (fingertips, sponge, cream or liquid blush,
+loose powder), so it is written in one place. `MakeupKitItem.imageName` (optional) shows the item's picture instead of the
+symbol in `LookBriefView`'s card (`kit-blush-*`); brow and eyeliner are unchanged. `BlushInfo`'s look descriptions are not
+shown by the E2E flow yet. Simulator tests only.
+
 ## Blush look and kit data; kit pictures — -Nimah (2026-11-05)
 
 `BlushInfo` (`Features/Blush/Info/`) is real data now, not sample wording: one beginner sentence per look (Youthful,

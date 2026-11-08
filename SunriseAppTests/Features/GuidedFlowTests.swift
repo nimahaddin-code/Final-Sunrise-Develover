@@ -39,6 +39,13 @@ final class GuidedFlowTests: XCTestCase {
         }
     }
 
+    func testBlushGetReadyPageListsTheBlushKitWithPictures() {
+        let info = ToolInfo.blush(TutorialHandoff(tool: .blush, shades: [:], intensities: [:]))
+        let kit = TryOnTool.blush.kit
+        XCTAssertEqual(kit.map(\.id), (info.tools + info.products).map(\.id))
+        XCTAssertEqual(kit.compactMap(\.imageName), ["kit-blush-sponge", "kit-blush-blush", "kit-blush-powder"])
+    }
+
     func testEachBlushLookHasItsOwnDescription() {
         let descriptions = BlushPlacementStyle.referenceLooks.map { style -> String in
             var value = handoff(enabled: [.blush])
