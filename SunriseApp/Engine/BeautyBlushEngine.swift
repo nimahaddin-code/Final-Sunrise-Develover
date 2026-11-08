@@ -60,6 +60,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
     let brush:MTLTexture
     var textureCache:CVMetalTextureCache?
     var layer:CAMetalLayer?
+    /// Shutters waiting for the next presented picture (`readScreen`). Guarded by `lock`.
+    var screenReaders:[ScreenReader]=[]
     var settings=Settings(),busy=false
     var vertices:[MTLBuffer]=[],indices:MTLBuffer?,bakeVertices:MTLBuffer?,indexCount=0,slot=0
     var rest:[SIMD3<Float>]=[],uvs:[SIMD2<Float>]=[],filters:[OneEuroFilter]=[]
@@ -159,7 +161,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
             view.beautyLayer.device=engine.device;view.beautyLayer.pixelFormat = .bgra8Unorm_srgb
             // Colour-managed as sRGB like ARSCNView's camera; with no colour space iOS shows the bytes unmanaged.
             view.beautyLayer.colorspace=CGColorSpace(name:CGColorSpace.sRGB)
-            view.beautyLayer.framebufferOnly=true;view.beautyLayer.isOpaque=true;view.beautyLayer.isHidden=true
+            // Not framebuffer-only: the shutter copies the shown picture (`readScreen`).
+            view.beautyLayer.framebufferOnly=false;view.beautyLayer.isOpaque=true;view.beautyLayer.isHidden=true
             view.beautyLayer.actions=["bounds":NSNull(),"position":NSNull(),"contents":NSNull()]
             view.beautyLayer.maximumDrawableCount=3;view.layer.addSublayer(view.beautyLayer)
             engine.layer=view.beautyLayer;view.beauty=engine;view.setNeedsLayout();return engine
@@ -394,6 +397,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         #if !targetEnvironment(simulator)
         drawable.addPresentedHandler { [weak self] _ in self?.queue.async { [weak self] in self?.presentedFrames += 1 } }
         #endif
+        copyForReaders(drawable.texture,command)
         command.present(drawable)
         let ts=frame.timestamp
         if blush.tracked && blush.opacity>0.9 {pigmentFrames += 1;lastError=nil}
@@ -544,4 +548,42 @@ final class BeautyBlushEngine:@unchecked Sendable {
     }
     #endif
 
+}
+
+// -Nimah: the shutter's copy of the picture on screen (camera + virtual makeup). `ARSCNView.snapshot()` only has the
+// SceneKit camera under this layer, so the desired-look photo lost the blush and brow.
+final class ScreenReader:@unchecked Sendable {
+    private let lock=NSLock();private var done=false;private let deliver:@Sendable (ScreenPixels?)->Void
+    init(_ deliver:@escaping @Sendable (ScreenPixels?)->Void) {self.deliver=deliver}
+    func finish(_ pixels:ScreenPixels?) {
+        lock.lock();let first = !done;done=true;lock.unlock()
+        if first {deliver(pixels)}
+    }
+}
+extension BeautyBlushEngine {
+    /// The next picture this engine presents, or nil when it draws nothing within `timeout` (layer off, no face yet).
+    func readScreen(timeout:Double=0.5) async->ScreenPixels? {
+        await withCheckedContinuation { continuation in
+            let reader=ScreenReader {continuation.resume(returning:$0)}
+            lock.lock();screenReaders.append(reader);lock.unlock()
+            DispatchQueue.global().asyncAfter(deadline:.now()+timeout) {reader.finish(nil)}
+        }
+    }
+    /// Copies the drawable into CPU memory for waiting shutters, after the frame's drawing and before it is presented.
+    func copyForReaders(_ texture:MTLTexture,_ command:MTLCommandBuffer) {
+        lock.lock();let readers=screenReaders;screenReaders=[];lock.unlock()
+        guard !readers.isEmpty else{return}
+        let width=texture.width,height=texture.height,row=width*4
+        guard texture.pixelFormat == .bgra8Unorm_srgb || texture.pixelFormat == .bgra8Unorm,
+              let buffer=device.makeBuffer(length:row*height,options:.storageModeShared),
+              let blit=command.makeBlitCommandEncoder() else {readers.forEach {$0.finish(nil)};return}
+        blit.copy(from:texture,sourceSlice:0,sourceLevel:0,sourceOrigin:MTLOrigin(x:0,y:0,z:0),sourceSize:MTLSize(width:width,height:height,depth:1),
+                  to:buffer,destinationOffset:0,destinationBytesPerRow:row,destinationBytesPerImage:row*height)
+        blit.endEncoding()
+        command.addCompletedHandler { _ in
+            let bytes=Array(UnsafeBufferPointer(start:buffer.contents().assumingMemoryBound(to:UInt8.self),count:row*height))
+            let pixels=ScreenPixels(width:width,height:height,bytesPerRow:row,bytes:bytes)
+            readers.forEach {$0.finish(pixels)}
+        }
+    }
 }

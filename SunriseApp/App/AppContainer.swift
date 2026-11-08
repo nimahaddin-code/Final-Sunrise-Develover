@@ -2,7 +2,7 @@
 struct AppContainer {
     let faceTracking: any FaceTrackingAvailabilityChecking
     /// Compares the desired-look photo with the result. Placeholder until the real comparison is plugged in here.
-    var feedback: any MakeupFeedbackProviding = PlaceholderFeedbackProvider()
+    var feedback: any MakeupFeedbackProviding = MeasuredFeedbackProvider()
     static func live() -> AppContainer {
         AppContainer(faceTracking: DeviceFaceTrackingChecker())
     }

@@ -1,3 +1,27 @@
+## Blush feedback v2: measured on the face mesh — -Nimah (2026-11-09)
+
+The E2E feedback screen now measures blush instead of the placeholder text (`AppContainer.feedback` =
+`MeasuredFeedbackProvider`; brow and eyeliner still get `PlaceholderFeedbackProvider`). At each shutter
+`FeatureCaptureView` measures the face (`Engine/Feedback/FaceScan`): six fixed points per ARKit mesh triangle, each with its
+face-local position (mm), its bare camera colour (decoded like the shader, Lab), on the desired-look photo also the colour
+shown with the virtual blush, its screen point, plus pose, blend shapes and IPD. Stored in `MakeupFlowStore`
+(`desiredScan`/`resultScan`, memory only, numbers only). For blush the capture camera publishes the target outlines
+(`showGuide`; on the result photo the engine runs with `pigmentHalf = .none`, so the photo stays the plain camera).
+`Features/Blush/Feedback/BlushFeedback` compares the two scans sample by sample (same mesh point = same skin, whatever the
+pose): light matched on forehead and chin, blush = chroma rise with the shade's hue (`detection.makeup_mask.blush`), then per
+cheek against the target (outer line = target area, inner circle = core, outer / 0.82 = limit): none, offset up/down/in/out
+(mm, IPD-scaled), size, coverage, strength (vs the virtual blush on the same spots), spill (eye, nose, mouth, ear, jaw),
+patchiness, hue; symmetry height, strength and size; praise. Photo checks: no face, turned, tilted, rolled, smiling, mouth
+open, too dark, pose and light mismatch, no Try On photo. Bands, texts (id/en, app language), merging, suppression, top 3
+and score come from `makeup-feedback.database.json` (now in the app target) through `Engine/Feedback/FeedbackRules`.
+Not measured yet: angle, edge softness, Lifted temple reach, Sunkissed nose band, blob cleanup. The desired-look photo now
+shows the virtual makeup: `BeautyBlushEngine.readScreen()` copies the next presented drawable (`framebufferOnly` is off),
+on both the blush and brow paths; `ARSCNView.snapshot()` had only the camera under the Metal layer. `FeedbackView` lists the
+messages as cards in a scroll view. Shared files changed: `BeautyBlushEngine`, `BrowEngine+Draw` (one line), `MakeupFlow`,
+`FeatureCaptureView`, `FeedbackView`, `AppContainer`, `project.pbxproj`. `BlushFeedbackTests` (synthetic faces). Thresholds
+are the database's draft values; nothing is checked on a device yet (target outline on the result photo, colour detection
+in real light, read-back on device).
+
 ## Indonesian rewritten in the brand voice — -Nimah (2026-11-09)
 
 Every string the app shows now has Indonesian in the voice of `Docs/GayaBahasa.md` (a big sister who is good at makeup,
