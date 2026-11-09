@@ -1006,8 +1006,9 @@ final class MakeupPreferenceTests:XCTestCase {
         var behind=mvp;behind.columns.3.w = -1
         XCTAssertNil(BeautyBlushEngine.projectGuide(outlines,vertices:region.restVertices,mvp:behind,viewport:CGSize(width:200,height:200)))
     }
-    func testBlushTutorialHasTheTwoSpecSteps() {
-        XCTAssertEqual(GuidedTutorialModel.blushLessons.map(\.title),["Tap a little blush into the small circle.","Now dab outward, blending into your skin.","Buff in small circles, sweeping out, until the edge melts away."])
+    func testBlushTutorialHasTheDesignStep() {
+        XCTAssertEqual(GuidedTutorialModel.blushLessons.map(\.instruction),["Dab a little blush inside the circle, then blend outward."])
+        XCTAssertEqual(GuidedTutorialModel.blushGuideSteps.count,GuidedTutorialModel.blushLessons.count)
     }
 
     func testShaderCameraToneMatchesTheSwiftTable() throws {

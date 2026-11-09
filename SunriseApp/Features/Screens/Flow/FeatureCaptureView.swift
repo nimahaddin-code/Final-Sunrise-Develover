@@ -1,7 +1,8 @@
 import SwiftUI
 import UIKit
 
-/// "Take a picture": the live camera with the face feature's frame, a shutter, then Retake / Next. `.desired` draws the
+/// "Before photo": the camera fills the page with a dashed oval for the whole face; back, the style's name and the screen
+/// light sit in the top safe area, the hint and a round shutter at the bottom, then Retake / Next. `.desired` draws the
 /// look chosen on Try On (the picture the result is compared with); `.result` is the plain camera after the tutorial.
 /// Without a usable camera (Simulator, no TrueDepth, permission denied) it can continue without a photo, so the flow
 /// still runs end to end.
@@ -12,6 +13,7 @@ struct FeatureCaptureView: View {
     let onBack: () -> Void
     let onNext: () -> Void
     @StateObject private var home: TryOnHomeModel
+    @StateObject private var light = ScreenLight()
     @State private var captured: UIImage?
     /// -Nimah: the face measured at the shutter, for the blush feedback.
     @State private var scanned: FaceScan?
@@ -33,48 +35,68 @@ struct FeatureCaptureView: View {
     }
 
     var body: some View {
-        VStack(spacing: AppSpacing.medium) {
-            ZStack {
-                Text("Take a picture")
-                    .font(.title2.weight(.semibold))
-                    .accessibilityAddTraits(.isHeader)
-                HStack {
-                    GlassCircleButton(symbol: "chevron.left", size: 44, tint: AppColors.glassLight, label: "Back") {
-                        home.deactivate()
-                        onBack()
-                    }
-                    Spacer()
+        CaptureCameraCard(home: home, light: light, captured: captured, configuration: cameraConfiguration,
+                          active: visible && scenePhase == .active)
+            .ignoresSafeArea()
+            .overlay { if captured == nil { FaceOvalGuide() } }
+            .overlay(alignment: .top) { topBar }
+            .overlay(alignment: .bottom) {
+                VStack(spacing: 28) {
+                    if captured == nil { hint }
+                    CaptureControls(camera: home.camera, brow: home.brow, captured: $captured, onShoot: shoot, onNext: next)
+                        .disabled(shooting)
                 }
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.bottom, AppSpacing.medium)
             }
-            CaptureCameraCard(home: home, tool: handoff.tool, captured: captured, configuration: cameraConfiguration,
-                              active: visible && scenePhase == .active)
-                .frame(maxHeight: .infinity)
-            VStack(spacing: 2) {
-                Text(handoff.styleTitle).font(.title3.weight(.semibold))
-                Text(stage == .desired ? "Your desired look" : "Both sides done. Look at you! Let's take your after photo.")
-                    .multilineTextAlignment(.center)
-                    .font(.subheadline)
-                    .foregroundStyle(AppColors.snow.opacity(0.75))
+            .background { (light.isOn ? AppColors.ringLight : Color.black).ignoresSafeArea() }
+            .environment(\.colorScheme, .dark)
+            .animation(.easeInOut(duration: 0.25), value: light.isOn)
+            .toolbar(.hidden, for: .navigationBar)
+            .navigationBarBackButtonHidden()
+            .sensoryFeedback(.success, trigger: captured != nil)
+            // Retake: back to the live camera.
+            .onChange(of: captured == nil) { _, retake in
+                if retake { scanned = nil; diagnostics = nil; bareImage = nil; if visible { activate() } }
             }
-            CaptureControls(camera: home.camera, brow: home.brow, captured: $captured, onShoot: shoot, onNext: next)
-                .disabled(shooting)
+            .onAppear { visible = true; activate(); light.resume() }
+            .onDisappear { visible = false; home.deactivate(); light.turnOff() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active && visible { activate(); light.resume() } else { home.deactivate(); light.suspend() }
+            }
+    }
+
+    /// Back, the style's name and the screen light.
+    private var topBar: some View {
+        HStack {
+            Button {
+                home.deactivate()
+                onBack()
+            } label: {
+                Image(systemName: "chevron.left")
+                    .font(.title2.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .frame(width: 48, height: 48)
+                    .glassEffect(.regular.interactive(), in: .circle)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Back")
+            Spacer()
+            StylePill(handoff: handoff, onGlass: true)
+            Spacer()
+            ScreenLightButton(light: light, pulse: 0, plainGlass: true)
         }
-        .foregroundStyle(AppColors.snow)
-        .padding(.horizontal, AppSpacing.medium)
-        .padding(.bottom, AppSpacing.small)
-        .background { MainBackground() }
-        .toolbar(.hidden, for: .navigationBar)
-        .navigationBarBackButtonHidden()
-        .sensoryFeedback(.success, trigger: captured != nil)
-        // Retake: back to the live camera.
-        .onChange(of: captured == nil) { _, retake in
-            if retake { scanned = nil; diagnostics = nil; bareImage = nil; if visible { activate() } }
-        }
-        .onAppear { visible = true; activate() }
-        .onDisappear { visible = false; home.deactivate() }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active && visible { activate() } else { home.deactivate() }
-        }
+        .padding(AppSpacing.small)
+    }
+
+    private var hint: some View {
+        Label("Fit your whole face inside the line", systemImage: "face.smiling")
+            .font(.footnote.weight(.medium))
+            .foregroundStyle(AppColors.snow)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(.black.opacity(0.35), in: Capsule())
     }
 
     private func activate() {
@@ -172,39 +194,84 @@ private struct CaptureControls: View {
                 Button { captured = nil } label: {
                     Image(systemName: "arrow.counterclockwise")
                         .font(.title3.weight(.medium))
-                        .frame(width: 60, height: 60)
-                        .glassCircle()
+                        .foregroundStyle(.primary)
+                        .frame(width: 56, height: 56)
+                        .glassEffect(.regular.interactive(), in: .circle)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Retake photo")
-                FlowPrimaryButton(title: "Next", action: onNext)
+                CaptureCapsuleButton(title: "Next", action: onNext)
             }
         } else if !noCamera {
-            FlowPrimaryButton(title: "Take picture", symbol: "camera", action: onShoot)
-                .disabled(!camera.authorized)
+            Button(action: onShoot) {
+                Circle()
+                    .fill(AppColors.snow)
+                    .padding(6)
+                    .overlay(Circle().strokeBorder(AppColors.snow, lineWidth: 4))
+                    .frame(width: 76, height: 76)
+                    .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
+            }
+            .buttonStyle(.plain)
+            .disabled(!camera.authorized)
+            .accessibilityLabel("Take picture")
         } else {
             // Simulator or no camera: keep the flow going without a photo.
-            FlowPrimaryButton(title: "Continue without photo", action: onNext)
+            CaptureCapsuleButton(title: "Continue without photo", action: onNext)
         }
     }
 }
 
-/// The camera card of the capture screen, or the still once taken, with the feature frame over either.
+/// Full-width dark glass capsule, like Try On's Continue.
+private struct CaptureCapsuleButton: View {
+    let title: LocalizedStringKey
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(AppColors.snow)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// The dashed oval the whole face goes inside.
+private struct FaceOvalGuide: View {
+    var body: some View {
+        GeometryReader { proxy in
+            let width = proxy.size.width * 0.78
+            let height = min(width * 1.42, proxy.size.height * 0.56)
+            Ellipse()
+                .stroke(AppColors.snow, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, dash: [10, 8]))
+                .frame(width: width, height: height)
+                .position(x: proxy.size.width / 2, y: proxy.size.height * 0.42)
+                .shadow(color: .black.opacity(0.25), radius: 2)
+        }
+        .ignoresSafeArea()
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
+
+/// The full-page camera, or the still once taken.
 private struct CaptureCameraCard: View {
     @ObservedObject var home: TryOnHomeModel
     @ObservedObject var camera: FaceCameraState
     @ObservedObject var brow: EyebrowViewModel
-    let tool: TryOnTool
+    @ObservedObject var light: ScreenLight
     let captured: UIImage?
     let configuration: EyebrowConfiguration
     let active: Bool
     @Environment(\.openURL) private var openURL
 
-    init(home: TryOnHomeModel, tool: TryOnTool, captured: UIImage?, configuration: EyebrowConfiguration, active: Bool) {
+    init(home: TryOnHomeModel, light: ScreenLight, captured: UIImage?, configuration: EyebrowConfiguration, active: Bool) {
         self.home = home
         camera = home.camera
         brow = home.brow
-        self.tool = tool
+        self.light = light
         self.captured = captured
         self.configuration = configuration
         self.active = active
@@ -212,16 +279,19 @@ private struct CaptureCameraCard: View {
 
     var body: some View {
         ZStack {
-            Color.black
+            if !light.isOn { Color.black }
             if let captured {
-                Image(uiImage: captured).resizable().scaledToFill()
+                Color.clear.overlay { Image(uiImage: captured).resizable().scaledToFill() }.clipped()
             } else {
                 content
             }
-            FeatureFrameOverlay(tool: tool, highlight: captured == nil ? AppColors.snow : AppColors.flamingo,
-                                showsHint: captured == nil)
         }
-        .clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous))
+        // The screen light: the picture's edge melts into the white screen, which is what lights the face.
+        .mask {
+            Rectangle()
+                .padding(light.isOn ? 26 : 0)
+                .blur(radius: light.isOn ? 26 : 0)
+        }
     }
 
     @ViewBuilder private var content: some View {

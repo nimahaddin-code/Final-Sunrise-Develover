@@ -3,15 +3,14 @@
 import SwiftUI
 
 extension GuidedTutorialModel {
-    /// The Blush tab's two steps (UX spec 3.5). "Dab" works for cream and powder alike; the caption is the whole instruction.
+    /// The Blush tab's one step: a short title (steps sheet) and the instruction shown over the camera.
     static let blushLessons = [
-        FaceGuideLesson(title: String(localized: "Tap a little blush into the small circle."),
-                        instruction: String(localized: "Just a tiny bit, babe. You can always add more, so starting light is the secret.")),
-        FaceGuideLesson(title: String(localized: "Now dab outward, blending into your skin."),
-                        instruction: String(localized: "Soft little taps, no rush. You're doing so good.")),
-        FaceGuideLesson(title: String(localized: "Buff in small circles, sweeping out, until the edge melts away."),
-                        instruction: String(localized: "See that glow coming in? Trust the process, it's all coming together.")),
+        FaceGuideLesson(title: String(localized: "Apply and Blend"),
+                        instruction: String(localized: "Dab a little blush inside the circle, then blend outward.")),
     ]
+
+    /// `BlushTutorialOverlay`'s animation for each lesson: both dotted outlines with the outward dab.
+    static let blushGuideSteps = [1]
 }
 
 /// Blush tutorial overlay (UX spec 3.2 and 3.5), anchored to each cheek through `BlushGuideFeed`.

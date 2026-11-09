@@ -3,17 +3,14 @@
 import SwiftUI
 
 extension GuidedTutorialModel {
-    /// The Brows tab's steps, as a brow is drawn with a pencil after brow mapping: what to do, then a line of encouragement.
+    /// The Brows tab's steps: a short title (steps sheet) and the instruction shown over the camera.
     static let browLessons = [
-        FaceGuideLesson(title: String(localized: "Brush your brows up with your spoolie."),
-                        instruction: String(localized: "Let's wake those brows up first! Seeing the gaps now makes everything easier later.")),
-        FaceGuideLesson(title: String(localized: "Mark three tiny dots on the guide."),
-                        instruction: String(localized: "These are your map. They don't have to be perfect, the guide's got you.")),
-        FaceGuideLesson(title: String(localized: "Fill lightly from the middle out to the tail."),
-                        instruction: String(localized: "Feather-light strokes, okay? Slow is smooth, and smooth is pretty.")),
-        FaceGuideLesson(title: String(localized: "Brush the middle colour into the front."),
-                        instruction: String(localized: "Keep the front soft and fluffy. You're nailing that natural look.")),
-        FaceGuideLesson(title: String(localized: "Clean up anything outside the guide."),
-                        instruction: String(localized: "Last touch! A little tidy-up and your brows are done. So proud of you.")),
+        FaceGuideLesson(title: String(localized: "Brush Your Brows"), instruction: String(localized: "Brush your brows up with a spoolie.")),
+        FaceGuideLesson(title: String(localized: "Map Your Brows"), instruction: String(localized: "Grab your brow pencil and mark 3 points.")),
+        FaceGuideLesson(title: String(localized: "Connect and Fill"), instruction: String(localized: "Connect the dots and fill from the middle out.")),
+        FaceGuideLesson(title: String(localized: "Blend and Clean Up"), instruction: String(localized: "Blend the front and clean up the messy part.")),
     ]
+
+    /// `BrowTutorialOverlay`'s animation for each lesson: brush, dots, fill from the arch, then the front.
+    static let browGuideSteps = [0, 1, 2, 3]
 }

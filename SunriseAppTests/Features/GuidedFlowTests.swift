@@ -39,11 +39,14 @@ final class GuidedFlowTests: XCTestCase {
         }
     }
 
-    func testBlushGetReadyPageListsTheBlushKitWithPictures() {
-        let info = ToolInfo.blush(TutorialHandoff(tool: .blush, shades: [:], intensities: [:]))
-        let kit = TryOnTool.blush.kit
-        XCTAssertEqual(kit.map(\.id), (info.tools + info.products).map(\.id))
-        XCTAssertEqual(kit.compactMap(\.imageName), ["kit-blush-sponge", "kit-blush-blush", "kit-blush-powder"])
+    /// The get-ready page's item pictures (`TryOnTool.mustHave` / `nearby`) are in the assets.
+    func testEveryKitItemPictureIsInTheAssets() {
+        for tool in TryOnTool.allCases {
+            for item in tool.mustHave + tool.nearby {
+                guard let name = item.info?.imageName else { continue }
+                XCTAssertNotNil(UIImage(named: name), "\(tool): no asset named \(name)")
+            }
+        }
     }
 
     func testEachBlushLookHasItsOwnDescription() {
