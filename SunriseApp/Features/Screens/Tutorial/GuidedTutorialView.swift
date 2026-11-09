@@ -195,7 +195,6 @@ enum TutorialTab: CaseIterable, Identifiable {
     var finishesFirstSide: Bool { perSide && side == .leading && isSideLastStep }
 
     /// The side-done card's "Replay": the same side again from its first step.
-    func replaySide() { moveTo(side: side, step: 0) }
 
     /// True on the second side's last step (or the last step when not per side): Next finishes the tutorial.
     var isFinalStep: Bool { stepIndex + 1 >= lessons.count && (!perSide || side == .trailing) }
@@ -490,9 +489,12 @@ private struct TutorialScreen: View {
 
     private func next() {
         if model.finishesFirstSide { leave { sideDone = true }; return }
-        if model.advance() {
-            if let onFinished { leave(onFinished) } else { model.enterPhoto() }
-        }
+        if model.advance() { finish() }
+    }
+
+    /// The tutorial is over: the result photo in the flow, the photo screen otherwise.
+    private func finish() {
+        if let onFinished { leave(onFinished) } else { model.enterPhoto() }
     }
 
     private func back() {
@@ -524,14 +526,21 @@ private struct TutorialScreen: View {
 
     private var card: some View {
         ZStack {
-            if !lit { Color.black }
-            // Light on: the picture fades softly into the white screen instead of ending in a hard edge.
-            cameraContent
-                .mask {
-                    RoundedRectangle(cornerRadius: lit ? cornerRadius * 2 : cornerRadius, style: .continuous)
-                        .padding(lit ? 26 : 0)
-                        .blur(radius: lit ? 26 : 0)
-                }
+            Group {
+                if !lit { Color.black }
+                // Light on: the picture fades softly into the white screen instead of ending in a hard edge.
+                cameraContent
+                    .mask {
+                        if fullBleed && !lit {
+                            bottomRounded
+                        } else {
+                            RoundedRectangle(cornerRadius: lit ? cornerRadius * 2 : cornerRadius, style: .continuous)
+                                .padding(lit ? 26 : 0)
+                                .blur(radius: lit ? 26 : 0)
+                        }
+                    }
+            }
+            .ignoresSafeArea(edges: fullBleed ? .top : [])
             if flashing { Color.white.ignoresSafeArea().allowsHitTesting(false) }
             if !model.photoMode {
                 VStack(spacing: AppSpacing.small) {
@@ -542,13 +551,13 @@ private struct TutorialScreen: View {
                 .padding(AppSpacing.small)
                 .opacity(sideDone ? 0 : 1)
                 if sideDone {
-                    Rectangle().fill(.ultraThinMaterial).transition(.opacity)
+                    bottomRounded.fill(.ultraThinMaterial).ignoresSafeArea(edges: .top).transition(.opacity)
                     SideDoneCard(tool: model.tab, onNext: {
                         sideDone = false
                         _ = model.advance()
-                    }, onReplay: {
+                    }, onDone: {
                         sideDone = false
-                        model.replaySide()
+                        finish()
                     })
                     .padding(.horizontal, 40)
                     .transition(.scale(scale: 0.92).combined(with: .opacity))
@@ -558,7 +567,17 @@ private struct TutorialScreen: View {
         .animation(.easeInOut(duration: 0.25), value: lit)
         // The flash on the photo screen is the screen light: full brightness and a warm ring round the picture.
         .overlay { if model.photoMode { ScreenLightGlow(light: light, cornerRadius: 10) } }
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        // Full bleed: clipping to the card's own frame would cut the camera off at the safe area; the mask rounds it.
+        .clipShape(fullBleed ? AnyShape(Rectangle().inset(by: -1000)) : AnyShape(RoundedRectangle(cornerRadius: cornerRadius,
+                                                                                                    style: .continuous)))
+    }
+
+    /// The tutorial's camera runs from the top edge under the status bar (the buttons stay in the safe area) and is
+    /// rounded only above the bottom bar; the photo screen keeps its framed picture.
+    private var fullBleed: Bool { !model.photoMode }
+
+    private var bottomRounded: UnevenRoundedRectangle {
+        UnevenRoundedRectangle(bottomLeadingRadius: cornerRadius, bottomTrailingRadius: cornerRadius, style: .continuous)
     }
 
     @ViewBuilder private var cameraContent: some View {
@@ -736,13 +755,14 @@ private struct TutorialScreen: View {
 private struct SideDoneCard: View {
     let tool: TutorialTab
     let onNext: () -> Void
-    let onReplay: () -> Void
+    /// "Done": ends the tutorial here (on to the result photo) without the other side.
+    let onDone: () -> Void
 
-    private var copy: (title: LocalizedStringKey, text: LocalizedStringKey, next: LocalizedStringKey, replay: LocalizedStringKey) {
+    private var copy: (title: LocalizedStringKey, text: LocalizedStringKey, next: LocalizedStringKey) {
         switch tool {
-        case .blush: ("Left cheek done!", "Now the same on your right cheek, so both sides match.", "Do my right cheek", "Replay left cheek")
-        case .brows: ("Left brow done!", "Now the same on your right brow, so both sides match.", "Do my right brow", "Replay left brow")
-        case .eyeliner: ("Left eye done!", "Now the same on your right eye, so both sides match.", "Do my right eye", "Replay left eye")
+        case .blush: ("Left cheek done!", "Now the same on your right cheek, so both sides match.", "Do my right cheek")
+        case .brows: ("Left brow done!", "Now the same on your right brow, so both sides match.", "Do my right brow")
+        case .eyeliner: ("Left eye done!", "Now the same on your right eye, so both sides match.", "Do my right eye")
         }
     }
 
@@ -775,8 +795,8 @@ private struct SideDoneCard: View {
                     .background(AppColors.buttonInk, in: Capsule())
             }
             .padding(.top, 18)
-            Button(action: onReplay) {
-                Label(copy.replay, systemImage: "arrow.counterclockwise")
+            Button(action: onDone) {
+                Text("Done")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(AppColors.dandanPink)
                     .frame(minHeight: 44)

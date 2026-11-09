@@ -118,8 +118,8 @@ enum LinerOverlayRenderer {
         format.scale = snapshot.scale
         let renderer = UIGraphicsImageRenderer(size: snapshot.size, format: format)
         let fills = fills(frame, shade: shade, intensity: intensity)
-        // The bleed and the liner each alone on a transparent layer, softened like the live overlay, then multiplied
-        // over the photo: the ink darkens the skin under it and keeps its texture and shading.
+        // The bleed and the liner each alone on a transparent layer, softened like the live overlay, then laid over the
+        // photo.
         func layer(halo: Bool, blur: CGFloat?) -> UIImage {
             let image = renderer.image { context in
                 draw(frame, shade: shade, intensity: intensity, in: context.cgContext, halo: halo)
@@ -136,10 +136,12 @@ enum LinerOverlayRenderer {
             layer(halo: false, blur: fills.map(\.blur).max()).draw(at: .zero)
             eraseGrain(for: fills, in: context.cgContext)
         }
+        // Laid over the photo (not multiplied): every liner shade is dark, and multiplied into warm skin brown, plum and
+        // navy all came out black. The fill's own alpha and the grain still let skin texture through.
         return renderer.image { _ in
             snapshot.draw(at: .zero)
-            bleed.draw(at: .zero, blendMode: .multiply, alpha: 1)
-            liner.draw(at: .zero, blendMode: .multiply, alpha: 1)
+            bleed.draw(at: .zero, blendMode: .normal, alpha: 1)
+            liner.draw(at: .zero, blendMode: .normal, alpha: 1)
         }
     }
 

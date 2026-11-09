@@ -76,19 +76,22 @@ struct FeedbackView: View {
     private func result(_ feedback: MakeupFeedback) -> some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                VStack(alignment: .leading, spacing: 14) {
                     topBar
                     VStack(alignment: .leading, spacing: 4) {
                         Text(headline(feedback.score))
-                            .font(.system(size: 40, weight: .black))
+                            .font(.system(size: 32, weight: .black)).fontWidth(.expanded)
+                            .tracking(-0.6)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
                             .accessibilityAddTraits(.isHeader)
                         Text(feedback.score == nil ? "Let's take the photo again so we can check it."
                                                    : "Here's how close you got to your try-on.")
-                            .font(.callout)
+                            .font(.system(size: 15))
                             .foregroundStyle(AppColors.onboardingBody)
                     }
                     BeforeAfterSlider(before: store.bare ?? store.desired, after: store.result)
-                        .frame(height: 360)
+                        .aspectRatio(362 / 236, contentMode: .fit)
                     if let score = feedback.score {
                         scoreCard(score: score, feedback: feedback)
                     } else {
@@ -96,8 +99,8 @@ struct FeedbackView: View {
                     }
                     if !feedback.categories.isEmpty {
                         Text("What we think")
-                            .font(.title2.weight(.bold))
-                            .padding(.top, AppSpacing.small)
+                            .font(.system(size: 22, weight: .bold))
+                            .padding(.top, 4)
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                             ForEach(feedback.categories) { category in
                                 Button { opened = category } label: { FeedbackCategoryCard(category: category) }
@@ -106,18 +109,9 @@ struct FeedbackView: View {
                             }
                         }
                     }
-                    if feedback.score != nil, !feedback.notes.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Photo tips").font(.headline)
-                            ForEach(feedback.notes, id: \.self) { note in
-                                Text(note.say).font(.footnote).foregroundStyle(AppColors.onboardingBody)
-                            }
-                        }
-                        .feedbackCard()
-                    }
                     if developerTools { diagnostics }
                 }
-                .padding(.horizontal, AppSpacing.medium)
+                .padding(.horizontal, 20)
                 .padding(.bottom, AppSpacing.large)
             }
             bottomBar
@@ -127,7 +121,7 @@ struct FeedbackView: View {
 
     private var topBar: some View {
         ZStack {
-            Text(lookTitle).font(.headline).lineLimit(1).padding(.horizontal, 64)
+            Text(lookTitle).font(.system(size: 15, weight: .semibold)).lineLimit(1).padding(.horizontal, 64)
             HStack {
                 circleButton(symbol: "chevron.left", label: "Done", action: onDone)
                 Spacer()
@@ -143,20 +137,20 @@ struct FeedbackView: View {
     }
 
     private func scoreCard(score: Double, feedback: MakeupFeedback) -> some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 14) {
             ZStack {
-                Circle().stroke(AppColors.dandanPink.opacity(0.18), lineWidth: 9)
+                Circle().stroke(AppColors.dandanPink.opacity(0.18), lineWidth: 6)
                 Circle().trim(from: 0, to: score)
-                    .stroke(AppColors.dandanPink, style: StrokeStyle(lineWidth: 9, lineCap: .round))
+                    .stroke(AppColors.dandanPink, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                 Text(score, format: .percent.precision(.fractionLength(0)))
-                    .font(.system(size: 17, weight: .bold).monospacedDigit())
+                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
             }
-            .frame(width: 76, height: 76)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(feedback.headline).font(.headline)
+            .frame(width: 60, height: 60)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(feedback.headline).font(.system(size: 17, weight: .semibold))
                 if !feedback.summary.isEmpty {
-                    Text(feedback.summary).font(.subheadline).foregroundStyle(AppColors.onboardingBody)
+                    Text(feedback.summary).font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -165,28 +159,22 @@ struct FeedbackView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// Retry (back to the tutorial) and Done (home). Saving the photo is the share button at the top.
     private var bottomBar: some View {
-        HStack(spacing: AppSpacing.medium) {
+        HStack(spacing: 12) {
             circleButton(symbol: "arrow.clockwise", label: "Back to tutorial", action: onBackToTutorial)
-            if let after = store.result {
-                // "Save look": the share sheet, where "Save Image" puts it in the person's own photos. The app keeps nothing.
-                ShareLink(item: Image(uiImage: after), preview: SharePreview(lookTitle, image: Image(uiImage: after))) {
-                    saveLabel
-                }
-            } else {
-                Button(action: onDone) { saveLabel }.buttonStyle(.plain)
+            Button(action: onDone) {
+                Text("Done")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .background(AppColors.buttonInk, in: Capsule())
+                    .shadow(color: .black.opacity(0.2), radius: 14, y: 6)
             }
+            .buttonStyle(.plain)
         }
-        .padding(.horizontal, AppSpacing.medium)
+        .padding(.horizontal, 20)
         .padding(.vertical, AppSpacing.small)
-    }
-
-    private var saveLabel: some View {
-        Label(store.result == nil ? "Done" : "Save look", systemImage: store.result == nil ? "checkmark" : "heart")
-            .font(.system(size: 18, weight: .semibold))
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity, minHeight: 60)
-            .background(AppColors.buttonInk, in: Capsule())
     }
 
     private func circleButton(symbol: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
@@ -197,9 +185,9 @@ struct FeedbackView: View {
 
     private func circleLabel(symbol: String) -> some View {
         Image(systemName: symbol)
-            .font(.system(size: 18, weight: .semibold))
+            .font(.system(size: 17, weight: .semibold))
             .foregroundStyle(AppColors.onboardingInk)
-            .frame(width: 56, height: 56)
+            .frame(width: 48, height: 48)
             .background(.white, in: Circle())
             .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
     }
@@ -261,12 +249,12 @@ private struct BeforeAfterSlider: View {
                     .mask(alignment: .trailing) { Rectangle().frame(width: width * (1 - split)) }
                 Rectangle().fill(.white).frame(width: 3).offset(x: width * split - 1.5)
                 Image(systemName: "arrow.left.and.right")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(AppColors.onboardingInk)
-                    .frame(width: 52, height: 52)
+                    .frame(width: 36, height: 36)
                     .background(.white, in: Circle())
                     .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
-                    .offset(x: width * split - 26)
+                    .offset(x: width * split - 18)
                 VStack {
                     Spacer()
                     HStack {
@@ -274,7 +262,7 @@ private struct BeforeAfterSlider: View {
                         Spacer()
                         tag("After", dot: true)
                     }
-                    .padding(14)
+                    .padding(10)
                 }
             }
             .contentShape(Rectangle())
@@ -282,7 +270,7 @@ private struct BeforeAfterSlider: View {
                 split = min(max(value.location.x / max(width, 1), 0.05), 0.95)
             })
         }
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Before and after photos")
         .accessibilityAdjustableAction { direction in
@@ -299,12 +287,12 @@ private struct BeforeAfterSlider: View {
     }
 
     private func tag(_ title: LocalizedStringKey, dot: Bool) -> some View {
-        HStack(spacing: 6) {
-            if dot { Circle().fill(AppColors.dandanPink).frame(width: 8, height: 8) }
-            Text(title).font(.subheadline.weight(.semibold))
+        HStack(spacing: 5) {
+            if dot { Circle().fill(AppColors.dandanPink).frame(width: 6, height: 6) }
+            Text(title).font(.system(size: 11, weight: .semibold))
         }
         .foregroundStyle(.white)
-        .padding(.horizontal, 14).padding(.vertical, 8)
+        .padding(.horizontal, 10).padding(.vertical, 6)
         .background(.black.opacity(0.85), in: Capsule())
     }
 }
@@ -314,25 +302,25 @@ private struct FeedbackCategoryCard: View {
     let category: MakeupFeedback.Category
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
                 Image(systemName: category.symbol)
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(AppColors.dandanPink)
-                    .frame(width: 36, height: 36)
+                    .frame(width: 30, height: 30)
                     .background(AppColors.dandanPink.opacity(0.12), in: Circle())
                 Text(category.title.uppercased())
-                    .font(.caption.weight(.semibold))
-                    .tracking(1)
+                    .font(.system(size: 11, weight: .semibold))
+                    .tracking(0.6)
                     .foregroundStyle(AppColors.onboardingBody)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
             HStack(alignment: .firstTextBaseline, spacing: 6) {
                 Text(category.percent, format: .percent.precision(.fractionLength(0)))
-                    .font(.system(size: 22, weight: .bold).monospacedDigit())
+                    .font(.system(size: 20, weight: .bold, design: .rounded).monospacedDigit())
                 Text(category.label)
-                    .font(.footnote)
+                    .font(.system(size: 13))
                     .foregroundStyle(AppColors.onboardingBody)
                     .lineLimit(2)
             }
@@ -342,9 +330,9 @@ private struct FeedbackCategoryCard: View {
                     Capsule().fill(AppColors.dandanPink).frame(width: proxy.size.width * category.percent)
                 }
             }
-            .frame(height: 6)
+            .frame(height: 5)
         }
-        .frame(maxWidth: .infinity, minHeight: 118, alignment: .topLeading)
+        .frame(maxWidth: .infinity, alignment: .topLeading)
         .feedbackCard()
         .accessibilityElement(children: .combine)
     }
@@ -413,8 +401,8 @@ private struct FeedbackMessageRow: View {
 private extension View {
     /// The design's white card: rounded, soft shadow.
     func feedbackCard() -> some View {
-        padding(16)
-            .background(.white, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+        padding(14)
+            .background(.white, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
             .shadow(color: .black.opacity(0.06), radius: 12, y: 4)
     }
 }

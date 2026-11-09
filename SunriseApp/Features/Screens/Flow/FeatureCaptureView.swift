@@ -132,7 +132,9 @@ struct FeatureCaptureView: View {
             var pixels: ScreenPixels?
             var report = CaptureDiagnostics()
             // The bare camera of this moment (SceneKit draws nothing for the capture): the feedback's "Before".
-            let bare = view.snapshot()
+            // `ARSCNView.snapshot()` comes at scale 1 (one point per pixel); the eyeliner is drawn in view points, so
+            // at that scale it landed a third of the way, top left. Give it the view's size in points.
+            let bare = Self.inPoints(view.snapshot(), of: view.bounds.size)
             // The picture on screen is the engine's layer when it is on: on the desired look it has the virtual makeup.
             let makeup = view as? BeautyBlushARView
             report.engine = makeup?.beauty != nil
@@ -163,6 +165,12 @@ struct FeatureCaptureView: View {
             // The still replaces the camera until Retake.
             home.deactivate()
         }
+    }
+
+    /// The same pixels, with the scale that makes the picture `size` points wide.
+    private static func inPoints(_ image: UIImage, of size: CGSize) -> UIImage {
+        guard let cg = image.cgImage, size.width > 0, abs(image.size.width - size.width) > 0.5 else { return image }
+        return UIImage(cgImage: cg, scale: CGFloat(cg.width) / size.width, orientation: image.imageOrientation)
     }
 
     private func next() {

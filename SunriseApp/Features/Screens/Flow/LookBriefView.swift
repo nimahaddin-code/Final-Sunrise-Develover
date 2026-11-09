@@ -1,9 +1,9 @@
 import SwiftUI
 import UIKit
 
-/// "Your final look": between the desired-look photo and the tutorial. The photo cropped to the feature, the must-have
-/// product and tool as cards, what to keep nearby for mistakes as rows, and "Start tutorial". An item with an ⓘ opens
-/// `KitItemSheet` (its picture, what it is, a tip).
+/// "Your expected result": between the desired-look photo and the tutorial. The photo cropped to the feature, the must-have
+/// product and tool as cards, what to keep nearby for mistakes as rows, and "Start tutorial". An item that has a popup reads
+/// as a link (underlined in pink) and opens `KitItemSheet` (its name, picture and what it is).
 struct LookBriefView: View {
     let handoff: TutorialHandoff
     let photo: UIImage?
@@ -11,42 +11,45 @@ struct LookBriefView: View {
     let onStart: () -> Void
     @State private var shown: MakeupKitItem?
 
-    private static let ink = AppColors.onboardingInk
-    private static let muted = AppColors.onboardingBody
-    private static let faint = Color(red: 0x9A / 255, green: 0x9A / 255, blue: 0x9A / 255)
+    // The design uses two text colours only: ink #0A0A0A and grey #757575.
+    private static let ink = Color(red: 0x0A / 255, green: 0x0A / 255, blue: 0x0A / 255)
+    private static let muted = Color(red: 0x75 / 255, green: 0x75 / 255, blue: 0x75 / 255)
+    private static let faint = muted
 
     var body: some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     header
-                    Text("Your final look")
-                        .font(.system(size: 30, weight: .black)).fontWidth(.expanded)
+                    Text("Your expected result")
+                        .font(.system(size: 28, weight: .black)).fontWidth(.expanded)
                         .tracking(-0.6)
                         .foregroundStyle(Self.ink)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
                         .accessibilityAddTraits(.isHeader)
-                        .padding(.top, AppSpacing.medium)
+                        .padding(.top, 20)
                     picture
-                        .frame(height: 196)
-                        .padding(.top, AppSpacing.medium)
+                        .aspectRatio(362 / 196, contentMode: .fit)
+                        .padding(.top, 12)
                     Text("What to prepare")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundStyle(Self.ink)
                         .padding(.top, 28)
                     Text("Tap an item to see what it looks like.")
-                        .font(.system(size: 14))
+                        .font(.system(size: 13))
                         .foregroundStyle(Self.muted)
                         .padding(.top, 4)
                     sectionLabel("Must have", color: Self.ink).padding(.top, 20)
-                    HStack(spacing: 12) {
+                    HStack(alignment: .top, spacing: 12) {
                         ForEach(handoff.tool.mustHave) { card($0) }
                     }
-                    .padding(.top, 10)
-                    sectionLabel("Keep nearby · for mistakes", color: Self.muted).padding(.top, 24)
+                    .padding(.top, 8)
+                    sectionLabel("Keep nearby · for mistakes", color: Self.muted).padding(.top, 20)
                     VStack(alignment: .leading, spacing: 12) {
                         ForEach(handoff.tool.nearby) { row($0) }
                     }
-                    .padding(.top, 12)
+                    .padding(.top, 10)
                 }
                 .padding(.horizontal, AppSpacing.large)
                 .padding(.top, AppSpacing.small)
@@ -56,13 +59,13 @@ struct LookBriefView: View {
             Button(action: onStart) {
                 Label("Start tutorial", systemImage: "play.fill")
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(AppColors.buttonInk, in: Capsule())
-                    .shadow(color: .black.opacity(0.18), radius: 12, y: 6)
+                    .frame(maxWidth: .infinity, minHeight: 36)
             }
-            .buttonStyle(.plain)
+            // Native Liquid Glass, tinted the homepage button colour, with the design's drop shadow.
+            .buttonStyle(.glassProminent)
+            .tint(AppColors.buttonInk)
+            .controlSize(.large)
+            .shadow(color: .black.opacity(0.22), radius: 16, y: 8)
             .padding(.horizontal, AppSpacing.large)
             .padding(.bottom, AppSpacing.medium)
         }
@@ -91,7 +94,7 @@ struct LookBriefView: View {
     }
 
     @ViewBuilder private var picture: some View {
-        let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
+        let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
         if let photo {
             Color.clear
                 .overlay { Image(uiImage: Self.crop(photo, for: handoff.tool)).resizable().scaledToFill() }
@@ -106,15 +109,15 @@ struct LookBriefView: View {
         }
     }
 
-    private func sectionLabel(_ text: LocalizedStringKey, color: Color) -> some View {
+    private func sectionLabel(_ text: LocalizedStringKey, color: Color, size: CGFloat = 12) -> some View {
         Text(text)
             .textCase(.uppercase)
-            .font(.system(size: 12, weight: .semibold))
+            .font(.system(size: size, weight: .semibold))
             .tracking(0.6)
             .foregroundStyle(color)
     }
 
-    /// A must-have: icon and kind on top, the name (dotted underline and ⓘ when it opens a popup), then a short detail.
+    /// A must-have: icon and kind on top, the name (a link when it opens a popup), then a short detail.
     private func card(_ item: MakeupKitItem) -> some View {
         Button { if item.info != nil { shown = item } } label: {
             VStack(alignment: .leading, spacing: 10) {
@@ -122,12 +125,13 @@ struct LookBriefView: View {
                     Image(systemName: item.symbol)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundStyle(AppColors.dandanPink)
-                        .frame(width: 34, height: 34)
+                        .frame(width: 36, height: 36)
                         .background(AppColors.dandanPink.opacity(0.1), in: Circle())
-                    sectionLabel(item.kind.label, color: Self.faint)
+                    sectionLabel(item.kind.label, color: Self.muted, size: 11)
+                    Spacer(minLength: 0)
                 }
-                VStack(alignment: .leading, spacing: 3) {
-                    name(item, size: 17)
+                VStack(alignment: .leading, spacing: 4) {
+                    name(item, size: 17, weight: .semibold)
                     Text(item.detail)
                         .font(.system(size: 13))
                         .foregroundStyle(Self.muted)
@@ -137,7 +141,7 @@ struct LookBriefView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(14)
             .background(.white, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .shadow(color: .black.opacity(0.06), radius: 12, y: 4)
+            .shadow(color: .black.opacity(0.06), radius: 14, y: 4)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
@@ -147,7 +151,7 @@ struct LookBriefView: View {
     /// Something to keep nearby: icon, name, and a faint note after it.
     private func row(_ item: MakeupKitItem) -> some View {
         Button { if item.info != nil { shown = item } } label: {
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 Image(systemName: item.symbol)
                     .font(.system(size: 15))
                     .foregroundStyle(Self.muted)
@@ -157,27 +161,21 @@ struct LookBriefView: View {
                     .font(.system(size: 13))
                     .foregroundStyle(Self.faint)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.85)
+                    .minimumScaleFactor(0.8)
                 Spacer(minLength: 0)
             }
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(item.info != nil ? .isLink : [])
     }
 
-    private func name(_ item: MakeupKitItem, size: CGFloat, weight: Font.Weight = .semibold) -> some View {
-        HStack(spacing: 5) {
-            Text(item.title)
-                .font(.system(size: size, weight: weight))
-                .foregroundStyle(Self.ink)
-                .underline(item.info != nil, pattern: .dot, color: AppColors.dandanPink)
-            if item.info != nil {
-                Image(systemName: "info.circle")
-                    .font(.system(size: size * 0.7, weight: .semibold))
-                    .foregroundStyle(AppColors.dandanPink)
-                    .accessibilityHidden(true)
-            }
-        }
+    /// The item's name in ink; underlined in pink, like a link, when it opens a popup.
+    private func name(_ item: MakeupKitItem, size: CGFloat, weight: Font.Weight) -> some View {
+        Text(item.title)
+            .font(.system(size: size, weight: weight))
+            .foregroundStyle(Self.ink)
+            .underline(item.info != nil, color: AppColors.dandanPink)
     }
 
     /// The part of the full-page photo the brief shows: both brows and eyes, both eyes, or the face for blush, at the
@@ -199,86 +197,63 @@ struct LookBriefView: View {
     }
 }
 
-/// An item's popup: its kind and name, its picture, what it is, a tip, and "Got it".
+/// An item's popup: a native sheet (system material, navigation bar with the name and a close button), its picture on a
+/// white card, what it is, and "Got it".
 private struct KitItemSheet: View {
     let item: MakeupKitItem
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(item.kind.label)
-                        .textCase(.uppercase)
-                        .font(.system(size: 11, weight: .semibold))
-                        .tracking(0.6)
-                        .foregroundStyle(AppColors.onboardingBody)
-                    Text(item.title)
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(AppColors.onboardingInk)
-                        .accessibilityAddTraits(.isHeader)
-                }
-                Spacer()
-                Button { dismiss() } label: {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(AppColors.onboardingBody)
-                        .frame(width: 30, height: 30)
-                        .background(Color.black.opacity(0.05), in: Circle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Close")
-            }
-            picture
-                .frame(maxWidth: .infinity)
-                .frame(height: 170)
-                .padding(.top, AppSpacing.medium)
-            if let info = item.info {
-                Text(info.text)
-                    .font(.system(size: 15))
-                    .foregroundStyle(AppColors.onboardingInk)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.top, AppSpacing.medium)
-                Label {
-                    Text(info.tip)
-                } icon: {
-                    Image(systemName: "sparkles").foregroundStyle(AppColors.dandanPink)
-                }
-                .font(.system(size: 13))
-                .foregroundStyle(AppColors.onboardingBody)
-                .padding(.top, 10)
-            }
-            Spacer(minLength: AppSpacing.medium)
-            Button { dismiss() } label: {
-                Text("Got it")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(AppColors.onboardingInk)
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 16) {
+                // The product photos are 1086 x 588: the card takes their shape at full width and the photo fills it.
+                picture
                     .frame(maxWidth: .infinity)
-                    .frame(height: 52)
-                    .background(AppColors.dandanPink.opacity(0.06), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .aspectRatio(1086 / 588, contentMode: .fit)
+                    .background(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                if let info = item.info {
+                    Text(info.text)
+                        .font(.body)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
             }
-            .buttonStyle(.plain)
+            .padding(.horizontal)
+            .navigationTitle(Text(item.title))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button { dismiss() } label: { Image(systemName: "xmark") }
+                        .accessibilityLabel("Close")
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                Button { dismiss() } label: {
+                    Text("Got it").frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.glass)
+                .controlSize(.large)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            }
         }
-        .padding(.horizontal, AppSpacing.large)
-        .padding(.top, 28)
-        .padding(.bottom, AppSpacing.small)
-        .presentationDetents([.height(440)])
+        // Close and "Got it" in the design's ink, not the app's pink accent.
+        .tint(AppColors.onboardingInk)
+        .presentationDetents([.height(520)])
         .presentationDragIndicator(.visible)
-        .presentationCornerRadius(28)
-        .presentationBackground(.white)
         .preferredColorScheme(.light)
     }
 
     /// The `kit-*` picture, or the item's symbol large until the image set is filled.
     @ViewBuilder private var picture: some View {
         if let name = item.info?.imageName, UIImage(named: name) != nil {
-            Image(name).resizable().scaledToFit().accessibilityHidden(true)
+            Color.clear.overlay { Image(name).resizable().scaledToFill() }.clipped().accessibilityHidden(true)
         } else {
             Image(systemName: item.symbol)
                 .font(.system(size: 64, weight: .light))
                 .foregroundStyle(AppColors.dandanPink.opacity(0.5))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(AppColors.dandanPink.opacity(0.05), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
                 .accessibilityHidden(true)
         }
     }

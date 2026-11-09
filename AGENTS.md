@@ -1,3 +1,27 @@
+## Feedback cards: Placement and Shade only; brief and popup to the design; eyeliner photo position — 2026-11-09
+
+`FeedbackCategory` has two cases (design 18): `placement` (rule priorities 20-39 where and what shape, 50-59 spill, 70+
+balance) and `shade` (under 20 nothing applied, 40-49 amount, 60-69 finish and hue); the six database groups are folded
+into them, so the feedback screen shows two cards. `LookBriefView` follows the design again: title "Your expected result",
+larger type, an item with a popup reads as a link (pink, solid pink underline; no ⓘ). `KitItemSheet` is a native sheet:
+system material, a `NavigationStack` inline title with a close button in the toolbar, system padding, the picture on a
+white card, the text, and "Got it" as a large `.glass` button; the kind label and the tip are no longer shown.
+Eyeliner capture: `ARSCNView.snapshot()` returns a scale-1 image (one point per pixel) while the liner is drawn in view
+points, so the liner landed small in the top left; the snapshot now gets the view's size in points
+(`FeatureCaptureView.inPoints`). Tutorial: the camera now runs from the top edge under the status bar (`GuidedTutorialView.fullBleed`, rounded only above
+the bottom bar; buttons stay in the safe area); brow step 4 reads "Blend the front and clean up." Eyeliner colour: the liner is now laid over the camera with normal blending, live and in the photo (`LinerOverlayView`,
+`LinerOverlayRenderer.compose`); multiplied into skin, every liner shade (all dark: brown, plum, navy, black) read as black. Second design pass: brief and feedback use the design's sizes (brief: title 28 expanded black, photo 362:196, "What to
+prepare" 22 bold, labels 12/11 semibold, card name 17 semibold, rows 15, details 13, 36 pt icon circles, grey style pill
+12 semibold; feedback: headline 32 expanded black, subtitle 15, Before/After 362:236 with small tags, score card 17/13,
+categories 11 semibold, percent 20 bold rounded, bottom ↻ and "Done" (home; sharing stays the top button, "Save look"
+removed)). Item sheet: the product photo fills a full-width card at its own 1086:588 shape; close and "Got it" in ink.
+`SideDoneCard`'s second button is now "Done", which ends the tutorial without the other side (result photo, or the photo
+screen outside the flow); "Replay left …" and `GuidedTutorialModel.replaySide()` are gone. Third pass: the feedback screen no longer shows the "Photo tips" card (its text also showed an unfilled {value}). Brief:
+KEEP NEARBY lists two items (micellar water and cotton pads/buds; "Clean, dry face" removed from `TryOnTool.nearby`),
+text uses only #0A0A0A and #757575 (link names in ink with a pink underline), the light `StylePill` is 154 x 40, and
+"Start tutorial" is a native `.glassProminent` button tinted `AppColors.buttonInk` with a drop shadow. 365 Simulator tests pass; the brief, popup and eyeliner photo were not looked at after
+this change (Simulator has no camera; brief and popup not opened), device check pending.
+
 ## Merge: staging into E2E-Flow — 2026-11-09
 
 staging (Nimah's measured feedback for every tool, capture diagnostics, the Indonesian rewrite, the blush kit data)
@@ -987,7 +1011,7 @@ guessed from `mayBeHooded`. Missing/unclear measurements use the neutral liner. 
 eye measurements embedded in the face result when no separate eye result exists. Eyeshadow is outside this scope.
 
 Eyeliner look (Hanum's overlay): `LinerOverlayRenderer` yields a halo fill plus a body fill per eye; the live canvas and photo
-`compose` multiply them into the camera picture, erase a skin-texture grain (`LinerInk`, anchored to the eye) and hand
+`compose` lay them over the camera picture (normal blending since 2026-11-09), erase a skin-texture grain (`LinerInk`, anchored to the eye) and hand
 regions, and tint the pigment with skin sampled from the ARKit frame. Shared tuning constants live in `LinerInk` and `LinerOverlayRenderer`.
 
 Shared brief for anyone working on this repo with an AI coding assistant (Claude Code, Codex, Cursor, Copilot, …).

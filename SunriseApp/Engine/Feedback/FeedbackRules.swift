@@ -107,41 +107,30 @@ struct FeedbackHit: Sendable {
 /// One evaluated metric, for the score (also the ones that were ok).
 struct FeedbackScoreEntry: Sendable { var band: FeedbackBand; var weight: Double; var priority: Int }
 
-/// The feedback screen's cards: the database's `selection.priority_groups`, by the rule's priority.
+/// The feedback screen's two cards (design 18), from the database's `selection.priority_groups` by the rule's priority:
+/// Placement = where and what shape (20-39), spill past the area (50-59) and left/right balance (70+); Shade = how much
+/// colour (nothing applied, under 20; amount, 40-49) and its finish and hue (60-69).
 enum FeedbackCategory: String, CaseIterable, Sendable {
-    case placement, shape, amount, edges, finish, balance
+    case placement, shade
 
     init(priority: Int) {
         switch priority {
-        case ..<20: self = .amount   // nothing applied
-        case 20..<30: self = .placement
-        case 30..<40: self = .shape
-        case 40..<50: self = .amount
-        case 50..<60: self = .edges
-        case 60..<70: self = .finish
-        default: self = .balance
+        case ..<20, 40..<50, 60..<70: self = .shade
+        default: self = .placement
         }
     }
 
     var title: String {
         switch self {
         case .placement: String(localized: "Placement")
-        case .shape: String(localized: "Shape")
-        case .amount: String(localized: "Amount")
-        case .edges: String(localized: "Clean edges")
-        case .finish: String(localized: "Finish")
-        case .balance: String(localized: "Balance")
+        case .shade: String(localized: "Shade")
         }
     }
 
     var symbol: String {
         switch self {
         case .placement: "viewfinder"
-        case .shape: "scribble.variable"
-        case .amount: "drop.fill"
-        case .edges: "sparkles"
-        case .finish: "paintpalette.fill"
-        case .balance: "arrow.left.and.right"
+        case .shade: "paintpalette.fill"
         }
     }
 }

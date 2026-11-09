@@ -8,7 +8,7 @@ extension GuidedTutorialModel {
         FaceGuideLesson(title: String(localized: "Brush Your Brows"), instruction: String(localized: "Brush your brows up with a spoolie.")),
         FaceGuideLesson(title: String(localized: "Map Your Brows"), instruction: String(localized: "Grab your brow pencil and mark 3 points.")),
         FaceGuideLesson(title: String(localized: "Connect and Fill"), instruction: String(localized: "Connect the dots and fill from the middle out.")),
-        FaceGuideLesson(title: String(localized: "Blend and Clean Up"), instruction: String(localized: "Blend the front and clean up the messy part.")),
+        FaceGuideLesson(title: String(localized: "Blend and Clean Up"), instruction: String(localized: "Blend the front and clean up.")),
     ]
 
     /// `BrowTutorialOverlay`'s animation for each lesson: brush, dots, fill from the arch, then the front.
