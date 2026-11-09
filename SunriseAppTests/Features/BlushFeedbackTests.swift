@@ -86,8 +86,10 @@ final class BlushFeedbackTests: XCTestCase {
         XCTAssertTrue(placement.items.contains { $0.rule == "blush.offset.too_high" })
         let scores = try XCTUnwrap(FeedbackDatabase.load()?.scores)
         let row = try XCTUnwrap(scores.tools["blush"]?["placement"]?.percent.first { $0.percent == Int((placement.percent * 100).rounded()) })
-        XCTAssertEqual(placement.label, row.label.en)
+        XCTAssertTrue(placement.label.hasSuffix("high"), "the card says which way: \(placement.label)")
         XCTAssertEqual(placement.description, row.description.en)
+        XCTAssertEqual(feedback.categories.last?.label, "Spot on")
+        XCTAssertTrue(feedback.summary.hasPrefix("Your shade is spot on. Placement is "), feedback.summary)
         XCTAssertEqual(feedback.placement?.value, placement.percent, "Hanum's Placement part follows the card")
         XCTAssertEqual(try XCTUnwrap(feedback.score), feedback.categories.map(\.percent).reduce(0, +) / 2, accuracy: 0.0001)
 
@@ -95,6 +97,35 @@ final class BlushFeedbackTests: XCTestCase {
         XCTAssertTrue(onTarget.categories.allSatisfy { $0.percent >= 0.9 && $0.items.isEmpty }, "\(onTarget.categories.map(\.label))")
         let none = try evaluate(after: scan())
         XCTAssertEqual(none.categories.map(\.percent), [0.01, 0.01], "nothing applied: 1% for both")
+    }
+
+    func testCardNotesSayWhichWay() {
+        XCTAssertEqual(FeedbackNote.text(rule: "blush.offset.too_high", band: .slight, language: .en), "A little high")
+        XCTAssertEqual(FeedbackNote.text(rule: "blush.intensity.too_heavy", band: .clear, language: .en), "Too heavy")
+        XCTAssertEqual(FeedbackNote.text(rule: "brow.tail.too_short", band: .large, language: .id), "Jauh terlalu pendek")
+        XCTAssertEqual(FeedbackNote.text(rule: "blush.spill.eye", band: .clear, language: .en), "Past the line")
+        XCTAssertEqual(FeedbackNote.text(rule: "eyeliner.none", band: .large, language: .id), "Belum terlihat")
+        XCTAssertNil(FeedbackNote.text(rule: "brow.arch.too_inner", band: .clear, language: .en), "no word: the score label is used")
+    }
+
+    /// The After photo is moved, scaled and turned so its eyes land on the Before photo's eyes.
+    func testAlignmentPutsTheEyesOnTheEyes() throws {
+        let t = try XCTUnwrap(PhotoAlignment.transform(from: (CGPoint(x: 100, y: 200), CGPoint(x: 160, y: 200)),
+                                                       to: (CGPoint(x: 120, y: 260), CGPoint(x: 240, y: 260))))
+        let left = CGPoint(x: 100, y: 200).applying(t), right = CGPoint(x: 160, y: 200).applying(t)
+        XCTAssertEqual(left.x, 120, accuracy: 0.001); XCTAssertEqual(left.y, 260, accuracy: 0.001)
+        XCTAssertEqual(right.x, 240, accuracy: 0.001); XCTAssertEqual(right.y, 260, accuracy: 0.001)
+        XCTAssertNil(PhotoAlignment.transform(from: (.zero, .zero), to: (.zero, CGPoint(x: 10, y: 0))))
+
+        let picture = UIGraphicsImageRenderer(size: CGSize(width: 40, height: 80)).image { _ in }
+        var before = scan(), after = scan()
+        before.leftEye = CGPoint(x: 150, y: 300); before.rightEye = CGPoint(x: 250, y: 300)
+        after.leftEye = CGPoint(x: 140, y: 310); after.rightEye = CGPoint(x: 240, y: 310)
+        let aligned = PhotoAlignment.align(after: picture, afterScan: after, to: picture, beforeScan: before)
+        XCTAssertEqual(aligned.size, picture.size)
+        XCTAssertFalse(aligned === picture, "moved: a new picture")
+        after.rightEye = CGPoint(x: 400, y: 310)   // 2.6x wider: implausible, left as it is
+        XCTAssertTrue(PhotoAlignment.align(after: picture, afterScan: after, to: picture, beforeScan: before) === picture)
     }
 
     func testScoreCurveMatchesTheDatabaseDescription() {

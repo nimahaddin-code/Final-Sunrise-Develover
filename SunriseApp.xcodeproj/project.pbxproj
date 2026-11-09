@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA7F8C6B10DAD55DA0B33AB4 /* PhotoAlignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F4BC847DE7ACFEE92D9C2 /* PhotoAlignment.swift */; };
 		DA7F27CE25946E00F23D133F /* makeup-score.database.json in Resources */ = {isa = PBXBuildFile; fileRef = DA7FCBB04A872F861B11FAE2 /* makeup-score.database.json */; };
 		DA7F30D87A097FC1912300C0 /* LineFeedbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7FB78841BE7AE803170E09 /* LineFeedbackTests.swift */; };
 		DA7FD4409B946F3081EEFD86 /* EyelinerFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F4D55BA5337E5BFFC436C /* EyelinerFeedback.swift */; };
@@ -204,6 +205,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DA7F4BC847DE7ACFEE92D9C2 /* PhotoAlignment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoAlignment.swift; sourceTree = "<group>"; };
 		DA7FCBB04A872F861B11FAE2 /* makeup-score.database.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "makeup-score.database.json"; sourceTree = "<group>"; };
 		DA7FB78841BE7AE803170E09 /* LineFeedbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineFeedbackTests.swift; sourceTree = "<group>"; };
 		DA7F4D55BA5337E5BFFC436C /* EyelinerFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerFeedback.swift; sourceTree = "<group>"; };
@@ -438,6 +440,7 @@
 		DA7FCC4EBB727569FDAB6F87 /* Feedback */ = {
 			isa = PBXGroup;
 			children = (
+				DA7F4BC847DE7ACFEE92D9C2 /* PhotoAlignment.swift */,
 				DA7F7785119D12160DFD67D6 /* LineProfile.swift */,
 				DA7F5A668A9AD9B99273200F /* FaceScan.swift */,
 				DA7F54F71553CAEE51B376B3 /* FeedbackRules.swift */,
@@ -1137,6 +1140,7 @@
 				6073C06ABA610D35DB264744 /* BlushLookPicker.swift in Sources */,
 				F7E1A0000000000000000004 /* BlushTryOnFeature.swift in Sources */,
 				F49403615C6E340AD3E06244 /* BlushInfo.swift in Sources */,
+				DA7F8C6B10DAD55DA0B33AB4 /* PhotoAlignment.swift in Sources */,
 				DA7FD4409B946F3081EEFD86 /* EyelinerFeedback.swift in Sources */,
 				DA7FFDB723B4D0BE4CFF1347 /* BrowFeedback.swift in Sources */,
 				DA7F7FAE45901869110BE3B8 /* LineProfile.swift in Sources */,
