@@ -604,9 +604,8 @@ private struct TutorialScreen: View {
                                       relay.deliver(frame, face)
                                   }, reducedFrameRate: advisor.reducesLoad)
                     if model.tab == .blush, model.hasGuide, !model.photoMode, let side = model.compare.side(of: .guide) {
-                        // The guide's half only, over the bare camera; the look is on the other half.
-                        BlushTutorialOverlay(feed: camera.blushGuide, step: model.guideStep)
-                            .mask { FaceHalfMask(feed: camera.faceSplit, left: side == .leading) }
+                        // The guide's cheek only, over the bare camera; the look is on the other half.
+                        BlushTutorialOverlay(feed: camera.blushGuide, step: model.guideStep, side: side)
                     }
                     if model.tab == .brows, model.hasGuide, !model.photoMode, let side = model.compare.side(of: .guide) {
                         // The guide's brow only; the look is on the other one.
@@ -813,16 +812,3 @@ private struct SideDoneCard: View {
     }
 }
 
-/// A mask covering the whole view, or only the part left / right of the face's midline.
-private struct FaceHalfMask: View {
-    @ObservedObject var feed: FaceSplitFeed
-    let left: Bool
-
-    var body: some View {
-        GeometryReader { proxy in
-            let cut = proxy.size.width * feed.x
-            Rectangle().frame(width: left ? cut : proxy.size.width - cut)
-                .frame(maxWidth: .infinity, alignment: left ? .leading : .trailing)
-        }
-    }
-}

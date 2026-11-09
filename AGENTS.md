@@ -19,7 +19,14 @@ removed)). Item sheet: the product photo fills a full-width card at its own 1086
 screen outside the flow); "Replay left …" and `GuidedTutorialModel.replaySide()` are gone. Third pass: the feedback screen no longer shows the "Photo tips" card (its text also showed an unfilled {value}). Brief:
 KEEP NEARBY lists two items (micellar water and cotton pads/buds; "Clean, dry face" removed from `TryOnTool.nearby`),
 text uses only #0A0A0A and #757575 (link names in ink with a pink underline), the light `StylePill` is 154 x 40, and
-"Start tutorial" is a native `.glassProminent` button tinted `AppColors.buttonInk` with a drop shadow. 365 Simulator tests pass; the brief, popup and eyeliner photo were not looked at after
+"Start tutorial" is a native `.glassProminent` button tinted `AppColors.buttonInk` with a drop shadow. Tutorial side guides on a turned face: the blush guide now draws only the cheek on its side, picked by the cheeks' own
+positions (`BlushTutorialOverlay(side:)`; the screen-half mask `FaceHalfMask` is gone), the blush split for the pigment
+follows the nose (5.5 cm forward of the face anchor) instead of the anchor's origin inside the head, and the brow guide
+shows a lone visible brow only when it is on its side. The eyeliner already splits between the two eyes. Camera messages: `CameraAdvisor` shows a message only while the face is not tracked (or the phone is too hot), so the
+filter and guide stay on while ARKit follows the face (head down, dim light, backlight, close or far). The message still
+names the likely reason (too dark, backlit, too close, turned away, covered: `CameraMessageEngine.lostCause` now also
+blames a face last seen covered; "I'll wait here" / "I can't see you yet" only when no reason is known). "Too dark" still
+pulses the light button. "Start tutorial" is back to 52 pt high (glass tint on a fixed-height label). 365 Simulator tests pass; the brief, popup and eyeliner photo were not looked at after
 this change (Simulator has no camera; brief and popup not opened), device check pending.
 
 ## Merge: staging into E2E-Flow — 2026-11-09

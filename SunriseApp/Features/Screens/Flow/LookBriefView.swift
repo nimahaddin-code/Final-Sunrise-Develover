@@ -59,13 +59,14 @@ struct LookBriefView: View {
             Button(action: onStart) {
                 Label("Start tutorial", systemImage: "play.fill")
                     .font(.system(size: 17, weight: .semibold))
-                    .frame(maxWidth: .infinity, minHeight: 36)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 52)
+                    // Native Liquid Glass tinted the homepage button colour, at the earlier 52 pt height, with a drop shadow.
+                    .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
+                    .shadow(color: .black.opacity(0.22), radius: 16, y: 8)
             }
-            // Native Liquid Glass, tinted the homepage button colour, with the design's drop shadow.
-            .buttonStyle(.glassProminent)
-            .tint(AppColors.buttonInk)
-            .controlSize(.large)
-            .shadow(color: .black.opacity(0.22), radius: 16, y: 8)
+            .buttonStyle(.plain)
             .padding(.horizontal, AppSpacing.large)
             .padding(.bottom, AppSpacing.medium)
         }

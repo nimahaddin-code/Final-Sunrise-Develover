@@ -45,7 +45,7 @@ struct CameraMessageEngine {
     private var clearSince: [CameraMessage: TimeInterval] = [:]
     private var shown = Set<CameraMessage>()
     private var seenFace = false
-    private var lastSeen: (time: TimeInterval, distance: Double?, yaw: Double?)?
+    private var lastSeen: (time: TimeInterval, distance: Double?, yaw: Double?, covered: Bool)?
 
     init(context: CameraGuidanceContext) { self.context = context }
 
@@ -54,7 +54,7 @@ struct CameraMessageEngine {
 
     /// The message to show now, or nil.
     mutating func update(_ signals: CameraSignals, at now: TimeInterval) -> CameraMessage? {
-        if signals.faceTracked { seenFace = true; lastSeen = (now, signals.distance, signals.yawDegrees) }
+        if signals.faceTracked { seenFace = true; lastSeen = (now, signals.distance, signals.yawDegrees, signals.faceCovered) }
         let cause = lostCause(signals, at: now)
         for message in CameraMessage.allCases where message != .phoneWarm {
             let isRaw = condition(message, signals, cause: cause, wasRaw: raw.contains(message))
@@ -75,11 +75,12 @@ struct CameraMessageEngine {
         return shown.min()
     }
 
-    /// When tracking drops right after a close or turned-away face, that is the likely reason: tell her what to fix.
+    /// When tracking drops right after a close, turned-away or covered face, that is the likely reason: tell her what to fix.
     private func lostCause(_ s: CameraSignals, at now: TimeInterval) -> CameraMessage? {
         guard !s.faceTracked, let last = lastSeen, now - last.time < Limits.lostCauseWindow else { return nil }
         if let distance = last.distance, distance < Limits.lostCloseDistance { return .tooClose }
         if let yaw = last.yaw, yaw > Limits.lostYaw { return .headTurned }
+        if last.covered { return .faceCovered }
         return nil
     }
 
@@ -100,7 +101,7 @@ struct CameraMessageEngine {
             return s.faceCount > 1
         case .faceCovered:
             // In the tutorial her hand and brush are always near her face, so this one is Try On only.
-            return context == .tryOn && s.faceTracked && s.faceCovered
+            return (context == .tryOn && s.faceTracked && s.faceCovered) || cause == .faceCovered
         case .tooClose:
             let near = s.distance.map { Self.below($0, show: Limits.closeShow, clear: Limits.closeClear, was: was) } ?? false
             return near || cause == .tooClose

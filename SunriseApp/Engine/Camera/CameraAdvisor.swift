@@ -18,6 +18,8 @@ import SwiftUI
     private var thermalObserver: NSObjectProtocol?
     private let motion = CMMotionManager()
     private var tilt: Double?
+    /// The engine's last answer, shown or not (messages show only while the face is lost).
+    private var lastFound: CameraMessage?
 
     init(context: CameraGuidanceContext, session: ARSession = ARFaceTrackingManager.shared.session) {
         self.session = session
@@ -82,9 +84,15 @@ import SwiftUI
         var signals = await sampler.sample(.init(frame: frame), visionEnabled: !reducesLoad)
         guard !Task.isCancelled, thermal != .critical else { return }
         signals.tiltDegrees = tilt
-        let next = engine.update(signals, at: ProcessInfo.processInfo.systemUptime)
+        let found = engine.update(signals, at: ProcessInfo.processInfo.systemUptime)
+        // "Too dark" still pulses the light button once, without a message.
+        if found == .tooDark && lastFound != .tooDark { darkPulse += 1 }
+        lastFound = found
+        // The makeup stays on the face for as long as ARKit can follow it (head down, dim light, backlight, close or far):
+        // a message, which also fades the makeup, shows only once the face is lost, and it still names the likely reason
+        // (too dark, backlit, too close, turned away, covered, ...; "I'll wait here" only when none is known).
+        let next = signals.faceTracked ? nil : found
         guard next != message else { return }
-        if next == .tooDark { darkPulse += 1 }
         message = next
     }
 }
