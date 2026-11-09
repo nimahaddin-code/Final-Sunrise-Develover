@@ -60,11 +60,9 @@ extension TryOnTool {
     /// The tools and products to have ready before the tutorial. Placeholder list until the design team's copy arrives.
     var kit: [MakeupKitItem] {
         switch self {
-        case .blush: [
-            MakeupKitItem(id: "blush", symbol: "circle.hexagongrid.fill", title: "Blush", detail: "Powder or cream, in the shade you tried."),
-            MakeupKitItem(id: "brush", symbol: "paintbrush.pointed", title: "Fluffy brush or fingertips", detail: "To dab and blend."),
-            MakeupKitItem(id: "mirror", symbol: "iphone", title: "Phone at eye level", detail: "Lean it on something so both hands stay free.")
-        ]
+        case .blush:
+            // -Nimah: the blush kit is kept in one place, `BlushInfo`, with its pictures.
+            ToolInfo.blush(TutorialHandoff(tool: .blush, shades: [:], intensities: [:])).kitItems
         case .eyebrow: [
             MakeupKitItem(id: "spoolie", symbol: "scribble.variable", title: "Spoolie", detail: "To brush the hairs up and blend."),
             MakeupKitItem(id: "pencil", symbol: "pencil", title: "Brow pencil", detail: "Close to the shade you tried."),
@@ -84,6 +82,18 @@ struct MakeupKitItem: Identifiable {
     let symbol: String
     let title: LocalizedStringKey
     let detail: LocalizedStringKey
+    /// An asset shown instead of the symbol, when the tool has a picture of the item.
+    var imageName: String? = nil
+}
+
+extension ToolInfo {
+    /// Tools then products, as cards for the get-ready page. Texts are already localised, so they are shown as they are.
+    var kitItems: [MakeupKitItem] {
+        (tools + products).map { item in
+            MakeupKitItem(id: item.id, symbol: item.symbol, title: LocalizedStringKey(stringLiteral: item.name),
+                          detail: LocalizedStringKey(stringLiteral: item.detail), imageName: item.imageName)
+        }
+    }
 }
 
 // MARK: Feedback

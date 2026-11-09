@@ -54,12 +54,18 @@ struct LookBriefView: View {
 
     private func card(_ item: MakeupKitItem) -> some View {
         HStack(spacing: 16) {
-            Image(systemName: item.symbol)
-                .font(.system(size: 22, weight: .regular))
-                .foregroundStyle(AppColors.flamingo)
-                .frame(width: 58, height: 58)
-                .background(AppColors.flamingo.opacity(0.18), in: Circle())
-                .accessibilityHidden(true)
+            Group {
+                if let name = item.imageName {
+                    Image(name).resizable().scaledToFit().padding(4)
+                } else {
+                    Image(systemName: item.symbol)
+                        .font(.system(size: 22, weight: .regular))
+                        .foregroundStyle(AppColors.flamingo)
+                }
+            }
+            .frame(width: 58, height: 58)
+            .background(AppColors.flamingo.opacity(0.18), in: Circle())
+            .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
                 Text(item.title).font(.system(size: 17, weight: .semibold))
                 Text(item.detail).font(.system(size: 15))

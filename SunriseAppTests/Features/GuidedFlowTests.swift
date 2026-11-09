@@ -29,6 +29,32 @@ final class GuidedFlowTests: XCTestCase {
         XCTAssertEqual(ToolInfo.of(.eyebrow, handoff: all).lookName, all.browOverlay?.title)
     }
 
+    /// A picture name with no asset would show an empty card instead of the symbol.
+    func testEveryItemPictureIsInTheAssets() {
+        for tool in TryOnTool.allCases {
+            let info = ToolInfo.of(tool, handoff: handoff(enabled: Set(TryOnTool.allCases)))
+            for name in (info.tools + info.products).compactMap(\.imageName) {
+                XCTAssertNotNil(UIImage(named: name), "\(tool): no asset named \(name)")
+            }
+        }
+    }
+
+    func testBlushGetReadyPageListsTheBlushKitWithPictures() {
+        let info = ToolInfo.blush(TutorialHandoff(tool: .blush, shades: [:], intensities: [:]))
+        let kit = TryOnTool.blush.kit
+        XCTAssertEqual(kit.map(\.id), (info.tools + info.products).map(\.id))
+        XCTAssertEqual(kit.compactMap(\.imageName), ["kit-blush-sponge", "kit-blush-blush", "kit-blush-powder"])
+    }
+
+    func testEachBlushLookHasItsOwnDescription() {
+        let descriptions = BlushPlacementStyle.referenceLooks.map { style -> String in
+            var value = handoff(enabled: [.blush])
+            value.blushStyle = style
+            return ToolInfo.of(.blush, handoff: value).lookDescription
+        }
+        XCTAssertEqual(Set(descriptions).count, BlushPlacementStyle.referenceLooks.count)
+    }
+
     func testOnlyToolsWithMakeupOnAreShownInTryOnOrder() {
         let chosen = ToolInfo.chosen(in: handoff(enabled: [.eyebrow, .blush]))
         XCTAssertEqual(chosen.map(\.tool), TryOnTool.allCases.filter { [.eyebrow, .blush].contains($0) })
