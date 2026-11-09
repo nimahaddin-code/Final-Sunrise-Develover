@@ -1,3 +1,14 @@
+## Feedback photos fixed after the first device test — -Nimah (2026-11-09)
+
+Device test: the desired-look photo had no blush, the result photo showed blush and dotted circles, and the head-tilt
+check (8°) blocked every result, so no advice showed. Causes and fixes: `TryOnHomeModel.apply` filtered tools by `canTry`
+while the brow model was still loading (`brow.prepare()` is async), which dropped blush on the desired-look capture: it no
+longer filters by `canTry` (`layer(_:)` checks it every frame). The result capture runs the blush engine with `showGuide`,
+which also makes the SceneKit view under the Metal layer draw guide shapes; `ARSCNView.snapshot()` took those: both
+photos are now read from the engine's layer when it is on (`readScreen`). Turned or tilted up to 15°
+(`FeedbackPhotoCheck.poseBlockingDegrees`) is now a note, beyond it a retake (database: 8°, blocking). Tests in
+`GuidedFlowTests`. Device check of the fix pending.
+
 ## Brow and eyeliner feedback measured too — -Nimah (2026-11-09)
 
 `MeasuredFeedbackProvider` now measures every tool (`BrowFeedback`, `EyelinerFeedback` beside `BlushFeedback`; the

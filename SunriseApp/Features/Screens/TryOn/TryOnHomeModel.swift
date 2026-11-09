@@ -226,7 +226,9 @@ final class LinerFrameRelay: @unchecked Sendable {
         linerLook = handoff.linerLook
         browOverlay = handoff.browOverlay
         naturalBrowVisible = !handoff.hideNaturalBrow
-        enabled = handoff.enabled.filter { canTry($0) && ($0 != .eyebrow || browOverlay != nil) }
+        // -Nimah: not filtered by `canTry`: right after `activate()` the brow model is still loading, so blush was dropped
+        // and the desired-look photo had no makeup. `layer(_:)` checks `canTry` on every frame anyway.
+        enabled = handoff.enabled.filter { $0 != .eyebrow || browOverlay != nil }
         syncLiner()
     }
 
