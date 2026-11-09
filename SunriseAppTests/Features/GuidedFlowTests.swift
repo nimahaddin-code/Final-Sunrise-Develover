@@ -29,6 +29,58 @@ final class GuidedFlowTests: XCTestCase {
         XCTAssertEqual(ToolInfo.of(.eyebrow, handoff: all).lookName, all.browOverlay?.title)
     }
 
+    /// A picture name with no asset would show an empty card instead of the symbol.
+    func testEveryItemPictureIsInTheAssets() {
+        for tool in TryOnTool.allCases {
+            let info = ToolInfo.of(tool, handoff: handoff(enabled: Set(TryOnTool.allCases)))
+            for name in (info.tools + info.products).compactMap(\.imageName) {
+                XCTAssertNotNil(UIImage(named: name), "\(tool): no asset named \(name)")
+            }
+        }
+    }
+
+    /// The look brief's item popups: every picture they name is in the assets.
+    func testEveryBriefItemPictureIsInTheAssets() {
+        for tool in TryOnTool.allCases {
+            for name in (tool.mustHave + tool.nearby).compactMap(\.info?.imageName) {
+                XCTAssertNotNil(UIImage(named: name), "\(tool): no asset named \(name)")
+            }
+        }
+    }
+
+    func testEachBlushLookHasItsOwnDescription() {
+        let descriptions = BlushPlacementStyle.referenceLooks.map { style -> String in
+            var value = handoff(enabled: [.blush])
+            value.blushStyle = style
+            return ToolInfo.of(.blush, handoff: value).lookDescription
+        }
+        XCTAssertEqual(Set(descriptions).count, BlushPlacementStyle.referenceLooks.count)
+    }
+
+    /// Device test 2026-11-09: the desired-look photo had no blush. `apply` ran while the brow model was still loading and
+    /// dropped blush; the layer now turns on as soon as the placement is known.
+    @MainActor func testDesiredLookKeepsBlushOnBeforeTheModelHasLoaded() {
+        let home = TryOnHomeModel(tool: .blush, plan: MakeupPlan(shape: .heart), assessment: .init(shape: .heart, origin: .analysis),
+                                  checker: MockFaceTrackingChecker())
+        home.apply(TutorialHandoff(tool: .blush, shades: [:], intensities: [:], blushStyle: .lifted, enabled: [.blush]))
+        XCTAssertTrue(home.enabled.contains(.blush))
+        home.deactivate()
+    }
+
+    func testAPhoneHeldABitLowIsANoteNotARetake() throws {
+        let database = try XCTUnwrap(FeedbackDatabase.load())
+        let composer = FeedbackComposer(database: database, language: .en)
+        func scan(pitch: Float) -> FaceScan {
+            FaceScan(samples: [], yaw: 0, pitch: pitch, roll: 0, blink: 0, smile: 0, jawOpen: 0, browRaise: 0, ipd: 63, eyeY: 30,
+                     outline: nil, viewport: .zero)
+        }
+        let slight = FeedbackPhotoCheck(before: scan(pitch: 0), after: scan(pitch: 9), tool: "blush", composer: composer)
+        XCTAssertTrue(slight.blocking.isEmpty)
+        XCTAssertEqual(slight.notes.map(\.rule), ["capture.tilted_up_down", "capture.pose_mismatch"])
+        let steep = FeedbackPhotoCheck(before: scan(pitch: 0), after: scan(pitch: 20), tool: "blush", composer: composer)
+        XCTAssertEqual(steep.blocking.map(\.rule), ["capture.tilted_up_down"])
+    }
+
     func testOnlyToolsWithMakeupOnAreShownInTryOnOrder() {
         let chosen = ToolInfo.chosen(in: handoff(enabled: [.eyebrow, .blush]))
         XCTAssertEqual(chosen.map(\.tool), TryOnTool.allCases.filter { [.eyebrow, .blush].contains($0) })

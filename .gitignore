@@ -27,3 +27,6 @@ xcuserdata/
 # Swift package checkouts; keep lockfiles if packages are added later
 .swiftpm/
 
+
+# App Store submission materials (local only)
+AppStoreSubmission/

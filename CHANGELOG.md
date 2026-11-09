@@ -1,3 +1,14 @@
+## Merge: staging into E2E-Flow — 2026-11-09
+
+staging (Nimah's measured feedback for every tool, capture diagnostics, the Indonesian rewrite, the blush kit data)
+merged into E2E-Flow. `FeedbackView` is staging's redesign (measured categories, Before / After with the bare photo);
+E2E-Flow's own feedback restyle and `MakeupFeedback.Part` were dropped. `FeatureCaptureView` keeps E2E-Flow's layout
+(oval, style pill, shutter) with staging's shutter logic (`FaceScan`, `CaptureDiagnostics`, bare photo, blush target
+`cameraConfiguration`). `LookBriefView` and the brief items (`TryOnTool.mustHave` / `nearby`) stay E2E-Flow's, so the
+blush kit from `BlushInfo` (`ToolInfo.kitItems`, `TryOnTool.kit`) no longer shows on the brief; its test was replaced by
+one that checks the brief's item pictures exist. Strings: staging's catalog plus E2E-Flow's 43 new keys (English only,
+no Indonesian for those yet). 365 Simulator tests pass; nothing checked on a device.
+
 ## Tutorial, side-done card, steps sheet and feedback restyle — 2026-11-09
 
 Follows the design (tutorial screens, 17 After photo, 18 Your feedback). `GuidedTutorialView` (one-tool flow): black page,
@@ -32,6 +43,106 @@ optional `info`; replaces `kit`); an item with `info` shows a dotted pink underl
 `kit-fluffy-brush`, `kit-liquid-liner`, `kit-micellar-water`, `kit-spoolie`, `kit-brow-pencil` (the last two replace the
 SVG Repo drawings); a missing picture falls back to the item's SF Symbol. New strings are not yet synced into `Localizable.xcstrings` (no Indonesian). Simulator only (iPhone 17
 Pro): brief and popup seen with a sample photo, capture seen in its no-camera state; the crop and oval need a device check.
+## Feedback screen redesign; capture diagnostics; stricter blush detection — -Nimah (2026-11-09)
+
+`FeedbackView` follows design "18 · Your feedback": light theme (`OnboardingGlow`), top bar (back = Done, "Blush ·
+Sunkissed", share), headline from the score (Perfect! / Nice work! / Almost there! / Let's try again!; "Retake the photo"
+when a photo check blocked), Before / After with a drag slider (`BeforeAfterSlider`; Before = the bare camera kept at the
+desired-look shutter, `MakeupFlowStore.bare`), score ring with the database's label and a short line (the two weakest
+categories), and "What we think" cards (`MakeupFeedback.Category`, from `FeedbackCategory`: the database's priority groups
+placement, shape, amount, clean edges, finish, balance; each with its own score, label and messages, shown in a sheet when
+tapped). Bottom: ↻ back to tutorial, "Save look" = share sheet with the After photo (Save Image puts it in the person's own
+photos; the app keeps nothing). Photo notes that did not block show as "Photo tips". New texts have Indonesian drafts.
+Second device test: the result photo still had SceneKit guide shapes and the desired photo no virtual blush. The capture now
+uses `EyebrowConfiguration.measuresBlushTarget` (engine publishes the outlines, nothing draws them; `showGuide` stays off),
+reads the screen with 1.5 s and one retry, and records `CaptureDiagnostics` per shutter (engine, layer, drawing, read result,
+target, face), shown under the feedback with developer tools on. Blush detection: chroma rise >= 6 and dE00 >= 5 (database 4
+and 3), and each cheek's light is matched on the skin around its field. Simulator: the screen seen with sample data; the
+tap-to-open sheet not checked there (taps did not reach the Simulator). Device check pending.
+
+## Feedback photos fixed after the first device test — -Nimah (2026-11-09)
+
+Device test: the desired-look photo had no blush, the result photo showed blush and dotted circles, and the head-tilt
+check (8°) blocked every result, so no advice showed. Causes and fixes: `TryOnHomeModel.apply` filtered tools by `canTry`
+while the brow model was still loading (`brow.prepare()` is async), which dropped blush on the desired-look capture: it no
+longer filters by `canTry` (`layer(_:)` checks it every frame). The result capture runs the blush engine with `showGuide`,
+which also makes the SceneKit view under the Metal layer draw guide shapes; `ARSCNView.snapshot()` took those: both
+photos are now read from the engine's layer when it is on (`readScreen`). Turned or tilted up to 15°
+(`FeedbackPhotoCheck.poseBlockingDegrees`) is now a note, beyond it a retake (database: 8°, blocking). Tests in
+`GuidedFlowTests`. Device check of the fix pending.
+
+## Brow and eyeliner feedback measured too — -Nimah (2026-11-09)
+
+`MeasuredFeedbackProvider` now measures every tool (`BrowFeedback`, `EyelinerFeedback` beside `BlushFeedback`; the
+placeholder only if the database cannot be read). Every shutter measures the face for every tool; the eyeliner, drawn by
+SwiftUI, is read from the composed desired-look picture (`ScreenPixels(image:)`), brows from the engine read-back.
+Target = the desired-look photo itself: brow samples at least 12 L* darker than the skin there, liner samples at least 15
+L* darker than the bare face (lashes cancel); result = the same in the result photo (`detection.makeup_mask`).
+`Engine/Feedback/LineProfile` puts both in a frame along the target line (`LineFrame`, principal axis, inner end first)
+and reads the outline per column (`LineProfile`: ends, head/tail heights, arch, rise and fall angles, thickness, darkness);
+`FeedbackRecorder` bands values with the database thresholds (IPD-scaled where marked) and builds the messages and score.
+Brow: none, head close/far/high/low, tail short/long/high/low, arch inner/outer/high/flat, rise and tail angles, thickness
+per third, coverage, darkness (where the brow landed in the target), spill above/below/between the brows (product only:
+natural hairs do not count), symmetry, praise. Calibration choice not in the database: when head and tail are both off the
+same way, that side's gap, spill and "too light" are not told (the shift is). Eyeliner: none, start early/late, coverage
+and thickness per third, too light, smudge above/below, wing angle/length/tip (not for Natural), symmetry, praise.
+Not measured: brow head softness, outline, colour; liner lash gap, wobble, blunt or detached wing, Arabian lower line.
+Photo checks are shared (`FeedbackPhotoCheck`, per tool: smiling and mouth open for blush, eyes closed for eyeliner,
+raised brows for brows); light matching shared (`FeedbackSkin`). Mesh sampling is now 10 points per triangle. Messages
+carry their rule id (`MakeupFeedback.Item.rule`). `LineFeedbackTests` (synthetic faces). Not checked on a device.
+
+## Blush feedback v2: measured on the face mesh — -Nimah (2026-11-09)
+
+The E2E feedback screen now measures blush instead of the placeholder text (`AppContainer.feedback` =
+`MeasuredFeedbackProvider`; brow and eyeliner still get `PlaceholderFeedbackProvider`). At each shutter
+`FeatureCaptureView` measures the face (`Engine/Feedback/FaceScan`): six fixed points per ARKit mesh triangle, each with its
+face-local position (mm), its bare camera colour (decoded like the shader, Lab), on the desired-look photo also the colour
+shown with the virtual blush, its screen point, plus pose, blend shapes and IPD. Stored in `MakeupFlowStore`
+(`desiredScan`/`resultScan`, memory only, numbers only). For blush the capture camera publishes the target outlines
+(`showGuide`; on the result photo the engine runs with `pigmentHalf = .none`, so the photo stays the plain camera).
+`Features/Blush/Feedback/BlushFeedback` compares the two scans sample by sample (same mesh point = same skin, whatever the
+pose): light matched on forehead and chin, blush = chroma rise with the shade's hue (`detection.makeup_mask.blush`), then per
+cheek against the target (outer line = target area, inner circle = core, outer / 0.82 = limit): none, offset up/down/in/out
+(mm, IPD-scaled), size, coverage, strength (vs the virtual blush on the same spots), spill (eye, nose, mouth, ear, jaw),
+patchiness, hue; symmetry height, strength and size; praise. Photo checks: no face, turned, tilted, rolled, smiling, mouth
+open, too dark, pose and light mismatch, no Try On photo. Bands, texts (id/en, app language), merging, suppression, top 3
+and score come from `makeup-feedback.database.json` (now in the app target) through `Engine/Feedback/FeedbackRules`.
+Not measured yet: angle, edge softness, Lifted temple reach, Sunkissed nose band, blob cleanup. The desired-look photo now
+shows the virtual makeup: `BeautyBlushEngine.readScreen()` copies the next presented drawable (`framebufferOnly` is off),
+on both the blush and brow paths; `ARSCNView.snapshot()` had only the camera under the Metal layer. `FeedbackView` lists the
+messages as cards in a scroll view. Shared files changed: `BeautyBlushEngine`, `BrowEngine+Draw` (one line), `MakeupFlow`,
+`FeatureCaptureView`, `FeedbackView`, `AppContainer`, `project.pbxproj`. `BlushFeedbackTests` (synthetic faces). Thresholds
+are the database's draft values; nothing is checked on a device yet (target outline on the result photo, colour detection
+in real light, read-back on device).
+
+## Indonesian rewritten in the brand voice — -Nimah (2026-11-09)
+
+Every string the app shows now has Indonesian in the voice of `Docs/GayaBahasa.md` (a big sister who is good at makeup,
+"kamu", casual "yuk/aja/nggak", short sentences, makeup terms kept in English): 133 drafts rewritten, the 61 E2E-flow
+strings that had none translated (the tutorial's cheers keep their warm tone), and the camera and photo prompts in
+`InfoPlist.xcstrings`. Look, shade and style names are unchanged; strings from deleted screens were left alone. All
+`needs_review`. Text only; screens not yet checked in Indonesian for longer lines.
+
+## Blush kit on the E2E get-ready page — -Nimah (2026-11-09)
+
+Staging's E2E flow lists the kit from `TryOnTool.kit` (`Features/Screens/Flow/MakeupFlow.swift`); its blush list was a
+placeholder. Blush now takes `ToolInfo.blush(...).kitItems`, the `BlushInfo` kit (fingertips, sponge, cream or liquid blush,
+loose powder), so it is written in one place. `MakeupKitItem.imageName` (optional) shows the item's picture instead of the
+symbol in `LookBriefView`'s card (`kit-blush-*`); brow and eyeliner are unchanged. `BlushInfo`'s look descriptions are not
+shown by the E2E flow yet. Simulator tests only.
+
+## Blush look and kit data; kit pictures — -Nimah (2026-11-05)
+
+`BlushInfo` (`Features/Blush/Info/`) is real data now, not sample wording: one beginner sentence per look (Youthful,
+Sunkissed, Lifted; other styles get a general one), 1 minute for every look, and one kit for all three: fingertips
+(required, symbol), makeup sponge (optional), cream or liquid blush (required, shows the chosen shade; powder or lip tint
+as the stand-in) and loose powder (optional). Texts use `String(localized:)`, with Indonesian drafts in `Localizable.xcstrings`
+(`needs_review`), written in the brand voice of `Docs/GayaBahasa.md` (casual "kamu", big-sister tone; a prompt to
+paste into an AI for new Indonesian copy). Kit pictures: PNG, transparent background, square,
+600 x 600, product centred, named `kit-<tool>-<item>` (`kit-blush-sponge`, `kit-blush-blush`, `kit-blush-powder`; brow
+`kit-brow-…`, eyeliner `kit-liner-…`). The three blush pictures are flat drawn illustrations, unbranded, to be replaced
+by real photos under the same names. `GuidedFlowTests.testEveryItemPictureIsInTheAssets` fails when an `imageName` has
+no asset. Simulator tests only.
 
 ## Onboarding page art (pages 1-3) — Khalish (2026-11-07)
 

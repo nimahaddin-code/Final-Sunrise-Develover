@@ -24,7 +24,40 @@ import UIKit
         }
     }
 
-    func reset() { desired = nil; result = nil }
+    /// -Nimah: the face measured at each shutter, for the blush feedback. Numbers only, memory only.
+    var desiredScan: FaceScan?
+    var resultScan: FaceScan?
+
+    func store(_ scan: FaceScan?, for stage: CaptureStage) {
+        switch stage {
+        case .desired: desiredScan = scan
+        case .result: resultScan = scan
+        }
+    }
+
+    /// The bare camera at the desired-look shutter (no virtual makeup): the feedback's "Before".
+    var bare: UIImage?
+    /// Developer read-out of each shutter (shown on the feedback screen with developer tools on).
+    var diagnostics: [CaptureStage: CaptureDiagnostics] = [:]
+
+    func reset() { desired = nil; result = nil; desiredScan = nil; resultScan = nil; bare = nil; diagnostics = [:] }
+}
+
+/// -Nimah: what happened at a shutter, for developers: whether the makeup engine's picture could be read, the target
+/// outline and the face. English only, like the other developer views.
+struct CaptureDiagnostics: Hashable, Sendable {
+    enum Read: String, Sendable { case notTried = "not tried", read = "read", timedOut = "timed out" }
+    var engine = false, layerShown = false, engineOn = false
+    var read = Read.notTried
+    var readTries = 0, readMilliseconds = 0
+    var framesBefore = 0
+    var outline = false, face = false
+
+    var line: String {
+        "engine \(engine ? "yes" : "no") · layer \(layerShown ? "shown" : "hidden") · drawing \(engineOn ? "on" : "off") · "
+            + "screen \(read.rawValue)\(readTries > 0 ? " (\(readTries)x, \(readMilliseconds) ms)" : "") · frames \(framesBefore) · "
+            + "target \(outline ? "yes" : "no") · face \(face ? "yes" : "no")"
+    }
 }
 
 extension TutorialHandoff {
@@ -130,23 +163,47 @@ struct MakeupFeedbackRequest: @unchecked Sendable {
     let styleTitle: String
     let desired: UIImage?
     let result: UIImage?
+    var blushStyle: BlushPlacementStyle? = nil
+    var linerLook: LinerLook? = nil
+    var shade: MakeupShade? = nil
+    var desiredScan: FaceScan? = nil
+    var resultScan: FaceScan? = nil
 }
 
 struct MakeupFeedback: Sendable, Equatable {
-    /// One measured part of the result, e.g. placement: 0...1 and a short note ("A little high").
-    struct Part: Sendable, Equatable {
-        var value: Double
-        var note: String
+    /// One message: what is off and how to fix it, from `makeup-feedback.database.json`.
+    struct Item: Sendable, Hashable {
+        var title: String
+        var say: String
+        var steps: [String]
+        var band: FeedbackBand
+        /// The database id of the rule, praise or photo check (for tests and calibration).
+        var rule: String = ""
+    }
+
+    /// One card of the feedback screen: a group of rules (placement, shape, ...) with its own score.
+    struct Category: Sendable, Hashable, Identifiable {
+        var id: String
+        var title: String
+        var symbol: String
+        /// 0...1.
+        var percent: Double
+        /// Short: the worst message's title, or "Spot on".
+        var label: String
+        /// Every message of this group, worst first (shown when the card is opened).
+        var items: [Item]
     }
 
     /// 0...1 when the comparison gives one.
     var score: Double?
     var headline: String
     var comments: [String]
-    /// Where the makeup sits compared with the try-on; nil until the comparison measures it.
-    var placement: Part? = nil
-    /// How close the colour is to the shade tried on; nil until the comparison measures it.
-    var shade: Part? = nil
+    var items: [Item] = []
+    var categories: [Category] = []
+    /// One sentence for the score card: what to fix first, or the praise.
+    var summary: String = ""
+    /// Photo notes that did not stop the check (tilted a little, light changed).
+    var notes: [Item] = []
 }
 
 /// Compares the desired-look photo with the result. The real comparison (placement from coordinates) is built
@@ -166,6 +223,37 @@ struct PlaceholderFeedbackProvider: MakeupFeedbackProviding {
         return MakeupFeedback(score: nil,
                               headline: String(localized: "Feedback is coming soon"),
                               comments: [String(localized: "Placement feedback for your \(request.styleTitle) will show here.")])
+    }
+}
+
+/// -Nimah: the measured comparison for every tool (`BlushFeedback`, `BrowFeedback`, `EyelinerFeedback`); the placeholder
+/// only when the database cannot be read.
+struct MeasuredFeedbackProvider: MakeupFeedbackProviding {
+    var fallback: any MakeupFeedbackProviding = PlaceholderFeedbackProvider()
+
+    func feedback(for request: MakeupFeedbackRequest, progress: @escaping @MainActor @Sendable (Double) -> Void) async -> MakeupFeedback {
+        guard let database = FeedbackDatabase.load() else { return await fallback.feedback(for: request, progress: progress) }
+        await progress(0.1)
+        let language = FeedbackLanguage.current
+        let tool = request.tool
+        let blush = BlushFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
+                                       style: request.blushStyle,
+                                       shade: request.shade.map { SIMD3($0.red, $0.green, $0.blue) })
+        let line = LineFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
+                                     look: request.linerLook?.rawValue)
+        let result = await Task.detached(priority: .userInitiated) { () -> MakeupFeedback in
+            switch tool {
+            case .blush: BlushFeedback.evaluate(blush, database: database, language: language)
+            case .eyebrow: BrowFeedback.evaluate(line, database: database, language: language)
+            case .eyeliner: EyelinerFeedback.evaluate(line, database: database, language: language)
+            }
+        }.value
+        // A short, steady finish so the loading screen does not flash.
+        for step in 2...10 {
+            try? await Task.sleep(for: .milliseconds(60))
+            await progress(Double(step) / 10)
+        }
+        return result
     }
 }
 
