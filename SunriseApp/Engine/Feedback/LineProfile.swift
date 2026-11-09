@@ -143,7 +143,7 @@ struct FeedbackRecorder {
     mutating func add(_ id: String, value: Double, side: FeedbackSide, values: [String: String] = [:], size: Double? = nil) -> FeedbackBand? {
         guard let rule = database.rule(id), applies(rule), let t = rule.thresholds else { return nil }
         let band = FeedbackBand.of(value, kind: rule.kind, t, scale: rule.scale == "ipd" ? scale : 1)
-        entries.append(FeedbackScoreEntry(band: band, weight: rule.weight))
+        entries.append(FeedbackScoreEntry(band: band, weight: rule.weight, priority: rule.priority))
         hits.append(FeedbackHit(rule: id, band: band, side: side, priority: rule.priority, values: values,
                                 size: size ?? abs(value), suppresses: rule.suppresses ?? []))
         return band
@@ -152,7 +152,7 @@ struct FeedbackRecorder {
     /// A rule that only fires (e.g. "none"), always at its worst band.
     mutating func fire(_ id: String, side: FeedbackSide, band: FeedbackBand = .large, values: [String: String] = [:]) {
         guard let rule = database.rule(id), applies(rule) else { return }
-        entries.append(FeedbackScoreEntry(band: band, weight: rule.weight))
+        entries.append(FeedbackScoreEntry(band: band, weight: rule.weight, priority: rule.priority))
         hits.append(FeedbackHit(rule: id, band: band, side: side, priority: rule.priority, values: values, size: 100,
                                 suppresses: rule.suppresses ?? []))
     }
@@ -167,9 +167,6 @@ struct FeedbackRecorder {
 
     /// Final step: the chosen messages (or praise), and the score.
     func feedback(_ composer: FeedbackComposer, praise: [MakeupFeedback.Item], notes: [MakeupFeedback.Item]) -> MakeupFeedback {
-        let chosen = composer.select(hits).compactMap { composer.message(for: $0) }
-        let score = composer.score(entries)
-        return MakeupFeedback(score: score.map { $0 / 100 }, headline: score.map { composer.label(score: $0) } ?? "",
-                              comments: [], items: (chosen.isEmpty ? praise : chosen) + notes)
+        composer.assemble(hits: hits, entries: entries, praise: praise, notes: notes)
     }
 }

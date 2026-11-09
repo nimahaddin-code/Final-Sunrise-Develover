@@ -6518,6 +6518,206 @@
           }
         }
       }
+    },
+    "Placement" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Posisi"
+          }
+        }
+      }
+    },
+    "Shape" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bentuk"
+          }
+        }
+      }
+    },
+    "Amount" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Takaran"
+          }
+        }
+      }
+    },
+    "Clean edges" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pinggiran rapi"
+          }
+        }
+      }
+    },
+    "Finish" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hasil akhir"
+          }
+        }
+      }
+    },
+    "Balance" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kiri-kanan"
+          }
+        }
+      }
+    },
+    "Spot on" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Udah pas"
+          }
+        }
+      }
+    },
+    "Perfect!" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sempurna!"
+          }
+        }
+      }
+    },
+    "Nice work!" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Keren!"
+          }
+        }
+      }
+    },
+    "Almost there!" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dikit lagi!"
+          }
+        }
+      }
+    },
+    "Let's try again!" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Yuk, coba lagi!"
+          }
+        }
+      }
+    },
+    "Retake the photo" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Foto ulang, yuk"
+          }
+        }
+      }
+    },
+    "Let's take the photo again so we can check it." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ambil fotonya sekali lagi, ya, biar bisa kami cek."
+          }
+        }
+      }
+    },
+    "Here's how close you got to your try-on." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Segini miripnya hasilmu sama Try On tadi."
+          }
+        }
+      }
+    },
+    "What we think" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Menurut kami"
+          }
+        }
+      }
+    },
+    "Photo tips" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tips foto"
+          }
+        }
+      }
+    },
+    "Shows how to fix it" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lihat cara benerinnya"
+          }
+        }
+      }
+    },
+    "Save look" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Simpan look"
+          }
+        }
+      }
+    },
+    "Nothing to fix here. Keep doing it this way." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nggak ada yang perlu dibenerin. Pertahankan caranya, ya."
+          }
+        }
+      }
+    },
+    "Before and after photos" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Foto sebelum dan sesudah"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

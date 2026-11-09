@@ -60,6 +60,8 @@ final class BeautyBlushEngine:@unchecked Sendable {
     let brush:MTLTexture
     var textureCache:CVMetalTextureCache?
     var layer:CAMetalLayer?
+    /// Whether `configure` turned drawing on (developer read-out).
+    var isDrawing:Bool {lock.lock();defer{lock.unlock()};return settings.enabled}
     /// Shutters waiting for the next presented picture (`readScreen`). Guarded by `lock`.
     var screenReaders:[ScreenReader]=[]
     var settings=Settings(),busy=false
@@ -248,7 +250,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         settings.enabled=enabled
         if let c {
             settings.comparisonSplit=c.comparisonSplit;settings.browOnlySide=c.browOnlySide;settings.pigmentHalf=c.pigmentHalf ?? (c.comparisonSplit ? .left:.full);settings.isBrow=c.needsBrow;settings.withBlush=c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay
-            settings.style=c.blushStyle;settings.guide=c.showGuide;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow
+            settings.style=c.blushStyle;settings.guide=c.showGuide || c.measuresBlushTarget;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow
             let browDefault=SIMD3<Float>(0.2,0.13,0.09),blushDefault=SIMD3<Float>(0.9,0.3,0.45)
             settings.tint=c.layered ? c.browLayer.tint ?? browDefault:c.shadeTint ?? browDefault
             settings.intensity=c.layered ? c.browLayer.intensity:c.previewIntensity
@@ -562,7 +564,7 @@ final class ScreenReader:@unchecked Sendable {
 }
 extension BeautyBlushEngine {
     /// The next picture this engine presents, or nil when it draws nothing within `timeout` (layer off, no face yet).
-    func readScreen(timeout:Double=0.5) async->ScreenPixels? {
+    func readScreen(timeout:Double=1.5) async->ScreenPixels? {
         await withCheckedContinuation { continuation in
             let reader=ScreenReader {continuation.resume(returning:$0)}
             lock.lock();screenReaders.append(reader);lock.unlock()

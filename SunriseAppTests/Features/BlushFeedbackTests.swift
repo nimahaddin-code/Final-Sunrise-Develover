@@ -40,12 +40,12 @@ final class BlushFeedbackTests: XCTestCase {
     }
 
     private func scan(blushCentres: [SIMD2<Float>] = [], radius: Float = 15, strength: Float = 0, rendered: Bool = false,
-                      withOutline: Bool = true, smile: Float = 0) -> FaceScan {
+                      withOutline: Bool = true, smile: Float = 0, leftLight: Lab = .zero) -> FaceScan {
         var samples: [FaceScan.Sample] = []
         for y in stride(from: Float(-115), through: 70, by: 2) {
             for x in stride(from: Float(-75), through: 75, by: 2) {
                 let p = SIMD2(x, y)
-                let lab = skin + blush(at: p, centres: blushCentres, radius: radius, strength: strength)
+                let lab = skin + blush(at: p, centres: blushCentres, radius: radius, strength: strength) + (x > 20 ? leftLight : .zero)
                 let shown = rendered ? skin + blush(at: p, centres: targets, radius: outerRadius, strength: 12) : nil
                 samples.append(.init(position: SIMD3(x, y, 0), area: 4, lab: lab, rendered: shown, screen: screen(p), visible: true))
             }
@@ -76,6 +76,18 @@ final class BlushFeedbackTests: XCTestCase {
         XCTAssertLessThan(try XCTUnwrap(feedback.score), 0.9)
     }
 
+    func testCardsScoreEachCategoryAndHoldItsAdvice() throws {
+        let raised = targets.map { $0 + SIMD2(0, 8) }
+        let feedback = try evaluate(after: scan(blushCentres: raised, radius: outerRadius, strength: 12))
+        let placement = try XCTUnwrap(feedback.categories.first { $0.id == "placement" })
+        XCTAssertLessThan(placement.percent, 1)
+        XCTAssertTrue(placement.items.contains { $0.rule == "blush.offset.too_high" })
+        XCTAssertEqual(placement.label, placement.items.first?.title)
+        XCTAssertTrue(feedback.summary.hasSuffix("."))
+        let onTarget = try evaluate(after: scan(blushCentres: targets, radius: outerRadius, strength: 12))
+        XCTAssertTrue(onTarget.categories.allSatisfy { $0.items.isEmpty && $0.label == "Spot on" }, "\(onTarget.categories.map(\.label))")
+    }
+
     func testOneCheekLowNamesThatCheek() throws {
         let feedback = try evaluate(after: scan(blushCentres: [targets[0] + SIMD2(0, -9), targets[1]], radius: outerRadius, strength: 12))
         let low = try XCTUnwrap(feedback.items.first { $0.title.localizedCaseInsensitiveContains("low") }, "\(feedback.items.map(\.title))")
@@ -86,6 +98,13 @@ final class BlushFeedbackTests: XCTestCase {
         let feedback = try evaluate(after: scan())
         XCTAssertEqual(feedback.items.first?.title, "No blush found")
         XCTAssertTrue(feedback.items.first?.say.contains("both cheeks") ?? false)
+    }
+
+    /// Device test 2026-11-09: no blush worn, the head tilted and one cheek lit warmer; that cheek read as blush.
+    func testABareCheekInWarmerLightIsNotBlush() throws {
+        let feedback = try evaluate(after: scan(leftLight: Lab(-3, 4, 4)))
+        XCTAssertEqual(feedback.items.first?.rule, "blush.none")
+        XCTAssertTrue(feedback.items.first?.say.contains("both cheeks") ?? false, feedback.items.first?.say ?? "")
     }
 
     func testTooHeavyBlushIsCalledHeavy() throws {

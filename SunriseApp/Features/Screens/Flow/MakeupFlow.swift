@@ -35,7 +35,29 @@ import UIKit
         }
     }
 
-    func reset() { desired = nil; result = nil; desiredScan = nil; resultScan = nil }
+    /// The bare camera at the desired-look shutter (no virtual makeup): the feedback's "Before".
+    var bare: UIImage?
+    /// Developer read-out of each shutter (shown on the feedback screen with developer tools on).
+    var diagnostics: [CaptureStage: CaptureDiagnostics] = [:]
+
+    func reset() { desired = nil; result = nil; desiredScan = nil; resultScan = nil; bare = nil; diagnostics = [:] }
+}
+
+/// -Nimah: what happened at a shutter, for developers: whether the makeup engine's picture could be read, the target
+/// outline and the face. English only, like the other developer views.
+struct CaptureDiagnostics: Hashable, Sendable {
+    enum Read: String, Sendable { case notTried = "not tried", read = "read", timedOut = "timed out" }
+    var engine = false, layerShown = false, engineOn = false
+    var read = Read.notTried
+    var readTries = 0, readMilliseconds = 0
+    var framesBefore = 0
+    var outline = false, face = false
+
+    var line: String {
+        "engine \(engine ? "yes" : "no") · layer \(layerShown ? "shown" : "hidden") · drawing \(engineOn ? "on" : "off") · "
+            + "screen \(read.rawValue)\(readTries > 0 ? " (\(readTries)x, \(readMilliseconds) ms)" : "") · frames \(framesBefore) · "
+            + "target \(outline ? "yes" : "no") · face \(face ? "yes" : "no")"
+    }
 }
 
 extension TutorialHandoff {
@@ -133,11 +155,29 @@ struct MakeupFeedback: Sendable, Equatable {
         var rule: String = ""
     }
 
+    /// One card of the feedback screen: a group of rules (placement, shape, ...) with its own score.
+    struct Category: Sendable, Hashable, Identifiable {
+        var id: String
+        var title: String
+        var symbol: String
+        /// 0...1.
+        var percent: Double
+        /// Short: the worst message's title, or "Spot on".
+        var label: String
+        /// Every message of this group, worst first (shown when the card is opened).
+        var items: [Item]
+    }
+
     /// 0...1 when the comparison gives one.
     var score: Double?
     var headline: String
     var comments: [String]
     var items: [Item] = []
+    var categories: [Category] = []
+    /// One sentence for the score card: what to fix first, or the praise.
+    var summary: String = ""
+    /// Photo notes that did not stop the check (tilted a little, light changed).
+    var notes: [Item] = []
 }
 
 /// Compares the desired-look photo with the result. The real comparison (placement from coordinates) is built

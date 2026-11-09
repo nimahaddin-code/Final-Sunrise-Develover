@@ -1,3 +1,20 @@
+## Feedback screen redesign; capture diagnostics; stricter blush detection — -Nimah (2026-11-09)
+
+`FeedbackView` follows design "18 · Your feedback": light theme (`OnboardingGlow`), top bar (back = Done, "Blush ·
+Sunkissed", share), headline from the score (Perfect! / Nice work! / Almost there! / Let's try again!; "Retake the photo"
+when a photo check blocked), Before / After with a drag slider (`BeforeAfterSlider`; Before = the bare camera kept at the
+desired-look shutter, `MakeupFlowStore.bare`), score ring with the database's label and a short line (the two weakest
+categories), and "What we think" cards (`MakeupFeedback.Category`, from `FeedbackCategory`: the database's priority groups
+placement, shape, amount, clean edges, finish, balance; each with its own score, label and messages, shown in a sheet when
+tapped). Bottom: ↻ back to tutorial, "Save look" = share sheet with the After photo (Save Image puts it in the person's own
+photos; the app keeps nothing). Photo notes that did not block show as "Photo tips". New texts have Indonesian drafts.
+Second device test: the result photo still had SceneKit guide shapes and the desired photo no virtual blush. The capture now
+uses `EyebrowConfiguration.measuresBlushTarget` (engine publishes the outlines, nothing draws them; `showGuide` stays off),
+reads the screen with 1.5 s and one retry, and records `CaptureDiagnostics` per shutter (engine, layer, drawing, read result,
+target, face), shown under the feedback with developer tools on. Blush detection: chroma rise >= 6 and dE00 >= 5 (database 4
+and 3), and each cheek's light is matched on the skin around its field. Simulator: the screen seen with sample data; the
+tap-to-open sheet not checked there (taps did not reach the Simulator). Device check pending.
+
 ## Feedback photos fixed after the first device test — -Nimah (2026-11-09)
 
 Device test: the desired-look photo had no blush, the result photo showed blush and dotted circles, and the head-tilt
