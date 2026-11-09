@@ -133,10 +133,20 @@ struct MakeupFeedbackRequest: @unchecked Sendable {
 }
 
 struct MakeupFeedback: Sendable, Equatable {
+    /// One measured part of the result, e.g. placement: 0...1 and a short note ("A little high").
+    struct Part: Sendable, Equatable {
+        var value: Double
+        var note: String
+    }
+
     /// 0...1 when the comparison gives one.
     var score: Double?
     var headline: String
     var comments: [String]
+    /// Where the makeup sits compared with the try-on; nil until the comparison measures it.
+    var placement: Part? = nil
+    /// How close the colour is to the shade tried on; nil until the comparison measures it.
+    var shade: Part? = nil
 }
 
 /// Compares the desired-look photo with the result. The real comparison (placement from coordinates) is built

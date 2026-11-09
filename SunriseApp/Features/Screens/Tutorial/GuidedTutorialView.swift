@@ -182,6 +182,21 @@ enum TutorialTab: CaseIterable, Identifiable {
         }
     }
 
+    /// The step the tool's guide overlay animates for the current lesson.
+    var guideStep: Int {
+        let steps = switch tab { case .brows: Self.browGuideSteps; case .blush: Self.blushGuideSteps; case .eyeliner: Array(lessons.indices) }
+        return steps.indices.contains(stepIndex) ? steps[stepIndex] : stepIndex
+    }
+
+    /// True on the last step of the side being done (Next reads "Finish").
+    var isSideLastStep: Bool { stepIndex + 1 >= lessons.count }
+
+    /// True on the first side's last step: Finish shows the side-done card before the other side.
+    var finishesFirstSide: Bool { perSide && side == .leading && isSideLastStep }
+
+    /// The side-done card's "Replay": the same side again from its first step.
+    func replaySide() { moveTo(side: side, step: 0) }
+
     /// True on the second side's last step (or the last step when not per side): Next finishes the tutorial.
     var isFinalStep: Bool { stepIndex + 1 >= lessons.count && (!perSide || side == .trailing) }
 
@@ -344,10 +359,12 @@ private struct TutorialScreen: View {
     @ObservedObject var model: GuidedTutorialModel
     let onFinished: (() -> Void)?
     @ObservedObject private var camera: FaceCameraState
-    /// The step-by-step sheet (one-tool flow). Opens by itself once, at the start.
+    /// The steps sheet ("Tutorial"). Opens by itself once, at the start, showing the current step only.
     @State private var showsSteps = false
-    @State private var stepsDetent = PresentationDetent.medium
+    @State private var stepsDetent = TutorialStepsSheet.compact
     @State private var openedSteps = false
+    /// The first side is finished: the side-done card is up until "Do my right …" or "Replay left …".
+    @State private var sideDone = false
     @State private var visible = false
     @State private var theme = PhotoTheme.pink
     @State private var flashOn = false
@@ -367,37 +384,24 @@ private struct TutorialScreen: View {
 
     private var lessons: [FaceGuideLesson] { model.lessons }
     private var index: Int { min(model.stepIndex, lessons.count - 1) }
-    private var isLast: Bool { model.isFinalStep }
-    /// The side being done, as the user sees it in the mirrored camera.
-    private var sideTitle: LocalizedStringKey { model.side == .leading ? "Right side" : "Left side" }
+    /// The button reads "Finish" on the last step of each side.
+    private var finishes: Bool { model.perSide ? model.isSideLastStep : model.isFinalStep }
     /// The screen light is on: white screen, dark labels (the design's "tutorial w flash").
     private var lit: Bool { light.isOn && !model.photoMode }
     private var ink: Color { lit ? .black : AppColors.snow }
 
     var body: some View {
-        GeometryReader { proxy in
-            VStack(spacing: AppSpacing.medium) {
-                if model.photoMode { PhotoHeader(theme: theme) { model.leavePhoto() } }
-                // Tutorial: the card fills the screen. Photo: a fixed portrait frame (208:300 in the design) with the controls
-                // right below it.
-                card.frame(maxHeight: model.photoMode ? photoHeight(in: proxy.size) : .infinity)
-                if model.photoMode {
-                    PhotoControls(theme: theme, flashOn: $flashOn, onTheme: { theme = theme.next }, onShutter: takePhoto)
-                    Spacer(minLength: 0)
-                } else {
-                    tabBar
-                }
-            }
+        Group {
+            if model.photoMode { photoLayout } else { tutorialLayout }
         }
-        .padding(.horizontal, AppSpacing.medium)
-        .padding(.bottom, AppSpacing.small)
         .background {
             if model.photoMode { theme.background.ignoresSafeArea() }
             else if lit { Color.white.ignoresSafeArea() }
-            else { MainBackground() }
+            else { Color.black.ignoresSafeArea() }
         }
         .animation(.easeInOut(duration: 0.25), value: theme)
         .animation(.easeInOut(duration: 0.25), value: lit)
+        .animation(.easeInOut(duration: 0.25), value: sideDone)
         .preferredColorScheme(lit ? .light : nil)
         .foregroundStyle(AppColors.snow)
         .overlay {
@@ -409,6 +413,7 @@ private struct TutorialScreen: View {
         .animation(.easeInOut(duration: 0.2), value: captured != nil)
         .sensoryFeedback(.selection, trigger: theme)
         .sensoryFeedback(.success, trigger: captured != nil)
+        .sensoryFeedback(.success, trigger: sideDone)
         .toolbar(.hidden, for: .navigationBar)
         .navigationBarBackButtonHidden()
         .sensoryFeedback(.selection, trigger: model.tab)
@@ -422,20 +427,15 @@ private struct TutorialScreen: View {
             if model.brow.availability == .supported { await camera.requestPermission() }
         }
         .sheet(isPresented: $showsSteps) {
-            TutorialStepsSheet(steps: stepTexts, current: index, sideTitle: model.perSide ? sideTitle : nil,
-                               note: model.perSide && model.side == .trailing ? "One side done! Now let's give the other side the same love." : nil)
-                .presentationDetents([.medium, .large], selection: $stepsDetent)
-                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+            TutorialStepsSheet(steps: stepTexts, current: currentStepInSheet, expanded: stepsDetent == .large) { showsSteps = false }
+                .presentationDetents([TutorialStepsSheet.compact, .large], selection: $stepsDetent)
+                .presentationBackgroundInteraction(.enabled(upThrough: TutorialStepsSheet.compact))
                 .presentationContentInteraction(.resizes)
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
             visible = true; model.activate(); advisor.start(); light.resume()
             if model.perSide && !openedSteps { openedSteps = true; showsSteps = true }
-        }
-        // The second side starts: the sheet comes back up with its cheer and the steps from the top.
-        .onChange(of: model.side) { _, side in
-            if model.perSide && side == .trailing && visible { stepsDetent = .medium; showsSteps = true }
         }
         .onDisappear { visible = false; showsSteps = false; model.deactivate(); advisor.stop(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
@@ -448,6 +448,31 @@ private struct TutorialScreen: View {
         }
     }
 
+    /// The camera card fills the page above the bottom bar.
+    private var tutorialLayout: some View {
+        VStack(spacing: 0) {
+            card
+                .frame(maxHeight: .infinity)
+            bottomBar
+                .padding(.horizontal, AppSpacing.medium)
+                .padding(.vertical, AppSpacing.small)
+        }
+    }
+
+    /// Photo (tutorial without the one-tool flow): a fixed portrait frame (208:300 in the design) with the controls below.
+    private var photoLayout: some View {
+        GeometryReader { proxy in
+            VStack(spacing: AppSpacing.medium) {
+                PhotoHeader(theme: theme) { model.leavePhoto() }
+                card.frame(maxHeight: photoHeight(in: proxy.size))
+                PhotoControls(theme: theme, flashOn: $flashOn, onTheme: { theme = theme.next }, onShutter: takePhoto)
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(.horizontal, AppSpacing.medium)
+        .padding(.bottom, AppSpacing.small)
+    }
+
     /// Closes the steps sheet first: navigating while it is up can leave the push or pop undone.
     private func leave(_ action: @escaping () -> Void) {
         guard showsSteps else { action(); return }
@@ -455,14 +480,24 @@ private struct TutorialScreen: View {
         Task { try? await Task.sleep(for: .milliseconds(350)); action() }
     }
 
-    /// The steps sheet's rows: each step's instruction and its line of encouragement.
+    /// The steps sheet's rows: each step's title and its instruction.
     private var stepTexts: [TutorialStepsSheet.Step] {
-        if model.tab == .eyeliner, model.hasGuide {
-            return LinerTutorialStep.allCases.map { TutorialStepsSheet.Step(title: Text($0.caption), detail: Text($0.cheer)) }
+        lessons.map { TutorialStepsSheet.Step(title: Text($0.title), detail: $0.instruction.isEmpty ? nil : Text($0.instruction)) }
+    }
+
+    /// Past the last step once the side is finished, so every step reads "Done".
+    private var currentStepInSheet: Int { sideDone ? lessons.count : index }
+
+    private func next() {
+        if model.finishesFirstSide { leave { sideDone = true }; return }
+        if model.advance() {
+            if let onFinished { leave(onFinished) } else { model.enterPhoto() }
         }
-        return lessons.map { lesson in
-            TutorialStepsSheet.Step(title: Text(lesson.title), detail: lesson.instruction.isEmpty ? nil : Text(lesson.instruction))
-        }
+    }
+
+    private func back() {
+        if sideDone { sideDone = false; return }
+        if model.retreat() { leave(dismiss.callAsFunction) }
     }
 
     /// Photographs the camera as shown. With the flash on, the screen goes white for a moment first.
@@ -485,29 +520,45 @@ private struct TutorialScreen: View {
 
     // MARK: Camera card
 
+    private var cornerRadius: CGFloat { model.photoMode ? 10 : 28 }
+
     private var card: some View {
         ZStack {
             if !lit { Color.black }
             // Light on: the picture fades softly into the white screen instead of ending in a hard edge.
             cameraContent
                 .mask {
-                    // Same corners as the card's clip when the light is off, so no black shows in them.
-                    RoundedRectangle(cornerRadius: lit ? AppSpacing.cornerRadius * 2 : AppSpacing.cornerRadius, style: .continuous)
+                    RoundedRectangle(cornerRadius: lit ? cornerRadius * 2 : cornerRadius, style: .continuous)
                         .padding(lit ? 26 : 0)
                         .blur(radius: lit ? 26 : 0)
                 }
             if flashing { Color.white.ignoresSafeArea().allowsHitTesting(false) }
-            VStack(spacing: AppSpacing.small) {
-                if !model.photoMode { header }
-                Spacer()
-                if !model.photoMode { bottomCaption }
+            if !model.photoMode {
+                VStack(spacing: AppSpacing.small) {
+                    topButtons
+                    Spacer()
+                    bottomCaption
+                }
+                .padding(AppSpacing.small)
+                .opacity(sideDone ? 0 : 1)
+                if sideDone {
+                    Rectangle().fill(.ultraThinMaterial).transition(.opacity)
+                    SideDoneCard(tool: model.tab, onNext: {
+                        sideDone = false
+                        _ = model.advance()
+                    }, onReplay: {
+                        sideDone = false
+                        model.replaySide()
+                    })
+                    .padding(.horizontal, 40)
+                    .transition(.scale(scale: 0.92).combined(with: .opacity))
+                }
             }
-            .padding(AppSpacing.small)
         }
         .animation(.easeInOut(duration: 0.25), value: lit)
         // The flash on the photo screen is the screen light: full brightness and a warm ring round the picture.
         .overlay { if model.photoMode { ScreenLightGlow(light: light, cornerRadius: 10) } }
-        .clipShape(RoundedRectangle(cornerRadius: model.photoMode ? 10 : AppSpacing.cornerRadius, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
     }
 
     @ViewBuilder private var cameraContent: some View {
@@ -535,12 +586,12 @@ private struct TutorialScreen: View {
                                   }, reducedFrameRate: advisor.reducesLoad)
                     if model.tab == .blush, model.hasGuide, !model.photoMode, let side = model.compare.side(of: .guide) {
                         // The guide's half only, over the bare camera; the look is on the other half.
-                        BlushTutorialOverlay(feed: camera.blushGuide, step: index)
+                        BlushTutorialOverlay(feed: camera.blushGuide, step: model.guideStep)
                             .mask { FaceHalfMask(feed: camera.faceSplit, left: side == .leading) }
                     }
                     if model.tab == .brows, model.hasGuide, !model.photoMode, let side = model.compare.side(of: .guide) {
                         // The guide's brow only; the look is on the other one.
-                        BrowTutorialOverlay(feed: camera.browGuide, step: index, paused: advisor.pausesAnimation, side: side)
+                        BrowTutorialOverlay(feed: camera.browGuide, step: model.guideStep, paused: advisor.pausesAnimation, side: side)
                     }
                     if model.photoMode {
                         // Plain camera: nothing drawn on the face.
@@ -566,7 +617,6 @@ private struct TutorialScreen: View {
         }
     }
 
-
     private func message(symbol: String, title: LocalizedStringKey, text: LocalizedStringKey,
                          actionTitle: LocalizedStringKey? = nil, action: (() -> Void)? = nil) -> some View {
         VStack(spacing: AppSpacing.medium) {
@@ -579,42 +629,27 @@ private struct TutorialScreen: View {
         }
         .padding(AppSpacing.large)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(AppColors.cocoa)
     }
 
-    /// Round frosted back button on the left; a frosted "Next" capsule on the right that turns into a pink "Done" on the last step.
-    private var header: some View {
+    /// Compare (left), the style's name, the screen light (right), as on the capture screen.
+    private var topButtons: some View {
         HStack {
-            Button {
-                if model.retreat() { leave(dismiss.callAsFunction) }
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.body.weight(.semibold))
-                    .frame(width: 44, height: 44)
-                    .glassCircle(tint: lit ? AppColors.snow.opacity(0.6) : nil)
-                    .foregroundStyle(ink)
+            Button { model.cycleCompare() } label: {
+                Image(systemName: "circle.lefthalf.filled")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .frame(width: 48, height: 48)
+                    .glassEffect(.regular.interactive(), in: .circle)
             }
-            .accessibilityLabel(index == 0 ? "Back to try on" : "Previous step")
+            .buttonStyle(.plain)
+            .accessibilityLabel("Compare")
+            .accessibilityValue(model.compare.label)
             Spacer()
-            Button {
-                if model.advance() {
-                    if let onFinished { leave(onFinished) } else { model.enterPhoto() }
-                }
-            } label: {
-                HStack(spacing: 6) {
-                    Text(isLast ? "Done" : "Next")
-                    if !isLast { Image(systemName: "chevron.right").fontWeight(.medium) }
-                }
-                .font(.body.weight(isLast ? .semibold : .regular))
-                .padding(.horizontal, isLast ? 24 : 18)
-                .frame(height: 44)
-                .glassCapsule(tint: isLast ? AppColors.glassSelected : (lit ? AppColors.snow.opacity(0.6) : nil))
-                .foregroundStyle(isLast ? AppColors.snow : ink)
-            }
-            .accessibilityLabel(isLast ? "Done" : "Next step")
+            StylePill(handoff: model.handoff, onGlass: true)
+            Spacer()
+            ScreenLightButton(light: light, pulse: advisor.darkPulse, plainGlass: true)
         }
-        .animation(.easeInOut(duration: 0.2), value: isLast)
-        .buttonStyle(.plain)
+        .environment(\.colorScheme, lit ? .light : .dark)
     }
 
     /// The brow/blush preview configuration, with the guide hidden while a camera message shows.
@@ -624,108 +659,137 @@ private struct TutorialScreen: View {
         return value
     }
 
-    /// Over the camera: a camera message when there is one; otherwise the eyeliner step caption, or (brows, blush) the
-    /// lesson card.
-    @ViewBuilder private var bottomCaption: some View {
-        if model.tab == .eyeliner, model.hasGuide {
-            let step = LinerTutorialStep(rawValue: index) ?? .markDots
-            CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: step.label, stepText: step.caption)
-                .padding(.bottom, AppSpacing.medium)
-        } else if advisor.message != nil {
-            CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
-                .padding(.bottom, AppSpacing.medium)
-        } else {
-            wording
-        }
-    }
-
-    /// Brows: a small spaced "STEP 1 OF 5" over one short instruction in a pill, like a camera effect's caption.
-    @ViewBuilder private var wording: some View {
-        switch model.tab {
-        case .brows, .blush: stepCaption
-        case .eyeliner: lessonCard
-        }
-    }
-
-    /// UX spec 1.1: "STEP 1 OF 2" (17 pt, 2 pt tracking, 70%, drop shadow), 4 pt gap, then the caption in a #370B21 rounded
-    /// rectangle (15 pt, -0.43 tracking, 22 pt lines, radius 18, padding 22 x 4, hugging the text up to 300 pt wide).
-    private var stepCaption: some View {
-        VStack(spacing: 4) {
-            (model.perSide ? Text("\(Text(sideTitle)) · Step \(index + 1) of \(lessons.count)") : Text("Step \(index + 1) of \(lessons.count)"))
-                .textCase(.uppercase)
-                .font(.body)
-                .tracking(2)
-                .monospacedDigit()
-                .foregroundStyle(AppColors.snow.opacity(0.7))
-                .shadow(color: .black.opacity(0.35), radius: 3, y: 1)
-            Text(lessons[index].title)
-                .font(.subheadline)
-                .tracking(-0.43)
-                .lineSpacing(2)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(AppColors.snow)
-                .padding(.horizontal, 22).padding(.vertical, 4)
-                .background(AppColors.captionFill, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-                .frame(maxWidth: 300)
-                .fixedSize(horizontal: false, vertical: true)
+    /// Over the bottom of the camera: a camera message when there is one, else the step's instruction; then the step dots.
+    private var bottomCaption: some View {
+        VStack(spacing: 12) {
+            if advisor.message != nil {
+                CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
+            } else {
+                Text(lessons[index].instruction)
+                    .font(.system(size: 15, weight: .medium))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(lit ? Color.black : AppColors.snow)
+                    .shadow(color: .black.opacity(lit ? 0 : 0.45), radius: 3, y: 1)
+                    .frame(maxWidth: 260)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .id(index)
+                    .transition(.opacity)
+            }
+            HStack(spacing: 5) {
+                ForEach(lessons.indices, id: \.self) { step in
+                    Capsule()
+                        .fill((lit ? Color.black : AppColors.snow).opacity(step == index ? 1 : 0.55))
+                        .frame(width: step == index ? 22 : 6, height: 6)
+                }
+            }
+            .accessibilityHidden(true)
         }
         .frame(maxWidth: .infinity)
         .padding(.bottom, AppSpacing.medium)
         .animation(.easeInOut(duration: 0.2), value: index)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
-        .accessibilityValue(Text(lessons[index].title))
-    }
-
-    private var lessonCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
-                Text(lessons[index].title).font(.headline)
-                Spacer()
-                Text("\(index + 1)/\(lessons.count)").font(.caption.monospacedDigit())
-            }
-            Text(lessons[index].instruction).font(.subheadline).fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(AppSpacing.medium)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColors.wine.opacity(0.85), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("Step \(index + 1) of \(lessons.count)"))
     }
 
-    // MARK: Tabs
+    // MARK: Bottom bar
 
-    /// Compare on the left, the name of the tool being taught, the screen light on the right (as on Try On).
-    private var tabBar: some View {
-        HStack(spacing: AppSpacing.small) {
-            CameraBarButton(symbol: model.compare.symbol) { model.cycleCompare() }
-                .accessibilityLabel("Compare")
-                .accessibilityValue(model.compare.label)
-            if model.perSide {
-                // One tool only: the side being done, and the steps sheet.
-                Button { stepsDetent = .medium; showsSteps = true } label: {
-                    VStack(spacing: 2) {
-                        Text(sideTitle).font(.title3.weight(.semibold))
-                        Label("Steps", systemImage: "list.bullet").font(.footnote)
-                    }
+    /// Back (left), "Tutorial" (the steps sheet) in the middle, Next / Finish (right).
+    private var bottomBar: some View {
+        ZStack {
+            Button { stepsDetent = TutorialStepsSheet.compact; showsSteps = true } label: {
+                Text("Tutorial")
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(ink)
-                    .frame(maxWidth: .infinity, minHeight: 56)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(Text(sideTitle))
-                .accessibilityHint("Shows all steps")
-            } else {
-                Text(model.tab.title)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(ink)
-                    .lineLimit(1).minimumScaleFactor(0.8)
-                    .frame(maxWidth: .infinity, minHeight: 56)
-                    .accessibilityAddTraits(.isHeader)
+                    .padding(.horizontal, 20)
+                    .frame(height: 44)
+                    .background(Capsule().fill(ink.opacity(0.28)))
             }
-            CameraBarButton(symbol: light.isOn ? "bolt.fill" : "bolt.slash.fill") { light.toggle() }
-                .accessibilityLabel("Light")
-                .accessibilityValue(light.isOn ? Text("On") : Text("Off"))
+            .accessibilityHint("Shows all steps")
+            HStack {
+                Button(action: back) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(ink)
+                        .frame(width: 44, height: 44)
+                        .overlay(Circle().strokeBorder(ink.opacity(0.45), lineWidth: 1))
+                }
+                .accessibilityLabel(index == 0 && !sideDone ? "Back" : "Previous step")
+                Spacer()
+                Button(action: next) {
+                    Text(finishes ? "Finish" : "Next")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(ink)
+                        .padding(.horizontal, 20)
+                        .frame(height: 44)
+                        .overlay(Capsule().strokeBorder(ink.opacity(0.45), lineWidth: 1))
+                }
+                .disabled(sideDone)
+                .opacity(sideDone ? 0.5 : 1)
+            }
         }
+        .buttonStyle(.plain)
+        .animation(.easeInOut(duration: 0.2), value: finishes)
+    }
+}
+
+/// "Left cheek done!": the first side is finished. On to the other side, or the same side again.
+private struct SideDoneCard: View {
+    let tool: TutorialTab
+    let onNext: () -> Void
+    let onReplay: () -> Void
+
+    private var copy: (title: LocalizedStringKey, text: LocalizedStringKey, next: LocalizedStringKey, replay: LocalizedStringKey) {
+        switch tool {
+        case .blush: ("Left cheek done!", "Now the same on your right cheek, so both sides match.", "Do my right cheek", "Replay left cheek")
+        case .brows: ("Left brow done!", "Now the same on your right brow, so both sides match.", "Do my right brow", "Replay left brow")
+        case .eyeliner: ("Left eye done!", "Now the same on your right eye, so both sides match.", "Do my right eye", "Replay left eye")
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Image(systemName: "checkmark")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 30, height: 30)
+                .background(AppColors.dandanPink, in: Circle())
+                .frame(width: 52, height: 52)
+                .background(.white, in: Circle())
+                .accessibilityHidden(true)
+            Text(copy.title)
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(AppColors.onboardingInk)
+                .padding(.top, 14)
+                .accessibilityAddTraits(.isHeader)
+            Text(copy.text)
+                .font(.system(size: 13))
+                .foregroundStyle(AppColors.onboardingBody)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 6)
+            Button(action: onNext) {
+                Text(copy.next)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(AppColors.buttonInk, in: Capsule())
+            }
+            .padding(.top, 18)
+            Button(action: onReplay) {
+                Label(copy.replay, systemImage: "arrow.counterclockwise")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AppColors.dandanPink)
+                    .frame(minHeight: 44)
+            }
+            .padding(.top, 4)
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+        .padding(.bottom, 8)
+        .background(.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .environment(\.colorScheme, .light)
     }
 }
 

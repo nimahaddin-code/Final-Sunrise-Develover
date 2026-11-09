@@ -81,8 +81,7 @@ struct FeatureCaptureView: View {
     }
 
     private var hint: some View {
-        Label(stage == .desired ? "Fit your whole face inside the line" : "Both sides done. Look at you! Let's take your after photo.",
-              systemImage: "face.smiling")
+        Label("Fit your whole face inside the line", systemImage: "face.smiling")
             .font(.footnote.weight(.medium))
             .foregroundStyle(AppColors.snow)
             .multilineTextAlignment(.center)

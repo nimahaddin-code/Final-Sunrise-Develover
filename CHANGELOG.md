@@ -1,3 +1,23 @@
+## Tutorial, side-done card, steps sheet and feedback restyle — 2026-11-09
+
+Follows the design (tutorial screens, 17 After photo, 18 Your feedback). `GuidedTutorialView` (one-tool flow): black page,
+camera card with 28 pt corners; over it compare (left, glass), `StylePill` and the screen light (right); at its bottom the
+step's instruction (white, shadow) and step dots. Bottom bar: back circle, "Tutorial" (opens the steps sheet), Next /
+Finish (Finish on the last step of each side). Finish on the first side shows `SideDoneCard` over a blurred camera
+("Left cheek/brow/eye done!", "Do my right …" = `advance()`, "Replay left …" = `GuidedTutorialModel.replaySide()`). The
+side done first (`.leading`) is now called "Left", as the design names it. Step copy from the design's list: brows 4
+steps, blush 1, eyeliner 3; `FaceGuideLesson.title` is the short step title (sheet), `instruction` the text over the
+camera; the encouragement lines and the second-side cheer are gone. The guide overlays get `GuidedTutorialModel.guideStep`
+(`browGuideSteps` = brush, dots, fill, front; `blushGuideSteps` = both outlines), so the brow overlay's clean-up step and
+the blush inner-circle-only step are no longer shown. `TutorialStepsSheet`: white, "Tutorial" with close, compact height
+(`TutorialStepsSheet.compact`) shows the current step and "Swipe for more", large shows all with Done / Now / Up next;
+step pictures are grey placeholders. `FeedbackView`: light page, back (home), style name, share; "Nice work!", try-on vs
+result under a drag divider (`CompareSlider`, labelled Try-on / Yours, not the design's Before / After, since there is no
+bare photo), overall ring, Placement and Shade cards (`MakeupFeedback.placement` / `shade`, "—" and "Coming soon" while
+nil, as the placeholder provider returns), retry (back to tutorial) and "Save look" (the share sheet; nothing is saved by
+the app). The result capture uses the same hint as the first. Photo mode (tutorial without the flow) is unchanged. New
+strings not synced into the catalog. Simulator only (no camera there): layout seen, guides on a face need a device check.
+
 ## Before photo, "Your final look" brief and item popups — 2026-11-08
 
 Restyled to the design (screens 09, 10, 10a/10b). `FeatureCaptureView` (both stages): full-page camera, back, the style

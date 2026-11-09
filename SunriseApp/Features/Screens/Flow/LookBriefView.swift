@@ -152,7 +152,7 @@ struct LookBriefView: View {
                     .font(.system(size: 15))
                     .foregroundStyle(Self.muted)
                     .frame(width: 20)
-                name(item, size: 15)
+                name(item, size: 15, weight: .regular)
                 Text(item.detail)
                     .font(.system(size: 13))
                     .foregroundStyle(Self.faint)
@@ -162,14 +162,13 @@ struct LookBriefView: View {
             }
         }
         .buttonStyle(.plain)
-        .disabled(item.info == nil)
         .accessibilityElement(children: .combine)
     }
 
-    private func name(_ item: MakeupKitItem, size: CGFloat) -> some View {
+    private func name(_ item: MakeupKitItem, size: CGFloat, weight: Font.Weight = .semibold) -> some View {
         HStack(spacing: 5) {
             Text(item.title)
-                .font(.system(size: size, weight: .semibold))
+                .font(.system(size: size, weight: weight))
                 .foregroundStyle(Self.ink)
                 .underline(item.info != nil, pattern: .dot, color: AppColors.dandanPink)
             if item.info != nil {
