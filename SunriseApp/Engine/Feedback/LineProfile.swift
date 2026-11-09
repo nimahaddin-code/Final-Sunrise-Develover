@@ -131,6 +131,8 @@ struct FeedbackRecorder {
     let look: String?
     var hits: [FeedbackHit] = []
     var entries: [FeedbackScoreEntry] = []
+    /// Raw differences for the Placement and Shade percentages (`makeup-score.database.json`).
+    var inputs = ScoreInputs()
 
     func applies(_ rule: FeedbackDatabase.Rule) -> Bool {
         if let looks = rule.looks, !looks.contains(look ?? "") { return false }
@@ -166,7 +168,7 @@ struct FeedbackRecorder {
     }
 
     /// Final step: the chosen messages (or praise), and the score.
-    func feedback(_ composer: FeedbackComposer, praise: [MakeupFeedback.Item], notes: [MakeupFeedback.Item]) -> MakeupFeedback {
-        composer.assemble(hits: hits, entries: entries, praise: praise, notes: notes)
+    func feedback(_ composer: FeedbackComposer, tool: String, praise: [MakeupFeedback.Item], notes: [MakeupFeedback.Item]) -> MakeupFeedback {
+        composer.assemble(hits: hits, entries: entries, praise: praise, notes: notes, tool: tool, inputs: inputs, ipdScale: scale, look: look)
     }
 }

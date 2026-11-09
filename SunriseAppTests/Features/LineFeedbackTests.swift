@@ -61,6 +61,14 @@ final class LineFeedbackTests: XCTestCase {
         XCTAssertTrue(feedback.items.contains { $0.rule == "brow.praise.shape" }, "\(feedback.items.map(\.rule))")
     }
 
+    func testBrowAndLinerGetTheTwoCards() throws {
+        for feedback in [try browFeedback(brow(tailX: 50)), try linerFeedback(liner(wing: 2))] {
+            XCTAssertEqual(feedback.categories.map(\.id), ["placement", "shade"])
+            XCTAssertLessThan(try XCTUnwrap(feedback.categories.first).percent, 1)
+            XCTAssertFalse(try XCTUnwrap(feedback.categories.first).description.isEmpty)
+        }
+    }
+
     func testShortBrowTailIsNamed() throws {
         let feedback = try browFeedback(brow(tailX: 50))
         let tail = try XCTUnwrap(feedback.items.first { $0.rule == "brow.tail.too_short" }, "\(feedback.items.map(\.rule))")

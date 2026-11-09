@@ -75,7 +75,11 @@ enum BrowFeedback {
             let r = LineProfile(brow.map { LineSample(local: $0.local, area: Double(before.samples[$0.i].area), dark: skinNow - afterL($0.i), index: $0.i) }, bin: 2)
             let targetIndices = Set(t.samples.map(\.index))
             let productShare = t.samples.filter { product.contains($0.index) }.reduce(0) { $0 + $1.area } / max(t.area, 1)
-            guard productShare >= 0.15, let rs = r.shape() else { record.fire("brow.none", side: side); continue }
+            guard productShare >= 0.15, let rs = r.shape() else {
+                record.fire("brow.none", side: side)
+                record.inputs.add("placement", "key_point_offset_mm", 15 * record.scale); record.inputs.add("shade", "darkness_ratio", 3)
+                continue
+            }
 
             func mm(_ d: Double) -> [String: String] { ["delta": FeedbackComposer.mm(d)] }
             let head = rs.start - ts.start
@@ -88,7 +92,9 @@ enum BrowFeedback {
             record.add(tailV > 0 ? "brow.tail.too_high" : "brow.tail.too_low", value: tailV, side: side, values: mm(tailV))
             let archU = rs.archU - ts.archU
             record.add(archU > 0 ? "brow.arch.too_outer" : "brow.arch.too_inner", value: archU, side: side, values: mm(archU))
+            record.inputs.add("placement", "key_point_offset_mm", [head, headV, tail, tailV, rs.archU - ts.archU].map(abs).reduce(0, +) / 5)
             let archH = rs.archHeight - ts.archHeight
+            record.inputs.add("placement", "arch_height_mm", archH)
             record.add(archH > 0 ? "brow.arch.too_high" : "brow.arch.too_flat", value: archH, side: side, values: mm(archH))
             func angles(_ d: Double, _ v: Double, _ target: Double) -> [String: String] {
                 ["delta": FeedbackComposer.degrees(d), "value": FeedbackComposer.degrees(v), "target": FeedbackComposer.degrees(target)]
@@ -107,6 +113,7 @@ enum BrowFeedback {
                 return (name, a - b)
             }
             if let worst = thick.max(by: { abs($0.1) < abs($1.1) }) {
+                record.inputs.add("shade", "thickness_mm", worst.1)
                 record.add(worst.1 > 0 ? "brow.thickness.too_thick" : "brow.thickness.too_thin", value: worst.1, side: side,
                            values: ["delta": FeedbackComposer.mm(worst.1), "zone": zones[worst.0] ?? worst.0])
             }
@@ -128,6 +135,7 @@ enum BrowFeedback {
             let inside = landed.map { max(skinNow - afterL($0.index), 0) * $0.area }.reduce(0, +) / max(landedArea, 1)
             let shownThere = landed.map { $0.dark * $0.area }.reduce(0, +) / max(landedArea, 1)
             let ratio = shownThere > 0 && landedArea > 0 ? inside / shownThere : 1
+            record.inputs.add("shade", "darkness_ratio", max(ratio, 1 / max(ratio, 0.01)) - 1)
             record.add(ratio > 1 ? "brow.darkness.too_dark" : "brow.darkness.too_light", value: ratio, side: side,
                        values: ["value": ratio > 1 ? FeedbackComposer.times(ratio) : FeedbackComposer.percent(ratio * 100)],
                        size: abs(log(max(ratio, 0.01))))
@@ -145,6 +153,7 @@ enum BrowFeedback {
                     } / Float(darkest.count)
                     if hypot(mean.x, mean.y) >= 4 {
                         let d = Double(FeedbackColor.hueDifference(shadeHue, FeedbackColor.hue(a: mean.x, b: mean.y)))
+                        record.inputs.add("shade", "hue_delta_deg", d)
                         record.add(d > 0 ? "brow.hue.warmer" : "brow.hue.cooler", value: d, side: side,
                                    values: ["delta": FeedbackComposer.degrees(d)])
                     }
@@ -209,6 +218,6 @@ enum BrowFeedback {
             praise += [composer.praise("brow.praise.fill", tool: tool)].compactMap { $0 }
         }
         if measured.count == 2, !record.notOK("brow.symmetry") { praise += [composer.praise("brow.praise.balance", tool: tool)].compactMap { $0 } }
-        return record.feedback(composer, praise: praise, notes: check.notes)
+        return record.feedback(composer, tool: "brow", praise: praise, notes: check.notes)
     }
 }

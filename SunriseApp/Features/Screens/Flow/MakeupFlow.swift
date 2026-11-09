@@ -192,6 +192,8 @@ struct MakeupFeedback: Sendable, Equatable {
         var label: String
         /// Every message of this group, worst first (shown when the card is opened).
         var items: [Item]
+        /// What this percentage means (`makeup-score.database.json`), shown above the messages.
+        var description: String = ""
     }
 
     /// One measured part of the result, e.g. placement: 0...1 and a short note ("A little high").

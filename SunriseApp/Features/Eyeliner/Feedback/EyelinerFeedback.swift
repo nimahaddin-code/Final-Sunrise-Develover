@@ -56,7 +56,11 @@ enum EyelinerFeedback {
             // Share of the target path (its columns) with liner on it.
             let targetColumns = Set(t.columns.keys), covered = targetColumns.filter { r.columns[$0] != nil }
             let coverage = targetColumns.isEmpty ? 0 : Double(covered.count) / Double(targetColumns.count) * 100
-            guard coverage >= 15, let rStart = r.start, let rEnd = r.end else { record.fire("eyeliner.none", side: side); continue }
+            guard coverage >= 15, let rStart = r.start, let rEnd = r.end else {
+                record.fire("eyeliner.none", side: side)
+                record.inputs.add("placement", "key_point_offset_mm", 10.5 * record.scale); record.inputs.add("shade", "darkness_ratio", 3)
+                continue
+            }
 
             let startDelta = rStart - tStart
             record.add(startDelta < 0 ? "eyeliner.start.too_early" : "eyeliner.start.too_late", value: startDelta, side: side,
@@ -76,11 +80,13 @@ enum EyelinerFeedback {
                 return (name, a - b)
             }
             if let worst = thick.max(by: { abs($0.1) < abs($1.1) }) {
+                record.inputs.add("shade", "thickness_mm", worst.1)
                 record.add(worst.1 > 0 ? "eyeliner.thickness.too_thick" : "eyeliner.thickness.too_thin", value: worst.1, side: side,
                            values: ["delta": FeedbackComposer.mm(worst.1), "zone": zones[worst.0] ?? worst.0])
             }
             let inside = t.samples.map { max(bare($0.index) - now($0.index), 0) * $0.area }.reduce(0, +) / max(t.area, 1)
             let ratio = t.darkness > 0 ? min(inside / t.darkness, 1) : 1
+            record.inputs.add("shade", "darkness_ratio", 1 / max(ratio, 0.01) - 1)
             record.add("eyeliner.darkness.too_light", value: ratio, side: side, values: ["value": FeedbackComposer.percent(ratio * 100)],
                        size: abs(log(max(ratio, 0.01))))
 
@@ -114,6 +120,10 @@ enum EyelinerFeedback {
                 return (frame.origin + frame.u * end + frame.v * v).y
             }
             let rAngle = wingAngle(r), tAngle = wingAngle(t)
+            var keyPoints = [startDelta]
+            if hasWing { keyPoints += [rEnd - tEnd, tip(r, rEnd) - tip(t, tEnd)] }
+            record.inputs.add("placement", "key_point_offset_mm", keyPoints.map(abs).reduce(0, +) / Double(keyPoints.count))
+            if hasWing, let rAngle, let tAngle { record.inputs.add("placement", "wing_angle_deg", rAngle - tAngle) }
             if hasWing {
                 if let rAngle, let tAngle {
                     let d = rAngle - tAngle
@@ -157,6 +167,6 @@ enum EyelinerFeedback {
             praise += [composer.praise("eyeliner.praise.wing", tool: tool, values: ["value": "3"])].compactMap { $0 }
         }
         if measured.count == 2, !record.notOK("eyeliner.symmetry") { praise += [composer.praise("eyeliner.praise.balance", tool: tool)].compactMap { $0 } }
-        return record.feedback(composer, praise: praise, notes: check.notes)
+        return record.feedback(composer, tool: "eyeliner", praise: praise, notes: check.notes)
     }
 }
