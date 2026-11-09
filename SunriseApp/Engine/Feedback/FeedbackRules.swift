@@ -196,12 +196,17 @@ struct FeedbackPhotoCheck {
         for (index, scan) in [before, after].enumerated() {
             let photo = ["photo": names[index]]
             guard let scan else { report("capture.no_face", photo, tool: tool, composer); continue }
-            if abs(scan.yaw) > 8 { report("capture.turned", photo.merging(["value": FeedbackComposer.degrees(Double(scan.yaw))]) { $1 }, tool: tool, composer) }
+            // Calibration (device test 2026-11-09): a phone held a little below the eyes reads 8° down, and the database's 8°
+            // blocked every result. Up to `poseBlockingDegrees` it is a note; beyond, a retake.
+            if abs(scan.yaw) > 8 {
+                report("capture.turned", photo.merging(["value": FeedbackComposer.degrees(Double(scan.yaw))]) { $1 }, tool: tool, composer,
+                       blocks: abs(scan.yaw) > Self.poseBlockingDegrees)
+            }
             if abs(scan.pitch) > 8 {
                 let down = scan.pitch > 0
                 let direction = language == .id ? (down ? "menunduk" : "mendongak") : (down ? "tilted down" : "tilted up")
                 report("capture.tilted_up_down", photo.merging(["direction": direction, "value": FeedbackComposer.degrees(Double(scan.pitch))]) { $1 },
-                       tool: tool, composer)
+                       tool: tool, composer, blocks: abs(scan.pitch) > Self.poseBlockingDegrees)
             }
             if abs(scan.roll) > 5 { report("capture.rolled", photo.merging(["value": FeedbackComposer.degrees(Double(scan.roll))]) { $1 }, tool: tool, composer) }
             if scan.smile > 0.3 { report("capture.smiling", photo, tool: tool, composer) }
@@ -215,12 +220,15 @@ struct FeedbackPhotoCheck {
         }
     }
 
-    mutating func report(_ id: String, _ values: [String: String] = [:], tool: String, _ composer: FeedbackComposer) {
+    static let poseBlockingDegrees: Float = 15
+
+    mutating func report(_ id: String, _ values: [String: String] = [:], tool: String, _ composer: FeedbackComposer, blocks override: Bool? = nil) {
         guard let rule = composer.database.captureRule(id), rule.tools?.contains(tool) ?? true else { return }
         let text = rule.message.text(composer.language)
+        let blocks = override ?? rule.blocking
         let item = MakeupFeedback.Item(title: text.title, say: composer.fill(text.say, values), steps: text.steps ?? [],
-                                       band: rule.blocking ? .large : .slight, rule: id)
-        if rule.blocking { if !blocking.contains(item) { blocking.append(item) } } else if !notes.contains(item) { notes.append(item) }
+                                       band: blocks ? .large : .slight, rule: id)
+        if blocks { if !blocking.contains(item) { blocking.append(item) } } else if !notes.contains(item) { notes.append(item) }
     }
 }
 
