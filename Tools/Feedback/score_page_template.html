@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skor Placement Shade</title>
+<style>
+:root {
+  --bg: #fffbf8; --card: #ffffff; --ink: #111111; --muted: #6b6b6b; --line: #eee6ea;
+  --pink: #ff2d8e; --pink-soft: #ffe3f0;
+  --ok: #1f9d55; --ok-soft: #e3f6ea; --slight: #b7791f; --slight-soft: #fdf1dc;
+  --clear: #d9480f; --clear-soft: #ffe8dc; --large: #c92a2a; --large-soft: #ffe3e3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141113; --card: #1e1a1c; --ink: #f4eff1; --muted: #a79da2; --line: #332b2f;
+    --pink: #ff5aa8; --pink-soft: #3a1f2c;
+    --ok: #4cc583; --ok-soft: #173325; --slight: #e3a64b; --slight-soft: #36291a;
+    --clear: #ff8a57; --clear-soft: #3a2219; --large: #ff6b6b; --large-soft: #3a1c1c;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141113; --card: #1e1a1c; --ink: #f4eff1; --muted: #a79da2; --line: #332b2f;
+  --pink: #ff5aa8; --pink-soft: #3a1f2c;
+  --ok: #4cc583; --ok-soft: #173325; --slight: #e3a64b; --slight-soft: #36291a;
+  --clear: #ff8a57; --clear-soft: #3a2219; --large: #ff6b6b; --large-soft: #3a1c1c;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+h1 { font-size: 28px; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.02em; }
+.sub { color: var(--muted); margin: 0 0 20px; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
+.seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.seg button { border: 0; background: none; color: var(--muted); font: inherit; font-weight: 600; padding: 7px 14px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--pink); color: #fff; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px; margin-bottom: 16px; }
+.pick { display: grid; grid-template-columns: 120px 1fr; gap: 18px; align-items: center; }
+.big { font-size: 52px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--pink); }
+.chip { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+.b-ok { background: var(--ok-soft); color: var(--ok); } .b-slight { background: var(--slight-soft); color: var(--slight); }
+.b-clear { background: var(--clear-soft); color: var(--clear); } .b-large { background: var(--large-soft); color: var(--large); }
+.label { font-size: 20px; font-weight: 700; margin: 8px 0 4px; }
+.desc { margin: 0 0 10px; }
+.eq { display: flex; flex-wrap: wrap; gap: 8px; }
+.eq span { background: var(--pink-soft); color: var(--ink); border-radius: 10px; padding: 4px 10px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.meta { color: var(--muted); font-size: 13px; }
+.meta p { margin: 0 0 6px; }
+.metrics { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+.metrics th, .metrics td { text-align: left; padding: 6px 8px; border-top: 1px solid var(--line); }
+.list { display: grid; gap: 6px; }
+.row { display: grid; grid-template-columns: 52px 92px 1fr; gap: 10px; align-items: start; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; }
+.row:hover, .row.on { border-color: var(--pink); }
+.row .p { font-weight: 800; font-variant-numeric: tabular-nums; }
+.row .t { font-size: 13px; color: var(--muted); }
+details summary { cursor: pointer; font-weight: 600; }
+@media (max-width: 560px) {
+  .pick { grid-template-columns: 1fr; gap: 8px; }
+  .row { grid-template-columns: 44px 1fr; }
+  .row .chipcell { grid-column: 2; }
+  .row .t { grid-column: 1 / -1; }
+}
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Arti persentase Placement &amp; Shade</h1>
+  <p class="sub" id="subtitle"></p>
+
+  <div class="bar">
+    <div class="seg" id="tool"></div>
+    <div class="seg" id="cat"></div>
+    <div class="seg" id="lang"></div>
+  </div>
+
+  <section class="card">
+    <div class="pick">
+      <div class="big"><span id="pct">61</span>%</div>
+      <div>
+        <input type="range" id="slider" min="1" max="100" value="61" aria-label="Persentase">
+        <div><span class="chip" id="band"></span></div>
+      </div>
+    </div>
+    <div class="label" id="label"></div>
+    <p class="desc" id="desc"></p>
+    <div class="eq" id="eq"></div>
+  </section>
+
+  <section class="card meta">
+    <details>
+      <summary id="howTitle"></summary>
+      <div id="how"></div>
+      <table class="metrics"><thead><tr id="mhead"></tr></thead><tbody id="mbody"></tbody></table>
+    </details>
+  </section>
+
+  <div class="list" id="list"></div>
+</main>
+<script>
+const DB = __DATA__;
+const T = {
+  id: { title: "Arti persentase Placement & Shade", tools: { blush: "Blush", brow: "Alis", eyeliner: "Eyeliner" },
+        cats: { placement: "Placement", shade: "Shade" }, how: "Cara menghitung dan sumber data",
+        head: ["Ukuran", "Bobot", "ok", "slight", "clear", "Aturan feedback"], status: "Draf: angka masih perlu dikalibrasi dengan foto asli." },
+  en: { title: "What Placement & Shade percentages mean", tools: { blush: "Blush", brow: "Brow", eyeliner: "Eyeliner" },
+        cats: { placement: "Placement", shade: "Shade" }, how: "How it is scored and where the data comes from",
+        head: ["Measurement", "Weight", "ok", "slight", "clear", "Feedback rules"], status: "Draft: values still need calibrating with real photos." }
+};
+const state = { tool: "blush", cat: "placement", lang: "id", pct: 61 };
+try { Object.assign(state, JSON.parse(localStorage.getItem("scorePage") || "{}")); } catch (e) {}
+const $ = id => document.getElementById(id);
+
+function seg(el, options, key) {
+  el.innerHTML = "";
+  for (const [value, text] of options) {
+    const b = document.createElement("button");
+    b.textContent = text; b.setAttribute("aria-pressed", state[key] === value);
+    b.onclick = () => { state[key] = value; render(); };
+    el.appendChild(b);
+  }
+}
+function unitText(k, v) {
+  if (v.mm !== undefined) return `${v.mm.toFixed(1)} mm`;
+  if (v.deg !== undefined) return `${v.deg.toFixed(1)}°`;
+  if (v.times !== undefined) return `${v.times.toFixed(2)}x · ${v.or_percent_of_target.toFixed(1)}%`;
+  return JSON.stringify(v);
+}
+/** The description without its leading "Label. ", which is shown on its own. */
+function body(r, L) {
+  const d = r.description[L], p = r.label[L] + ". ";
+  return d.startsWith(p) ? d.slice(p.length) : d;
+}
+function render() {
+  try { localStorage.setItem("scorePage", JSON.stringify(state)); } catch (e) {}
+  const t = T[state.lang], L = state.lang;
+  document.documentElement.lang = L;
+  $("title").textContent = t.title;
+  $("subtitle").textContent = `${DB.meta.purpose[L]} ${t.status}`;
+  seg($("tool"), Object.entries(t.tools), "tool");
+  seg($("cat"), Object.entries(t.cats), "cat");
+  seg($("lang"), [["id", "ID"], ["en", "EN"]], "lang");
+  const cat = DB.tools[state.tool][state.cat];
+  const row = cat.percent.find(r => r.percent === state.pct);
+  $("pct").textContent = state.pct; $("slider").value = state.pct;
+  $("band").textContent = row.band; $("band").className = "chip b-" + row.band;
+  $("label").textContent = row.label[L];
+  $("desc").textContent = body(row, L);
+  $("eq").innerHTML = "";
+  for (const [k, v] of Object.entries(row.equivalent_single_difference)) {
+    const s = document.createElement("span"); s.textContent = `${k}: ${unitText(k, v)}`; $("eq").appendChild(s);
+  }
+  $("howTitle").textContent = t.how;
+  const h = DB.how_it_is_scored;
+  $("how").innerHTML = "";
+  for (const p of [cat.source[L], h.metric_score[L], h.category_score[L], h.per_side[L], h.equivalent_note[L]]) {
+    const el = document.createElement("p"); el.textContent = p; $("how").appendChild(el);
+  }
+  $("mhead").innerHTML = t.head.map(x => `<th>${x}</th>`).join("");
+  $("mbody").innerHTML = "";
+  for (const m of cat.metrics) {
+    const tr = document.createElement("tr");
+    for (const c of [m.id + (m.ipd ? " (ipd)" : ""), m.weight, m.thresholds.ok, m.thresholds.slight, m.thresholds.clear, m.rules.join(", ")]) {
+      const td = document.createElement("td"); td.textContent = c; tr.appendChild(td);
+    }
+    $("mbody").appendChild(tr);
+  }
+  const list = $("list"); list.innerHTML = "";
+  for (const r of cat.percent) {
+    const d = document.createElement("div");
+    d.className = "row" + (r.percent === state.pct ? " on" : "");
+    d.innerHTML = `<div class="p">${r.percent}%</div><div class="chipcell"><span class="chip b-${r.band}">${r.band}</span></div><div class="t"></div>`;
+    d.querySelector(".t").innerHTML = "<strong></strong> ";
+    d.querySelector(".t strong").textContent = r.label[L] + ".";
+    d.querySelector(".t").append(body(r, L));
+    d.onclick = () => { state.pct = r.percent; render(); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    list.appendChild(d);
+  }
+}
+$("slider").addEventListener("input", e => { state.pct = +e.target.value; render(); });
+render();
+</script>
+</body>
+</html>

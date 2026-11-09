@@ -1,4 +1,4 @@
-"""Builds SunriseApp/Resources/makeup-score.database.json: what every percentage 1-100 of the Placement and Shade scores
+"""Builds SunriseApp/Resources/makeup-score.database.json (and Docs/SkorPlacementShade.html to read it): what every percentage 1-100 of the Placement and Shade scores
 means, per tool (blush, brow, eyeliner), with the measurement behind it. Run: python3 Tools/Feedback/make_score_database.py
 
 -Nimah. The thresholds are the same draft values as makeup-feedback.database.json; change them here and run again.
@@ -255,6 +255,14 @@ def main():
         json.dump(db, f, ensure_ascii=False, indent=2)
         f.write("\n")
     print("wrote", os.path.relpath(OUT), "entries:", sum(len(c["percent"]) for t in db["tools"].values() for c in t.values()))
+    # A page to read it: the same data inlined into Docs/SkorPlacementShade.html (opens in any browser, no server).
+    here = os.path.dirname(__file__)
+    page = open(os.path.join(here, "score_page_template.html")).read()
+    data = json.dumps(db, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+    html = os.path.join(here, "..", "..", "Docs", "SkorPlacementShade.html")
+    with open(html, "w") as f:
+        f.write(page.replace("__DATA__", data))
+    print("wrote", os.path.relpath(html))
 
 
 if __name__ == "__main__":
