@@ -1,3 +1,13 @@
+## Feedback cards say which way; Before / After lined up — -Nimah (2026-11-09)
+
+As in the design: each card's note says which way it is off, from its worst message (`FeedbackNote`: "A little high", "Too
+heavy", "Far too short", or a phrase such as "Past the line", "Gaps to fill"; "Spot on" with no message; the score database
+label when a rule has no word), and the line beside the ring is built from the two cards, good first ("Your shade is spot
+on. Placement is a little high."). Coverage (gaps in the target) is told under Placement, since it follows where the makeup
+went. The slider's After photo is lined up with the bare Before photo (`PhotoAlignment`): each shutter records the eye
+centres on screen (`FaceScan.leftEye` / `rightEye`), and the result is moved, scaled and turned so its eyes land on the
+Before photo's eyes (left as it is beyond 1.6x or 25°). Tests in `BlushFeedbackTests`. Not checked on a device.
+
 ## Feedback cards scored with the score database — -Nimah (2026-11-09)
 
 The feedback screen now has the design's two cards, Placement and Shade, scored with `makeup-score.database.json` (now in

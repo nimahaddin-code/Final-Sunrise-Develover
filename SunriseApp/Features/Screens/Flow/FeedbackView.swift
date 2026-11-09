@@ -16,6 +16,8 @@ struct FeedbackView: View {
     @State private var progress = 0.0
     @State private var feedback: MakeupFeedback?
     @State private var opened: MakeupFeedback.Category?
+    /// The result photo lined up with the bare Before photo (`PhotoAlignment`), for the slider.
+    @State private var alignedResult: UIImage?
     @AppStorage(DeveloperTools.key) private var developerTools = false
 
     private static let ink = AppColors.onboardingInk
@@ -38,6 +40,9 @@ struct FeedbackView: View {
         .sheet(item: $opened) { category in FeedbackCategorySheet(category: category) }
         .task {
             guard feedback == nil else { return }
+            if let bare = store.bare, let result = store.result {
+                alignedResult = PhotoAlignment.align(after: result, afterScan: store.resultScan, to: bare, beforeScan: store.desiredScan)
+            }
             let request = MakeupFeedbackRequest(tool: handoff.tool, styleTitle: handoff.styleTitle,
                                                 desired: store.desired, result: store.result,
                                                 blushStyle: handoff.blushStyle, linerLook: handoff.linerLook,
@@ -120,7 +125,7 @@ struct FeedbackView: View {
                         .font(.system(size: 14))
                         .foregroundStyle(Self.muted)
                         .padding(.top, 4)
-                    CompareSlider(left: store.bare ?? store.desired, right: store.result, bare: store.bare != nil)
+                    CompareSlider(left: store.bare ?? store.desired, right: alignedResult ?? store.result, bare: store.bare != nil)
                         .frame(height: 210)
                         .padding(.top, AppSpacing.medium)
                     if feedback.score == nil && !feedback.items.isEmpty {

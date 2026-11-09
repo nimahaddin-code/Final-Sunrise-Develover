@@ -140,6 +140,9 @@ enum FeedbackCategory: String, CaseIterable, Sendable {
         }
     }
 
+    /// Under the Shade card (colour, strength, thickness); everything else is under Placement.
+    var isShade: Bool { self == .amount || self == .finish }
+
     var symbol: String {
         switch self {
         case .placement: "viewfinder"
@@ -200,15 +203,23 @@ struct FeedbackComposer {
             let cards = groups.compactMap { group -> MakeupFeedback.Category? in
                 guard let (percent, row) = scores.score(tool: tool, category: group.id, differences: inputs.values[group.id] ?? [:],
                                                         ipdScale: ipdScale, look: look) else { return nil }
-                let messages = all.filter { group.holds.contains(FeedbackCategory(priority: $0.priority)) }.compactMap { message(for: $0) }
+                // Coverage (gaps in the target) follows where the makeup went, so it is told under Placement.
+                func card(_ hit: FeedbackHit) -> String {
+                    hit.rule.contains(".coverage.") ? "placement"
+                        : FeedbackCategory(priority: hit.priority).isShade ? "shade" : "placement"
+                }
+                let own = all.filter { card($0) == group.id }
+                let messages = own.compactMap { message(for: $0) }
+                // The card's short note says which way it is off ("A little high"), from its worst message; the score
+                // database's label (no direction) when no rule has a word for it.
+                let note = own.first.flatMap { FeedbackNote.text(rule: $0.rule, band: $0.band, language: language) }
+                    ?? (own.isEmpty ? FeedbackNote.spotOn(language) : row.label.text(language))
                 return MakeupFeedback.Category(id: group.id, title: group.title, symbol: group.symbol, percent: Double(percent) / 100,
-                                               label: row.label.text(language), items: messages,
-                                               description: row.description.text(language))
+                                               label: note, items: messages, description: row.description.text(language))
             }
             if !cards.isEmpty {
                 let overall = cards.reduce(0) { $0 + $1.percent } / Double(cards.count)
-                let weakest = cards.filter { !$0.items.isEmpty }.min { $0.percent < $1.percent }
-                let summary = weakest?.items.first.map { $0.title + "." } ?? praise.first?.title ?? ""
+                let summary = FeedbackNote.summary(cards, language: language)
                 return MakeupFeedback(score: overall, headline: label(score: overall * 100), comments: [],
                                       items: (chosen.isEmpty ? praise : chosen) + notes, categories: cards, summary: summary,
                                       notes: notes, placement: cards.first { $0.id == "placement" }.map { .init(value: $0.percent, note: $0.label) },
@@ -416,5 +427,76 @@ struct ScoreInputs: Sendable {
     mutating func add(_ category: String, _ metric: String, _ value: Double) {
         guard value.isFinite else { return }
         values[category, default: [:]][metric, default: []].append(abs(value))
+    }
+}
+
+/// -Nimah: short, directional notes for the feedback cards ("A little high", "Too heavy", "Spot on") and the one-line summary
+/// beside the score ring ("Your shade is spot on. Placement is a little high."), as in the design.
+enum FeedbackNote {
+    /// The direction of a rule, as an adjective: (Indonesian, English). Keyed by rule id; tool-specific first.
+    static let words: [String: (String, String)] = [
+        "blush.offset.too_high": ("tinggi", "high"), "blush.offset.too_low": ("rendah", "low"),
+        "blush.offset.too_far_in": ("ke dalam", "far in"), "blush.offset.too_far_out": ("ke luar", "far out"),
+        "blush.size.too_small": ("kecil", "small"), "blush.size.too_large": ("lebar", "wide"),
+        "blush.intensity.too_heavy": ("tebal", "heavy"), "blush.intensity.too_light": ("tipis", "light"),
+        "blush.hue.warmer": ("oranye", "orange"), "blush.hue.cooler": ("pink", "pink"),
+        "brow.head.too_close": ("rapat", "close together"), "brow.head.too_far": ("renggang", "far apart"),
+        "brow.head.too_high": ("tinggi", "high"), "brow.head.too_low": ("rendah", "low"),
+        "brow.tail.too_short": ("pendek", "short"), "brow.tail.too_long": ("panjang", "long"),
+        "brow.tail.too_high": ("tinggi", "high"), "brow.tail.too_low": ("rendah", "low"),
+        "brow.arch.too_high": ("melengkung", "arched"), "brow.arch.too_flat": ("datar", "flat"),
+        "brow.rise_angle.too_steep": ("curam", "steep"), "brow.rise_angle.too_flat": ("datar", "flat"),
+        "brow.tail_angle.too_steep": ("turun", "droopy"), "brow.tail_angle.too_level": ("lurus", "straight"),
+        "brow.thickness.too_thick": ("tebal", "thick"), "brow.thickness.too_thin": ("tipis", "thin"),
+        "brow.darkness.too_dark": ("gelap", "dark"), "brow.darkness.too_light": ("terang", "light"),
+        "brow.hue.warmer": ("kemerahan", "red"), "brow.hue.cooler": ("abu-abu", "ashy"),
+        "eyeliner.start.too_early": ("ke dalam", "far in"), "eyeliner.start.too_late": ("ke luar", "far out"),
+        "eyeliner.wing.too_short": ("pendek", "short"), "eyeliner.wing.too_long": ("panjang", "long"),
+        "eyeliner.wing.too_steep": ("curam", "steep"), "eyeliner.wing.too_flat": ("datar", "flat"),
+        "eyeliner.wing_tip.too_high": ("tinggi", "high"), "eyeliner.wing_tip.too_low": ("rendah", "low"),
+        "eyeliner.thickness.too_thick": ("tebal", "thick"), "eyeliner.thickness.too_thin": ("tipis", "thin"),
+        "eyeliner.darkness.too_light": ("pudar", "faint")
+    ]
+    /// Rules whose note is a whole phrase, not "a little / too" + adjective.
+    static let phrases: [String: (String, String)] = [
+        "none": ("Belum terlihat", "Not found yet"), "spill": ("Keluar garis", "Past the line"),
+        "smudge": ("Ada noda", "Smudged"), "coverage.low": ("Belum rata", "Gaps to fill"), "patchy": ("Belang", "Patchy"),
+        "symmetry": ("Kiri-kanan beda", "Uneven sides")
+    ]
+
+    static func spotOn(_ language: FeedbackLanguage) -> String { language == .id ? "Sudah pas" : "Spot on" }
+
+    static func text(rule: String, band: FeedbackBand, language: FeedbackLanguage) -> String? {
+        let id = language == .id
+        if band == .ok { return spotOn(language) }
+        if let word = words[rule] {
+            let w = id ? word.0 : word.1
+            switch band {
+            case .slight: return id ? "Agak \(w)" : "A little \(w)"
+            case .clear: return id ? "Terlalu \(w)" : "Too \(w)"
+            default: return id ? "Jauh terlalu \(w)" : "Far too \(w)"
+            }
+        }
+        let part = rule.split(separator: ".").dropFirst().joined(separator: ".")
+        for (key, phrase) in phrases where part == key || part.hasPrefix(key + ".") || part.hasPrefix(key) {
+            return id ? phrase.0 : phrase.1
+        }
+        return nil
+    }
+
+    /// Good cards first, then what to fix: "Your shade is spot on. Placement is a little high."
+    static func summary(_ cards: [MakeupFeedback.Category], language: FeedbackLanguage) -> String {
+        let id = language == .id
+        let ordered = cards.filter(\.items.isEmpty) + cards.filter { !$0.items.isEmpty }
+        return ordered.map { card in
+            let name = card.title
+            if card.items.isEmpty {
+                return id ? "\(name) sudah pas." : "Your \(name.lowercased()) is spot on."
+            }
+            let note = card.label.prefix(1).lowercased() + card.label.dropFirst()
+            // "Placement is a little high." for a direction, "Shade: patchy." for a phrase.
+            let adjective = ["a little ", "too ", "far too ", "agak ", "terlalu ", "jauh "].contains { note.hasPrefix($0) }
+            return id ? (adjective ? "\(name) \(note)." : "\(name): \(note).") : (adjective ? "\(name) is \(note)." : "\(name): \(note).")
+        }.joined(separator: " ")
     }
 }
