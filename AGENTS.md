@@ -1,6 +1,20 @@
+## Feedback cards scored with the score database — -Nimah (2026-11-09)
+
+The feedback screen now has the design's two cards, Placement and Shade, scored with `makeup-score.database.json` (now in
+the app target; `FeedbackDatabase.load()` also loads it as `scores`). Each tool records its raw differences per side
+(`ScoreInputs`): blush offset (hypot of up and out, mm) and area ratio / hue and strength; brow mean offset of head, tail and
+arch (mm) and arch height / hue, darkness and thickness; eyeliner mean offset of start, wing reach and tip (mm) and wing angle
+(not Natural) / darkness and thickness. Nothing applied on a side: 1% for both. `ScoreDatabase.score` uses the database's
+curve (0 -> 100, ok -> 90, slight -> 75, clear -> 55, 2x clear -> 20, 3x clear -> 1; mm thresholds x IPD/63), averages the
+sides, takes the weighted mean of the metrics, and the card shows that percentage's label; the sheet opens with its
+description, then the advice messages (placement, shape, spill and balance rules under Placement; amount and finish under
+Shade). Overall ring = mean of the two cards; Hanum's `placement` / `shade` parts follow them. Without the score database the
+per-group cards remain. Tests: `BlushFeedbackTests`, `LineFeedbackTests`. Not checked on a device.
+
+
 ## Score database: what each Placement and Shade percentage means — -Nimah (2026-11-09)
 
-`SunriseApp/Resources/makeup-score.database.json` (draft, not in the app target yet, not read by code): for blush, brow and
+`SunriseApp/Resources/makeup-score.database.json` (draft; read by the app since the entry above): for blush, brow and
 eyeliner, the Placement score (from the Try On coordinates: the target drawn on the desired-look photo against the result on
 the same ARKit mesh points, mm) and the Shade score (colour, strength and thickness against the Try On look and the chosen
 shade) each get 100 entries, 100% down to 1%: band, short label and a description (formal Indonesian and English) naming

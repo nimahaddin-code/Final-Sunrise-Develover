@@ -374,6 +374,16 @@ private struct FeedbackCategorySheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
+                    if !category.description.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(verbatim: "\(Int((category.percent * 100).rounded()))% · \(category.label)")
+                                .font(.system(size: 17, weight: .bold))
+                            Text(category.description).font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
+                        }
+                        .foregroundStyle(AppColors.onboardingInk)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .feedbackCard()
+                    }
                     if category.items.isEmpty {
                         FeedbackMessageRow(item: .init(title: String(localized: "Spot on"),
                                                        say: String(localized: "Nothing to fix here. Keep doing it this way."),

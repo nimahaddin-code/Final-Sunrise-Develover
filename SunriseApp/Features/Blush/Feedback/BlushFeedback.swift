@@ -69,7 +69,17 @@ enum BlushFeedback {
                                     suppresses: rule.suppresses ?? []))
         }
         let zoneWords = database.words(language).blush_zone
+        var inputs = ScoreInputs()
         for c in cheeks {
+            // Raw differences for the Placement and Shade percentages (`makeup-score.database.json`).
+            if c.coverage < 10 {
+                inputs.add("placement", "offset_mm", 30 * scale); inputs.add("shade", "intensity_ratio", 3)
+            } else {
+                inputs.add("placement", "offset_mm", hypot(c.vertical, c.lateral))
+                inputs.add("placement", "size_ratio", max(c.areaRatio, 1 / max(c.areaRatio, 0.01)) - 1)
+                if let hue = c.hueDelta { inputs.add("shade", "hue_delta_deg", hue) }
+                if let r = c.intensityRatio { inputs.add("shade", "intensity_ratio", max(r, 1 / max(r, 0.01)) - 1) }
+            }
             if c.coverage < 10, let rule = database.rule("blush.none") {
                 entries.append(FeedbackScoreEntry(band: .large, weight: rule.weight, priority: rule.priority))
                 hits.append(FeedbackHit(rule: rule.id, band: .large, side: c.side, priority: rule.priority, values: [:],
@@ -145,7 +155,8 @@ enum BlushFeedback {
                 items.append(.init(title: text.title, say: text.say, steps: [], band: .ok, rule: p.id))
             }
         }
-        return composer.assemble(hits: hits, entries: entries, praise: items, notes: check.notes)
+        return composer.assemble(hits: hits, entries: entries, praise: items, notes: check.notes, tool: "blush", inputs: inputs,
+                                 ipdScale: scale, look: look)
     }
 
     // MARK: Measuring one cheek

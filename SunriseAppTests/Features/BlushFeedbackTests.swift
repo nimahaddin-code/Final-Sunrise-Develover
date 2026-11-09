@@ -76,16 +76,35 @@ final class BlushFeedbackTests: XCTestCase {
         XCTAssertLessThan(try XCTUnwrap(feedback.score), 0.9)
     }
 
-    func testCardsScoreEachCategoryAndHoldItsAdvice() throws {
+    /// The design's two cards, scored with `makeup-score.database.json`: label and meaning for that exact percentage.
+    func testPlacementAndShadeCardsComeFromTheScoreDatabase() throws {
         let raised = targets.map { $0 + SIMD2(0, 8) }
         let feedback = try evaluate(after: scan(blushCentres: raised, radius: outerRadius, strength: 12))
-        let placement = try XCTUnwrap(feedback.categories.first { $0.id == "placement" })
-        XCTAssertLessThan(placement.percent, 1)
+        XCTAssertEqual(feedback.categories.map(\.id), ["placement", "shade"])
+        let placement = try XCTUnwrap(feedback.categories.first)
+        XCTAssertLessThan(placement.percent, 0.9)
         XCTAssertTrue(placement.items.contains { $0.rule == "blush.offset.too_high" })
-        XCTAssertEqual(placement.label, placement.items.first?.title)
-        XCTAssertTrue(feedback.summary.hasSuffix("."))
+        let scores = try XCTUnwrap(FeedbackDatabase.load()?.scores)
+        let row = try XCTUnwrap(scores.tools["blush"]?["placement"]?.percent.first { $0.percent == Int((placement.percent * 100).rounded()) })
+        XCTAssertEqual(placement.label, row.label.en)
+        XCTAssertEqual(placement.description, row.description.en)
+        XCTAssertEqual(feedback.placement?.value, placement.percent, "Hanum's Placement part follows the card")
+        XCTAssertEqual(try XCTUnwrap(feedback.score), feedback.categories.map(\.percent).reduce(0, +) / 2, accuracy: 0.0001)
+
         let onTarget = try evaluate(after: scan(blushCentres: targets, radius: outerRadius, strength: 12))
-        XCTAssertTrue(onTarget.categories.allSatisfy { $0.items.isEmpty && $0.label == "Spot on" }, "\(onTarget.categories.map(\.label))")
+        XCTAssertTrue(onTarget.categories.allSatisfy { $0.percent >= 0.9 && $0.items.isEmpty }, "\(onTarget.categories.map(\.label))")
+        let none = try evaluate(after: scan())
+        XCTAssertEqual(none.categories.map(\.percent), [0.01, 0.01], "nothing applied: 1% for both")
+    }
+
+    func testScoreCurveMatchesTheDatabaseDescription() {
+        XCTAssertEqual(ScoreDatabase.score(0, ok: 3, slight: 6, clear: 10), 100)
+        XCTAssertEqual(ScoreDatabase.score(3, ok: 3, slight: 6, clear: 10), 90)
+        XCTAssertEqual(ScoreDatabase.score(6, ok: 3, slight: 6, clear: 10), 75)
+        XCTAssertEqual(ScoreDatabase.score(10, ok: 3, slight: 6, clear: 10), 55)
+        XCTAssertEqual(ScoreDatabase.score(20, ok: 3, slight: 6, clear: 10), 20)
+        XCTAssertEqual(ScoreDatabase.score(8.8, ok: 3, slight: 6, clear: 10), 61, accuracy: 0.01, "61% = 8.8 mm, as the page says")
+        XCTAssertEqual(ScoreDatabase.score(99, ok: 3, slight: 6, clear: 10), 1)
     }
 
     func testOneCheekLowNamesThatCheek() throws {
