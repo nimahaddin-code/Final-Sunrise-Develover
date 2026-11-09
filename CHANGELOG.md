@@ -1,3 +1,11 @@
+## Brow colour check — -Nimah (2026-11-09)
+
+`BrowFeedback` now checks the colour (`brow.hue.warmer` / `cooler`): the darkest quarter of the product samples inside the
+target (where the pencil covers most and skin between hairs least), light-matched, against the chosen brow shade
+(`LineFeedbackInput.shade`, from `handoff.shades[.eyebrow]`). Redder or more orange than the shade (a smaller hue angle for
+browns) is "warmer", towards grey-yellow "cooler"; below chroma 4 the colour is not read. Database thresholds (12/22/35°).
+Lands in the Finish card. `LineFeedbackTests` (chosen shade, red-brown, ashy). Simulator tests only.
+
 ## Merge: Hanum's E2E-Flow restyle with the measured feedback — -Nimah (2026-11-09)
 
 `E2E-Flow` (Hanum: before photo, "Your final look" brief and item popups, tutorial, side-done card, steps sheet and feedback
