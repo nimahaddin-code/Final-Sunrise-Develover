@@ -250,7 +250,8 @@ struct MeasuredFeedbackProvider: MakeupFeedbackProviding {
                                        style: request.blushStyle,
                                        shade: request.shade.map { SIMD3($0.red, $0.green, $0.blue) })
         let line = LineFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
-                                     look: request.linerLook?.rawValue)
+                                     look: request.linerLook?.rawValue,
+                                     shade: request.shade.map { SIMD3($0.red, $0.green, $0.blue) })
         let result = await Task.detached(priority: .userInitiated) { () -> MakeupFeedback in
             switch tool {
             case .blush: BlushFeedback.evaluate(blush, database: database, language: language)
