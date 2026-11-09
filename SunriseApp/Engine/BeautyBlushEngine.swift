@@ -368,7 +368,10 @@ final class BeautyBlushEngine:@unchecked Sendable {
         pass.depthAttachment.texture=depthTexture;pass.depthAttachment.loadAction = .clear;pass.depthAttachment.storeAction = .dontCare;pass.depthAttachment.clearDepth=1
         var splitPixels=drawable.texture.width/2
         if let anchor {
-            let world=SIMD3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
+            // The split follows the nose, not the anchor's origin: that sits inside the head, so a turned face put the cut on
+            // a cheek and let the other cheek's colour show across the nose. 5.5 cm forward in face space is about the nose.
+            let nose=anchor.transform*SIMD4<Float>(0,0,0.055,1)
+            let world=SIMD3(nose.x,nose.y,nose.z)
             let rawSize=CGSize(width:CVPixelBufferGetWidth(frame.capturedImage),height:CVPixelBufferGetHeight(frame.capturedImage))
             let rp=frame.camera.projectPoint(world,orientation:.landscapeRight,viewportSize:rawSize)
             let centre=CGPoint(x:rp.x/rawSize.width,y:rp.y/rawSize.height).applying(frame.displayTransform(for:s.orientation,viewportSize:s.viewport))
@@ -387,7 +390,10 @@ final class BeautyBlushEngine:@unchecked Sendable {
         }
         e.endEncoding()
         if let anchor {
-            let world=SIMD3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
+            // The split follows the nose, not the anchor's origin: that sits inside the head, so a turned face put the cut on
+            // a cheek and let the other cheek's colour show across the nose. 5.5 cm forward in face space is about the nose.
+            let nose=anchor.transform*SIMD4<Float>(0,0,0.055,1)
+            let world=SIMD3(nose.x,nose.y,nose.z)
             let rawSize=CGSize(width:CVPixelBufferGetWidth(frame.capturedImage),height:CVPixelBufferGetHeight(frame.capturedImage))
             let rp=frame.camera.projectPoint(world,orientation:.landscapeRight,viewportSize:rawSize)
             let normalized=CGPoint(x:rp.x/rawSize.width,y:rp.y/rawSize.height)

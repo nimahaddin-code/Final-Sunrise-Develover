@@ -20,6 +20,17 @@ extension GuidedTutorialModel {
 struct BlushTutorialOverlay: View {
     @ObservedObject var feed: BlushGuideFeed
     let step: Int
+    /// Draws only the cheek on this side of the screen (the per-side tutorial and the comparison layouts), picked by the
+    /// cheeks' own positions so a turned face never shows the other cheek's guide across the nose. nil: both.
+    var side: HorizontalEdge? = nil
+
+    private var cheeks: [BlushGuideSnapshot.Cheek]? {
+        guard let all = feed.snapshot?.cheeks else { return nil }
+        guard let side, all.count == 2 else { return all }
+        let left = all[0].center.x <= all[1].center.x ? all[0] : all[1]
+        let right = all[0].center.x <= all[1].center.x ? all[1] : all[0]
+        return [side == .leading ? left : right]
+    }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var thermal = ProcessInfo.processInfo.thermalState
 
@@ -39,7 +50,7 @@ struct BlushTutorialOverlay: View {
                     g.addFilter(.shadow(color: .black.opacity(0.35), radius: 1.5, x: 0, y: 0))
                     draw(&g, time: t, still: paused)
                 }
-                if let cheeks = feed.snapshot?.cheeks {
+                if let cheeks {
                     ForEach(cheeks.indices, id: \.self) { i in fingertip(cheeks[i], time: t, still: paused) }
                 }
             }
@@ -63,7 +74,7 @@ struct BlushTutorialOverlay: View {
     private var dotted: StrokeStyle { StrokeStyle(lineWidth: 2.2, lineCap: .round, dash: [0.1, 7]) }
 
     private func draw(_ g: inout GraphicsContext, time t: Double, still: Bool) {
-        guard let cheeks = feed.snapshot?.cheeks else { return }
+        guard let cheeks else { return }
         for c in cheeks {
             let inner = path(c.inner), outer = path(c.outer)
             if step >= 1 {
