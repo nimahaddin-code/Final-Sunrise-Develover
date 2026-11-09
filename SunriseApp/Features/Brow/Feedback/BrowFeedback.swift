@@ -1,7 +1,7 @@
 // -Nimah: brow feedback. The target is the brow as it looked in the desired-look photo (the chosen picture drawn by the
 // engine): every mesh sample clearly darker than the skin there. The result is the same in the result photo; product is
 // what got darker than the bare face. Both are compared in a frame along the target brow. Rules and texts:
-// `makeup-feedback.database.json` (brow). Not measured yet: head softness, visible outline, colour.
+// `makeup-feedback.database.json` (brow). Not measured yet: head softness, visible outline.
 import Foundation
 import simd
 
@@ -12,6 +12,8 @@ struct LineFeedbackInput: Sendable {
     var after: FaceScan?
     /// Database look id (eyeliner), nil for brows.
     var look: String?
+    /// The chosen shade, sRGB 0...1 (brow colour check).
+    var shade: SIMD3<Double>? = nil
 }
 
 enum BrowFeedback {
@@ -45,6 +47,10 @@ enum BrowFeedback {
 
         var record = FeedbackRecorder(database: database, scale: Double(before.ipd > 40 ? before.ipd / 63 : 1), look: nil)
         let zones = database.words(language).brow_zone
+        let shadeHue = input.shade.map { s -> Float in
+            let lab = FeedbackColor.lab(sRGB: s.x, s.y, s.z)
+            return FeedbackColor.hue(a: lab.y, b: lab.z)
+        }
         var measured: [FeedbackSide: Measured] = [:]
         for sign in [1.0, -1.0] {
             let side: FeedbackSide = sign > 0 ? .left : .right
@@ -125,6 +131,25 @@ enum BrowFeedback {
             record.add(ratio > 1 ? "brow.darkness.too_dark" : "brow.darkness.too_light", value: ratio, side: side,
                        values: ["value": ratio > 1 ? FeedbackComposer.times(ratio) : FeedbackComposer.percent(ratio * 100)],
                        size: abs(log(max(ratio, 0.01))))
+
+            // Colour (`brow.hue.*`): the darkest quarter of the product inside the target, where the pencil covers most and
+            // skin between the hairs least, against the chosen shade. Redder or more orange than the shade (a smaller hue
+            // angle for browns) is "warmer", towards grey-yellow "cooler". Too little colour to read: not checked.
+            if let shadeHue {
+                let pigment = t.samples.filter { product.contains($0.index) }.sorted { afterL($0.index) < afterL($1.index) }
+                if pigment.count >= 8 {
+                    let darkest = pigment.prefix(max(pigment.count / 4, 5))
+                    let mean = darkest.reduce(SIMD2<Float>.zero) {
+                        let lab = after.samples[$1.index].lab + light.shift
+                        return $0 + SIMD2(lab.y, lab.z)
+                    } / Float(darkest.count)
+                    if hypot(mean.x, mean.y) >= 4 {
+                        let d = Double(FeedbackColor.hueDifference(shadeHue, FeedbackColor.hue(a: mean.x, b: mean.y)))
+                        record.add(d > 0 ? "brow.hue.warmer" : "brow.hue.cooler", value: d, side: side,
+                                   values: ["delta": FeedbackComposer.degrees(d)])
+                    }
+                }
+            }
 
             // Product outside the target outline (natural hairs that were already there do not count).
             var above = 0.0, below = 0.0, inner = 0.0

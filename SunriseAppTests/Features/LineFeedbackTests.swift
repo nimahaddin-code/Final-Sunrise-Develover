@@ -13,12 +13,13 @@ final class LineFeedbackTests: XCTestCase {
     /// A dark shape: is face-local point `p` (mm) inside it, for either side (mirrored on x).
     typealias Shape = (SIMD2<Float>) -> Bool
 
-    private func scan(shown: Shape? = nil, worn: Shape? = nil, darkness: Float = 30, wornDarkness: Float = 30, smile: Float = 0) -> FaceScan {
+    private func scan(shown: Shape? = nil, worn: Shape? = nil, darkness: Float = 30, wornDarkness: Float = 30, wornAB: SIMD2<Float>? = nil,
+                      smile: Float = 0) -> FaceScan {
         var samples: [FaceScan.Sample] = []
         func add(_ x: Float, _ y: Float, _ step: Float) {
             let p = SIMD2(x, y)
             var lab = skin
-            if let worn, worn(p) { lab.x -= wornDarkness }
+            if let worn, worn(p) { lab.x -= wornDarkness; if let wornAB { lab.y = wornAB.x; lab.z = wornAB.y } }
             var rendered: Lab?
             if let shown { rendered = skin; if shown(p) { rendered!.x -= darkness } }
             samples.append(.init(position: SIMD3(x, y, 0), area: step * step, lab: lab, rendered: rendered,
@@ -75,6 +76,31 @@ final class LineFeedbackTests: XCTestCase {
     func testNoBrowProductSaysSo() throws {
         let feedback = try browFeedback(nil)
         XCTAssertEqual(feedback.items.first?.rule, "brow.none")
+    }
+
+    /// B202 Brown, the shade chosen on Try On in these tests.
+    private let brown = SIMD3<Double>(0.38, 0.27, 0.20)
+
+    private func browColour(_ ab: SIMD2<Float>) throws -> MakeupFeedback {
+        let input = LineFeedbackInput(before: scan(shown: brow()), hadBeforePhoto: true,
+                                      after: scan(worn: brow(), wornAB: ab), look: nil, shade: brown)
+        return BrowFeedback.evaluate(input, database: try database(), language: .en)
+    }
+
+    func testBrowInTheChosenShadeHasNoColourMessage() throws {
+        let shade = FeedbackColor.lab(sRGB: brown.x, brown.y, brown.z)
+        let feedback = try browColour(SIMD2(shade.y, shade.z))
+        XCTAssertFalse(feedback.categories.flatMap(\.items).contains { $0.rule.hasPrefix("brow.hue") }, "\(feedback.items.map(\.rule))")
+    }
+
+    func testRedderBrowIsCalledWarmer() throws {
+        let feedback = try browColour(SIMD2(22, 8))   // hue about 20°: red-brown
+        XCTAssertTrue(feedback.categories.flatMap(\.items).contains { $0.rule == "brow.hue.warmer" }, "\(feedback.items.map(\.rule))")
+    }
+
+    func testAshyBrowIsCalledCooler() throws {
+        let feedback = try browColour(SIMD2(1, 10))   // hue about 85°: grey-yellow
+        XCTAssertTrue(feedback.categories.flatMap(\.items).contains { $0.rule == "brow.hue.cooler" }, "\(feedback.items.map(\.rule))")
     }
 
     func testLightBrowIsCalledLight() throws {
