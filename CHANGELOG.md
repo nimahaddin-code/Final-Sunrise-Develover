@@ -11,6 +11,7 @@ description, then the advice messages (placement, shape, spill and balance rules
 Shade). Overall ring = mean of the two cards; Hanum's `placement` / `shade` parts follow them. Without the score database the
 per-group cards remain. Tests: `BlushFeedbackTests`, `LineFeedbackTests`. Not checked on a device.
 
+
 ## Score database: what each Placement and Shade percentage means — -Nimah (2026-11-09)
 
 `SunriseApp/Resources/makeup-score.database.json` (draft; read by the app since the entry above): for blush, brow and
