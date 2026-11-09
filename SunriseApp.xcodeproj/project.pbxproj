@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA7F27CE25946E00F23D133F /* makeup-score.database.json in Resources */ = {isa = PBXBuildFile; fileRef = DA7FCBB04A872F861B11FAE2 /* makeup-score.database.json */; };
 		DA7F30D87A097FC1912300C0 /* LineFeedbackTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7FB78841BE7AE803170E09 /* LineFeedbackTests.swift */; };
 		DA7FD4409B946F3081EEFD86 /* EyelinerFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F4D55BA5337E5BFFC436C /* EyelinerFeedback.swift */; };
 		DA7FFDB723B4D0BE4CFF1347 /* BrowFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F660BC5BDAA59F20BF09F /* BrowFeedback.swift */; };
@@ -203,6 +204,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DA7FCBB04A872F861B11FAE2 /* makeup-score.database.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "makeup-score.database.json"; sourceTree = "<group>"; };
 		DA7FB78841BE7AE803170E09 /* LineFeedbackTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineFeedbackTests.swift; sourceTree = "<group>"; };
 		DA7F4D55BA5337E5BFFC436C /* EyelinerFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerFeedback.swift; sourceTree = "<group>"; };
 		DA7F660BC5BDAA59F20BF09F /* BrowFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowFeedback.swift; sourceTree = "<group>"; };
@@ -486,6 +488,7 @@
 				133DCD5B481F352F758A1E3F /* Assets.xcassets */,
 				DA7ABA5E0000000000000004 /* makeup-reference.database.json */,
 				DA7FF52592D8D0BED189D82C /* makeup-feedback.database.json */,
+				DA7FCBB04A872F861B11FAE2 /* makeup-score.database.json */,
 				9C489D19343491FCEF4D67B7 /* blush-wash-mask.png */,
 				B5A0C0DE00000000000F0005 /* brow-hair-3d.obj */,
 				BF09F9EA1B31E2CEA9FCECC1 /* blush-rendering.json */,
@@ -1058,6 +1061,7 @@
 				7C0E5C02D823502F262C2E96 /* Assets.xcassets in Resources */,
 				DA7ABA5E0000000000000003 /* makeup-reference.database.json in Resources */,
 				DA7F117878EC808D6413635D /* makeup-feedback.database.json in Resources */,
+				DA7F27CE25946E00F23D133F /* makeup-score.database.json in Resources */,
 				8BBA5B983D53C01D8867678A /* BeautyBlush.metal.txt in Resources */,
 				B5A0C0DE000000000011020C /* Brow.metal.txt in Resources */,
 				E75A5467E80EFB42F0A20D33 /* blush-wash-mask.png in Resources */,

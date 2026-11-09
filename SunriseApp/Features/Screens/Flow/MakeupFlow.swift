@@ -187,6 +187,14 @@ struct MakeupFeedback: Sendable, Equatable {
         var label: String
         /// Every message of this group, worst first (shown when the card is opened).
         var items: [Item]
+        /// What this percentage means (`makeup-score.database.json`), shown above the messages.
+        var description: String = ""
+    }
+
+    /// One measured part of the result, e.g. placement: 0...1 and a short note ("A little high").
+    struct Part: Sendable, Equatable {
+        var value: Double
+        var note: String
     }
 
     /// 0...1 when the comparison gives one.
@@ -199,6 +207,10 @@ struct MakeupFeedback: Sendable, Equatable {
     var summary: String = ""
     /// Photo notes that did not stop the check (tilted a little, light changed).
     var notes: [Item] = []
+    /// Where the makeup sits compared with the try-on; nil until the comparison measures it.
+    var placement: Part? = nil
+    /// How close the colour is to the shade tried on; nil until the comparison measures it.
+    var shade: Part? = nil
 }
 
 /// Compares the desired-look photo with the result. The real comparison (placement from coordinates) is built
@@ -235,7 +247,8 @@ struct MeasuredFeedbackProvider: MakeupFeedbackProviding {
                                        style: request.blushStyle,
                                        shade: request.shade.map { SIMD3($0.red, $0.green, $0.blue) })
         let line = LineFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
-                                     look: request.linerLook?.rawValue)
+                                     look: request.linerLook?.rawValue,
+                                     shade: request.shade.map { SIMD3($0.red, $0.green, $0.blue) })
         let result = await Task.detached(priority: .userInitiated) { () -> MakeupFeedback in
             switch tool {
             case .blush: BlushFeedback.evaluate(blush, database: database, language: language)

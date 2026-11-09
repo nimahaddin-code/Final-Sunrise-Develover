@@ -39,10 +39,11 @@ final class GuidedFlowTests: XCTestCase {
         }
     }
 
-    /// The look brief's item popups: every picture they name is in the assets.
-    func testEveryBriefItemPictureIsInTheAssets() {
+    /// The get-ready page's item pictures (`TryOnTool.mustHave` / `nearby`) are in the assets.
+    func testEveryKitItemPictureIsInTheAssets() {
         for tool in TryOnTool.allCases {
-            for name in (tool.mustHave + tool.nearby).compactMap(\.info?.imageName) {
+            for item in tool.mustHave + tool.nearby {
+                guard let name = item.info?.imageName else { continue }
                 XCTAssertNotNil(UIImage(named: name), "\(tool): no asset named \(name)")
             }
         }

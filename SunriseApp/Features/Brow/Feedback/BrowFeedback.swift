@@ -1,7 +1,7 @@
 // -Nimah: brow feedback. The target is the brow as it looked in the desired-look photo (the chosen picture drawn by the
 // engine): every mesh sample clearly darker than the skin there. The result is the same in the result photo; product is
 // what got darker than the bare face. Both are compared in a frame along the target brow. Rules and texts:
-// `makeup-feedback.database.json` (brow). Not measured yet: head softness, visible outline, colour.
+// `makeup-feedback.database.json` (brow). Not measured yet: head softness, visible outline.
 import Foundation
 import simd
 
@@ -12,6 +12,8 @@ struct LineFeedbackInput: Sendable {
     var after: FaceScan?
     /// Database look id (eyeliner), nil for brows.
     var look: String?
+    /// The chosen shade, sRGB 0...1 (brow colour check).
+    var shade: SIMD3<Double>? = nil
 }
 
 enum BrowFeedback {
@@ -45,6 +47,10 @@ enum BrowFeedback {
 
         var record = FeedbackRecorder(database: database, scale: Double(before.ipd > 40 ? before.ipd / 63 : 1), look: nil)
         let zones = database.words(language).brow_zone
+        let shadeHue = input.shade.map { s -> Float in
+            let lab = FeedbackColor.lab(sRGB: s.x, s.y, s.z)
+            return FeedbackColor.hue(a: lab.y, b: lab.z)
+        }
         var measured: [FeedbackSide: Measured] = [:]
         for sign in [1.0, -1.0] {
             let side: FeedbackSide = sign > 0 ? .left : .right
@@ -69,7 +75,11 @@ enum BrowFeedback {
             let r = LineProfile(brow.map { LineSample(local: $0.local, area: Double(before.samples[$0.i].area), dark: skinNow - afterL($0.i), index: $0.i) }, bin: 2)
             let targetIndices = Set(t.samples.map(\.index))
             let productShare = t.samples.filter { product.contains($0.index) }.reduce(0) { $0 + $1.area } / max(t.area, 1)
-            guard productShare >= 0.15, let rs = r.shape() else { record.fire("brow.none", side: side); continue }
+            guard productShare >= 0.15, let rs = r.shape() else {
+                record.fire("brow.none", side: side)
+                record.inputs.add("placement", "key_point_offset_mm", 15 * record.scale); record.inputs.add("shade", "darkness_ratio", 3)
+                continue
+            }
 
             func mm(_ d: Double) -> [String: String] { ["delta": FeedbackComposer.mm(d)] }
             let head = rs.start - ts.start
@@ -82,7 +92,9 @@ enum BrowFeedback {
             record.add(tailV > 0 ? "brow.tail.too_high" : "brow.tail.too_low", value: tailV, side: side, values: mm(tailV))
             let archU = rs.archU - ts.archU
             record.add(archU > 0 ? "brow.arch.too_outer" : "brow.arch.too_inner", value: archU, side: side, values: mm(archU))
+            record.inputs.add("placement", "key_point_offset_mm", [head, headV, tail, tailV, rs.archU - ts.archU].map(abs).reduce(0, +) / 5)
             let archH = rs.archHeight - ts.archHeight
+            record.inputs.add("placement", "arch_height_mm", archH)
             record.add(archH > 0 ? "brow.arch.too_high" : "brow.arch.too_flat", value: archH, side: side, values: mm(archH))
             func angles(_ d: Double, _ v: Double, _ target: Double) -> [String: String] {
                 ["delta": FeedbackComposer.degrees(d), "value": FeedbackComposer.degrees(v), "target": FeedbackComposer.degrees(target)]
@@ -101,6 +113,7 @@ enum BrowFeedback {
                 return (name, a - b)
             }
             if let worst = thick.max(by: { abs($0.1) < abs($1.1) }) {
+                record.inputs.add("shade", "thickness_mm", worst.1)
                 record.add(worst.1 > 0 ? "brow.thickness.too_thick" : "brow.thickness.too_thin", value: worst.1, side: side,
                            values: ["delta": FeedbackComposer.mm(worst.1), "zone": zones[worst.0] ?? worst.0])
             }
@@ -122,9 +135,30 @@ enum BrowFeedback {
             let inside = landed.map { max(skinNow - afterL($0.index), 0) * $0.area }.reduce(0, +) / max(landedArea, 1)
             let shownThere = landed.map { $0.dark * $0.area }.reduce(0, +) / max(landedArea, 1)
             let ratio = shownThere > 0 && landedArea > 0 ? inside / shownThere : 1
+            record.inputs.add("shade", "darkness_ratio", max(ratio, 1 / max(ratio, 0.01)) - 1)
             record.add(ratio > 1 ? "brow.darkness.too_dark" : "brow.darkness.too_light", value: ratio, side: side,
                        values: ["value": ratio > 1 ? FeedbackComposer.times(ratio) : FeedbackComposer.percent(ratio * 100)],
                        size: abs(log(max(ratio, 0.01))))
+
+            // Colour (`brow.hue.*`): the darkest quarter of the product inside the target, where the pencil covers most and
+            // skin between the hairs least, against the chosen shade. Redder or more orange than the shade (a smaller hue
+            // angle for browns) is "warmer", towards grey-yellow "cooler". Too little colour to read: not checked.
+            if let shadeHue {
+                let pigment = t.samples.filter { product.contains($0.index) }.sorted { afterL($0.index) < afterL($1.index) }
+                if pigment.count >= 8 {
+                    let darkest = pigment.prefix(max(pigment.count / 4, 5))
+                    let mean = darkest.reduce(SIMD2<Float>.zero) {
+                        let lab = after.samples[$1.index].lab + light.shift
+                        return $0 + SIMD2(lab.y, lab.z)
+                    } / Float(darkest.count)
+                    if hypot(mean.x, mean.y) >= 4 {
+                        let d = Double(FeedbackColor.hueDifference(shadeHue, FeedbackColor.hue(a: mean.x, b: mean.y)))
+                        record.inputs.add("shade", "hue_delta_deg", d)
+                        record.add(d > 0 ? "brow.hue.warmer" : "brow.hue.cooler", value: d, side: side,
+                                   values: ["delta": FeedbackComposer.degrees(d)])
+                    }
+                }
+            }
 
             // Product outside the target outline (natural hairs that were already there do not count).
             var above = 0.0, below = 0.0, inner = 0.0
@@ -184,6 +218,6 @@ enum BrowFeedback {
             praise += [composer.praise("brow.praise.fill", tool: tool)].compactMap { $0 }
         }
         if measured.count == 2, !record.notOK("brow.symmetry") { praise += [composer.praise("brow.praise.balance", tool: tool)].compactMap { $0 } }
-        return record.feedback(composer, praise: praise, notes: check.notes)
+        return record.feedback(composer, tool: "brow", praise: praise, notes: check.notes)
     }
 }

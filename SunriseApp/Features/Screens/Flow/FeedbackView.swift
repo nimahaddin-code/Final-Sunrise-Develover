@@ -65,13 +65,10 @@ struct FeedbackView: View {
             ProgressView(value: progress).tint(AppColors.dandanPink)
                 .padding(.bottom, AppSpacing.medium)
         }
-        .padding(.horizontal, AppSpacing.medium)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Checking your look")
         .accessibilityValue(Text(progress, format: .percent.precision(.fractionLength(0))))
     }
-
-    // MARK: Result
 
     private func result(_ feedback: MakeupFeedback) -> some View {
         VStack(spacing: 0) {
@@ -114,7 +111,6 @@ struct FeedbackView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, AppSpacing.large)
             }
-            bottomBar
         }
         .transition(.opacity)
     }
@@ -338,7 +334,7 @@ private struct FeedbackCategoryCard: View {
     }
 }
 
-/// Every message of one category, opened from its card.
+/// -Nimah: every message of one category, opened from its card.
 private struct FeedbackCategorySheet: View {
     let category: MakeupFeedback.Category
     @Environment(\.dismiss) private var dismiss
@@ -347,6 +343,16 @@ private struct FeedbackCategorySheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
+                    if !category.description.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(verbatim: "\(Int((category.percent * 100).rounded()))% · \(category.label)")
+                                .font(.system(size: 17, weight: .bold))
+                            Text(category.description).font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
+                        }
+                        .foregroundStyle(AppColors.onboardingInk)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .feedbackCard()
+                    }
                     if category.items.isEmpty {
                         FeedbackMessageRow(item: .init(title: String(localized: "Spot on"),
                                                        say: String(localized: "Nothing to fix here. Keep doing it this way."),
@@ -363,6 +369,7 @@ private struct FeedbackCategorySheet: View {
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }
         .presentationDetents([.medium, .large])
+        .preferredColorScheme(.light)
     }
 }
 
@@ -377,10 +384,10 @@ private struct FeedbackMessageRow: View {
                 .foregroundStyle(item.band == .ok ? Color.green : AppColors.dandanPink)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 6) {
-                Text(item.title).font(.headline)
-                Text(item.say).font(.subheadline).foregroundStyle(AppColors.onboardingBody)
+                Text(item.title).font(.system(size: 15, weight: .semibold))
+                Text(item.say).font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
                 ForEach(Array(item.steps.enumerated()), id: \.offset) { index, step in
-                    Text(verbatim: "\(index + 1). \(step)").font(.footnote).foregroundStyle(AppColors.onboardingBody)
+                    Text(verbatim: "\(index + 1). \(step)").font(.system(size: 12)).foregroundStyle(AppColors.onboardingBody)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -399,7 +406,7 @@ private struct FeedbackMessageRow: View {
 }
 
 private extension View {
-    /// The design's white card: rounded, soft shadow.
+    /// The design's white card.
     func feedbackCard() -> some View {
         padding(14)
             .background(.white, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
