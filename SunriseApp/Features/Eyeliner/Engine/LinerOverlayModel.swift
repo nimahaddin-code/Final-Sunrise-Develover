@@ -295,7 +295,7 @@ struct LinerOverlayView: View {
     /// `false` hides the liner, for comparing with the bare face.
     let isVisible: Bool
     /// Draws only on this half of the view (the tutorial's side-by-side comparison). Clipping inside the canvas keeps the
-    /// multiply blend against the camera, which a mask outside the view would break.
+    /// blend against the camera, which a mask outside the view would break.
     var visibleSide: HorizontalEdge?
 
     var body: some View {
@@ -344,9 +344,7 @@ struct LinerOverlayView: View {
                     }
                 }
             }
-            // Multiply over the camera picture, like ink: the skin's texture, shading and light show through the liner
-            // instead of a flat colour sitting on top of it.
-            .blendMode(.multiply)
+            // Normal blending, as in the photo: multiplied into skin, every (dark) liner shade read as black.
             .overlay { landmarkDots }
             .onChange(of: proxy.size, initial: true) { _, size in model.viewport = size }
         }

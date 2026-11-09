@@ -1,3 +1,11 @@
+## Merge: Hanum's latest E2E-Flow into staging — -Nimah (2026-11-10)
+
+E2E-Flow (design sizes for brief, item sheet and feedback; Done at the bottom; two `FeedbackCategory` cases; eyeliner photo
+in points and normal blending; tutorial guides kept on their side; camera messages only while the face is lost) merged
+with staging's directional card notes and lined-up Before/After. `FeedbackView` is Hanum's layout; her `BeforeAfterSlider`
+now shows the lined-up After photo (`alignedResult`). `FeedbackCategory.isShade` is `self == .shade`. 372 Simulator tests
+pass; not checked on a device.
+
 ## Feedback cards say which way; Before / After lined up — -Nimah (2026-11-09)
 
 As in the design: each card's note says which way it is off, from its worst message (`FeedbackNote`: "A little high", "Too
@@ -8,6 +16,92 @@ went. The slider's After photo is lined up with the bare Before photo (`PhotoAli
 centres on screen (`FaceScan.leftEye` / `rightEye`), and the result is moved, scaled and turned so its eyes land on the
 Before photo's eyes (left as it is beyond 1.6x or 25°). Tests in `BlushFeedbackTests`. Not checked on a device.
 
+## Merge: staging (score database, brow colour) into E2E-Flow — 2026-11-10
+
+staging brought Nimah's score database (`makeup-score.database.json`, Placement and Shade percentages with a label and a
+description shown in the card's sheet), the brow colour check, and her merge of an earlier E2E-Flow. Conflicts resolved:
+`FeedbackView` keeps E2E-Flow's latest layout (design sizes, Done, no Photo tips) and gains the sheet's description;
+`MakeupFeedback` keeps staging's `Category.description` and `Part` / `placement` / `shade`; `FeedbackComposer`'s score groups
+use E2E-Flow's two-case `FeedbackCategory` (`[.placement]`, `[.shade]`, the same rule priorities as staging's six groups),
+and the fallback `shade` part reads `.shade` (was `.finish`). Strings: staging's catalog plus 32 E2E-Flow keys. 370
+Simulator tests pass; not checked on a device.
+
+## Feedback cards: Placement and Shade only; brief and popup to the design; eyeliner photo position — 2026-11-09
+
+`FeedbackCategory` has two cases (design 18): `placement` (rule priorities 20-39 where and what shape, 50-59 spill, 70+
+balance) and `shade` (under 20 nothing applied, 40-49 amount, 60-69 finish and hue); the six database groups are folded
+into them, so the feedback screen shows two cards. `LookBriefView` follows the design again: title "Your expected result",
+larger type, an item with a popup reads as a link (pink, solid pink underline; no ⓘ). `KitItemSheet` is a native sheet:
+system material, a `NavigationStack` inline title with a close button in the toolbar, system padding, the picture on a
+white card, the text, and "Got it" as a large `.glass` button; the kind label and the tip are no longer shown.
+Eyeliner capture: `ARSCNView.snapshot()` returns a scale-1 image (one point per pixel) while the liner is drawn in view
+points, so the liner landed small in the top left; the snapshot now gets the view's size in points
+(`FeatureCaptureView.inPoints`). Tutorial: the camera now runs from the top edge under the status bar (`GuidedTutorialView.fullBleed`, rounded only above
+the bottom bar; buttons stay in the safe area); brow step 4 reads "Blend the front and clean up." Eyeliner colour: the liner is now laid over the camera with normal blending, live and in the photo (`LinerOverlayView`,
+`LinerOverlayRenderer.compose`); multiplied into skin, every liner shade (all dark: brown, plum, navy, black) read as black. Second design pass: brief and feedback use the design's sizes (brief: title 28 expanded black, photo 362:196, "What to
+prepare" 22 bold, labels 12/11 semibold, card name 17 semibold, rows 15, details 13, 36 pt icon circles, grey style pill
+12 semibold; feedback: headline 32 expanded black, subtitle 15, Before/After 362:236 with small tags, score card 17/13,
+categories 11 semibold, percent 20 bold rounded, bottom ↻ and "Done" (home; sharing stays the top button, "Save look"
+removed)). Item sheet: the product photo fills a full-width card at its own 1086:588 shape; close and "Got it" in ink.
+`SideDoneCard`'s second button is now "Done", which ends the tutorial without the other side (result photo, or the photo
+screen outside the flow); "Replay left …" and `GuidedTutorialModel.replaySide()` are gone. Third pass: the feedback screen no longer shows the "Photo tips" card (its text also showed an unfilled {value}). Brief:
+KEEP NEARBY lists two items (micellar water and cotton pads/buds; "Clean, dry face" removed from `TryOnTool.nearby`),
+text uses only #0A0A0A and #757575 (link names in ink with a pink underline), the light `StylePill` is 154 x 40, and
+"Start tutorial" is a native `.glassProminent` button tinted `AppColors.buttonInk` with a drop shadow. Tutorial side guides on a turned face: the blush guide now draws only the cheek on its side, picked by the cheeks' own
+positions (`BlushTutorialOverlay(side:)`; the screen-half mask `FaceHalfMask` is gone), the blush split for the pigment
+follows the nose (5.5 cm forward of the face anchor) instead of the anchor's origin inside the head, and the brow guide
+shows a lone visible brow only when it is on its side. The eyeliner already splits between the two eyes. Camera messages: `CameraAdvisor` shows a message only while the face is not tracked (or the phone is too hot), so the
+filter and guide stay on while ARKit follows the face (head down, dim light, backlight, close or far). The message still
+names the likely reason (too dark, backlit, too close, turned away, covered: `CameraMessageEngine.lostCause` now also
+blames a face last seen covered; "I'll wait here" / "I can't see you yet" only when no reason is known). "Too dark" still
+pulses the light button. "Start tutorial" is back to 52 pt high (glass tint on a fixed-height label). 365 Simulator tests pass; the brief, popup and eyeliner photo were not looked at after
+this change (Simulator has no camera; brief and popup not opened), device check pending.
+
+## Merge: staging into E2E-Flow — 2026-11-09
+
+staging (Nimah's measured feedback for every tool, capture diagnostics, the Indonesian rewrite, the blush kit data)
+merged into E2E-Flow. `FeedbackView` is staging's redesign (measured categories, Before / After with the bare photo);
+E2E-Flow's own feedback restyle and `MakeupFeedback.Part` were dropped. `FeatureCaptureView` keeps E2E-Flow's layout
+(oval, style pill, shutter) with staging's shutter logic (`FaceScan`, `CaptureDiagnostics`, bare photo, blush target
+`cameraConfiguration`). `LookBriefView` and the brief items (`TryOnTool.mustHave` / `nearby`) stay E2E-Flow's, so the
+blush kit from `BlushInfo` (`ToolInfo.kitItems`, `TryOnTool.kit`) no longer shows on the brief; its test was replaced by
+one that checks the brief's item pictures exist. Strings: staging's catalog plus E2E-Flow's 43 new keys (English only,
+no Indonesian for those yet). 365 Simulator tests pass; nothing checked on a device.
+
+## Tutorial, side-done card, steps sheet and feedback restyle — 2026-11-09
+
+Follows the design (tutorial screens, 17 After photo, 18 Your feedback). `GuidedTutorialView` (one-tool flow): black page,
+camera card with 28 pt corners; over it compare (left, glass), `StylePill` and the screen light (right); at its bottom the
+step's instruction (white, shadow) and step dots. Bottom bar: back circle, "Tutorial" (opens the steps sheet), Next /
+Finish (Finish on the last step of each side). Finish on the first side shows `SideDoneCard` over a blurred camera
+("Left cheek/brow/eye done!", "Do my right …" = `advance()`, "Replay left …" = `GuidedTutorialModel.replaySide()`). The
+side done first (`.leading`) is now called "Left", as the design names it. Step copy from the design's list: brows 4
+steps, blush 1, eyeliner 3; `FaceGuideLesson.title` is the short step title (sheet), `instruction` the text over the
+camera; the encouragement lines and the second-side cheer are gone. The guide overlays get `GuidedTutorialModel.guideStep`
+(`browGuideSteps` = brush, dots, fill, front; `blushGuideSteps` = both outlines), so the brow overlay's clean-up step and
+the blush inner-circle-only step are no longer shown. `TutorialStepsSheet`: white, "Tutorial" with close, compact height
+(`TutorialStepsSheet.compact`) shows the current step and "Swipe for more", large shows all with Done / Now / Up next;
+step pictures are grey placeholders. `FeedbackView`: light page, back (home), style name, share; "Nice work!", try-on vs
+result under a drag divider (`CompareSlider`, labelled Try-on / Yours, not the design's Before / After, since there is no
+bare photo), overall ring, Placement and Shade cards (`MakeupFeedback.placement` / `shade`, "—" and "Coming soon" while
+nil, as the placeholder provider returns), retry (back to tutorial) and "Save look" (the share sheet; nothing is saved by
+the app). The result capture uses the same hint as the first. Photo mode (tutorial without the flow) is unchanged. New
+strings not synced into the catalog. Simulator only (no camera there): layout seen, guides on a face need a device check.
+
+## Before photo, "Your final look" brief and item popups — 2026-11-08
+
+Restyled to the design (screens 09, 10, 10a/10b). `FeatureCaptureView` (both stages): full-page camera, back, the style
+pill (`StylePill`: shade dot + `styleTitle`, shared with the brief) and the screen light in the top safe area, a dashed
+white oval for the whole face (`FaceOvalGuide`; replaces the per-feature frame, `FeatureFrameOverlay`/`FeatureFrameShape`
+and `TryOnTool.captureRegion`/`captureHint` deleted), the hint pill and a white ring shutter; Retake + dark glass Next
+once taken. `LookBriefView`: light page on `OnboardingGlow`, "Your final look" (black, expanded width), the desired photo
+cropped to the feature (`LookBriefView.crop`, placeholder fractions), "What to prepare", MUST HAVE cards and KEEP NEARBY ·
+FOR MISTAKES rows, dark "Start tutorial". Items come from `TryOnTool.mustHave` / `nearby` (`MakeupKitItem` with `kind` and
+optional `info`; replaces `kit`); an item with `info` shows a dotted pink underline and ⓘ and opens `KitItemSheet`
+(kind, name, picture, text, sparkle tip, "Got it"). Pictures: the design team's product photos in `kit-blush`,
+`kit-fluffy-brush`, `kit-liquid-liner`, `kit-micellar-water`, `kit-spoolie`, `kit-brow-pencil` (the last two replace the
+SVG Repo drawings); a missing picture falls back to the item's SF Symbol. New strings are not yet synced into `Localizable.xcstrings` (no Indonesian). Simulator only (iPhone 17
+Pro): brief and popup seen with a sample photo, capture seen in its no-camera state; the crop and oval need a device check.
 ## Feedback cards scored with the score database — -Nimah (2026-11-09)
 
 The feedback screen now has the design's two cards, Placement and Shade, scored with `makeup-score.database.json` (now in
@@ -156,41 +250,6 @@ paste into an AI for new Indonesian copy). Kit pictures: PNG, transparent backgr
 `kit-brow-…`, eyeliner `kit-liner-…`). The three blush pictures are flat drawn illustrations, unbranded, to be replaced
 by real photos under the same names. `GuidedFlowTests.testEveryItemPictureIsInTheAssets` fails when an `imageName` has
 no asset. Simulator tests only.
-
-## Tutorial, side-done card, steps sheet and feedback restyle — 2026-11-09
-
-Follows the design (tutorial screens, 17 After photo, 18 Your feedback). `GuidedTutorialView` (one-tool flow): black page,
-camera card with 28 pt corners; over it compare (left, glass), `StylePill` and the screen light (right); at its bottom the
-step's instruction (white, shadow) and step dots. Bottom bar: back circle, "Tutorial" (opens the steps sheet), Next /
-Finish (Finish on the last step of each side). Finish on the first side shows `SideDoneCard` over a blurred camera
-("Left cheek/brow/eye done!", "Do my right …" = `advance()`, "Replay left …" = `GuidedTutorialModel.replaySide()`). The
-side done first (`.leading`) is now called "Left", as the design names it. Step copy from the design's list: brows 4
-steps, blush 1, eyeliner 3; `FaceGuideLesson.title` is the short step title (sheet), `instruction` the text over the
-camera; the encouragement lines and the second-side cheer are gone. The guide overlays get `GuidedTutorialModel.guideStep`
-(`browGuideSteps` = brush, dots, fill, front; `blushGuideSteps` = both outlines), so the brow overlay's clean-up step and
-the blush inner-circle-only step are no longer shown. `TutorialStepsSheet`: white, "Tutorial" with close, compact height
-(`TutorialStepsSheet.compact`) shows the current step and "Swipe for more", large shows all with Done / Now / Up next;
-step pictures are grey placeholders. `FeedbackView`: light page, back (home), style name, share; "Nice work!", try-on vs
-result under a drag divider (`CompareSlider`, labelled Try-on / Yours, not the design's Before / After, since there is no
-bare photo), overall ring, Placement and Shade cards (`MakeupFeedback.placement` / `shade`, "—" and "Coming soon" while
-nil, as the placeholder provider returns), retry (back to tutorial) and "Save look" (the share sheet; nothing is saved by
-the app). The result capture uses the same hint as the first. Photo mode (tutorial without the flow) is unchanged. New
-strings not synced into the catalog. Simulator only (no camera there): layout seen, guides on a face need a device check.
-
-## Before photo, "Your final look" brief and item popups — 2026-11-08
-
-Restyled to the design (screens 09, 10, 10a/10b). `FeatureCaptureView` (both stages): full-page camera, back, the style
-pill (`StylePill`: shade dot + `styleTitle`, shared with the brief) and the screen light in the top safe area, a dashed
-white oval for the whole face (`FaceOvalGuide`; replaces the per-feature frame, `FeatureFrameOverlay`/`FeatureFrameShape`
-and `TryOnTool.captureRegion`/`captureHint` deleted), the hint pill and a white ring shutter; Retake + dark glass Next
-once taken. `LookBriefView`: light page on `OnboardingGlow`, "Your final look" (black, expanded width), the desired photo
-cropped to the feature (`LookBriefView.crop`, placeholder fractions), "What to prepare", MUST HAVE cards and KEEP NEARBY ·
-FOR MISTAKES rows, dark "Start tutorial". Items come from `TryOnTool.mustHave` / `nearby` (`MakeupKitItem` with `kind` and
-optional `info`; replaces `kit`); an item with `info` shows a dotted pink underline and ⓘ and opens `KitItemSheet`
-(kind, name, picture, text, sparkle tip, "Got it"). Pictures: the design team's product photos in `kit-blush`,
-`kit-fluffy-brush`, `kit-liquid-liner`, `kit-micellar-water`, `kit-spoolie`, `kit-brow-pencil` (the last two replace the
-SVG Repo drawings); a missing picture falls back to the item's SF Symbol. New strings are not yet synced into `Localizable.xcstrings` (no Indonesian). Simulator only (iPhone 17
-Pro): brief and popup seen with a sample photo, capture seen in its no-camera state; the crop and oval need a device check.
 
 ## Onboarding page art (pages 1-3) — Khalish (2026-11-07)
 

@@ -105,19 +105,14 @@ extension TryOnTool {
         }
     }
 
+    /// What to keep nearby for mistakes: micellar water and what to wipe with.
     var nearby: [MakeupKitItem] {
-        let face: LocalizedStringKey = switch self {
-        case .blush: "no old makeup on"
-        case .eyebrow: "no oil on the brows"
-        case .eyeliner: "no oil all around the eyes"
-        }
         let wipe = switch self {
         case .blush: MakeupKitItem(id: "pads", kind: .forMistakes, symbol: "circle", title: "Cotton pads", detail: "to apply the micellar water")
         case .eyebrow: MakeupKitItem(id: "buds", kind: .forMistakes, symbol: "circle", title: "Cotton buds", detail: "to wipe small edges")
         case .eyeliner: MakeupKitItem(id: "buds", kind: .forMistakes, symbol: "circle", title: "Cotton buds", detail: "pointed ones fix small lines")
         }
         return [
-            MakeupKitItem(id: "face", kind: .forMistakes, symbol: "face.smiling", title: "Clean, dry face", detail: face),
             MakeupKitItem(id: "micellar", kind: .forMistakes, symbol: "drop", title: "Micellar water", detail: "wipes off mistakes",
                           info: .init(imageName: "kit-micellar-water",
                                       text: "A gentle cleansing water. Put a little on a cotton pad or bud and wipe a mistake away.",
@@ -332,17 +327,21 @@ struct StylePill: View {
     }
 
     var body: some View {
-        HStack(spacing: 6) {
-            Circle().fill(dot).frame(width: 9, height: 9)
+        HStack(spacing: 8) {
+            Circle().fill(dot).frame(width: onGlass ? 9 : 16, height: onGlass ? 9 : 16)
                 .overlay(Circle().strokeBorder(.white.opacity(0.6), lineWidth: onGlass ? 1 : 0))
-            Text(verbatim: handoff.styleTitle).lineLimit(1)
+            Text(verbatim: handoff.styleTitle).lineLimit(1).minimumScaleFactor(0.8)
         }
-        .font(.system(size: 13, weight: .semibold))
+        .font(.system(size: 12, weight: .semibold))
         .foregroundStyle(onGlass ? AppColors.snow : AppColors.onboardingInk)
-        .padding(.horizontal, 12)
-        .frame(minHeight: 30)
+        .padding(.leading, onGlass ? 12 : 10)
+        .padding(.trailing, onGlass ? 12 : 14)
+        .frame(minHeight: onGlass ? 30 : nil)
+        // Light pages: the design's 154 x 40 capsule.
+        .frame(width: onGlass ? nil : 154, height: onGlass ? nil : 40)
         .background {
-            if !onGlass { Capsule().fill(AppColors.dandanPink.opacity(0.1)) }
+            // Light pages (brief): the design's soft grey capsule.
+            if !onGlass { Capsule().fill(Color.black.opacity(0.06)) }
         }
         .modifier(PillGlass(on: onGlass))
         .accessibilityElement(children: .combine)

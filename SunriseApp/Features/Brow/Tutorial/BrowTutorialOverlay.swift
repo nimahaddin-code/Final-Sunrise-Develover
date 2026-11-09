@@ -21,8 +21,14 @@ struct BrowTutorialOverlay: View {
             let progress = min(1, local / Self.animation)
             GeometryReader { proxy in
                 let all = feed.snapshot?.brows ?? []
-                // The snapshot lists the screen's left brow first.
-                let picked = side.map { [$0 == .leading ? all.first : all.last].compactMap { $0 } } ?? all
+                // The snapshot lists the screen's left brow first. With only one brow seen (a turned face), it is shown
+                // only when it is on the side asked for, so the guide never lands on the other brow.
+                let picked: [BrowGuideSnapshot.Brow] = switch (side, all.count) {
+                case (nil, _): all
+                case (let side?, 2): [side == .leading ? all[0] : all[1]]
+                case (let side?, 1): ((all[0].upper.first?.x ?? 0.5) < 0.5) == (side == .leading) ? all : []
+                default: []
+                }
                 let brows = picked.compactMap { Shape(brow: $0, size: proxy.size) }
                 ZStack {
                     Canvas { g, _ in
