@@ -196,9 +196,12 @@ struct FeedbackComposer {
         // The score card's line, short as in the design: the two weakest categories' labels, or the first praise.
         let weakest = categories.filter { !$0.items.isEmpty }.sorted { $0.percent < $1.percent }.prefix(2).map(\.label)
         let summary = weakest.isEmpty ? (praise.first?.title ?? "") : weakest.joined(separator: ". ") + "."
+        func part(_ id: FeedbackCategory) -> MakeupFeedback.Part? {
+            categories.first { $0.id == id.rawValue }.map { .init(value: $0.percent, note: $0.label) }
+        }
         return MakeupFeedback(score: score.map { $0 / 100 }, headline: score.map { label(score: $0) } ?? "", comments: [],
                               items: (chosen.isEmpty ? praise : chosen) + notes, categories: categories,
-                              summary: summary, notes: notes)
+                              summary: summary, notes: notes, placement: part(.placement), shade: part(.finish))
     }
 
     static func matches(_ id: String, pattern: String) -> Bool {

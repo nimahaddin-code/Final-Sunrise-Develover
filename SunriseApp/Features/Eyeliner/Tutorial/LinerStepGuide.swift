@@ -9,18 +9,9 @@ enum LinerTutorialStep: Int, CaseIterable {
 
     var caption: LocalizedStringKey {
         switch self {
-        case .markDots: "Start at the inner corner and dot along the guide."
-        case .connect: "Connect the dots into one thin line."
-        case .fill: "Fill it in, close to your lashes."
-        }
-    }
-
-    /// The encouraging line under the caption in the steps sheet.
-    var cheer: LocalizedStringKey {
-        switch self {
-        case .markDots: "Little dots, not a line yet. Breathe, keep your hand steady, you've got this."
-        case .connect: "Short strokes are your best friend. A bit wobbly? Totally normal, just keep going."
-        case .fill: "Almost there! Hug that lash line and watch your eyes pop."
+        case .markDots: "Mark 4 points along the eyeliner guide."
+        case .connect: "Connect the dots to create a thin eyeliner outline."
+        case .fill: "Fill in the eyeliner frame, keeping it close to your lashes."
         }
     }
 
