@@ -13,6 +13,9 @@ struct FeatureCaptureView: View {
     let onNext: () -> Void
     @StateObject private var home: TryOnHomeModel
     @State private var captured: UIImage?
+    /// -Nimah: the face measured at the shutter, for the blush feedback.
+    @State private var scanned: FaceScan?
+    @State private var shooting = false
     @State private var visible = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -41,7 +44,8 @@ struct FeatureCaptureView: View {
                     Spacer()
                 }
             }
-            CaptureCameraCard(home: home, tool: handoff.tool, captured: captured, active: visible && scenePhase == .active)
+            CaptureCameraCard(home: home, tool: handoff.tool, captured: captured, configuration: cameraConfiguration,
+                              active: visible && scenePhase == .active)
                 .frame(maxHeight: .infinity)
             VStack(spacing: 2) {
                 Text(handoff.styleTitle).font(.title3.weight(.semibold))
@@ -51,6 +55,7 @@ struct FeatureCaptureView: View {
                     .foregroundStyle(AppColors.snow.opacity(0.75))
             }
             CaptureControls(camera: home.camera, brow: home.brow, captured: $captured, onShoot: shoot, onNext: next)
+                .disabled(shooting)
         }
         .foregroundStyle(AppColors.snow)
         .padding(.horizontal, AppSpacing.medium)
@@ -60,7 +65,7 @@ struct FeatureCaptureView: View {
         .navigationBarBackButtonHidden()
         .sensoryFeedback(.success, trigger: captured != nil)
         // Retake: back to the live camera.
-        .onChange(of: captured == nil) { _, retake in if retake && visible { activate() } }
+        .onChange(of: captured == nil) { _, retake in if retake { scanned = nil; if visible { activate() } } }
         .onAppear { visible = true; activate() }
         .onDisappear { visible = false; home.deactivate() }
         .onChange(of: scenePhase) { _, phase in
@@ -74,17 +79,51 @@ struct FeatureCaptureView: View {
         if stage == .desired { home.apply(handoff) }
     }
 
-    /// The camera picture as shown. The eyeliner is a SwiftUI overlay, so it is drawn into the picture here.
+    /// -Nimah: blush also measures its target area: on the desired look with the virtual blush, on the result with the
+    /// engine running but no pigment drawn (the photo stays the plain camera).
+    private var cameraConfiguration: EyebrowConfiguration {
+        var configuration = home.liveConfiguration
+        guard handoff.tool == .blush, let style = handoff.blushStyle, style.isReferenceLook else { return configuration }
+        configuration.blushStyle = style
+        configuration.showGuide = true
+        if stage == .result {
+            configuration.layered = false
+            configuration.region = .blush
+            configuration.showMakeupPreview = true
+            configuration.previewAfter = true
+            configuration.pigmentHalf = PigmentHalf.none
+        }
+        return configuration
+    }
+
+    /// The camera picture as shown. The makeup engine's own layer is read back (`ARSCNView.snapshot()` has only the
+    /// camera under it); the eyeliner is a SwiftUI overlay, so it is drawn into the picture here.
     private func shoot() {
-        guard var image = home.camera.view?.snapshot() else { return }
-        if stage == .desired && handoff.tool == .eyeliner { image = home.liner.composed(image) }
-        captured = image
-        // The still replaces the camera until Retake.
-        home.deactivate()
+        guard let view = home.camera.view, !shooting else { return }
+        shooting = true
+        Task { @MainActor in
+            defer { shooting = false }
+            var pixels: ScreenPixels?
+            if stage == .desired, let makeup = view as? BeautyBlushARView, let engine = makeup.beauty, !makeup.beautyLayer.isHidden {
+                pixels = await engine.readScreen()
+            }
+            var image = pixels?.image(scale: view.window?.screen.scale ?? 3) ?? view.snapshot()
+            if stage == .desired && handoff.tool == .eyeliner {
+                image = home.liner.composed(image)
+                // The eyeliner is drawn by SwiftUI, not the engine: its target is read from the composed picture.
+                pixels = ScreenPixels(image: image)
+            }
+            scanned = FaceScan.measure(view: view, outline: handoff.tool == .blush ? home.camera.blushGuide.snapshot : nil,
+                                       rendered: pixels)
+            captured = image
+            // The still replaces the camera until Retake.
+            home.deactivate()
+        }
     }
 
     private func next() {
         store.store(captured, for: stage)
+        store.store(scanned, for: stage)
         home.deactivate()
         onNext()
     }
@@ -133,15 +172,17 @@ private struct CaptureCameraCard: View {
     @ObservedObject var brow: EyebrowViewModel
     let tool: TryOnTool
     let captured: UIImage?
+    let configuration: EyebrowConfiguration
     let active: Bool
     @Environment(\.openURL) private var openURL
 
-    init(home: TryOnHomeModel, tool: TryOnTool, captured: UIImage?, active: Bool) {
+    init(home: TryOnHomeModel, tool: TryOnTool, captured: UIImage?, configuration: EyebrowConfiguration, active: Bool) {
         self.home = home
         camera = home.camera
         brow = home.brow
         self.tool = tool
         self.captured = captured
+        self.configuration = configuration
         self.active = active
     }
 
@@ -179,7 +220,7 @@ private struct CaptureCameraCard: View {
             } else if camera.authorized {
                 ZStack {
                     LiveGuideView(camera: camera, referenceID: "eyebrows", active: home.active && active,
-                                  eyebrowConfiguration: home.liveConfiguration, onFrame: { [relay = home.relay] frame, face in
+                                  eyebrowConfiguration: configuration, onFrame: { [relay = home.relay] frame, face in
                                       relay.deliver(frame, face)
                                   })
                     LinerOverlayView(model: home.liner, isVisible: true)

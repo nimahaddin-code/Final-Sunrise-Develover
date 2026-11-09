@@ -24,7 +24,18 @@ import UIKit
         }
     }
 
-    func reset() { desired = nil; result = nil }
+    /// -Nimah: the face measured at each shutter, for the blush feedback. Numbers only, memory only.
+    var desiredScan: FaceScan?
+    var resultScan: FaceScan?
+
+    func store(_ scan: FaceScan?, for stage: CaptureStage) {
+        switch stage {
+        case .desired: desiredScan = scan
+        case .result: resultScan = scan
+        }
+    }
+
+    func reset() { desired = nil; result = nil; desiredScan = nil; resultScan = nil }
 }
 
 extension TutorialHandoff {
@@ -104,13 +115,29 @@ struct MakeupFeedbackRequest: @unchecked Sendable {
     let styleTitle: String
     let desired: UIImage?
     let result: UIImage?
+    var blushStyle: BlushPlacementStyle? = nil
+    var linerLook: LinerLook? = nil
+    var shade: MakeupShade? = nil
+    var desiredScan: FaceScan? = nil
+    var resultScan: FaceScan? = nil
 }
 
 struct MakeupFeedback: Sendable, Equatable {
+    /// One message: what is off and how to fix it, from `makeup-feedback.database.json`.
+    struct Item: Sendable, Hashable {
+        var title: String
+        var say: String
+        var steps: [String]
+        var band: FeedbackBand
+        /// The database id of the rule, praise or photo check (for tests and calibration).
+        var rule: String = ""
+    }
+
     /// 0...1 when the comparison gives one.
     var score: Double?
     var headline: String
     var comments: [String]
+    var items: [Item] = []
 }
 
 /// Compares the desired-look photo with the result. The real comparison (placement from coordinates) is built
@@ -130,6 +157,37 @@ struct PlaceholderFeedbackProvider: MakeupFeedbackProviding {
         return MakeupFeedback(score: nil,
                               headline: String(localized: "Feedback is coming soon"),
                               comments: [String(localized: "Placement feedback for your \(request.styleTitle) will show here.")])
+    }
+}
+
+/// -Nimah: the measured comparison for every tool (`BlushFeedback`, `BrowFeedback`, `EyelinerFeedback`); the placeholder
+/// only when the database cannot be read.
+struct MeasuredFeedbackProvider: MakeupFeedbackProviding {
+    var fallback: any MakeupFeedbackProviding = PlaceholderFeedbackProvider()
+
+    func feedback(for request: MakeupFeedbackRequest, progress: @escaping @MainActor @Sendable (Double) -> Void) async -> MakeupFeedback {
+        guard let database = FeedbackDatabase.load() else { return await fallback.feedback(for: request, progress: progress) }
+        await progress(0.1)
+        let language = FeedbackLanguage.current
+        let tool = request.tool
+        let blush = BlushFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
+                                       style: request.blushStyle,
+                                       shade: request.shade.map { SIMD3($0.red, $0.green, $0.blue) })
+        let line = LineFeedbackInput(before: request.desiredScan, hadBeforePhoto: request.desired != nil, after: request.resultScan,
+                                     look: request.linerLook?.rawValue)
+        let result = await Task.detached(priority: .userInitiated) { () -> MakeupFeedback in
+            switch tool {
+            case .blush: BlushFeedback.evaluate(blush, database: database, language: language)
+            case .eyebrow: BrowFeedback.evaluate(line, database: database, language: language)
+            case .eyeliner: EyelinerFeedback.evaluate(line, database: database, language: language)
+            }
+        }.value
+        // A short, steady finish so the loading screen does not flash.
+        for step in 2...10 {
+            try? await Task.sleep(for: .milliseconds(60))
+            await progress(Double(step) / 10)
+        }
+        return result
     }
 }
 

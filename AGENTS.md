@@ -1,3 +1,47 @@
+## Brow and eyeliner feedback measured too — -Nimah (2026-11-09)
+
+`MeasuredFeedbackProvider` now measures every tool (`BrowFeedback`, `EyelinerFeedback` beside `BlushFeedback`; the
+placeholder only if the database cannot be read). Every shutter measures the face for every tool; the eyeliner, drawn by
+SwiftUI, is read from the composed desired-look picture (`ScreenPixels(image:)`), brows from the engine read-back.
+Target = the desired-look photo itself: brow samples at least 12 L* darker than the skin there, liner samples at least 15
+L* darker than the bare face (lashes cancel); result = the same in the result photo (`detection.makeup_mask`).
+`Engine/Feedback/LineProfile` puts both in a frame along the target line (`LineFrame`, principal axis, inner end first)
+and reads the outline per column (`LineProfile`: ends, head/tail heights, arch, rise and fall angles, thickness, darkness);
+`FeedbackRecorder` bands values with the database thresholds (IPD-scaled where marked) and builds the messages and score.
+Brow: none, head close/far/high/low, tail short/long/high/low, arch inner/outer/high/flat, rise and tail angles, thickness
+per third, coverage, darkness (where the brow landed in the target), spill above/below/between the brows (product only:
+natural hairs do not count), symmetry, praise. Calibration choice not in the database: when head and tail are both off the
+same way, that side's gap, spill and "too light" are not told (the shift is). Eyeliner: none, start early/late, coverage
+and thickness per third, too light, smudge above/below, wing angle/length/tip (not for Natural), symmetry, praise.
+Not measured: brow head softness, outline, colour; liner lash gap, wobble, blunt or detached wing, Arabian lower line.
+Photo checks are shared (`FeedbackPhotoCheck`, per tool: smiling and mouth open for blush, eyes closed for eyeliner,
+raised brows for brows); light matching shared (`FeedbackSkin`). Mesh sampling is now 10 points per triangle. Messages
+carry their rule id (`MakeupFeedback.Item.rule`). `LineFeedbackTests` (synthetic faces). Not checked on a device.
+
+## Blush feedback v2: measured on the face mesh — -Nimah (2026-11-09)
+
+The E2E feedback screen now measures blush instead of the placeholder text (`AppContainer.feedback` =
+`MeasuredFeedbackProvider`; brow and eyeliner: see the section above). At each shutter
+`FeatureCaptureView` measures the face (`Engine/Feedback/FaceScan`): six fixed points per ARKit mesh triangle, each with its
+face-local position (mm), its bare camera colour (decoded like the shader, Lab), on the desired-look photo also the colour
+shown with the virtual blush, its screen point, plus pose, blend shapes and IPD. Stored in `MakeupFlowStore`
+(`desiredScan`/`resultScan`, memory only, numbers only). For blush the capture camera publishes the target outlines
+(`showGuide`; on the result photo the engine runs with `pigmentHalf = .none`, so the photo stays the plain camera).
+`Features/Blush/Feedback/BlushFeedback` compares the two scans sample by sample (same mesh point = same skin, whatever the
+pose): light matched on forehead and chin, blush = chroma rise with the shade's hue (`detection.makeup_mask.blush`), then per
+cheek against the target (outer line = target area, inner circle = core, outer / 0.82 = limit): none, offset up/down/in/out
+(mm, IPD-scaled), size, coverage, strength (vs the virtual blush on the same spots), spill (eye, nose, mouth, ear, jaw),
+patchiness, hue; symmetry height, strength and size; praise. Photo checks: no face, turned, tilted, rolled, smiling, mouth
+open, too dark, pose and light mismatch, no Try On photo. Bands, texts (id/en, app language), merging, suppression, top 3
+and score come from `makeup-feedback.database.json` (now in the app target) through `Engine/Feedback/FeedbackRules`.
+Not measured yet: angle, edge softness, Lifted temple reach, Sunkissed nose band, blob cleanup. The desired-look photo now
+shows the virtual makeup: `BeautyBlushEngine.readScreen()` copies the next presented drawable (`framebufferOnly` is off),
+on both the blush and brow paths; `ARSCNView.snapshot()` had only the camera under the Metal layer. `FeedbackView` lists the
+messages as cards in a scroll view. Shared files changed: `BeautyBlushEngine`, `BrowEngine+Draw` (one line), `MakeupFlow`,
+`FeatureCaptureView`, `FeedbackView`, `AppContainer`, `project.pbxproj`. `BlushFeedbackTests` (synthetic faces). Thresholds
+are the database's draft values; nothing is checked on a device yet (target outline on the result photo, colour detection
+in real light, read-back on device).
+
 ## Indonesian rewritten in the brand voice — -Nimah (2026-11-09)
 
 Every string the app shows now has Indonesian in the voice of `Docs/GayaBahasa.md` (a big sister who is good at makeup,

@@ -28,7 +28,10 @@ struct FeedbackView: View {
         .task {
             guard feedback == nil else { return }
             let request = MakeupFeedbackRequest(tool: handoff.tool, styleTitle: handoff.styleTitle,
-                                                desired: store.desired, result: store.result)
+                                                desired: store.desired, result: store.result,
+                                                blushStyle: handoff.blushStyle, linerLook: handoff.linerLook,
+                                                shade: handoff.shades[handoff.tool],
+                                                desiredScan: store.desiredScan, resultScan: store.resultScan)
             feedback = await provider.feedback(for: request) { value in progress = value }
         }
     }
@@ -69,27 +72,33 @@ struct FeedbackView: View {
 
     private func result(_ feedback: MakeupFeedback) -> some View {
         VStack(spacing: AppSpacing.medium) {
-            Spacer()
-            HStack(spacing: AppSpacing.small) {
-                photo(store.desired, label: "Desired")
-                photo(store.result, label: "Yours")
+            ScrollView {
+                VStack(spacing: AppSpacing.medium) {
+                    HStack(spacing: AppSpacing.small) {
+                        photo(store.desired, label: "Desired")
+                        photo(store.result, label: "Yours")
+                    }
+                    .frame(height: 220)
+                    if let score = feedback.score {
+                        Text(score, format: .percent.precision(.fractionLength(0)))
+                            .font(.system(size: 44, weight: .bold).monospacedDigit())
+                    }
+                    if !feedback.headline.isEmpty {
+                        Text(feedback.headline)
+                            .font(.title2.weight(.semibold))
+                            .multilineTextAlignment(.center)
+                            .accessibilityAddTraits(.isHeader)
+                    }
+                    ForEach(feedback.comments, id: \.self) { comment in
+                        Text(comment)
+                            .font(.body)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(AppColors.snow.opacity(0.85))
+                    }
+                    ForEach(feedback.items, id: \.self) { item in FeedbackItemCard(item: item) }
+                }
+                .padding(.top, AppSpacing.medium)
             }
-            .frame(height: 220)
-            if let score = feedback.score {
-                Text(score, format: .percent.precision(.fractionLength(0)))
-                    .font(.system(size: 44, weight: .bold).monospacedDigit())
-            }
-            Text(feedback.headline)
-                .font(.title2.weight(.semibold))
-                .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.isHeader)
-            ForEach(feedback.comments, id: \.self) { comment in
-                Text(comment)
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(AppColors.snow.opacity(0.85))
-            }
-            Spacer()
             HStack(spacing: AppSpacing.medium) {
                 Button(action: onBackToTutorial) {
                     Text("Back to tutorial")
@@ -115,5 +124,38 @@ struct FeedbackView: View {
             Text(label).font(.footnote.weight(.semibold))
         }
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// -Nimah: one feedback message: what is off, how to fix it, and the steps when it is easier to redo.
+private struct FeedbackItemCard: View {
+    let item: MakeupFeedback.Item
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.title3)
+                .foregroundStyle(item.band == .ok ? Color.green : AppColors.flamingo)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 6) {
+                Text(item.title).font(.headline)
+                Text(item.say).font(.subheadline).foregroundStyle(AppColors.snow.opacity(0.85))
+                ForEach(Array(item.steps.enumerated()), id: \.offset) { index, step in
+                    Text(verbatim: "\(index + 1). \(step)").font(.footnote).foregroundStyle(AppColors.snow.opacity(0.75))
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(14)
+        .background(AppColors.snow.opacity(0.1), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var symbol: String {
+        switch item.band {
+        case .ok: "checkmark.circle.fill"
+        case .slight: "lightbulb.fill"
+        case .clear, .large: "exclamationmark.circle.fill"
+        }
     }
 }
