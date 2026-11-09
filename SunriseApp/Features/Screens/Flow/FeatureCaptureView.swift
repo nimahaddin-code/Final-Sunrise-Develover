@@ -104,7 +104,9 @@ struct FeatureCaptureView: View {
         Task { @MainActor in
             defer { shooting = false }
             var pixels: ScreenPixels?
-            if stage == .desired, let makeup = view as? BeautyBlushARView, let engine = makeup.beauty, !makeup.beautyLayer.isHidden {
+            // The picture on screen is the engine's layer when it is on: on the desired look it has the virtual makeup, on the
+            // result it is the plain camera (the SceneKit view under it can carry guide shapes, so it is not used).
+            if let makeup = view as? BeautyBlushARView, let engine = makeup.beauty, !makeup.beautyLayer.isHidden {
                 pixels = await engine.readScreen()
             }
             var image = pixels?.image(scale: view.window?.screen.scale ?? 3) ?? view.snapshot()
