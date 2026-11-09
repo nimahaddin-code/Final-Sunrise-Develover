@@ -77,6 +77,9 @@ struct EyebrowConfiguration: Equatable, Sendable {
     var needsBrow: Bool { layered ? browLayer.on : (region == .eyebrows || showAllRegions) }
     var needsBlush: Bool { layered ? blushLayer.on : region == .blush }
     var showMakeupPreview = false
+    /// -Nimah: the engine publishes the blush target outlines (`blushGuide`) without anything drawn for them, unlike
+    /// `showGuide`, which also makes the SceneKit view draw guide shapes (they showed up in the feedback's result photo).
+    var measuresBlushTarget = false
     var debugMesh = false
     /// While on, the eyebrow tool shows MediaPipe's tracking (every landmark, the brow points and contours, the fitted
     /// centerline and brow frame) instead of a brow shape, and the shape picker is hidden. The shapes stay in the app.

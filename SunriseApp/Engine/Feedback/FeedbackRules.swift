@@ -105,7 +105,46 @@ struct FeedbackHit: Sendable {
 }
 
 /// One evaluated metric, for the score (also the ones that were ok).
-struct FeedbackScoreEntry: Sendable { var band: FeedbackBand; var weight: Double }
+struct FeedbackScoreEntry: Sendable { var band: FeedbackBand; var weight: Double; var priority: Int }
+
+/// The feedback screen's cards: the database's `selection.priority_groups`, by the rule's priority.
+enum FeedbackCategory: String, CaseIterable, Sendable {
+    case placement, shape, amount, edges, finish, balance
+
+    init(priority: Int) {
+        switch priority {
+        case ..<20: self = .amount   // nothing applied
+        case 20..<30: self = .placement
+        case 30..<40: self = .shape
+        case 40..<50: self = .amount
+        case 50..<60: self = .edges
+        case 60..<70: self = .finish
+        default: self = .balance
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .placement: String(localized: "Placement")
+        case .shape: String(localized: "Shape")
+        case .amount: String(localized: "Amount")
+        case .edges: String(localized: "Clean edges")
+        case .finish: String(localized: "Finish")
+        case .balance: String(localized: "Balance")
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .placement: "viewfinder"
+        case .shape: "scribble.variable"
+        case .amount: "drop.fill"
+        case .edges: "sparkles"
+        case .finish: "paintpalette.fill"
+        case .balance: "arrow.left.and.right"
+        }
+    }
+}
 
 struct FeedbackComposer {
     let database: FeedbackDatabase
@@ -116,7 +155,7 @@ struct FeedbackComposer {
     func partName(_ side: FeedbackSide) -> String { database.words(language)[keyPath: part][side.rawValue] ?? "" }
 
     /// Steps 3-6 of `selection.order`: merge left and right, drop suppressed hits, sort, keep the first few.
-    func select(_ hits: [FeedbackHit]) -> [FeedbackHit] {
+    func select(_ hits: [FeedbackHit], limit: Int? = nil) -> [FeedbackHit] {
         var merged: [FeedbackHit] = []
         for hit in hits where hit.band != .ok {
             if let i = merged.firstIndex(where: { $0.rule == hit.rule && $0.band == hit.band && $0.side != hit.side && $0.side != .both }) {
@@ -136,7 +175,30 @@ struct FeedbackComposer {
         let sorted = kept.sorted {
             ($0.band, -$0.priority, $0.size) > ($1.band, -$1.priority, $1.size)
         }
-        return Array(sorted.prefix(database.selection.max_messages_per_tool))
+        return Array(sorted.prefix(limit ?? database.selection.max_messages_per_tool))
+    }
+
+    /// The whole feedback: the top messages (or praise), the score and its label, and one card per measured category with
+    /// its own percentage, short label and every message of that category.
+    func assemble(hits: [FeedbackHit], entries: [FeedbackScoreEntry], praise: [MakeupFeedback.Item],
+                  notes: [MakeupFeedback.Item]) -> MakeupFeedback {
+        let chosen = select(hits).compactMap { message(for: $0) }
+        let score = score(entries)
+        let all = select(hits, limit: .max)
+        let categories = FeedbackCategory.allCases.compactMap { category -> MakeupFeedback.Category? in
+            let own = entries.filter { FeedbackCategory(priority: $0.priority) == category }
+            guard let percent = self.score(own) else { return nil }
+            let messages = all.filter { FeedbackCategory(priority: $0.priority) == category }.compactMap { message(for: $0) }
+            return MakeupFeedback.Category(id: category.rawValue, title: category.title, symbol: category.symbol,
+                                           percent: percent / 100, label: messages.first?.title ?? String(localized: "Spot on"),
+                                           items: messages)
+        }
+        // The score card's line, short as in the design: the two weakest categories' labels, or the first praise.
+        let weakest = categories.filter { !$0.items.isEmpty }.sorted { $0.percent < $1.percent }.prefix(2).map(\.label)
+        let summary = weakest.isEmpty ? (praise.first?.title ?? "") : weakest.joined(separator: ". ") + "."
+        return MakeupFeedback(score: score.map { $0 / 100 }, headline: score.map { label(score: $0) } ?? "", comments: [],
+                              items: (chosen.isEmpty ? praise : chosen) + notes, categories: categories,
+                              summary: summary, notes: notes)
     }
 
     static func matches(_ id: String, pattern: String) -> Bool {

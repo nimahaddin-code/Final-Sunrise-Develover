@@ -19,6 +19,9 @@ struct BlushFeedbackInput: Sendable {
 enum BlushFeedback {
     /// Ratio of the tutorial's outer line to the full pigment field (`target_geometry.blush`).
     static let outerScale: CGFloat = 0.82
+    /// Blush = chroma rise and colour difference at least this large. Database: 4 and 3; raised after the first device
+    /// test (2026-11-09), where a bare cheek read as blush once the head was tilted and the light fell differently.
+    static let minimumChromaRise: Float = 6, minimumDifference: Float = 5
 
     static func evaluate(_ input: BlushFeedbackInput, database: FeedbackDatabase, language: FeedbackLanguage) -> MakeupFeedback {
         let composer = FeedbackComposer(database: database, language: language)
@@ -61,14 +64,14 @@ enum BlushFeedback {
         func add(_ id: String, value: Double, side: FeedbackSide, size: Double, values: [String: String], scaled: Bool = false) {
             guard let rule = database.rule(id), applies(rule), let t = rule.thresholds else { return }
             let band = FeedbackBand.of(value, kind: rule.kind, t, scale: scaled && rule.scale == "ipd" ? scale : 1)
-            entries.append(FeedbackScoreEntry(band: band, weight: rule.weight))
+            entries.append(FeedbackScoreEntry(band: band, weight: rule.weight, priority: rule.priority))
             hits.append(FeedbackHit(rule: id, band: band, side: side, priority: rule.priority, values: values, size: size,
                                     suppresses: rule.suppresses ?? []))
         }
         let zoneWords = database.words(language).blush_zone
         for c in cheeks {
             if c.coverage < 10, let rule = database.rule("blush.none") {
-                entries.append(FeedbackScoreEntry(band: .large, weight: rule.weight))
+                entries.append(FeedbackScoreEntry(band: .large, weight: rule.weight, priority: rule.priority))
                 hits.append(FeedbackHit(rule: rule.id, band: .large, side: c.side, priority: rule.priority, values: [:],
                                         size: 100 - c.coverage, suppresses: rule.suppresses ?? []))
                 continue
@@ -125,9 +128,8 @@ enum BlushFeedback {
         }
 
         // 5. What to show: the worst few, or praise when everything is within tolerance.
-        let chosen = composer.select(hits)
-        var items = chosen.compactMap { composer.message(for: $0) }
-        if items.isEmpty {
+        var items: [MakeupFeedback.Item] = []
+        do {
             let praise = database.tools.blush.praise
             let placementOK = !hits.contains { ($0.rule.hasPrefix("blush.offset") || $0.rule.hasPrefix("blush.size")) && $0.band != .ok }
             let worst = measured.map { max(abs($0.vertical), abs($0.lateral)) }.max() ?? 0
@@ -143,9 +145,7 @@ enum BlushFeedback {
                 items.append(.init(title: text.title, say: text.say, steps: [], band: .ok, rule: p.id))
             }
         }
-        let score = composer.score(entries)
-        return MakeupFeedback(score: score.map { $0 / 100 }, headline: score.map { composer.label(score: $0) } ?? "",
-                              comments: [], items: items + check.notes)
+        return composer.assemble(hits: hits, entries: entries, praise: items, notes: check.notes)
     }
 
     // MARK: Measuring one cheek
@@ -189,15 +189,24 @@ enum BlushFeedback {
         let zone = both.filter {
             Double(before.samples[$0].position.x) * sign > 0 && simd_length(local($0)) <= 2.5 * radius
         }
+        // This cheek's own light: the skin around the field (outside the limit) should not change between the photos, so
+        // its median change is taken out. Forehead and chin alone missed light that fell differently on one cheek.
+        var cheekShift = shift
+        let ring = zone.filter { !inside.contains($0) }
+        if ring.count >= 15 {
+            func median(_ values: [Float]) -> Float { let s = values.sorted(); return s[s.count / 2] }
+            let d = ring.map { before.samples[$0].lab - (after.samples[$0].lab + shift) }
+            cheekShift = shift + Lab(median(d.map(\.x)), median(d.map(\.y)), median(d.map(\.z)))
+        }
         // The blush: a clear rise in chroma, in the shade's direction (`detection.makeup_mask.blush`).
         var change: [Int: Float] = [:], blush = Set<Int>(), hueVector: [Int: SIMD2<Float>] = [:]
         for i in zone {
-            let b = before.samples[i].lab, a = after.samples[i].lab + shift
+            let b = before.samples[i].lab, a = after.samples[i].lab + cheekShift
             let dc = FeedbackColor.chroma(a) - FeedbackColor.chroma(b)
             let dab = SIMD2(a.y - b.y, a.z - b.z)
             change[i] = dc; hueVector[i] = dab
             let hueOK = shadeHue.map { abs(FeedbackColor.hueDifference(FeedbackColor.hue(a: dab.x, b: dab.y), $0)) <= 60 } ?? true
-            if dc >= 4 && FeedbackColor.deltaE2000(b, a) >= 3 && hueOK { blush.insert(i) }
+            if dc >= minimumChromaRise && FeedbackColor.deltaE2000(b, a) >= minimumDifference && hueOK { blush.insert(i) }
         }
         func areaOf<S: Sequence>(_ s: S) -> Double where S.Element == Int { s.reduce(0) { $0 + Double(before.samples[$1].area) } }
         let coverage = areaOf(area.filter(blush.contains)) / targetArea * 100

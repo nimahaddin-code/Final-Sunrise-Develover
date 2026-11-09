@@ -16,6 +16,8 @@ struct FeatureCaptureView: View {
     /// -Nimah: the face measured at the shutter, for the blush feedback.
     @State private var scanned: FaceScan?
     @State private var shooting = false
+    @State private var diagnostics: CaptureDiagnostics?
+    @State private var bareImage: UIImage?
     @State private var visible = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -65,7 +67,9 @@ struct FeatureCaptureView: View {
         .navigationBarBackButtonHidden()
         .sensoryFeedback(.success, trigger: captured != nil)
         // Retake: back to the live camera.
-        .onChange(of: captured == nil) { _, retake in if retake { scanned = nil; if visible { activate() } } }
+        .onChange(of: captured == nil) { _, retake in
+            if retake { scanned = nil; diagnostics = nil; bareImage = nil; if visible { activate() } }
+        }
         .onAppear { visible = true; activate() }
         .onDisappear { visible = false; home.deactivate() }
         .onChange(of: scenePhase) { _, phase in
@@ -85,7 +89,7 @@ struct FeatureCaptureView: View {
         var configuration = home.liveConfiguration
         guard handoff.tool == .blush, let style = handoff.blushStyle, style.isReferenceLook else { return configuration }
         configuration.blushStyle = style
-        configuration.showGuide = true
+        configuration.measuresBlushTarget = true
         if stage == .result {
             configuration.layered = false
             configuration.region = .blush
@@ -104,19 +108,35 @@ struct FeatureCaptureView: View {
         Task { @MainActor in
             defer { shooting = false }
             var pixels: ScreenPixels?
-            // The picture on screen is the engine's layer when it is on: on the desired look it has the virtual makeup, on the
-            // result it is the plain camera (the SceneKit view under it can carry guide shapes, so it is not used).
-            if let makeup = view as? BeautyBlushARView, let engine = makeup.beauty, !makeup.beautyLayer.isHidden {
+            var report = CaptureDiagnostics()
+            // The bare camera of this moment (SceneKit draws nothing for the capture): the feedback's "Before".
+            let bare = view.snapshot()
+            // The picture on screen is the engine's layer when it is on: on the desired look it has the virtual makeup.
+            let makeup = view as? BeautyBlushARView
+            report.engine = makeup?.beauty != nil
+            report.layerShown = makeup.map { !$0.beautyLayer.isHidden } ?? false
+            report.engineOn = makeup?.beauty?.isDrawing ?? false
+            report.framesBefore = makeup?.beauty?.presentedFrames ?? 0
+            if let makeup, let engine = makeup.beauty, report.layerShown {
+                let started = Date()
                 pixels = await engine.readScreen()
+                if pixels == nil { report.readTries += 1; pixels = await engine.readScreen() }
+                report.readTries += 1
+                report.readMilliseconds = Int(Date().timeIntervalSince(started) * 1000)
+                report.read = pixels != nil ? .read : .timedOut
             }
-            var image = pixels?.image(scale: view.window?.screen.scale ?? 3) ?? view.snapshot()
+            var image = pixels?.image(scale: view.window?.screen.scale ?? 3) ?? bare
             if stage == .desired && handoff.tool == .eyeliner {
                 image = home.liner.composed(image)
                 // The eyeliner is drawn by SwiftUI, not the engine: its target is read from the composed picture.
                 pixels = ScreenPixels(image: image)
             }
-            scanned = FaceScan.measure(view: view, outline: handoff.tool == .blush ? home.camera.blushGuide.snapshot : nil,
-                                       rendered: pixels)
+            let outline = handoff.tool == .blush ? home.camera.blushGuide.snapshot : nil
+            scanned = FaceScan.measure(view: view, outline: outline, rendered: pixels)
+            report.outline = outline != nil
+            report.face = scanned != nil
+            diagnostics = report
+            if stage == .desired { bareImage = bare }
             captured = image
             // The still replaces the camera until Retake.
             home.deactivate()
@@ -126,6 +146,8 @@ struct FeatureCaptureView: View {
     private func next() {
         store.store(captured, for: stage)
         store.store(scanned, for: stage)
+        store.diagnostics[stage] = diagnostics
+        if stage == .desired { store.bare = bareImage }
         home.deactivate()
         onNext()
     }
