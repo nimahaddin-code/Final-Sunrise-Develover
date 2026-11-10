@@ -230,16 +230,22 @@ private struct KitItemSheet: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
+                // Same dark button as "Start tutorial".
                 Button { dismiss() } label: {
-                    Text("Got it").frame(maxWidth: .infinity)
+                    Text("Got it")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 52)
+                        .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
+                        .shadow(color: .black.opacity(0.22), radius: 16, y: 8)
                 }
-                .buttonStyle(.glass)
-                .controlSize(.large)
+                .buttonStyle(.plain)
                 .padding(.horizontal)
                 .padding(.bottom, 8)
             }
         }
-        // Close and "Got it" in the design's ink, not the app's pink accent.
+        // Close in the design's ink, not the app's pink accent.
         .tint(AppColors.onboardingInk)
         .presentationDetents([.height(520)])
         .presentationDragIndicator(.visible)
