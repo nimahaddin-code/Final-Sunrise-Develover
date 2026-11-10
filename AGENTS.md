@@ -1,3 +1,9 @@
+## Feedback Before = the try-on photo — -Nimah (2026-11-10)
+
+Device test: the slider's Before showed the bare face. Before is now the try-on photo taken at the desired-look shutter
+(`MakeupFlowStore.desired`, the virtual makeup on); After (the result) is lined up with it (`PhotoAlignment`, eyes from
+`desiredScan`). The bare camera (`bare`) stays only as the fallback when there is no try-on photo. Not checked on a device.
+
 ## Merge: Hanum's latest E2E-Flow into staging — -Nimah (2026-11-10)
 
 E2E-Flow (design sizes for brief, item sheet and feedback; Done at the bottom; two `FeedbackCategory` cases; eyeliner photo
