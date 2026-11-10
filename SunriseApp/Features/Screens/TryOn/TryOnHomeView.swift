@@ -270,7 +270,7 @@ private struct IntensityBar: View {
     let tint: Color
     @State private var isDragging = false
 
-    private let trackHeight: CGFloat = 20 // design: a full-width fade from soft mauve through the shade to near-black
+    private let trackHeight: CGFloat = 20 // a full-width fade from the shade, faint, to the shade at full strength
     private let thumbSize: CGFloat = 28
 
     var body: some View {
@@ -280,7 +280,8 @@ private struct IntensityBar: View {
             ZStack(alignment: .leading) {
                 // One glass capsule over the fade: no outline, no inner stroke.
                 Capsule()
-                    .fill(LinearGradient(colors: [AppColors.glassLight.opacity(0.5), tint, Color.black.opacity(0.9)],
+                    // Faint to full shade: the right end is the picked colour at full strength (was near-black for every shade).
+                    .fill(LinearGradient(colors: [tint.opacity(0.15), tint],
                                          startPoint: .leading, endPoint: .trailing))
                     .frame(height: trackHeight)
                     .glassCapsule(tint: tint.opacity(0.12), interactive: false)
