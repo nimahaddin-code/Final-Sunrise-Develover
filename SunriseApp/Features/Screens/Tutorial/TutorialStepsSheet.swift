@@ -1,12 +1,14 @@
 import SwiftUI
 
 /// The tutorial's steps sheet ("Tutorial"): at its compact height only the current step with "Swipe for more"; dragged up,
-/// every step with its picture and a Done / Now / Up next badge. Each step's picture is a placeholder until the design
-/// team delivers the animations.
+/// every step with its picture and a Done / Now / Up next badge. Pictures are the design team's stills
+/// (`TutorialStepsSheet.imageName(tab:step:)`).
 struct TutorialStepsSheet: View {
     struct Step {
         let title: Text
         let detail: Text?
+        /// The step's picture (`tutorial-<tool>-<n>` image sets); a grey placeholder when nil.
+        var imageName: String? = nil
     }
 
     /// The sheet's first height: the current step's card.
@@ -98,7 +100,26 @@ struct TutorialStepsSheet: View {
                 detail.font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            picture(step)
+                .padding(.top, 6)
+                .accessibilityHidden(true)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(index == current ? .isSelected : [])
+    }
+
+    /// The step's still at its own 3 : 2 shape, full width; the grey box when there is none.
+    @ViewBuilder private func picture(_ step: Step) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
+        if let name = step.imageName, UIImage(named: name) != nil {
+            Image(name)
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity)
+                .aspectRatio(339 / 226, contentMode: .fit)
+                .clipShape(shape)
+        } else {
+            shape
                 .fill(Color(red: 0xF2 / 255, green: 0xEE / 255, blue: 0xF0 / 255))
                 .frame(height: 170)
                 .overlay {
@@ -106,11 +127,17 @@ struct TutorialStepsSheet: View {
                         .font(.system(size: 28, weight: .light))
                         .foregroundStyle(.black.opacity(0.2))
                 }
-                .padding(.top, 6)
-                .accessibilityHidden(true)
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityAddTraits(index == current ? .isSelected : [])
+    }
+
+    /// The picture of step `step` (0-based) of a tool's tutorial, in `GuidedTutorialModel`'s lesson order.
+    static func imageName(tab: TutorialTab, step: Int) -> String? {
+        let (prefix, count) = switch tab {
+        case .brows: ("tutorial-brow", 4)
+        case .eyeliner: ("tutorial-liner", 3)
+        case .blush: ("tutorial-blush", 1)
+        }
+        return (0..<count).contains(step) ? "\(prefix)-\(step + 1)" : nil
     }
 
     @ViewBuilder private func badge(_ index: Int) -> some View {

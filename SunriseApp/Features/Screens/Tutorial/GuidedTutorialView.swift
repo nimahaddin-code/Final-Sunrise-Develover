@@ -481,7 +481,10 @@ private struct TutorialScreen: View {
 
     /// The steps sheet's rows: each step's title and its instruction.
     private var stepTexts: [TutorialStepsSheet.Step] {
-        lessons.map { TutorialStepsSheet.Step(title: Text($0.title), detail: $0.instruction.isEmpty ? nil : Text($0.instruction)) }
+        lessons.enumerated().map { index, lesson in
+            TutorialStepsSheet.Step(title: Text(lesson.title), detail: lesson.instruction.isEmpty ? nil : Text(lesson.instruction),
+                                    imageName: model.hasGuide ? TutorialStepsSheet.imageName(tab: model.tab, step: index) : nil)
+        }
     }
 
     /// Past the last step once the side is finished, so every step reads "Done".
