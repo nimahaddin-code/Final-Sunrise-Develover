@@ -133,6 +133,13 @@ struct FeedbackRecorder {
     var entries: [FeedbackScoreEntry] = []
     /// Raw differences for the Placement and Shade percentages (`makeup-score.database.json`).
     var inputs = ScoreInputs()
+    /// Where to show the fixes on the result photo, one per measured side.
+    var marks: [MakeupFeedback.Mark] = []
+
+    /// Records one side's mark: the target samples, and the makeup samples found in the result photo.
+    mutating func mark(_ side: FeedbackSide, target: Set<Int>, product: Set<Int>, after: FaceScan) {
+        marks.append(after.mark(side, target: target, product: product))
+    }
 
     func applies(_ rule: FeedbackDatabase.Rule) -> Bool {
         if let looks = rule.looks, !looks.contains(look ?? "") { return false }
@@ -169,6 +176,7 @@ struct FeedbackRecorder {
 
     /// Final step: the chosen messages (or praise), and the score.
     func feedback(_ composer: FeedbackComposer, tool: String, praise: [MakeupFeedback.Item], notes: [MakeupFeedback.Item]) -> MakeupFeedback {
-        composer.assemble(hits: hits, entries: entries, praise: praise, notes: notes, tool: tool, inputs: inputs, ipdScale: scale, look: look)
+        composer.assemble(hits: hits, entries: entries, praise: praise, notes: notes, tool: tool, inputs: inputs, ipdScale: scale, look: look,
+                          marks: marks)
     }
 }

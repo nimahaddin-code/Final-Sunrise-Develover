@@ -1,3 +1,18 @@
+## Feedback: fix first, marked on the photo, no millimetres — -Nimah (2026-11-10)
+
+Device feedback: "Far too low" and "3 mm" did not help a beginner. Under the score ring the feedback screen now shows
+`FeedbackFixes`: the worst fix in its own card ("Fix this first") with a crop of the result photo (`FixCrop`): the
+target as faint pink dots, its bare spots as pink rings ("Add here") and makeup outside it filled ("Wipe off"); then the
+next fixes numbered, then "What went well" (the database's praise; "left and right match" is dropped when a fix is for one
+side). Each tool records a `MakeupFeedback.Mark` per side (`FaceScan.mark`: target samples and makeup samples on the
+result photo, 0...1; blush counts "outside" past the full field), and every message carries its side
+(`MakeupFeedback.Item.side`); `MakeupFeedback.fixes` / `mark(for:)` pick them. All 488 numbered sentences of
+`makeup-feedback.database.json` (en/id) were rewritten without mm, degrees, percent or "x": guide words instead (blush
+"the dotted area" / "area garis putus-putus", brow "the guide", eyeliner "the guide line", strength "than your try-on"),
+"a little" in the slight band; the numbers stay in the code for the score and the developer read-out. The category sheet
+no longer shows the score database's description (it named millimetres). Test `testNoMessageShowsMeasurements` keeps
+numbers out; the crop was seen rendered from a synthetic face only. Not checked on a device.
+
 ## Feedback Before = the try-on photo — -Nimah (2026-11-10)
 
 Device test: the slider's Before showed the bare face. Before is now the try-on photo taken at the desired-look shutter

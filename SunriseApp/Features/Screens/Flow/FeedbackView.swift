@@ -96,6 +96,7 @@ struct FeedbackView: View {
                         .aspectRatio(362 / 236, contentMode: .fit)
                     if let score = feedback.score {
                         scoreCard(score: score, feedback: feedback)
+                        FeedbackFixes(feedback: feedback, photo: store.result)
                     } else {
                         ForEach(feedback.items, id: \.self) { FeedbackMessageRow(item: $0).feedbackCard() }
                     }
@@ -298,6 +299,146 @@ private struct BeforeAfterSlider: View {
     }
 }
 
+/// -Nimah: the first fix in its own card with the marked photo crop, the next ones numbered under it, then what went
+/// well. Plain words, no millimetres: the crop shows where.
+struct FeedbackFixes: View {
+    let feedback: MakeupFeedback
+    /// The result photo the marks are placed on.
+    let photo: UIImage?
+
+    var body: some View {
+        let fixes = feedback.fixes
+        VStack(alignment: .leading, spacing: 14) {
+            if let first = fixes.first {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Fix this first")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(AppColors.dandanPink)
+                        .padding(.horizontal, 10).padding(.vertical, 4)
+                        .background(AppColors.dandanPink.opacity(0.12), in: Capsule())
+                    if let photo, let mark = feedback.mark(for: first), !mark.target.isEmpty {
+                        FixCrop(photo: photo, mark: mark)
+                    }
+                    Text(first.title).font(.system(size: 17, weight: .semibold))
+                    Text(first.say).font(.system(size: 14)).foregroundStyle(AppColors.onboardingBody)
+                    ForEach(Array(first.steps.enumerated()), id: \.offset) { index, step in
+                        Text(verbatim: "\(index + 1). \(step)").font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .feedbackCard()
+                .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(AppColors.dandanPink.opacity(0.5), lineWidth: 1))
+                .accessibilityElement(children: .combine)
+            }
+            if fixes.count > 1 {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Next").font(.system(size: 13, weight: .semibold)).foregroundStyle(AppColors.onboardingBody)
+                    ForEach(Array(fixes.dropFirst().enumerated()), id: \.offset) { index, item in
+                        HStack(alignment: .top, spacing: 10) {
+                            Text(verbatim: "\(index + 2)")
+                                .font(.system(size: 11, weight: .bold)).foregroundStyle(.white)
+                                .frame(width: 20, height: 20)
+                                .background(AppColors.dandanPink, in: Circle())
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.title).font(.system(size: 15, weight: .semibold))
+                                Text(item.say).font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
+                            }
+                        }
+                        .accessibilityElement(children: .combine)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .feedbackCard()
+            }
+            if !feedback.praise.isEmpty {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("What went well").font(.system(size: 13, weight: .semibold)).foregroundStyle(AppColors.onboardingBody)
+                    ForEach(feedback.praise, id: \.self) { item in
+                        HStack(spacing: 8) {
+                            Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                            Text(item.title).foregroundStyle(AppColors.onboardingInk)
+                        }
+                        .font(.system(size: 14))
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .feedbackCard()
+            }
+        }
+    }
+}
+
+/// -Nimah: the result photo cropped to the fix's side, with the target as faint dots, the target spots still bare as
+/// rings ("add here") and the makeup outside the target filled ("wipe off").
+private struct FixCrop: View {
+    let photo: UIImage
+    let mark: MakeupFeedback.Mark
+    static let aspect: CGFloat = 2.2
+
+    var body: some View {
+        let rect = Self.crop(mark, photo: photo.size)
+        VStack(alignment: .leading, spacing: 6) {
+            GeometryReader { proxy in
+                let size = proxy.size
+                let scale = size.width / max(rect.width * photo.size.width, 1)
+                Image(uiImage: photo)
+                    .resizable()
+                    .frame(width: photo.size.width * scale, height: photo.size.height * scale)
+                    .offset(x: -rect.minX * photo.size.width * scale, y: -rect.minY * photo.size.height * scale)
+                    .frame(width: size.width, height: size.height, alignment: .topLeading)
+                    .clipped()
+                    .overlay {
+                        Canvas { context, size in
+                            func place(_ p: CGPoint) -> CGPoint {
+                                CGPoint(x: (p.x - rect.minX) / rect.width * size.width, y: (p.y - rect.minY) / rect.height * size.height)
+                            }
+                            let r = max(1.4, size.width / 140)
+                            func dot(_ p: CGPoint, _ radius: CGFloat) -> Path {
+                                let c = place(p); return Path(ellipseIn: CGRect(x: c.x - radius, y: c.y - radius, width: radius * 2, height: radius * 2))
+                            }
+                            let pink = AppColors.dandanPink
+                            for p in mark.target { context.fill(dot(p, r * 0.6), with: .color(pink.opacity(0.25))) }
+                            for p in mark.remove { context.fill(dot(p, r), with: .color(pink.opacity(0.6))) }
+                            for p in mark.add { context.stroke(dot(p, r), with: .color(pink), lineWidth: 1.2) }
+                        }
+                    }
+            }
+            .aspectRatio(Self.aspect, contentMode: .fit)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            HStack(spacing: 14) {
+                if !mark.add.isEmpty { legend(Circle().stroke(AppColors.dandanPink, lineWidth: 1.2), "Add here") }
+                if !mark.remove.isEmpty { legend(Circle().fill(AppColors.dandanPink.opacity(0.6)), "Wipe off") }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Photo of the area to fix")
+    }
+
+    private func legend(_ shape: some View, _ title: LocalizedStringKey) -> some View {
+        HStack(spacing: 5) {
+            shape.frame(width: 9, height: 9)
+            Text(title).font(.system(size: 11)).foregroundStyle(AppColors.onboardingBody)
+        }
+    }
+
+    /// The part of the photo (0...1) around the mark, padded, at `aspect` in pixels and kept inside the photo.
+    static func crop(_ mark: MakeupFeedback.Mark, photo: CGSize) -> CGRect {
+        let points = mark.target + mark.add + mark.remove
+        guard let minX = points.map(\.x).min(), let maxX = points.map(\.x).max(),
+              let minY = points.map(\.y).min(), let maxY = points.map(\.y).max(), photo.width > 0, photo.height > 0 else {
+            return CGRect(x: 0, y: 0, width: 1, height: 1)
+        }
+        var w = max((maxX - minX) * 1.5, 0.3), h = max((maxY - minY) * 1.5, 0.05)
+        // Same shape as the frame: width / height in pixels = aspect.
+        let wanted = w * photo.width / aspect / photo.height
+        if h < wanted { h = wanted } else { w = h * photo.height * aspect / photo.width }
+        if w > 1 { h *= 1 / w; w = 1 }
+        if h > 1 { w *= 1 / h; h = 1 }
+        let x = min(max((minX + maxX) / 2 - w / 2, 0), 1 - w), y = min(max((minY + maxY) / 2 - h / 2, 0), 1 - h)
+        return CGRect(x: x, y: y, width: w, height: h)
+    }
+}
+
 /// One category: its symbol and name, percentage with a short label, and a bar.
 private struct FeedbackCategoryCard: View {
     let category: MakeupFeedback.Category
@@ -348,16 +489,6 @@ private struct FeedbackCategorySheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 12) {
-                    if !category.description.isEmpty {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(verbatim: "\(Int((category.percent * 100).rounded()))% · \(category.label)")
-                                .font(.system(size: 17, weight: .bold))
-                            Text(category.description).font(.system(size: 13)).foregroundStyle(AppColors.onboardingBody)
-                        }
-                        .foregroundStyle(AppColors.onboardingInk)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .feedbackCard()
-                    }
                     if category.items.isEmpty {
                         FeedbackMessageRow(item: .init(title: String(localized: "Spot on"),
                                                        say: String(localized: "Nothing to fix here. Keep doing it this way."),

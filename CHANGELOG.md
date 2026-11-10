@@ -1,3 +1,8 @@
+## 2026-11-10 — Feedback: fix first, marked on the photo -Nimah
+
+- `FeedbackView`: one "Fix this first" card with the result photo cropped and marked (add here / wipe off), the next fixes
+  numbered, and what went well. Feedback texts (en/id) no longer show millimetres, degrees or percentages.
+
 ## 2026-11-10 — Feedback Before is the try-on photo -Nimah
 
 - `FeedbackView`: the Before / After slider's Before is the try-on photo (desired-look shutter, virtual makeup on), not

@@ -434,11 +434,11 @@
       "message": {
         "id": {
           "title": "Wajah menoleh",
-          "say": "Wajahmu menoleh {value}° ke {side}. Hadapkan wajah lurus ke kamera (di bawah 8°) supaya kedua sisi bisa diukur sama rata."
+          "say": "Wajahmu menoleh ke {side}. Hadapkan wajah lurus ke kamera supaya kedua sisi bisa diukur sama rata."
         },
         "en": {
           "title": "Face turned",
-          "say": "Your face is turned {value}° to the {side}. Face the camera straight on (under 8°) so both sides are measured equally."
+          "say": "Your face is turned to the {side}. Face the camera straight on so both sides are measured equally."
         }
       }
     },
@@ -453,11 +453,11 @@
       "message": {
         "id": {
           "title": "Wajah terlalu menunduk atau mendongak",
-          "say": "Kepalamu {direction} {value}°. Taruh HP sejajar mata dan lihat lurus ke kamera."
+          "say": "Kepalamu {direction}. Taruh HP sejajar mata dan lihat lurus ke kamera."
         },
         "en": {
           "title": "Head tilted up or down",
-          "say": "Your head is {direction} by {value}°. Hold the phone at eye level and look straight at it."
+          "say": "Your head is {direction}. Hold the phone at eye level and look straight at it."
         }
       }
     },
@@ -473,11 +473,11 @@
       "message": {
         "id": {
           "title": "Kepala miring",
-          "say": "Kepalamu miring {value}° ke {side}. Hasil tetap diukur, tapi bayangan bisa berubah. Lain kali tegakkan kepala."
+          "say": "Kepalamu miring ke {side}. Hasil tetap diukur, tapi bayangan bisa berubah. Lain kali tegakkan kepala."
         },
         "en": {
           "title": "Head tilted sideways",
-          "say": "Your head is tilted {value}° to the {side}. We still measured it, but shadows change; keep your head upright next time."
+          "say": "Your head is tilted to the {side}. We still measured it, but shadows change; keep your head upright next time."
         }
       }
     },
@@ -489,11 +489,11 @@
       "message": {
         "id": {
           "title": "Posisi kepala berbeda dari foto pertama",
-          "say": "Sudut kepalamu berbeda {value}° dari foto Try On. Hasil tetap diukur, tapi cahaya di pipi bisa berbeda. Coba foto dengan posisi yang sama."
+          "say": "Sudut kepalamu berbeda dari foto Try On. Hasil tetap diukur, tapi cahaya di pipi bisa berbeda. Coba foto dengan posisi yang sama."
         },
         "en": {
           "title": "Different head position from the first photo",
-          "say": "Your head angle differs by {value}° from the Try On photo. We still measured it, but light on the cheeks can differ. Try the same position."
+          "say": "Your head angle differs from the Try On photo. We still measured it, but light on the cheeks can differ. Try the same position."
         }
       }
     },
@@ -778,11 +778,11 @@
           "message": {
             "id": {
               "title": "Posisi blush pas",
-              "say": "Letak dan arah blush di {part} sudah sesuai look pilihanmu (meleset di bawah {value} mm)."
+              "say": "Letak dan arah blush di {part} sudah sesuai look pilihanmu."
             },
             "en": {
               "title": "Blush placement is right",
-              "say": "The placement and direction on your {part} match your chosen look (off by less than {value} mm)."
+              "say": "The placement and direction on your {part} match your chosen look."
             }
           }
         },
@@ -878,27 +878,27 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu tinggi",
-                "say": "Blush di {part} {delta} mm lebih tinggi dari target. Tambah sedikit warna tepat di bawahnya, lalu baurkan ke atas supaya pusatnya turun."
+                "say": "Blush di {part} sedikit lebih tinggi dari area garis putus-putus. Tambah sedikit warna tepat di bawahnya, lalu baurkan ke atas supaya pusatnya turun."
               },
               "en": {
                 "title": "Blush slightly high",
-                "say": "The blush on your {part} sits {delta} mm above the target. Add a little colour just below it and blend upward so the centre comes down."
+                "say": "The blush on your {part} sits a little above the dotted area. Add a little colour just below it and blend upward so the centre comes down."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu tinggi",
-                "say": "Blush di {part} {delta} mm lebih tinggi dari target dan mulai mendekati mata. Usap pinggiran atas dengan spons bersih, lalu tambah blush di tulang pipi bagian bawah."
+                "say": "Blush di {part} lebih tinggi dari area garis putus-putus dan mulai mendekati mata. Usap pinggiran atas dengan spons bersih, lalu tambah blush di tulang pipi bagian bawah."
               },
               "en": {
                 "title": "Blush too high",
-                "say": "The blush on your {part} sits {delta} mm above the target and is getting close to the eye. Wipe the top edge with a clean sponge, then add blush lower on the cheekbone."
+                "say": "The blush on your {part} sits above the dotted area and is getting close to the eye. Wipe the top edge with a clean sponge, then add blush lower on the cheekbone."
               }
             },
             "large": {
               "id": {
                 "title": "Blush jauh terlalu tinggi",
-                "say": "Blush di {part} {delta} mm di atas target, hampir di bawah mata. Hapus bagian itu dan ulangi dari lingkaran kecil di layar.",
+                "say": "Blush di {part} di atas area garis putus-putus, hampir di bawah mata. Hapus bagian itu dan ulangi dari lingkaran kecil di layar.",
                 "steps": [
                   "Hapus blush di pipi itu dengan micellar water atau tisu basah.",
                   "Tunggu kulit kering.",
@@ -907,7 +907,7 @@
               },
               "en": {
                 "title": "Blush far too high",
-                "say": "The blush on your {part} is {delta} mm above the target, almost under the eye. Remove that part and start again from the small circle on screen.",
+                "say": "The blush on your {part} is above the dotted area, almost under the eye. Remove that part and start again from the small circle on screen.",
                 "steps": [
                   "Remove the blush on that cheek with micellar water or a wet wipe.",
                   "Let the skin dry.",
@@ -938,27 +938,27 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu rendah",
-                "say": "Blush di {part} {delta} mm lebih rendah dari target. Tambah sedikit warna di tulang pipi, tepat di atasnya, lalu baurkan ke atas."
+                "say": "Blush di {part} sedikit lebih rendah dari area garis putus-putus. Tambah sedikit warna di tulang pipi, tepat di atasnya, lalu baurkan ke atas."
               },
               "en": {
                 "title": "Blush slightly low",
-                "say": "The blush on your {part} sits {delta} mm below the target. Add a little colour on the cheekbone just above it and blend upward."
+                "say": "The blush on your {part} sits a little below the dotted area. Add a little colour on the cheekbone just above it and blend upward."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu rendah",
-                "say": "Blush di {part} {delta} mm di bawah target, sehingga wajah terlihat turun. Ratakan bagian bawah dengan spons bersih, lalu tambah warna lebih tinggi, sejajar ujung hidung."
+                "say": "Blush di {part} di bawah area garis putus-putus, sehingga wajah terlihat turun. Ratakan bagian bawah dengan spons bersih, lalu tambah warna lebih tinggi, sejajar ujung hidung."
               },
               "en": {
                 "title": "Blush too low",
-                "say": "The blush on your {part} is {delta} mm below the target, which drags the face down. Soften the lower part with a clean sponge, then add colour higher, level with the tip of the nose."
+                "say": "The blush on your {part} is below the dotted area, which drags the face down. Soften the lower part with a clean sponge, then add colour higher, level with the tip of the nose."
               }
             },
             "large": {
               "id": {
                 "title": "Blush jauh terlalu rendah",
-                "say": "Blush di {part} {delta} mm di bawah target, mendekati garis mulut. Hapus bagian bawah itu dan ulangi dari lingkaran kecil.",
+                "say": "Blush di {part} di bawah area garis putus-putus, mendekati garis mulut. Hapus bagian bawah itu dan ulangi dari lingkaran kecil.",
                 "steps": [
                   "Hapus bagian blush yang terlalu bawah.",
                   "Senyum tipis untuk menemukan bagian pipi yang menonjol, lalu kembali ke wajah santai.",
@@ -967,7 +967,7 @@
               },
               "en": {
                 "title": "Blush far too low",
-                "say": "The blush on your {part} is {delta} mm below the target, close to the mouth line. Remove that lower part and start again from the small circle.",
+                "say": "The blush on your {part} is below the dotted area, close to the mouth line. Remove that lower part and start again from the small circle.",
                 "steps": [
                   "Remove the blush that sits too low.",
                   "Smile slightly to find the round of the cheek, then relax your face.",
@@ -997,27 +997,27 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu ke dalam",
-                "say": "Blush di {part} {delta} mm terlalu dekat ke hidung. Baurkan sedikit ke arah telinga."
+                "say": "Blush di {part} terlalu dekat ke hidung. Baurkan sedikit ke arah telinga."
               },
               "en": {
                 "title": "Blush slightly too far in",
-                "say": "The blush on your {part} is {delta} mm too close to the nose. Blend it a little towards the ear."
+                "say": "The blush on your {part} is a little too close to the nose. Blend it a little towards the ear."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu dekat hidung",
-                "say": "Blush di {part} {delta} mm lebih ke dalam dari target. Usap bagian yang dekat hidung dengan spons bersih, lalu tambah warna ke arah telinga."
+                "say": "Blush di {part} lebih ke dalam dari area garis putus-putus. Usap bagian yang dekat hidung dengan spons bersih, lalu tambah warna ke arah telinga."
               },
               "en": {
                 "title": "Blush too close to the nose",
-                "say": "The blush on your {part} is {delta} mm further in than the target. Wipe the part near the nose with a clean sponge, then add colour towards the ear."
+                "say": "The blush on your {part} is further in than the dotted area. Wipe the part near the nose with a clean sponge, then add colour towards the ear."
               }
             },
             "large": {
               "id": {
                 "title": "Blush jauh terlalu ke dalam",
-                "say": "Blush di {part} {delta} mm dari target, hampir menempel di hidung. Hapus bagian itu dan ulangi mulai dari lingkaran kecil.",
+                "say": "Blush di {part} dari area garis putus-putus, hampir menempel di hidung. Hapus bagian itu dan ulangi mulai dari lingkaran kecil.",
                 "steps": [
                   "Hapus blush di sisi hidung.",
                   "Letakkan jari di lingkaran kecil di layar sebagai patokan.",
@@ -1026,7 +1026,7 @@
               },
               "en": {
                 "title": "Blush far too far in",
-                "say": "The blush on your {part} is {delta} mm off, almost touching the nose. Remove that part and start again from the small circle.",
+                "say": "The blush on your {part} is far off, almost touching the nose. Remove that part and start again from the small circle.",
                 "steps": [
                   "Remove the blush beside the nose.",
                   "Put a fingertip on the small circle on screen as your guide.",
@@ -1056,27 +1056,27 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu ke luar",
-                "say": "Blush di {part} {delta} mm terlalu ke arah telinga. Tambah sedikit warna ke arah tengah pipi."
+                "say": "Blush di {part} terlalu ke arah telinga. Tambah sedikit warna ke arah tengah pipi."
               },
               "en": {
                 "title": "Blush slightly too far out",
-                "say": "The blush on your {part} is {delta} mm towards the ear. Add a little colour towards the middle of the cheek."
+                "say": "The blush on your {part} is towards the ear. Add a little colour towards the middle of the cheek."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu ke samping",
-                "say": "Blush di {part} {delta} mm lebih ke luar dari target, sehingga bagian depan pipi kosong. Tepuk blush di tengah lingkaran kecil, lalu baurkan keluar."
+                "say": "Blush di {part} lebih ke luar dari area garis putus-putus, sehingga bagian depan pipi kosong. Tepuk blush di tengah lingkaran kecil, lalu baurkan keluar."
               },
               "en": {
                 "title": "Blush too far out",
-                "say": "The blush on your {part} is {delta} mm further out than the target, leaving the front of the cheek bare. Dab blush in the middle of the small circle, then blend outward."
+                "say": "The blush on your {part} is further out than the dotted area, leaving the front of the cheek bare. Dab blush in the middle of the small circle, then blend outward."
               }
             },
             "large": {
               "id": {
                 "title": "Blush jauh terlalu ke samping",
-                "say": "Blush di {part} {delta} mm dari target, hampir di depan telinga. Hapus bagian luar itu dan ulangi dari lingkaran kecil.",
+                "say": "Blush di {part} dari area garis putus-putus, hampir di depan telinga. Hapus bagian luar itu dan ulangi dari lingkaran kecil.",
                 "steps": [
                   "Hapus blush di dekat telinga.",
                   "Tepuk blush di lingkaran kecil.",
@@ -1085,7 +1085,7 @@
               },
               "en": {
                 "title": "Blush far too far out",
-                "say": "The blush on your {part} is {delta} mm off, almost in front of the ear. Remove that outer part and start again from the small circle.",
+                "say": "The blush on your {part} is far off, almost in front of the ear. Remove that outer part and start again from the small circle.",
                 "steps": [
                   "Remove the blush near the ear.",
                   "Dab blush in the small circle.",
@@ -1113,31 +1113,31 @@
             "slight": {
               "id": {
                 "title": "Arah sapuan sedikit terlalu naik",
-                "say": "Sapuan blush di {part} {delta}° lebih curam dari target ({value}° vs {target}°). Baurkan ujung atasnya sedikit lebih mendatar ke arah telinga."
+                "say": "Sapuan blush di {part} sedikit lebih curam dari area garis putus-putus. Baurkan ujung atasnya sedikit lebih mendatar ke arah telinga."
               },
               "en": {
                 "title": "Sweep slightly too steep",
-                "say": "The sweep on your {part} is {delta}° steeper than the target ({value}° vs {target}°). Blend the top end a little flatter, towards the ear."
+                "say": "The sweep on your {part} is a little steeper than the dotted area. Blend the top end a little flatter, towards the ear."
               }
             },
             "clear": {
               "id": {
                 "title": "Arah sapuan terlalu naik",
-                "say": "Sapuan di {part} naik {delta}° lebih curam dari target. Usap ujung atas yang naik ke pelipis, lalu sapukan ulang mengikuti panah di langkah 3."
+                "say": "Sapuan di {part} naik lebih curam dari area garis putus-putus. Usap ujung atas yang naik ke pelipis, lalu sapukan ulang mengikuti panah di langkah 3."
               },
               "en": {
                 "title": "Sweep too steep",
-                "say": "The sweep on your {part} rises {delta}° more steeply than the target. Wipe the end that climbs to the temple, then sweep again along the arrow in step 3."
+                "say": "The sweep on your {part} rises more steeply than the dotted area. Wipe the end that climbs to the temple, then sweep again along the arrow in step 3."
               }
             },
             "large": {
               "id": {
                 "title": "Arah sapuan berbeda jauh",
-                "say": "Sapuan di {part} hampir tegak ({value}°, target {target}°). Ulangi langkah 3 dan ikuti arah panah di layar."
+                "say": "Sapuan di {part} hampir tegak. Ulangi langkah 3 dan ikuti arah panah di layar."
               },
               "en": {
                 "title": "Sweep direction far off",
-                "say": "The sweep on your {part} is almost vertical ({value}°, target {target}°). Redo step 3 and follow the arrow on screen."
+                "say": "The sweep on your {part} is almost vertical. Redo step 3 and follow the arrow on screen."
               }
             }
           }
@@ -1159,31 +1159,31 @@
             "slight": {
               "id": {
                 "title": "Arah sapuan sedikit terlalu datar",
-                "say": "Sapuan blush di {part} {delta}° lebih datar dari target ({value}° vs {target}°). Saat membaurkan, arahkan sedikit naik ke pelipis."
+                "say": "Sapuan blush di {part} sedikit lebih datar dari area garis putus-putus. Saat membaurkan, arahkan sedikit naik ke pelipis."
               },
               "en": {
                 "title": "Sweep slightly too flat",
-                "say": "The sweep on your {part} is {delta}° flatter than the target ({value}° vs {target}°). When blending, angle it slightly up towards the temple."
+                "say": "The sweep on your {part} is a little flatter than the dotted area. When blending, angle it slightly up towards the temple."
               }
             },
             "clear": {
               "id": {
                 "title": "Arah sapuan terlalu datar",
-                "say": "Sapuan di {part} {delta}° lebih datar dari target, jadi wajah terlihat lebih lebar. Tambah sedikit warna dari ujung luar ke arah pelipis."
+                "say": "Sapuan di {part} lebih datar dari area garis putus-putus, jadi wajah terlihat lebih lebar. Tambah sedikit warna dari ujung luar ke arah pelipis."
               },
               "en": {
                 "title": "Sweep too flat",
-                "say": "The sweep on your {part} is {delta}° flatter than the target, which widens the face. Add a little colour from the outer end up towards the temple."
+                "say": "The sweep on your {part} is flatter than the dotted area, which widens the face. Add a little colour from the outer end up towards the temple."
               }
             },
             "large": {
               "id": {
                 "title": "Arah sapuan berbeda jauh",
-                "say": "Sapuan di {part} mendatar atau turun ({value}°, target {target}°). Ulangi langkah 3 dan ikuti arah panah di layar."
+                "say": "Sapuan di {part} mendatar atau turun. Ulangi langkah 3 dan ikuti arah panah di layar."
               },
               "en": {
                 "title": "Sweep direction far off",
-                "say": "The sweep on your {part} is flat or going down ({value}°, target {target}°). Redo step 3 and follow the arrow on screen."
+                "say": "The sweep on your {part} is flat or going down. Redo step 3 and follow the arrow on screen."
               }
             }
           }
@@ -1208,31 +1208,31 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu kecil",
-                "say": "Blush di {part} hanya {value}% dari luas target. Baurkan keluar sedikit lagi sampai garis luar."
+                "say": "Blush di {part} hanya menutupi sebagian kecil area garis putus-putus. Baurkan keluar sedikit lagi sampai garis luar."
               },
               "en": {
                 "title": "Blush slightly small",
-                "say": "The blush on your {part} covers only {value}% of the target area. Blend it out a little more, to the outer line."
+                "say": "The blush on your {part} covers only a small part of the dotted area. Blend it out a little more, to the outer line."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu terkumpul",
-                "say": "Blush di {part} terkumpul di satu titik ({value}% dari luas target). Baurkan keluar dengan gerakan memutar kecil sampai garis luar."
+                "say": "Blush di {part} terkumpul di satu titik. Baurkan keluar dengan gerakan memutar kecil sampai garis luar."
               },
               "en": {
                 "title": "Blush too concentrated",
-                "say": "The blush on your {part} is bunched in one spot ({value}% of the target area). Blend it out in small circles to the outer line."
+                "say": "The blush on your {part} is bunched in one spot. Blend it out in small circles to the outer line."
               }
             },
             "large": {
               "id": {
                 "title": "Blush seperti titik",
-                "say": "Blush di {part} hanya berupa titik kecil ({value}% dari luas target). Baurkan sampai mengisi lingkaran luar di layar."
+                "say": "Blush di {part} hanya berupa titik kecil. Baurkan sampai mengisi lingkaran luar di layar."
               },
               "en": {
                 "title": "Blush is just a dot",
-                "say": "The blush on your {part} is a small dot ({value}% of the target area). Blend until it fills the outer circle on screen."
+                "say": "The blush on your {part} is a small dot. Blend until it fills the outer circle on screen."
               }
             }
           }
@@ -1253,27 +1253,27 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu lebar",
-                "say": "Blush di {part} {value}% dari luas target. Rapikan pinggiran luarnya dengan spons bersih."
+                "say": "Blush di {part} sedikit keluar dari area garis putus-putus. Rapikan pinggiran luarnya dengan spons bersih."
               },
               "en": {
                 "title": "Blush slightly wide",
-                "say": "The blush on your {part} is {value}% of the target area. Tidy the outer edge with a clean sponge."
+                "say": "The blush on your {part} goes a little past the dotted area. Tidy the outer edge with a clean sponge."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu lebar",
-                "say": "Blush di {part} melebar sampai {value}% dari luas target. Usap pinggiran yang keluar garis luar dengan spons bersih atau tisu."
+                "say": "Blush di {part} melebar jauh keluar area garis putus-putus. Usap pinggiran yang keluar garis luar dengan spons bersih atau tisu."
               },
               "en": {
                 "title": "Blush too wide",
-                "say": "The blush on your {part} spreads to {value}% of the target area. Wipe what goes past the outer line with a clean sponge or tissue."
+                "say": "The blush on your {part} spreads well past the dotted area. Wipe what goes past the outer line with a clean sponge or tissue."
               }
             },
             "large": {
               "id": {
                 "title": "Blush jauh terlalu lebar",
-                "say": "Blush di {part} menutupi {value}% dari luas target, hampir seluruh pipi. Hapus dan ulangi dengan jumlah lebih sedikit.",
+                "say": "Blush di {part} menutupi hampir seluruh pipi. Hapus dan ulangi dengan jumlah lebih sedikit.",
                 "steps": [
                   "Hapus blush di pipi itu.",
                   "Ambil blush setengah dari sebelumnya.",
@@ -1282,7 +1282,7 @@
               },
               "en": {
                 "title": "Blush far too wide",
-                "say": "The blush on your {part} covers {value}% of the target area, almost the whole cheek. Remove it and start again with less product.",
+                "say": "The blush on your {part} covers almost the whole cheek. Remove it and start again with less product.",
                 "steps": [
                   "Remove the blush on that cheek.",
                   "Use half as much product as before.",
@@ -1309,31 +1309,31 @@
             "slight": {
               "id": {
                 "title": "Ada bagian yang belum terisi",
-                "say": "Blush di {part} sudah mengisi {value}% target. {zone} masih kosong: tepuk sedikit di sana lalu baurkan."
+                "say": "Blush di {part} sudah mengisi sebagian besar area garis putus-putus. {zone} masih kosong: tepuk sedikit di sana lalu baurkan."
               },
               "en": {
                 "title": "A part is still bare",
-                "say": "The blush on your {part} fills {value}% of the target. The {zone} is still bare: dab a little there and blend."
+                "say": "The blush on your {part} fills most of the dotted area. The {zone} is still bare: dab a little there and blend."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush belum rata",
-                "say": "Blush di {part} baru mengisi {value}% target, paling kosong di {zone}. Tambah blush di sana dengan tepukan kecil, lalu baurkan ke seluruh lingkaran luar."
+                "say": "Blush di {part} baru mengisi sebagian area garis putus-putus, paling kosong di {zone}. Tambah blush di sana dengan tepukan kecil, lalu baurkan ke seluruh lingkaran luar."
               },
               "en": {
                 "title": "Blush not even yet",
-                "say": "The blush on your {part} fills only {value}% of the target, emptiest in the {zone}. Dab more there, then blend across the outer circle."
+                "say": "The blush on your {part} fills only part of the dotted area, emptiest in the {zone}. Dab more there, then blend across the outer circle."
               }
             },
             "large": {
               "id": {
                 "title": "Blush baru sedikit",
-                "say": "Blush di {part} baru mengisi {value}% target. Ulangi langkah 2: baurkan dari lingkaran kecil keluar sampai garis luar."
+                "say": "Blush di {part} baru mengisi sebagian area garis putus-putus. Ulangi langkah 2: baurkan dari lingkaran kecil keluar sampai garis luar."
               },
               "en": {
                 "title": "Very little blush",
-                "say": "The blush on your {part} fills only {value}% of the target. Repeat step 2: blend from the small circle out to the outer line."
+                "say": "The blush on your {part} fills only part of the dotted area. Repeat step 2: blend from the small circle out to the outer line."
               }
             }
           }
@@ -1356,27 +1356,27 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu tebal",
-                "say": "Blush di {part} {value}x lebih pekat dari look pilihanmu. Tepuk bagian tengah dengan spons bersih untuk mengangkat sedikit warna."
+                "say": "Blush di {part} sedikit lebih pekat dari look pilihanmu. Tepuk bagian tengah dengan spons bersih untuk mengangkat sedikit warna."
               },
               "en": {
                 "title": "Blush slightly heavy",
-                "say": "The blush on your {part} is {value}x stronger than your chosen look. Press the centre with a clean sponge to lift a little colour."
+                "say": "The blush on your {part} is a little stronger than your chosen look. Press the centre with a clean sponge to lift a little colour."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu tebal",
-                "say": "Blush di {part} {value}x lebih pekat dari target. Tekan-tekan dengan spons bersih atau tisu sampai warnanya turun, lalu baurkan pinggirannya."
+                "say": "Blush di {part} lebih pekat dari Try On. Tekan-tekan dengan spons bersih atau tisu sampai warnanya turun, lalu baurkan pinggirannya."
               },
               "en": {
                 "title": "Blush too heavy",
-                "say": "The blush on your {part} is {value}x stronger than the target. Press with a clean sponge or tissue until the colour drops, then blend the edges."
+                "say": "The blush on your {part} is stronger than your try-on. Press with a clean sponge or tissue until the colour drops, then blend the edges."
               }
             },
             "large": {
               "id": {
                 "title": "Blush jauh terlalu tebal",
-                "say": "Blush di {part} {value}x lebih pekat dari target. Lebih mudah dihapus dan diulang dengan sedikit produk.",
+                "say": "Blush di {part} lebih pekat dari Try On. Lebih mudah dihapus dan diulang dengan sedikit produk.",
                 "steps": [
                   "Hapus blush di pipi itu.",
                   "Ambil produk sedikit saja, lalu ketuk kuas atau jari di tisu sekali.",
@@ -1385,7 +1385,7 @@
               },
               "en": {
                 "title": "Blush far too heavy",
-                "say": "The blush on your {part} is {value}x stronger than the target. It is easier to remove it and start again with a little product.",
+                "say": "The blush on your {part} is stronger than your try-on. It is easier to remove it and start again with a little product.",
                 "steps": [
                   "Remove the blush on that cheek.",
                   "Pick up very little product and tap the brush or finger on a tissue once.",
@@ -1412,31 +1412,31 @@
             "slight": {
               "id": {
                 "title": "Blush sedikit terlalu tipis",
-                "say": "Blush di {part} baru {value}% dari kepekatan look pilihanmu. Tambah satu tepukan tipis di tengah."
+                "say": "Blush di {part} sedikit lebih tipis dari look pilihanmu. Tambah satu tepukan tipis di tengah."
               },
               "en": {
                 "title": "Blush slightly light",
-                "say": "The blush on your {part} is {value}% as strong as your chosen look. Add one light dab in the centre."
+                "say": "The blush on your {part} is a little lighter than your chosen look. Add one light dab in the centre."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush terlalu tipis",
-                "say": "Blush di {part} baru {value}% dari kepekatan target. Tambah produk sedikit demi sedikit di lingkaran kecil, lalu baurkan."
+                "say": "Blush di {part} masih jauh lebih tipis dari Try On. Tambah produk sedikit demi sedikit di lingkaran kecil, lalu baurkan."
               },
               "en": {
                 "title": "Blush too light",
-                "say": "The blush on your {part} is only {value}% as strong as the target. Build it up little by little in the small circle, then blend."
+                "say": "The blush on your {part} is much lighter than your try-on. Build it up little by little in the small circle, then blend."
               }
             },
             "large": {
               "id": {
                 "title": "Blush hampir tidak terlihat",
-                "say": "Blush di {part} baru {value}% dari kepekatan target. Ulangi langkah 1 dengan produk sedikit lebih banyak."
+                "say": "Blush di {part} masih jauh lebih tipis dari Try On. Ulangi langkah 1 dengan produk sedikit lebih banyak."
               },
               "en": {
                 "title": "Blush barely visible",
-                "say": "The blush on your {part} is only {value}% as strong as the target. Repeat step 1 with a little more product."
+                "say": "The blush on your {part} is much lighter than your try-on. Repeat step 1 with a little more product."
               }
             }
           }
@@ -1458,31 +1458,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit naik ke bawah mata",
-                "say": "Ada blush {value}% di luar garis, ke arah mata. Usap tipis dengan spons bersih ke arah bawah."
+                "say": "Ada sedikit blush di luar garis, ke arah mata. Usap tipis dengan spons bersih ke arah bawah."
               },
               "en": {
                 "title": "A little up under the eye",
-                "say": "{value}% of the blush is past the line towards the eye. Wipe it lightly downward with a clean sponge."
+                "say": "Some blush is a little past the line towards the eye. Wipe it lightly downward with a clean sponge."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush masuk ke area bawah mata",
-                "say": "Blush keluar garis ke arah mata ({value}% dari target). Hapus bagian di bawah mata dengan cotton bud dan sedikit micellar water."
+                "say": "Blush keluar garis ke arah mata. Hapus bagian di bawah mata dengan cotton bud dan sedikit micellar water."
               },
               "en": {
                 "title": "Blush under the eye",
-                "say": "Blush goes past the line towards the eye ({value}% of the target). Remove the part under the eye with a cotton bud and a little micellar water."
+                "say": "Blush goes past the line towards the eye. Remove the part under the eye with a cotton bud and a little micellar water."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak blush di bawah mata",
-                "say": "Banyak blush naik sampai bawah mata ({value}% dari target). Hapus area itu dan baurkan ulang hanya sampai garis luar."
+                "say": "Banyak blush naik sampai bawah mata. Hapus area itu dan baurkan ulang hanya sampai garis luar."
               },
               "en": {
                 "title": "Lots of blush under the eye",
-                "say": "Much of the blush reaches under the eye ({value}% of the target). Remove that area and blend again only to the outer line."
+                "say": "Much of the blush reaches under the eye. Remove that area and blend again only to the outer line."
               }
             }
           }
@@ -1507,31 +1507,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit masuk ke samping hidung",
-                "say": "Ada blush {value}% di luar garis, ke arah hidung. Baurkan ke arah telinga."
+                "say": "Ada sedikit blush di luar garis, ke arah hidung. Baurkan ke arah telinga."
               },
               "en": {
                 "title": "A little beside the nose",
-                "say": "{value}% of the blush is past the line towards the nose. Blend it towards the ear."
+                "say": "Some blush is a little past the line towards the nose. Blend it towards the ear."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush masuk ke samping hidung",
-                "say": "Blush keluar garis ke arah hidung ({value}% dari target). Usap bagian samping hidung dengan spons bersih."
+                "say": "Blush keluar garis ke arah hidung. Usap bagian samping hidung dengan spons bersih."
               },
               "en": {
                 "title": "Blush beside the nose",
-                "say": "Blush goes past the line towards the nose ({value}% of the target). Wipe beside the nose with a clean sponge."
+                "say": "Blush goes past the line towards the nose. Wipe beside the nose with a clean sponge."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak blush di samping hidung",
-                "say": "Banyak blush di samping hidung ({value}% dari target). Hapus bagian itu dengan micellar water, lalu baurkan ulang dari lingkaran kecil ke arah luar."
+                "say": "Banyak blush di samping hidung. Hapus bagian itu dengan micellar water, lalu baurkan ulang dari lingkaran kecil ke arah luar."
               },
               "en": {
                 "title": "Lots of blush beside the nose",
-                "say": "A lot of blush sits beside the nose ({value}% of the target). Remove it with micellar water, then blend again from the small circle outward."
+                "say": "A lot of blush sits beside the nose. Remove it with micellar water, then blend again from the small circle outward."
               }
             }
           }
@@ -1552,31 +1552,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit turun ke bawah",
-                "say": "Ada blush {value}% di bawah garis luar. Usap tipis pinggiran bawah ke arah atas."
+                "say": "Ada sedikit blush di bawah garis luar. Usap tipis pinggiran bawah ke arah atas."
               },
               "en": {
                 "title": "A little too low",
-                "say": "{value}% of the blush is below the outer line. Wipe the lower edge lightly upward."
+                "say": "Some blush is a little below the outer line. Wipe the lower edge lightly upward."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush turun ke arah mulut",
-                "say": "Blush keluar garis ke bawah ({value}% dari target). Usap bagian bawah dengan spons bersih sampai batas garis luar."
+                "say": "Blush keluar garis ke bawah. Usap bagian bawah dengan spons bersih sampai batas garis luar."
               },
               "en": {
                 "title": "Blush drifting to the mouth",
-                "say": "Blush goes below the line ({value}% of the target). Wipe the lower part with a clean sponge up to the outer line."
+                "say": "Blush goes below the line. Wipe the lower part with a clean sponge up to the outer line."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak blush di pipi bawah",
-                "say": "Banyak blush di pipi bawah ({value}% dari target). Hapus bagian itu, lalu baurkan ulang ke atas."
+                "say": "Banyak blush di pipi bawah. Hapus bagian itu, lalu baurkan ulang ke atas."
               },
               "en": {
                 "title": "Lots of blush low on the cheek",
-                "say": "A lot of blush sits low on the cheek ({value}% of the target). Remove that part, then blend again upward."
+                "say": "A lot of blush sits low on the cheek. Remove that part, then blend again upward."
               }
             }
           }
@@ -1601,31 +1601,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit melebar ke telinga",
-                "say": "Ada blush {value}% di luar garis, ke arah telinga. Baurkan pinggirannya sampai hilang."
+                "say": "Ada sedikit blush di luar garis, ke arah telinga. Baurkan pinggirannya sampai hilang."
               },
               "en": {
                 "title": "A little towards the ear",
-                "say": "{value}% of the blush is past the line towards the ear. Blend the edge until it disappears."
+                "say": "Some blush is a little past the line towards the ear. Blend the edge until it disappears."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush melebar ke telinga",
-                "say": "Blush keluar garis ke arah telinga ({value}% dari target). Usap ujung luar dengan spons bersih."
+                "say": "Blush keluar garis ke arah telinga. Usap ujung luar dengan spons bersih."
               },
               "en": {
                 "title": "Blush spreading to the ear",
-                "say": "Blush goes past the line towards the ear ({value}% of the target). Wipe the outer end with a clean sponge."
+                "say": "Blush goes past the line towards the ear. Wipe the outer end with a clean sponge."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak blush di dekat telinga",
-                "say": "Banyak blush sampai dekat telinga ({value}% dari target). Hapus bagian itu dan baurkan ulang hanya sampai garis luar."
+                "say": "Banyak blush sampai dekat telinga. Hapus bagian itu dan baurkan ulang hanya sampai garis luar."
               },
               "en": {
                 "title": "Lots of blush near the ear",
-                "say": "A lot of blush reaches the ear ({value}% of the target). Remove that part and blend again only to the outer line."
+                "say": "A lot of blush reaches the ear. Remove that part and blend again only to the outer line."
               }
             }
           }
@@ -1646,31 +1646,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit turun ke rahang",
-                "say": "Ada blush {value}% turun ke arah rahang. Baurkan ke atas."
+                "say": "Ada sedikit blush turun ke arah rahang. Baurkan ke atas."
               },
               "en": {
                 "title": "A little towards the jaw",
-                "say": "{value}% of the blush runs down to the jaw. Blend it upward."
+                "say": "Some blush runs down to the jaw. Blend it upward."
               }
             },
             "clear": {
               "id": {
                 "title": "Blush turun ke rahang",
-                "say": "Blush keluar garis ke arah rahang ({value}% dari target). Usap bagian itu dengan spons bersih."
+                "say": "Blush keluar garis ke arah rahang. Usap bagian itu dengan spons bersih."
               },
               "en": {
                 "title": "Blush on the jaw",
-                "say": "Blush goes past the line to the jaw ({value}% of the target). Wipe that part with a clean sponge."
+                "say": "Blush goes past the line to the jaw. Wipe that part with a clean sponge."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak blush di rahang",
-                "say": "Banyak blush di rahang ({value}% dari target). Hapus dan baurkan ulang ke arah tulang pipi."
+                "say": "Banyak blush di rahang. Hapus dan baurkan ulang ke arah tulang pipi."
               },
               "en": {
                 "title": "Lots of blush on the jaw",
-                "say": "A lot of blush is on the jaw ({value}% of the target). Remove it and blend again towards the cheekbone."
+                "say": "A lot of blush is on the jaw. Remove it and blend again towards the cheekbone."
               }
             }
           }
@@ -1693,31 +1693,31 @@
             "slight": {
               "id": {
                 "title": "Pinggiran sedikit tegas",
-                "say": "Pinggiran blush di {part} masih terlihat ({value} mm, target minimal 6 mm), terutama di {zone}. Putar spons atau jari kecil-kecil di pinggiran itu."
+                "say": "Pinggiran blush di {part} masih terlihat, terutama di {zone}. Putar spons atau jari kecil-kecil di pinggiran itu."
               },
               "en": {
                 "title": "Edge slightly sharp",
-                "say": "The edge on your {part} still shows ({value} mm, target at least 6 mm), mostly at the {zone}. Make small circles over that edge with a sponge or finger."
+                "say": "The edge on your {part} still shows, mostly at the {zone}. Make small circles over that edge with a sponge or finger."
               }
             },
             "clear": {
               "id": {
                 "title": "Pinggiran terlihat tegas",
-                "say": "Ada garis tegas di pinggiran blush {part} ({value} mm) di {zone}. Buff dengan gerakan memutar kecil ke arah luar sampai garisnya hilang."
+                "say": "Ada garis tegas di pinggiran blush {part} di {zone}. Buff dengan gerakan memutar kecil ke arah luar sampai garisnya hilang."
               },
               "en": {
                 "title": "Hard edge",
-                "say": "There is a hard line at the edge on your {part} ({value} mm) at the {zone}. Buff in small circles outward until the line is gone."
+                "say": "There is a hard line at the edge on your {part} at the {zone}. Buff in small circles outward until the line is gone."
               }
             },
             "large": {
               "id": {
                 "title": "Blush seperti tempelan",
-                "say": "Blush di {part} berhenti mendadak ({value} mm), seperti stiker. Ulangi langkah 3: buff memutar kecil dari pinggiran ke luar, tanpa menambah produk."
+                "say": "Blush di {part} berhenti mendadak, seperti stiker. Ulangi langkah 3: buff memutar kecil dari pinggiran ke luar, tanpa menambah produk."
               },
               "en": {
                 "title": "Blush looks stuck on",
-                "say": "The blush on your {part} stops abruptly ({value} mm), like a sticker. Redo step 3: buff in small circles from the edge outward without adding product."
+                "say": "The blush on your {part} stops abruptly, like a sticker. Redo step 3: buff in small circles from the edge outward without adding product."
               }
             }
           }
@@ -1786,31 +1786,31 @@
             "slight": {
               "id": {
                 "title": "Warna sedikit lebih hangat",
-                "say": "Blush yang kamu pakai sedikit lebih oranye dari warna pilihanmu ({delta}°). Tidak apa-apa, tapi untuk look yang sama pilih blush yang lebih pink."
+                "say": "Blush yang kamu pakai sedikit lebih oranye dari warna pilihanmu. Tidak apa-apa, tapi untuk look yang sama pilih blush yang lebih pink."
               },
               "en": {
                 "title": "Colour slightly warmer",
-                "say": "Your blush is a little more orange than the shade you chose ({delta}°). That is fine; for the same look pick a pinker blush."
+                "say": "Your blush is a little more orange than the shade you chose. That is fine; for the same look pick a pinker blush."
               }
             },
             "clear": {
               "id": {
                 "title": "Warna lebih hangat dari pilihan",
-                "say": "Blush yang kamu pakai jelas lebih oranye atau cokelat ({delta}°) dari warna pilihanmu. Kalau ingin sama, ganti produk yang lebih pink, atau pilih warna yang mirip produkmu di Try On."
+                "say": "Blush yang kamu pakai jelas lebih oranye atau cokelat dari warna pilihanmu. Kalau ingin sama, ganti produk yang lebih pink, atau pilih warna yang mirip produkmu di Try On."
               },
               "en": {
                 "title": "Colour warmer than chosen",
-                "say": "Your blush is clearly more orange or brown ({delta}°) than your chosen shade. To match, use a pinker product, or pick a shade closer to yours on Try On."
+                "say": "Your blush is clearly more orange or brown than your chosen shade. To match, use a pinker product, or pick a shade closer to yours on Try On."
               }
             },
             "large": {
               "id": {
                 "title": "Warna sangat berbeda",
-                "say": "Warna blush yang kamu pakai berbeda jauh dari pilihanmu ({delta}°). Tambahkan warna produkmu lewat tombol + di Try On supaya target dan hasil bisa dibandingkan."
+                "say": "Warna blush yang kamu pakai berbeda jauh dari pilihanmu. Tambahkan warna produkmu lewat tombol + di Try On supaya area garis putus-putus dan hasil bisa dibandingkan."
               },
               "en": {
                 "title": "Very different colour",
-                "say": "Your blush colour is far from the shade you chose ({delta}°). Add your product's colour with the + button on Try On so target and result can be compared."
+                "say": "Your blush colour is far from the shade you chose. Add your product's colour with the + button on Try On so target and result can be compared."
               }
             }
           }
@@ -1832,31 +1832,31 @@
             "slight": {
               "id": {
                 "title": "Warna sedikit lebih dingin",
-                "say": "Blush yang kamu pakai sedikit lebih pink keunguan dari pilihanmu ({delta}°). Untuk look yang sama pilih blush yang lebih hangat."
+                "say": "Blush yang kamu pakai sedikit lebih pink keunguan dari pilihanmu. Untuk look yang sama pilih blush yang lebih hangat."
               },
               "en": {
                 "title": "Colour slightly cooler",
-                "say": "Your blush is a little more purple-pink than your chosen shade ({delta}°). For the same look pick a warmer blush."
+                "say": "Your blush is a little more purple-pink than your chosen shade. For the same look pick a warmer blush."
               }
             },
             "clear": {
               "id": {
                 "title": "Warna lebih dingin dari pilihan",
-                "say": "Blush yang kamu pakai jelas lebih pink keunguan ({delta}°) dari pilihanmu. Ganti produk yang lebih hangat, atau pilih warna yang mirip produkmu di Try On."
+                "say": "Blush yang kamu pakai jelas lebih pink keunguan dari pilihanmu. Ganti produk yang lebih hangat, atau pilih warna yang mirip produkmu di Try On."
               },
               "en": {
                 "title": "Colour cooler than chosen",
-                "say": "Your blush is clearly more purple-pink ({delta}°) than your chosen shade. Use a warmer product, or pick a shade closer to yours on Try On."
+                "say": "Your blush is clearly more purple-pink than your chosen shade. Use a warmer product, or pick a shade closer to yours on Try On."
               }
             },
             "large": {
               "id": {
                 "title": "Warna sangat berbeda",
-                "say": "Warna blush yang kamu pakai berbeda jauh dari pilihanmu ({delta}°). Tambahkan warna produkmu lewat tombol + di Try On."
+                "say": "Warna blush yang kamu pakai berbeda jauh dari pilihanmu. Tambahkan warna produkmu lewat tombol + di Try On."
               },
               "en": {
                 "title": "Very different colour",
-                "say": "Your blush colour is far from the shade you chose ({delta}°). Add your product's colour with the + button on Try On."
+                "say": "Your blush colour is far from the shade you chose. Add your product's colour with the + button on Try On."
               }
             }
           }
@@ -1881,21 +1881,21 @@
             "slight": {
               "id": {
                 "title": "Batang hidung kurang",
-                "say": "Look Sunkissed butuh sedikit warna di batang hidung; baru {value}% terisi. Sapukan sisa blush di kuas tipis-tipis melintang hidung."
+                "say": "Look Sunkissed butuh sedikit warna di batang hidung; masih kosong. Sapukan sisa blush di kuas tipis-tipis melintang hidung."
               },
               "en": {
                 "title": "Nose bridge a little bare",
-                "say": "Sunkissed needs a little colour across the nose; only {value}% is there. Sweep the leftover blush on your brush lightly across it."
+                "say": "Sunkissed needs a little colour across the nose; it is not there yet. Sweep the leftover blush on your brush lightly across it."
               }
             },
             "clear": {
               "id": {
                 "title": "Batang hidung belum diberi warna",
-                "say": "Batang hidung baru {value}% terisi. Sapukan blush tipis dari pipi kiri, melewati hidung, ke pipi kanan."
+                "say": "Batang hidung masih kosong. Sapukan blush tipis dari pipi kiri, melewati hidung, ke pipi kanan."
               },
               "en": {
                 "title": "Nose bridge missing colour",
-                "say": "Only {value}% of the nose bridge has colour. Sweep a thin layer from one cheek over the nose to the other."
+                "say": "The nose bridge has almost no colour. Sweep a thin layer from one cheek over the nose to the other."
               }
             },
             "large": {
@@ -1930,31 +1930,31 @@
             "slight": {
               "id": {
                 "title": "Hidung sedikit terlalu merah",
-                "say": "Warna di batang hidung {value}x lebih pekat dari target. Tepuk dengan spons bersih."
+                "say": "Warna di batang hidung sedikit lebih pekat dari Try On. Tepuk dengan spons bersih."
               },
               "en": {
                 "title": "Nose slightly too red",
-                "say": "The colour on the nose bridge is {value}x stronger than the target. Pat it with a clean sponge."
+                "say": "The colour on the nose bridge is a little stronger than your try-on. Pat it with a clean sponge."
               }
             },
             "clear": {
               "id": {
                 "title": "Hidung terlalu merah",
-                "say": "Batang hidung {value}x lebih pekat dari target, jadi terlihat seperti terbakar. Tekan dengan spons atau tisu sampai warnanya turun."
+                "say": "Batang hidung lebih pekat dari Try On, jadi terlihat seperti terbakar. Tekan dengan spons atau tisu sampai warnanya turun."
               },
               "en": {
                 "title": "Nose too red",
-                "say": "The nose bridge is {value}x stronger than the target and looks sunburnt. Press with a sponge or tissue until it fades."
+                "say": "The nose bridge is stronger than your try-on and looks sunburnt. Press with a sponge or tissue until it fades."
               }
             },
             "large": {
               "id": {
                 "title": "Hidung jauh terlalu merah",
-                "say": "Batang hidung {value}x lebih pekat dari target. Hapus dan sapukan ulang dengan sisa produk di kuas saja."
+                "say": "Batang hidung lebih pekat dari Try On. Hapus dan sapukan ulang dengan sisa produk di kuas saja."
               },
               "en": {
                 "title": "Nose far too red",
-                "say": "The nose bridge is {value}x stronger than the target. Remove it and sweep again with only what is left on the brush."
+                "say": "The nose bridge is stronger than your try-on. Remove it and sweep again with only what is left on the brush."
               }
             }
           }
@@ -1980,21 +1980,21 @@
             "slight": {
               "id": {
                 "title": "Kurang naik ke pelipis",
-                "say": "Look Lifted naik ke pelipis, tapi blush di {part} berhenti {delta} mm lebih awal. Baurkan ujung luar ke atas."
+                "say": "Look Lifted naik ke pelipis, tapi blush di {part} berhenti sedikit lebih awal. Baurkan ujung luar ke atas."
               },
               "en": {
                 "title": "Not quite up to the temple",
-                "say": "Lifted rises to the temple, but the blush on your {part} stops {delta} mm short. Blend the outer end upward."
+                "say": "Lifted rises to the temple, but the blush on your {part} stops short. Blend the outer end upward."
               }
             },
             "clear": {
               "id": {
                 "title": "Belum sampai pelipis",
-                "say": "Blush di {part} berhenti {delta} mm sebelum pelipis. Sapukan sisa produk dari ujung luar blush naik ke pelipis."
+                "say": "Blush di {part} berhenti sebelum pelipis. Sapukan sisa produk dari ujung luar blush naik ke pelipis."
               },
               "en": {
                 "title": "Not reaching the temple",
-                "say": "The blush on your {part} stops {delta} mm before the temple. Sweep the leftover product from the outer end up to the temple."
+                "say": "The blush on your {part} stops before the temple. Sweep the leftover product from the outer end up to the temple."
               }
             },
             "large": {
@@ -2028,31 +2028,31 @@
             "slight": {
               "id": {
                 "title": "Tinggi kiri-kanan sedikit beda",
-                "say": "Blush {part} {delta} mm lebih tinggi dari {other}. Tambah sedikit di atas sisi yang lebih rendah supaya sejajar."
+                "say": "Blush {part} sedikit lebih tinggi dari {other}. Tambah sedikit di atas sisi yang lebih rendah supaya sejajar."
               },
               "en": {
                 "title": "Heights slightly uneven",
-                "say": "The blush on your {part} sits {delta} mm higher than the {other}. Add a little above the lower side to level them."
+                "say": "The blush on your {part} sits a little higher than the {other}. Add a little above the lower side to level them."
               }
             },
             "clear": {
               "id": {
                 "title": "Tinggi kiri-kanan berbeda",
-                "say": "Blush {part} {delta} mm lebih tinggi dari {other}. Pakai garis di layar sebagai patokan: rapikan sisi yang tinggi dan tambah di sisi yang rendah."
+                "say": "Blush {part} lebih tinggi dari {other}. Pakai garis di layar sebagai patokan: rapikan sisi yang tinggi dan tambah di sisi yang rendah."
               },
               "en": {
                 "title": "Uneven heights",
-                "say": "The blush on your {part} is {delta} mm higher than the {other}. Use the lines on screen as a guide: tidy the high side and add to the low side."
+                "say": "The blush on your {part} is higher than the {other}. Use the lines on screen as a guide: tidy the high side and add to the low side."
               }
             },
             "large": {
               "id": {
                 "title": "Tinggi kiri-kanan jauh berbeda",
-                "say": "Blush {part} {delta} mm lebih tinggi dari {other}. Ulangi sisi yang meleset dari target dengan lingkaran di layar."
+                "say": "Blush {part} lebih tinggi dari {other}. Ulangi sisi yang meleset dari area garis putus-putus dengan lingkaran di layar."
               },
               "en": {
                 "title": "Very uneven heights",
-                "say": "The blush on your {part} is {delta} mm higher than the {other}. Redo the side that is off target using the circle on screen."
+                "say": "The blush on your {part} is higher than the {other}. Redo the side that is off target using the circle on screen."
               }
             }
           }
@@ -2073,31 +2073,31 @@
             "slight": {
               "id": {
                 "title": "Kepekatan sedikit beda",
-                "say": "Blush {part} {value}x lebih pekat dari {other}. Tambah satu tepukan tipis di {other}."
+                "say": "Blush {part} sedikit lebih pekat dari {other}. Tambah satu tepukan tipis di {other}."
               },
               "en": {
                 "title": "Strength slightly uneven",
-                "say": "The blush on your {part} is {value}x stronger than the {other}. Add one light dab to the {other}."
+                "say": "The blush on your {part} is a little stronger than the {other}. Add one light dab to the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Kepekatan kiri-kanan berbeda",
-                "say": "Blush {part} {value}x lebih pekat dari {other}. Tepuk {part} dengan spons bersih atau tambah di {other} sampai sama."
+                "say": "Blush {part} lebih pekat dari {other}. Tepuk {part} dengan spons bersih atau tambah di {other} sampai sama."
               },
               "en": {
                 "title": "Uneven strength",
-                "say": "The blush on your {part} is {value}x stronger than the {other}. Pat the {part} with a clean sponge or build up the {other} until they match."
+                "say": "The blush on your {part} is stronger than the {other}. Pat the {part} with a clean sponge or build up the {other} until they match."
               }
             },
             "large": {
               "id": {
                 "title": "Kepekatan jauh berbeda",
-                "say": "Blush {part} {value}x lebih pekat dari {other}. Samakan dulu sisi yang paling dekat dengan target, lalu ikuti sisi itu."
+                "say": "Blush {part} lebih pekat dari {other}. Samakan dulu sisi yang paling dekat dengan area garis putus-putus, lalu ikuti sisi itu."
               },
               "en": {
                 "title": "Very uneven strength",
-                "say": "The blush on your {part} is {value}x stronger than the {other}. Fix the side closest to the target first, then match the other to it."
+                "say": "The blush on your {part} is stronger than the {other}. Fix the side closest to the dotted area first, then match the other to it."
               }
             }
           }
@@ -2117,31 +2117,31 @@
             "slight": {
               "id": {
                 "title": "Ukuran sedikit beda",
-                "say": "Blush {part} {value}x lebih lebar dari {other}. Baurkan {other} sedikit lebih keluar."
+                "say": "Blush {part} sedikit lebih lebar dari {other}. Baurkan {other} sedikit lebih keluar."
               },
               "en": {
                 "title": "Size slightly uneven",
-                "say": "The blush on your {part} is {value}x wider than the {other}. Blend the {other} a little further out."
+                "say": "The blush on your {part} is a little wider than the {other}. Blend the {other} a little further out."
               }
             },
             "clear": {
               "id": {
                 "title": "Ukuran kiri-kanan berbeda",
-                "say": "Blush {part} {value}x lebih lebar dari {other}. Rapikan pinggiran {part} atau baurkan {other} sampai garis luar."
+                "say": "Blush {part} lebih lebar dari {other}. Rapikan pinggiran {part} atau baurkan {other} sampai garis luar."
               },
               "en": {
                 "title": "Uneven size",
-                "say": "The blush on your {part} is {value}x wider than the {other}. Tidy the {part}'s edge or blend the {other} out to the outer line."
+                "say": "The blush on your {part} is wider than the {other}. Tidy the {part}'s edge or blend the {other} out to the outer line."
               }
             },
             "large": {
               "id": {
                 "title": "Ukuran jauh berbeda",
-                "say": "Blush {part} {value}x lebih lebar dari {other}. Samakan keduanya dengan garis luar di layar."
+                "say": "Blush {part} lebih lebar dari {other}. Samakan keduanya dengan garis luar di layar."
               },
               "en": {
                 "title": "Very uneven size",
-                "say": "The blush on your {part} is {value}x wider than the {other}. Match both to the outer line on screen."
+                "say": "The blush on your {part} is wider than the {other}. Match both to the outer line on screen."
               }
             }
           }
@@ -2158,11 +2158,11 @@
           "message": {
             "id": {
               "title": "Bentuk alis pas",
-              "say": "Pangkal, lengkung dan ekor {part} sudah mengikuti bentuk pilihanmu (meleset di bawah {value} mm)."
+              "say": "Pangkal, lengkung dan ekor {part} sudah mengikuti bentuk pilihanmu."
             },
             "en": {
               "title": "Brow shape is right",
-              "say": "The head, arch and tail of your {part} follow your chosen shape (off by less than {value} mm)."
+              "say": "The head, arch and tail of your {part} follow your chosen shape."
             }
           }
         },
@@ -2248,31 +2248,31 @@
             "slight": {
               "id": {
                 "title": "Pangkal sedikit terlalu ke dalam",
-                "say": "Pangkal {part} mulai {delta} mm lebih dekat ke hidung dari target. Usap ujung dalamnya dengan cotton bud sampai titik pangkal."
+                "say": "Pangkal {part} mulai sedikit lebih dekat ke hidung dari garis panduan. Usap ujung dalamnya dengan cotton bud sampai titik pangkal."
               },
               "en": {
                 "title": "Head slightly too far in",
-                "say": "Your {part} starts {delta} mm closer to the nose than the target. Wipe the inner end with a cotton bud back to the head dot."
+                "say": "Your {part} starts a little closer to the nose than the guide. Wipe the inner end with a cotton bud back to the head dot."
               }
             },
             "clear": {
               "id": {
                 "title": "Pangkal terlalu dekat hidung",
-                "say": "Pangkal {part} {delta} mm melewati titik pangkal ke arah hidung, jadi kedua alis terlihat menyatu. Hapus bagian itu dengan cotton bud dan sedikit micellar water."
+                "say": "Pangkal {part} melewati titik pangkal ke arah hidung, jadi kedua alis terlihat menyatu. Hapus bagian itu dengan cotton bud dan sedikit micellar water."
               },
               "en": {
                 "title": "Head too close to the nose",
-                "say": "Your {part} goes {delta} mm past the head dot towards the nose, which makes the brows look joined. Remove that part with a cotton bud and a little micellar water."
+                "say": "Your {part} goes past the head dot towards the nose, which makes the brows look joined. Remove that part with a cotton bud and a little micellar water."
               }
             },
             "large": {
               "id": {
                 "title": "Pangkal jauh terlalu ke dalam",
-                "say": "Pangkal {part} {delta} mm melewati batas, hampir di batang hidung. Hapus pangkal itu dan mulai lagi dari titik pangkal di layar."
+                "say": "Pangkal {part} melewati batas, hampir di batang hidung. Hapus pangkal itu dan mulai lagi dari titik pangkal di layar."
               },
               "en": {
                 "title": "Head far too far in",
-                "say": "Your {part} starts {delta} mm past its limit, almost on the nose bridge. Remove the head and start again from the head dot on screen."
+                "say": "Your {part} starts past its limit, almost on the nose bridge. Remove the head and start again from the head dot on screen."
               }
             }
           },
@@ -2298,31 +2298,31 @@
             "slight": {
               "id": {
                 "title": "Pangkal sedikit terlalu ke luar",
-                "say": "Pangkal {part} mulai {delta} mm setelah titik pangkal. Tambah bulu tipis ke arah dalam sampai titik itu."
+                "say": "Pangkal {part} mulai sedikit setelah titik pangkal. Tambah bulu tipis ke arah dalam sampai titik itu."
               },
               "en": {
                 "title": "Head starts slightly late",
-                "say": "Your {part} starts {delta} mm after the head dot. Add light hair-like strokes inward up to the dot."
+                "say": "Your {part} starts a little after the head dot. Add light hair-like strokes inward up to the dot."
               }
             },
             "clear": {
               "id": {
                 "title": "Pangkal terlalu pendek",
-                "say": "Pangkal {part} kosong {delta} mm dari titik pangkal. Isi dengan goresan tipis ke atas seperti bulu, lalu sisir dengan spoolie."
+                "say": "Bagian awal {part} di dekat titik pangkal masih kosong. Isi dengan goresan tipis ke atas seperti bulu, lalu sisir dengan spoolie."
               },
               "en": {
                 "title": "Head too short",
-                "say": "The first {delta} mm of your {part} from the head dot are empty. Fill with thin upward hair-like strokes, then brush with the spoolie."
+                "say": "The start of your {part}, next to the head dot, is empty. Fill with thin upward hair-like strokes, then brush with the spoolie."
               }
             },
             "large": {
               "id": {
                 "title": "Pangkal belum diisi",
-                "say": "Pangkal {part} kosong {delta} mm. Ulangi langkah 4: sisir isian dari tengah ke pangkal, lalu tambah goresan tipis di pangkal."
+                "say": "Pangkal {part} masih kosong. Ulangi langkah 4: sisir isian dari tengah ke pangkal, lalu tambah goresan tipis di pangkal."
               },
               "en": {
                 "title": "Head not filled",
-                "say": "The head of your {part} is empty for {delta} mm. Redo step 4: brush the fill from the middle into the head, then add thin strokes at the head."
+                "say": "The head of your {part} is still empty. Redo step 4: brush the fill from the middle into the head, then add thin strokes at the head."
               }
             }
           }
@@ -2345,31 +2345,31 @@
             "slight": {
               "id": {
                 "title": "Pangkal sedikit terlalu tinggi",
-                "say": "Pangkal {part} {delta} mm lebih tinggi dari target. Isi sedikit di bawah pangkal dan rapikan bagian atas dengan cotton bud."
+                "say": "Pangkal {part} sedikit lebih tinggi dari garis panduan. Isi sedikit di bawah pangkal dan rapikan bagian atas dengan cotton bud."
               },
               "en": {
                 "title": "Head slightly high",
-                "say": "The head of your {part} is {delta} mm higher than the target. Fill a little below it and tidy the top with a cotton bud."
+                "say": "The head of your {part} is a little higher than the guide. Fill a little below it and tidy the top with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Pangkal terlalu tinggi",
-                "say": "Pangkal {part} {delta} mm di atas target, jadi wajah terlihat kaget. Hapus bagian atas pangkal dan isi ulang di dalam garis panduan."
+                "say": "Pangkal {part} di atas garis panduan, jadi wajah terlihat kaget. Hapus bagian atas pangkal dan isi ulang di dalam garis panduan."
               },
               "en": {
                 "title": "Head too high",
-                "say": "The head of your {part} is {delta} mm above the target, which looks surprised. Remove the top of the head and refill inside the guide."
+                "say": "The head of your {part} is above the guide, which looks surprised. Remove the top of the head and refill inside the guide."
               }
             },
             "large": {
               "id": {
                 "title": "Pangkal jauh terlalu tinggi",
-                "say": "Pangkal {part} {delta} mm di atas target. Hapus pangkal dan ulangi garis bawahnya dari titik pangkal."
+                "say": "Pangkal {part} di atas garis panduan. Hapus pangkal dan ulangi garis bawahnya dari titik pangkal."
               },
               "en": {
                 "title": "Head far too high",
-                "say": "The head of your {part} is {delta} mm above the target. Remove the head and redraw its lower line from the head dot."
+                "say": "The head of your {part} is above the guide. Remove the head and redraw its lower line from the head dot."
               }
             }
           }
@@ -2392,31 +2392,31 @@
             "slight": {
               "id": {
                 "title": "Pangkal sedikit terlalu rendah",
-                "say": "Pangkal {part} {delta} mm lebih rendah dari target. Tambah goresan tipis di atas pangkal."
+                "say": "Pangkal {part} sedikit lebih rendah dari garis panduan. Tambah goresan tipis di atas pangkal."
               },
               "en": {
                 "title": "Head slightly low",
-                "say": "The head of your {part} is {delta} mm lower than the target. Add thin strokes above the head."
+                "say": "The head of your {part} is a little lower than the guide. Add thin strokes above the head."
               }
             },
             "clear": {
               "id": {
                 "title": "Pangkal terlalu rendah",
-                "say": "Pangkal {part} {delta} mm di bawah target, jadi alis terlihat turun. Rapikan bagian bawah pangkal dengan cotton bud dan isi ke atas."
+                "say": "Pangkal {part} di bawah garis panduan, jadi alis terlihat turun. Rapikan bagian bawah pangkal dengan cotton bud dan isi ke atas."
               },
               "en": {
                 "title": "Head too low",
-                "say": "The head of your {part} is {delta} mm below the target, making the brow look heavy. Tidy the underside with a cotton bud and fill upward."
+                "say": "The head of your {part} is below the guide, making the brow look heavy. Tidy the underside with a cotton bud and fill upward."
               }
             },
             "large": {
               "id": {
                 "title": "Pangkal jauh terlalu rendah",
-                "say": "Pangkal {part} {delta} mm di bawah target. Hapus pangkal dan gambar ulang mengikuti garis panduan."
+                "say": "Pangkal {part} di bawah garis panduan. Hapus pangkal dan gambar ulang mengikuti garis panduan."
               },
               "en": {
                 "title": "Head far too low",
-                "say": "The head of your {part} is {delta} mm below the target. Remove the head and redraw it along the guide."
+                "say": "The head of your {part} is below the guide. Remove the head and redraw it along the guide."
               }
             }
           }
@@ -2439,31 +2439,31 @@
             "slight": {
               "id": {
                 "title": "Ekor sedikit pendek",
-                "say": "Ekor {part} berhenti {delta} mm sebelum titik ujung. Tarik goresan tipis sampai titik ujung."
+                "say": "Ekor {part} berhenti sebelum titik ujung. Tarik goresan tipis sampai titik ujung."
               },
               "en": {
                 "title": "Tail slightly short",
-                "say": "The tail of your {part} stops {delta} mm before the end dot. Draw a thin stroke out to the end dot."
+                "say": "The tail of your {part} stops a little before the end dot. Draw a thin stroke out to the end dot."
               }
             },
             "clear": {
               "id": {
                 "title": "Ekor terlalu pendek",
-                "say": "Ekor {part} {delta} mm lebih pendek dari target. Sambung dari ujung yang ada ke titik ujung dengan garis yang makin menipis."
+                "say": "Ekor {part} lebih pendek dari garis panduan. Sambung dari ujung yang ada ke titik ujung dengan garis yang makin menipis."
               },
               "en": {
                 "title": "Tail too short",
-                "say": "The tail of your {part} is {delta} mm shorter than the target. Extend it from where it ends to the end dot with a line that gets thinner."
+                "say": "The tail of your {part} is shorter than the guide. Extend it from where it ends to the end dot with a line that gets thinner."
               }
             },
             "large": {
               "id": {
                 "title": "Ekor belum digambar",
-                "say": "Ekor {part} kurang {delta} mm. Ulangi langkah 3: hubungkan titik lengkung ke titik ujung, lalu isi tipis."
+                "say": "Ekor {part} masih kurang panjang. Ulangi langkah 3: hubungkan titik lengkung ke titik ujung, lalu isi tipis."
               },
               "en": {
                 "title": "Tail missing",
-                "say": "The tail of your {part} is {delta} mm short. Redo step 3: join the arch dot to the end dot, then fill lightly."
+                "say": "The tail of your {part} is short. Redo step 3: join the arch dot to the end dot, then fill lightly."
               }
             }
           }
@@ -2486,31 +2486,31 @@
             "slight": {
               "id": {
                 "title": "Ekor sedikit panjang",
-                "say": "Ekor {part} {delta} mm melewati titik ujung. Usap ujungnya dengan cotton bud."
+                "say": "Ekor {part} sedikit melewati titik ujung. Usap ujungnya dengan cotton bud."
               },
               "en": {
                 "title": "Tail slightly long",
-                "say": "The tail of your {part} runs {delta} mm past the end dot. Wipe the end with a cotton bud."
+                "say": "The tail of your {part} runs a little past the end dot. Wipe the end with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Ekor terlalu panjang",
-                "say": "Ekor {part} {delta} mm lebih panjang dari target. Hapus bagian yang melewati titik ujung dengan cotton bud dan micellar water."
+                "say": "Ekor {part} lebih panjang dari garis panduan. Hapus bagian yang melewati titik ujung dengan cotton bud dan micellar water."
               },
               "en": {
                 "title": "Tail too long",
-                "say": "The tail of your {part} is {delta} mm longer than the target. Remove what goes past the end dot with a cotton bud and micellar water."
+                "say": "The tail of your {part} is longer than the guide. Remove what goes past the end dot with a cotton bud and micellar water."
               }
             },
             "large": {
               "id": {
                 "title": "Ekor jauh terlalu panjang",
-                "say": "Ekor {part} {delta} mm melewati titik ujung, hampir ke pelipis. Hapus ekor dan gambar ulang sampai titik ujung saja."
+                "say": "Ekor {part} melewati titik ujung, hampir ke pelipis. Hapus ekor dan gambar ulang sampai titik ujung saja."
               },
               "en": {
                 "title": "Tail far too long",
-                "say": "The tail of your {part} runs {delta} mm past the end dot, nearly to the temple. Remove the tail and redraw it to the end dot only."
+                "say": "The tail of your {part} runs past the end dot, nearly to the temple. Remove the tail and redraw it to the end dot only."
               }
             }
           }
@@ -2533,31 +2533,31 @@
             "slight": {
               "id": {
                 "title": "Ujung ekor sedikit tinggi",
-                "say": "Ujung {part} {delta} mm lebih tinggi dari titik ujung. Rapikan bagian atas ekor dengan cotton bud."
+                "say": "Ujung {part} sedikit lebih tinggi dari titik ujung. Rapikan bagian atas ekor dengan cotton bud."
               },
               "en": {
                 "title": "Tail end slightly high",
-                "say": "The tail end of your {part} is {delta} mm above the end dot. Tidy the top of the tail with a cotton bud."
+                "say": "The tail end of your {part} is a little above the end dot. Tidy the top of the tail with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Ujung ekor terlalu tinggi",
-                "say": "Ujung {part} {delta} mm di atas titik ujung, jadi alis terlihat menukik. Hapus atas ekor dan turunkan garisnya ke titik ujung."
+                "say": "Ujung {part} di atas titik ujung, jadi alis terlihat menukik. Hapus atas ekor dan turunkan garisnya ke titik ujung."
               },
               "en": {
                 "title": "Tail end too high",
-                "say": "The tail end of your {part} is {delta} mm above the end dot, so the brow looks sharp. Remove the top of the tail and bring the line down to the end dot."
+                "say": "The tail end of your {part} is above the end dot, so the brow looks sharp. Remove the top of the tail and bring the line down to the end dot."
               }
             },
             "large": {
               "id": {
                 "title": "Ujung ekor jauh terlalu tinggi",
-                "say": "Ujung {part} {delta} mm di atas target. Hapus ekor dan ulangi garis dari titik lengkung ke titik ujung."
+                "say": "Ujung {part} di atas garis panduan. Hapus ekor dan ulangi garis dari titik lengkung ke titik ujung."
               },
               "en": {
                 "title": "Tail end far too high",
-                "say": "The tail end of your {part} is {delta} mm above the target. Remove the tail and redraw from the arch dot to the end dot."
+                "say": "The tail end of your {part} is above the guide. Remove the tail and redraw from the arch dot to the end dot."
               }
             }
           },
@@ -2583,31 +2583,31 @@
             "slight": {
               "id": {
                 "title": "Ujung ekor sedikit turun",
-                "say": "Ujung {part} {delta} mm lebih rendah dari titik ujung. Tambah sedikit di atas ujung ekor."
+                "say": "Ujung {part} sedikit lebih rendah dari titik ujung. Tambah sedikit di atas ujung ekor."
               },
               "en": {
                 "title": "Tail end slightly low",
-                "say": "The tail end of your {part} is {delta} mm below the end dot. Add a little above the tail end."
+                "say": "The tail end of your {part} is a little below the end dot. Add a little above the tail end."
               }
             },
             "clear": {
               "id": {
                 "title": "Ujung ekor terlalu turun",
-                "say": "Ujung {part} {delta} mm di bawah titik ujung, jadi mata terlihat sedih. Hapus bagian bawah ekor dan naikkan garisnya ke titik ujung."
+                "say": "Ujung {part} di bawah titik ujung, jadi mata terlihat sedih. Hapus bagian bawah ekor dan naikkan garisnya ke titik ujung."
               },
               "en": {
                 "title": "Tail end drooping",
-                "say": "The tail end of your {part} is {delta} mm below the end dot, which makes the eyes look sad. Remove the underside of the tail and lift the line to the end dot."
+                "say": "The tail end of your {part} is below the end dot, which makes the eyes look sad. Remove the underside of the tail and lift the line to the end dot."
               }
             },
             "large": {
               "id": {
                 "title": "Ujung ekor jauh terlalu turun",
-                "say": "Ujung {part} {delta} mm di bawah target. Hapus ekor dan gambar ulang dari titik lengkung ke titik ujung."
+                "say": "Ujung {part} di bawah garis panduan. Hapus ekor dan gambar ulang dari titik lengkung ke titik ujung."
               },
               "en": {
                 "title": "Tail end far too low",
-                "say": "The tail end of your {part} is {delta} mm below the target. Remove the tail and redraw from the arch dot to the end dot."
+                "say": "The tail end of your {part} is below the guide. Remove the tail and redraw from the arch dot to the end dot."
               }
             }
           },
@@ -2633,31 +2633,31 @@
             "slight": {
               "id": {
                 "title": "Lengkung sedikit terlalu ke dalam",
-                "say": "Titik tertinggi {part} {delta} mm lebih dekat ke hidung dari titik lengkung. Isi sedikit di atas titik lengkung supaya puncaknya bergeser."
+                "say": "Titik tertinggi {part} sedikit lebih dekat ke hidung dari titik lengkung. Isi sedikit di atas titik lengkung supaya puncaknya bergeser."
               },
               "en": {
                 "title": "Arch slightly too far in",
-                "say": "The highest point of your {part} is {delta} mm closer to the nose than the arch dot. Fill a little above the arch dot to move the peak."
+                "say": "The highest point of your {part} is a little closer to the nose than the arch dot. Fill a little above the arch dot to move the peak."
               }
             },
             "clear": {
               "id": {
                 "title": "Lengkung terlalu ke dalam",
-                "say": "Puncak {part} {delta} mm lebih ke dalam dari target, jadi alis terlihat bulat. Rapikan atas puncak yang sekarang dan pertegas atas titik lengkung."
+                "say": "Puncak {part} lebih ke dalam dari garis panduan, jadi alis terlihat bulat. Rapikan atas puncak yang sekarang dan pertegas atas titik lengkung."
               },
               "en": {
                 "title": "Arch too far in",
-                "say": "The peak of your {part} is {delta} mm further in than the target, which rounds the brow. Tidy above the current peak and define above the arch dot."
+                "say": "The peak of your {part} is further in than the guide, which rounds the brow. Tidy above the current peak and define above the arch dot."
               }
             },
             "large": {
               "id": {
                 "title": "Lengkung di tempat yang salah",
-                "say": "Puncak {part} {delta} mm dari titik lengkung. Ulangi garis atas dari pangkal ke titik lengkung, lalu turun ke ujung."
+                "say": "Puncak {part} jauh dari titik lengkung. Ulangi garis atas dari pangkal ke titik lengkung, lalu turun ke ujung."
               },
               "en": {
                 "title": "Arch in the wrong place",
-                "say": "The peak of your {part} is {delta} mm from the arch dot. Redraw the top line from the head to the arch dot, then down to the end."
+                "say": "The peak of your {part} is far from the arch dot. Redraw the top line from the head to the arch dot, then down to the end."
               }
             }
           }
@@ -2680,31 +2680,31 @@
             "slight": {
               "id": {
                 "title": "Lengkung sedikit terlalu ke luar",
-                "say": "Titik tertinggi {part} {delta} mm lewat dari titik lengkung. Rapikan atas ekor sedikit."
+                "say": "Titik tertinggi {part} sedikit lewat dari titik lengkung. Rapikan atas ekor sedikit."
               },
               "en": {
                 "title": "Arch slightly too far out",
-                "say": "The highest point of your {part} is {delta} mm past the arch dot. Tidy the top of the tail a little."
+                "say": "The highest point of your {part} is a little past the arch dot. Tidy the top of the tail a little."
               }
             },
             "clear": {
               "id": {
                 "title": "Lengkung terlalu ke luar",
-                "say": "Puncak {part} {delta} mm lebih ke luar dari target, jadi ekor terlihat berat. Turunkan garis atas setelah titik lengkung."
+                "say": "Puncak {part} lebih ke luar dari garis panduan, jadi ekor terlihat berat. Turunkan garis atas setelah titik lengkung."
               },
               "en": {
                 "title": "Arch too far out",
-                "say": "The peak of your {part} is {delta} mm further out than the target, which makes the tail heavy. Lower the top line after the arch dot."
+                "say": "The peak of your {part} is further out than the guide, which makes the tail heavy. Lower the top line after the arch dot."
               }
             },
             "large": {
               "id": {
                 "title": "Lengkung di tempat yang salah",
-                "say": "Puncak {part} {delta} mm dari titik lengkung. Ulangi garis atas dari pangkal ke titik lengkung, lalu turun ke ujung."
+                "say": "Puncak {part} jauh dari titik lengkung. Ulangi garis atas dari pangkal ke titik lengkung, lalu turun ke ujung."
               },
               "en": {
                 "title": "Arch in the wrong place",
-                "say": "The peak of your {part} is {delta} mm from the arch dot. Redraw the top line from the head to the arch dot, then down to the end."
+                "say": "The peak of your {part} is far from the arch dot. Redraw the top line from the head to the arch dot, then down to the end."
               }
             }
           }
@@ -2727,31 +2727,31 @@
             "slight": {
               "id": {
                 "title": "Lengkung sedikit terlalu tinggi",
-                "say": "Lengkung {part} {delta} mm lebih tinggi dari bentuk pilihanmu. Rapikan sedikit bagian atas puncak."
+                "say": "Lengkung {part} sedikit lebih tinggi dari bentuk pilihanmu. Rapikan sedikit bagian atas puncak."
               },
               "en": {
                 "title": "Arch slightly high",
-                "say": "The arch of your {part} is {delta} mm higher than your chosen shape. Tidy a little off the top of the peak."
+                "say": "The arch of your {part} is a little higher than your chosen shape. Tidy a little off the top of the peak."
               }
             },
             "clear": {
               "id": {
                 "title": "Lengkung terlalu tinggi",
-                "say": "Lengkung {part} {delta} mm lebih tinggi dari target, jadi ekspresi terlihat kaget. Hapus bagian atas puncak dengan cotton bud mengikuti garis panduan."
+                "say": "Lengkung {part} lebih tinggi dari garis panduan, jadi ekspresi terlihat kaget. Hapus bagian atas puncak dengan cotton bud mengikuti garis panduan."
               },
               "en": {
                 "title": "Arch too high",
-                "say": "The arch of your {part} is {delta} mm higher than the target, which looks surprised. Remove the top of the peak with a cotton bud along the guide."
+                "say": "The arch of your {part} is higher than the guide, which looks surprised. Remove the top of the peak with a cotton bud along the guide."
               }
             },
             "large": {
               "id": {
                 "title": "Lengkung jauh terlalu tinggi",
-                "say": "Lengkung {part} {delta} mm di atas target. Hapus bagian atas dan gambar ulang garis atas mengikuti panduan."
+                "say": "Lengkung {part} di atas garis panduan. Hapus bagian atas dan gambar ulang garis atas mengikuti panduan."
               },
               "en": {
                 "title": "Arch far too high",
-                "say": "The arch of your {part} is {delta} mm above the target. Remove the top and redraw the upper line along the guide."
+                "say": "The arch of your {part} is above the guide. Remove the top and redraw the upper line along the guide."
               }
             }
           }
@@ -2774,31 +2774,31 @@
             "slight": {
               "id": {
                 "title": "Lengkung sedikit datar",
-                "say": "Lengkung {part} {delta} mm lebih rendah dari bentuk pilihanmu. Tambah sedikit di atas titik lengkung."
+                "say": "Lengkung {part} sedikit lebih rendah dari bentuk pilihanmu. Tambah sedikit di atas titik lengkung."
               },
               "en": {
                 "title": "Arch slightly flat",
-                "say": "The arch of your {part} is {delta} mm lower than your chosen shape. Add a little above the arch dot."
+                "say": "The arch of your {part} is a little lower than your chosen shape. Add a little above the arch dot."
               }
             },
             "clear": {
               "id": {
                 "title": "Lengkung terlalu datar",
-                "say": "Lengkung {part} {delta} mm lebih datar dari target. Pertegas garis atas: naik dari pangkal ke titik lengkung, lalu turun ke ujung."
+                "say": "Lengkung {part} lebih datar dari garis panduan. Pertegas garis atas: naik dari pangkal ke titik lengkung, lalu turun ke ujung."
               },
               "en": {
                 "title": "Arch too flat",
-                "say": "The arch of your {part} is {delta} mm flatter than the target. Define the top line: up from the head to the arch dot, then down to the end."
+                "say": "The arch of your {part} is flatter than the guide. Define the top line: up from the head to the arch dot, then down to the end."
               }
             },
             "large": {
               "id": {
                 "title": "Alis lurus, tanpa lengkung",
-                "say": "{part} hampir lurus ({delta} mm lebih datar dari target). Ulangi langkah 3 dengan tiga titik di layar sebagai patokan garis atas."
+                "say": "{part} hampir lurus. Ulangi langkah 3 dengan tiga titik di layar sebagai patokan garis atas."
               },
               "en": {
                 "title": "Straight brow, no arch",
-                "say": "Your {part} is almost straight ({delta} mm flatter than the target). Redo step 3 using the three dots on screen for the top line."
+                "say": "Your {part} is almost straight. Redo step 3 using the three dots on screen for the top line."
               }
             }
           }
@@ -2821,31 +2821,31 @@
             "slight": {
               "id": {
                 "title": "Naik sedikit terlalu curam",
-                "say": "Garis dari pangkal ke lengkung {part} {delta}° lebih curam dari target ({value}° vs {target}°). Isi sedikit di bawah garis atas di bagian badan."
+                "say": "Garis dari pangkal ke lengkung {part} sedikit lebih curam dari garis panduan. Isi sedikit di bawah garis atas di bagian badan."
               },
               "en": {
                 "title": "Rise slightly steep",
-                "say": "The line from head to arch on your {part} is {delta}° steeper than the target ({value}° vs {target}°). Fill a little under the top line in the body."
+                "say": "The line from head to arch on your {part} is a little steeper than the guide. Fill a little under the top line in the body."
               }
             },
             "clear": {
               "id": {
                 "title": "Naik terlalu curam",
-                "say": "Pangkal ke lengkung {part} naik {delta}° lebih curam dari target. Rapikan garis atas dekat pangkal supaya naiknya lebih landai."
+                "say": "Pangkal ke lengkung {part} naik lebih curam dari garis panduan. Rapikan garis atas dekat pangkal supaya naiknya lebih landai."
               },
               "en": {
                 "title": "Rise too steep",
-                "say": "Your {part} rises {delta}° more steeply from head to arch than the target. Tidy the top line near the head so it rises more gently."
+                "say": "Your {part} rises more steeply from head to arch than the guide. Tidy the top line near the head so it rises more gently."
               }
             },
             "large": {
               "id": {
                 "title": "Naik jauh terlalu curam",
-                "say": "Pangkal ke lengkung {part} hampir tegak ({value}°, target {target}°). Ulangi garis atas dari titik pangkal ke titik lengkung."
+                "say": "Pangkal ke lengkung {part} hampir tegak. Ulangi garis atas dari titik pangkal ke titik lengkung."
               },
               "en": {
                 "title": "Rise far too steep",
-                "say": "From head to arch your {part} is almost vertical ({value}°, target {target}°). Redraw the top line from the head dot to the arch dot."
+                "say": "From head to arch your {part} is almost vertical. Redraw the top line from the head dot to the arch dot."
               }
             }
           }
@@ -2867,31 +2867,31 @@
             "slight": {
               "id": {
                 "title": "Naik sedikit terlalu landai",
-                "say": "Garis pangkal ke lengkung {part} {delta}° lebih landai dari target. Tambah sedikit di atas badan alis."
+                "say": "Garis pangkal ke lengkung {part} sedikit lebih landai dari garis panduan. Tambah sedikit di atas badan alis."
               },
               "en": {
                 "title": "Rise slightly gentle",
-                "say": "The head-to-arch line on your {part} is {delta}° gentler than the target. Add a little above the brow body."
+                "say": "The head-to-arch line on your {part} is gentler than the guide. Add a little above the brow body."
               }
             },
             "clear": {
               "id": {
                 "title": "Naik terlalu landai",
-                "say": "Pangkal ke lengkung {part} {delta}° lebih landai dari target. Pertegas garis atas naik ke titik lengkung."
+                "say": "Pangkal ke lengkung {part} lebih landai dari garis panduan. Pertegas garis atas naik ke titik lengkung."
               },
               "en": {
                 "title": "Rise too gentle",
-                "say": "Your {part} rises {delta}° less than the target from head to arch. Define the top line rising to the arch dot."
+                "say": "Your {part} rises less than the guide from head to arch. Define the top line rising to the arch dot."
               }
             },
             "large": {
               "id": {
                 "title": "Tidak ada kenaikan",
-                "say": "{part} hampir tidak naik dari pangkal ke lengkung ({value}°, target {target}°). Ulangi garis atas mengikuti titik di layar."
+                "say": "{part} hampir tidak naik dari pangkal ke lengkung. Ulangi garis atas mengikuti titik di layar."
               },
               "en": {
                 "title": "No rise",
-                "say": "Your {part} barely rises from head to arch ({value}°, target {target}°). Redraw the top line following the dots on screen."
+                "say": "Your {part} barely rises from head to arch. Redraw the top line following the dots on screen."
               }
             }
           }
@@ -2913,31 +2913,31 @@
             "slight": {
               "id": {
                 "title": "Ekor sedikit terlalu menukik",
-                "say": "Ekor {part} turun {delta}° lebih curam dari target. Tambah sedikit di atas ujung ekor."
+                "say": "Ekor {part} turun sedikit lebih curam dari garis panduan. Tambah sedikit di atas ujung ekor."
               },
               "en": {
                 "title": "Tail drops slightly steeply",
-                "say": "The tail of your {part} drops {delta}° more steeply than the target. Add a little above the tail end."
+                "say": "The tail of your {part} drops more steeply than the guide. Add a little above the tail end."
               }
             },
             "clear": {
               "id": {
                 "title": "Ekor terlalu menukik",
-                "say": "Ekor {part} turun {delta}° lebih curam dari target. Hapus bagian bawah ujung ekor dan sambung garisnya lebih landai ke titik ujung."
+                "say": "Ekor {part} turun lebih curam dari garis panduan. Hapus bagian bawah ujung ekor dan sambung garisnya lebih landai ke titik ujung."
               },
               "en": {
                 "title": "Tail drops too steeply",
-                "say": "The tail of your {part} drops {delta}° more steeply than the target. Remove the underside of the tail end and run the line more gently to the end dot."
+                "say": "The tail of your {part} drops more steeply than the guide. Remove the underside of the tail end and run the line more gently to the end dot."
               }
             },
             "large": {
               "id": {
                 "title": "Ekor jatuh ke bawah",
-                "say": "Ekor {part} jatuh tajam ({value}°, target {target}°). Ulangi ekor dari titik lengkung ke titik ujung."
+                "say": "Ekor {part} jatuh tajam. Ulangi ekor dari titik lengkung ke titik ujung."
               },
               "en": {
                 "title": "Tail falls down",
-                "say": "The tail of your {part} falls sharply ({value}°, target {target}°). Redraw the tail from the arch dot to the end dot."
+                "say": "The tail of your {part} falls sharply. Redraw the tail from the arch dot to the end dot."
               }
             }
           }
@@ -2958,31 +2958,31 @@
             "slight": {
               "id": {
                 "title": "Ekor sedikit terlalu datar",
-                "say": "Ekor {part} {delta}° lebih datar dari target. Rapikan bagian atas ujung ekor."
+                "say": "Ekor {part} sedikit lebih datar dari garis panduan. Rapikan bagian atas ujung ekor."
               },
               "en": {
                 "title": "Tail slightly level",
-                "say": "The tail of your {part} is {delta}° more level than the target. Tidy the top of the tail end."
+                "say": "The tail of your {part} is more level than the guide. Tidy the top of the tail end."
               }
             },
             "clear": {
               "id": {
                 "title": "Ekor terlalu datar",
-                "say": "Ekor {part} {delta}° lebih datar dari target. Turunkan ujung ekor ke titik ujung dan hapus bagian atasnya."
+                "say": "Ekor {part} lebih datar dari garis panduan. Turunkan ujung ekor ke titik ujung dan hapus bagian atasnya."
               },
               "en": {
                 "title": "Tail too level",
-                "say": "The tail of your {part} is {delta}° more level than the target. Bring the tail end down to the end dot and remove the top."
+                "say": "The tail of your {part} is more level than the guide. Bring the tail end down to the end dot and remove the top."
               }
             },
             "large": {
               "id": {
                 "title": "Ekor tidak turun",
-                "say": "Ekor {part} lurus atau naik ({value}°, target {target}°). Ulangi ekor dari titik lengkung ke titik ujung."
+                "say": "Ekor {part} lurus atau naik. Ulangi ekor dari titik lengkung ke titik ujung."
               },
               "en": {
                 "title": "Tail does not come down",
-                "say": "The tail of your {part} is straight or rising ({value}°, target {target}°). Redraw it from the arch dot to the end dot."
+                "say": "The tail of your {part} is straight or rising. Redraw it from the arch dot to the end dot."
               }
             }
           }
@@ -3010,31 +3010,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit terlalu tebal",
-                "say": "Bagian {zone} {part} {delta} mm lebih tebal dari target. Rapikan pinggiran bawahnya dengan cotton bud."
+                "say": "Bagian {zone} {part} sedikit lebih tebal dari Try On. Rapikan pinggiran bawahnya dengan cotton bud."
               },
               "en": {
                 "title": "Slightly thick",
-                "say": "The {zone} of your {part} is {delta} mm thicker than the target. Tidy its lower edge with a cotton bud."
+                "say": "The {zone} of your {part} is a little thicker than your try-on. Tidy its lower edge with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Terlalu tebal",
-                "say": "Bagian {zone} {part} {delta} mm lebih tebal dari target. Hapus pinggiran yang keluar garis panduan, mulai dari bawah."
+                "say": "Bagian {zone} {part} lebih tebal dari Try On. Hapus pinggiran yang keluar garis panduan, mulai dari bawah."
               },
               "en": {
                 "title": "Too thick",
-                "say": "The {zone} of your {part} is {delta} mm thicker than the target. Remove what goes past the guide, starting from below."
+                "say": "The {zone} of your {part} is thicker than your try-on. Remove what goes past the guide, starting from below."
               }
             },
             "large": {
               "id": {
                 "title": "Jauh terlalu tebal",
-                "say": "Bagian {zone} {part} {delta} mm lebih tebal dari target. Hapus bagian itu dan gambar ulang outline-nya di dalam panduan."
+                "say": "Bagian {zone} {part} lebih tebal dari Try On. Hapus bagian itu dan gambar ulang outline-nya di dalam panduan."
               },
               "en": {
                 "title": "Far too thick",
-                "say": "The {zone} of your {part} is {delta} mm thicker than the target. Remove that part and redraw its outline inside the guide."
+                "say": "The {zone} of your {part} is thicker than your try-on. Remove that part and redraw its outline inside the guide."
               }
             }
           }
@@ -3061,31 +3061,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit terlalu tipis",
-                "say": "Bagian {zone} {part} {delta} mm lebih tipis dari target. Tambah goresan tipis di pinggiran bawah."
+                "say": "Bagian {zone} {part} sedikit lebih tipis dari Try On. Tambah goresan tipis di pinggiran bawah."
               },
               "en": {
                 "title": "Slightly thin",
-                "say": "The {zone} of your {part} is {delta} mm thinner than the target. Add thin strokes along the lower edge."
+                "say": "The {zone} of your {part} is a little thinner than your try-on. Add thin strokes along the lower edge."
               }
             },
             "clear": {
               "id": {
                 "title": "Terlalu tipis",
-                "say": "Bagian {zone} {part} {delta} mm lebih tipis dari target. Isi sampai garis panduan atas dan bawah dengan goresan pendek."
+                "say": "Bagian {zone} {part} lebih tipis dari Try On. Isi sampai garis panduan atas dan bawah dengan goresan pendek."
               },
               "en": {
                 "title": "Too thin",
-                "say": "The {zone} of your {part} is {delta} mm thinner than the target. Fill up to the top and bottom guide lines with short strokes."
+                "say": "The {zone} of your {part} is thinner than your try-on. Fill up to the top and bottom guide lines with short strokes."
               }
             },
             "large": {
               "id": {
                 "title": "Jauh terlalu tipis",
-                "say": "Bagian {zone} {part} hanya garis tipis ({delta} mm kurang dari target). Ulangi outline atas dan bawah, lalu isi."
+                "say": "Bagian {zone} {part} hanya garis tipis. Ulangi outline atas dan bawah, lalu isi."
               },
               "en": {
                 "title": "Far too thin",
-                "say": "The {zone} of your {part} is a thin line ({delta} mm under the target). Redraw the top and bottom outline, then fill."
+                "say": "The {zone} of your {part} is a thin line. Redraw the top and bottom outline, then fill."
               }
             }
           }
@@ -3112,31 +3112,31 @@
             "slight": {
               "id": {
                 "title": "Ada celah kecil",
-                "say": "{part} terisi {value}%. Ada celah di {zone}: isi dengan goresan pendek searah bulu."
+                "say": "{part} masih ada celah kecil. Ada celah di {zone}: isi dengan goresan pendek searah bulu."
               },
               "en": {
                 "title": "Small gaps",
-                "say": "Your {part} is {value}% filled. There is a gap in the {zone}: fill it with short strokes in the hair direction."
+                "say": "Your {part} has a small gap. There is a gap in the {zone}: fill it with short strokes in the hair direction."
               }
             },
             "clear": {
               "id": {
                 "title": "Belum terisi rata",
-                "say": "{part} baru terisi {value}%, paling kosong di {zone}. Isi bagian itu tipis-tipis, lalu sisir dengan spoolie."
+                "say": "{part} masih banyak celah, paling kosong di {zone}. Isi bagian itu tipis-tipis, lalu sisir dengan spoolie."
               },
               "en": {
                 "title": "Not evenly filled",
-                "say": "Your {part} is only {value}% filled, emptiest in the {zone}. Fill that part lightly, then brush with the spoolie."
+                "say": "Your {part} has big gaps, emptiest in the {zone}. Fill that part lightly, then brush with the spoolie."
               }
             },
             "large": {
               "id": {
                 "title": "Masih banyak bagian kosong",
-                "say": "{part} baru terisi {value}%. Ulangi langkah 3 dan 4: isi dari tengah ke ekor, lalu sisir ke pangkal."
+                "say": "{part} masih banyak celah. Ulangi langkah 3 dan 4: isi dari tengah ke ekor, lalu sisir ke pangkal."
               },
               "en": {
                 "title": "Still mostly empty",
-                "say": "Your {part} is only {value}% filled. Redo steps 3 and 4: fill from the middle to the tail, then brush into the head."
+                "say": "Your {part} has big gaps. Redo steps 3 and 4: fill from the middle to the tail, then brush into the head."
               }
             }
           }
@@ -3159,31 +3159,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit terlalu gelap",
-                "say": "{part} {value}x lebih gelap dari look pilihanmu. Sisir dengan spoolie bersih untuk mengangkat sedikit produk."
+                "say": "{part} sedikit lebih gelap dari look pilihanmu. Sisir dengan spoolie bersih untuk mengangkat sedikit produk."
               },
               "en": {
                 "title": "Slightly too dark",
-                "say": "Your {part} is {value}x darker than your chosen look. Brush with a clean spoolie to lift a little product."
+                "say": "Your {part} is a little darker than your chosen look. Brush with a clean spoolie to lift a little product."
               }
             },
             "clear": {
               "id": {
                 "title": "Terlalu gelap",
-                "say": "{part} {value}x lebih gelap dari target. Tekan dengan tisu, lalu sisir dengan spoolie bersih beberapa kali."
+                "say": "{part} lebih gelap dari Try On. Tekan dengan tisu, lalu sisir dengan spoolie bersih beberapa kali."
               },
               "en": {
                 "title": "Too dark",
-                "say": "Your {part} is {value}x darker than the target. Press with a tissue, then brush several times with a clean spoolie."
+                "say": "Your {part} is darker than your try-on. Press with a tissue, then brush several times with a clean spoolie."
               }
             },
             "large": {
               "id": {
                 "title": "Jauh terlalu gelap",
-                "say": "{part} {value}x lebih gelap dari target. Hapus dan isi ulang dengan tekanan pensil yang lebih ringan."
+                "say": "{part} lebih gelap dari Try On. Hapus dan isi ulang dengan tekanan pensil yang lebih ringan."
               },
               "en": {
                 "title": "Far too dark",
-                "say": "Your {part} is {value}x darker than the target. Remove it and refill with lighter pencil pressure."
+                "say": "Your {part} is darker than your try-on. Remove it and refill with lighter pencil pressure."
               }
             }
           }
@@ -3205,31 +3205,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit terlalu terang",
-                "say": "{part} baru {value}% sepekat look pilihanmu. Tambah satu lapis tipis di badan dan ekor."
+                "say": "{part} sedikit lebih tipis dari look pilihanmu. Tambah satu lapis tipis di badan dan ekor."
               },
               "en": {
                 "title": "Slightly light",
-                "say": "Your {part} is {value}% as strong as your chosen look. Add one thin layer to the body and tail."
+                "say": "Your {part} is a little lighter than your chosen look. Add one thin layer to the body and tail."
               }
             },
             "clear": {
               "id": {
                 "title": "Terlalu terang",
-                "say": "{part} baru {value}% sepekat target. Tambah lapisan di badan dan ekor, biarkan pangkal tetap paling terang."
+                "say": "{part} masih jauh lebih tipis dari Try On. Tambah lapisan di badan dan ekor, biarkan pangkal tetap paling terang."
               },
               "en": {
                 "title": "Too light",
-                "say": "Your {part} is only {value}% as strong as the target. Build up the body and tail, keeping the head lightest."
+                "say": "Your {part} is much lighter than your try-on. Build up the body and tail, keeping the head lightest."
               }
             },
             "large": {
               "id": {
                 "title": "Hampir tidak terlihat",
-                "say": "{part} baru {value}% sepekat target. Pakai produk lebih gelap atau tekanan lebih kuat di badan dan ekor."
+                "say": "{part} masih jauh lebih tipis dari Try On. Pakai produk lebih gelap atau tekanan lebih kuat di badan dan ekor."
               },
               "en": {
                 "title": "Barely visible",
-                "say": "Your {part} is only {value}% as strong as the target. Use a darker product or more pressure on the body and tail."
+                "say": "Your {part} is much lighter than your try-on. Use a darker product or more pressure on the body and tail."
               }
             }
           }
@@ -3251,31 +3251,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit keluar di atas",
-                "say": "Ada produk {value}% di atas garis {part}. Rapikan dengan cotton bud."
+                "say": "Ada sedikit produk di atas garis {part}. Rapikan dengan cotton bud."
               },
               "en": {
                 "title": "A little over the top",
-                "say": "{value}% of product is above the line of your {part}. Tidy it with a cotton bud."
+                "say": "Some product is a little above the line of your {part}. Tidy it with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Keluar garis di atas",
-                "say": "Produk keluar di atas garis {part} ({value}%). Usap dengan cotton bud dan sedikit micellar water mengikuti garis panduan."
+                "say": "Produk keluar di atas garis {part}. Usap dengan cotton bud dan sedikit micellar water mengikuti garis panduan."
               },
               "en": {
                 "title": "Over the top line",
-                "say": "Product goes over the top line of your {part} ({value}%). Wipe along the guide with a cotton bud and a little micellar water."
+                "say": "Product goes over the top line of your {part}. Wipe along the guide with a cotton bud and a little micellar water."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak keluar di atas",
-                "say": "Banyak produk di atas {part} ({value}%). Hapus bagian atas dan gambar ulang outline atas."
+                "say": "Banyak produk di atas {part}. Hapus bagian atas dan gambar ulang outline atas."
               },
               "en": {
                 "title": "Lots over the top",
-                "say": "Lots of product sits above your {part} ({value}%). Remove the top part and redraw the upper outline."
+                "say": "Lots of product sits above your {part}. Remove the top part and redraw the upper outline."
               }
             }
           }
@@ -3296,31 +3296,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit keluar di bawah",
-                "say": "Ada produk {value}% di bawah garis {part}. Rapikan dengan cotton bud."
+                "say": "Ada sedikit produk di bawah garis {part}. Rapikan dengan cotton bud."
               },
               "en": {
                 "title": "A little under the line",
-                "say": "{value}% of product is below the line of your {part}. Tidy it with a cotton bud."
+                "say": "Some product is a little below the line of your {part}. Tidy it with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Keluar garis di bawah",
-                "say": "Produk keluar di bawah garis {part} ({value}%), mendekati kelopak. Usap dengan cotton bud dan micellar water."
+                "say": "Produk keluar di bawah garis {part}, mendekati kelopak. Usap dengan cotton bud dan micellar water."
               },
               "en": {
                 "title": "Under the bottom line",
-                "say": "Product goes under the bottom line of your {part} ({value}%), towards the lid. Wipe with a cotton bud and micellar water."
+                "say": "Product goes under the bottom line of your {part}, towards the lid. Wipe with a cotton bud and micellar water."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak keluar di bawah",
-                "say": "Banyak produk di bawah {part} ({value}%). Hapus bagian bawah dan gambar ulang outline bawah."
+                "say": "Banyak produk di bawah {part}. Hapus bagian bawah dan gambar ulang outline bawah."
               },
               "en": {
                 "title": "Lots under the line",
-                "say": "Lots of product sits under your {part} ({value}%). Remove the lower part and redraw the bottom outline."
+                "say": "Lots of product sits under your {part}. Remove the lower part and redraw the bottom outline."
               }
             }
           }
@@ -3352,21 +3352,21 @@
             "clear": {
               "id": {
                 "title": "Produk di antara alis",
-                "say": "Ada produk di antara kedua alis ({value}%). Bersihkan dengan cotton bud dan micellar water supaya pangkal terlihat terpisah."
+                "say": "Ada produk di antara kedua alis. Bersihkan dengan cotton bud dan micellar water supaya pangkal terlihat terpisah."
               },
               "en": {
                 "title": "Product between the brows",
-                "say": "There is product between the brows ({value}%). Clean it with a cotton bud and micellar water so the heads look separate."
+                "say": "There is product between the brows. Clean it with a cotton bud and micellar water so the heads look separate."
               }
             },
             "large": {
               "id": {
                 "title": "Alis terlihat menyambung",
-                "say": "Banyak produk di antara alis ({value}%), jadi alis terlihat menyambung. Hapus area itu dan mulai pangkal dari titiknya."
+                "say": "Banyak produk di antara alis, jadi alis terlihat menyambung. Hapus area itu dan mulai pangkal dari titiknya."
               },
               "en": {
                 "title": "Brows look joined",
-                "say": "Lots of product between the brows ({value}%) makes them look joined. Remove it and start each head at its dot."
+                "say": "Lots of product between the brows makes them look joined. Remove it and start each head at its dot."
               }
             }
           }
@@ -3445,21 +3445,21 @@
             "clear": {
               "id": {
                 "title": "Outline terlihat",
-                "say": "Garis pinggir {part} {value}x lebih gelap dari isinya. Isi bagian dalam sampai sama, atau sisir outline supaya menyatu."
+                "say": "Garis pinggir {part} lebih gelap dari isinya. Isi bagian dalam sampai sama, atau sisir outline supaya menyatu."
               },
               "en": {
                 "title": "Outline shows",
-                "say": "The edge of your {part} is {value}x darker than the fill. Fill the inside to match, or brush the outline so it blends."
+                "say": "The edge of your {part} is darker than the fill. Fill the inside to match, or brush the outline so it blends."
               }
             },
             "large": {
               "id": {
                 "title": "Outline sangat tegas",
-                "say": "Outline {part} jauh lebih gelap dari isinya ({value}x). Usap outline tipis dengan cotton bud, lalu isi bagian dalam."
+                "say": "Outline {part} jauh lebih gelap dari isinya. Usap outline tipis dengan cotton bud, lalu isi bagian dalam."
               },
               "en": {
                 "title": "Very hard outline",
-                "say": "The outline of your {part} is much darker than the fill ({value}x). Lightly wipe the outline with a cotton bud, then fill the inside."
+                "say": "The outline of your {part} is much darker than the fill. Lightly wipe the outline with a cotton bud, then fill the inside."
               }
             }
           }
@@ -3481,31 +3481,31 @@
             "slight": {
               "id": {
                 "title": "Warna sedikit kemerahan",
-                "say": "Warna {part} sedikit lebih merah atau oranye dari pilihanmu ({delta}°)."
+                "say": "Warna {part} sedikit lebih merah atau oranye dari pilihanmu."
               },
               "en": {
                 "title": "Slightly reddish",
-                "say": "Your {part} is a little redder or more orange than your chosen shade ({delta}°)."
+                "say": "Your {part} is a little redder or more orange than your chosen shade."
               }
             },
             "clear": {
               "id": {
                 "title": "Warna terlalu kemerahan",
-                "say": "Warna {part} jelas lebih merah dari pilihanmu ({delta}°). Pilih pensil dengan warna cokelat abu-abu, atau tambahkan warna produkmu di Try On."
+                "say": "Warna {part} jelas lebih merah dari pilihanmu. Pilih pensil dengan warna cokelat abu-abu, atau tambahkan warna produkmu di Try On."
               },
               "en": {
                 "title": "Too reddish",
-                "say": "Your {part} is clearly redder than your chosen shade ({delta}°). Use a greyer brown pencil, or add your product's colour on Try On."
+                "say": "Your {part} is clearly redder than your chosen shade. Use a greyer brown pencil, or add your product's colour on Try On."
               }
             },
             "large": {
               "id": {
                 "title": "Warna sangat berbeda",
-                "say": "Warna {part} sangat berbeda dari pilihanmu ({delta}°). Tambahkan warna produkmu lewat tombol + di Try On."
+                "say": "Warna {part} sangat berbeda dari pilihanmu. Tambahkan warna produkmu lewat tombol + di Try On."
               },
               "en": {
                 "title": "Very different colour",
-                "say": "Your {part} is very different from your chosen shade ({delta}°). Add your product's colour with the + button on Try On."
+                "say": "Your {part} is very different from your chosen shade. Add your product's colour with the + button on Try On."
               }
             }
           }
@@ -3527,31 +3527,31 @@
             "slight": {
               "id": {
                 "title": "Warna sedikit keabu-abuan",
-                "say": "Warna {part} sedikit lebih abu-abu dari pilihanmu ({delta}°)."
+                "say": "Warna {part} sedikit lebih abu-abu dari pilihanmu."
               },
               "en": {
                 "title": "Slightly ashy",
-                "say": "Your {part} is a little greyer than your chosen shade ({delta}°)."
+                "say": "Your {part} is a little greyer than your chosen shade."
               }
             },
             "clear": {
               "id": {
                 "title": "Warna terlalu abu-abu",
-                "say": "Warna {part} jelas lebih abu-abu dari pilihanmu ({delta}°). Pilih pensil cokelat yang lebih hangat, atau tambahkan warna produkmu di Try On."
+                "say": "Warna {part} jelas lebih abu-abu dari pilihanmu. Pilih pensil cokelat yang lebih hangat, atau tambahkan warna produkmu di Try On."
               },
               "en": {
                 "title": "Too ashy",
-                "say": "Your {part} is clearly greyer than your chosen shade ({delta}°). Use a warmer brown pencil, or add your product's colour on Try On."
+                "say": "Your {part} is clearly greyer than your chosen shade. Use a warmer brown pencil, or add your product's colour on Try On."
               }
             },
             "large": {
               "id": {
                 "title": "Warna sangat berbeda",
-                "say": "Warna {part} sangat berbeda dari pilihanmu ({delta}°). Tambahkan warna produkmu lewat tombol + di Try On."
+                "say": "Warna {part} sangat berbeda dari pilihanmu. Tambahkan warna produkmu lewat tombol + di Try On."
               },
               "en": {
                 "title": "Very different colour",
-                "say": "Your {part} is very different from your chosen shade ({delta}°). Add your product's colour with the + button on Try On."
+                "say": "Your {part} is very different from your chosen shade. Add your product's colour with the + button on Try On."
               }
             }
           }
@@ -3574,31 +3574,31 @@
             "slight": {
               "id": {
                 "title": "Tinggi pangkal sedikit beda",
-                "say": "Pangkal {part} {delta} mm lebih tinggi dari {other}. Tambah sedikit di atas pangkal {other}."
+                "say": "Pangkal {part} sedikit lebih tinggi dari {other}. Tambah sedikit di atas pangkal {other}."
               },
               "en": {
                 "title": "Head heights slightly uneven",
-                "say": "The head of your {part} is {delta} mm higher than the {other}. Add a little above the head of the {other}."
+                "say": "The head of your {part} is a little higher than the {other}. Add a little above the head of the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Tinggi pangkal berbeda",
-                "say": "Pangkal {part} {delta} mm lebih tinggi dari {other}. Samakan dengan titik pangkal di layar."
+                "say": "Pangkal {part} lebih tinggi dari {other}. Samakan dengan titik pangkal di layar."
               },
               "en": {
                 "title": "Uneven head heights",
-                "say": "The head of your {part} is {delta} mm higher than the {other}. Match both to the head dots on screen."
+                "say": "The head of your {part} is higher than the {other}. Match both to the head dots on screen."
               }
             },
             "large": {
               "id": {
                 "title": "Tinggi pangkal jauh berbeda",
-                "say": "Pangkal {part} {delta} mm lebih tinggi dari {other}. Ulangi pangkal sisi yang meleset dari titiknya."
+                "say": "Pangkal {part} lebih tinggi dari {other}. Ulangi pangkal sisi yang meleset dari titiknya."
               },
               "en": {
                 "title": "Very uneven head heights",
-                "say": "The head of your {part} is {delta} mm higher than the {other}. Redo the head of the side that missed its dot."
+                "say": "The head of your {part} is higher than the {other}. Redo the head of the side that missed its dot."
               }
             }
           },
@@ -3620,31 +3620,31 @@
             "slight": {
               "id": {
                 "title": "Tinggi lengkung sedikit beda",
-                "say": "Lengkung {part} {delta} mm lebih tinggi dari {other}."
+                "say": "Lengkung {part} sedikit lebih tinggi dari {other}."
               },
               "en": {
                 "title": "Arch heights slightly uneven",
-                "say": "The arch of your {part} is {delta} mm higher than the {other}."
+                "say": "The arch of your {part} is a little higher than the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Tinggi lengkung berbeda",
-                "say": "Lengkung {part} {delta} mm lebih tinggi dari {other}. Rapikan puncak yang lebih tinggi atau pertegas yang lebih rendah sampai sama dengan titik lengkung."
+                "say": "Lengkung {part} lebih tinggi dari {other}. Rapikan puncak yang lebih tinggi atau pertegas yang lebih rendah sampai sama dengan titik lengkung."
               },
               "en": {
                 "title": "Uneven arch heights",
-                "say": "The arch of your {part} is {delta} mm higher than the {other}. Tidy the higher peak or define the lower one until both reach the arch dot."
+                "say": "The arch of your {part} is higher than the {other}. Tidy the higher peak or define the lower one until both reach the arch dot."
               }
             },
             "large": {
               "id": {
                 "title": "Tinggi lengkung jauh berbeda",
-                "say": "Lengkung {part} {delta} mm lebih tinggi dari {other}, jadi ekspresi terlihat tidak seimbang. Ulangi garis atas sisi yang meleset."
+                "say": "Lengkung {part} lebih tinggi dari {other}, jadi ekspresi terlihat tidak seimbang. Ulangi garis atas sisi yang meleset."
               },
               "en": {
                 "title": "Very uneven arches",
-                "say": "The arch of your {part} is {delta} mm higher than the {other}, which looks lopsided. Redraw the top line of the side that is off."
+                "say": "The arch of your {part} is higher than the {other}, which looks lopsided. Redraw the top line of the side that is off."
               }
             }
           },
@@ -3666,31 +3666,31 @@
             "slight": {
               "id": {
                 "title": "Tinggi ekor sedikit beda",
-                "say": "Ujung ekor {part} {delta} mm lebih tinggi dari {other}."
+                "say": "Ujung ekor {part} sedikit lebih tinggi dari {other}."
               },
               "en": {
                 "title": "Tail heights slightly uneven",
-                "say": "The tail end of your {part} is {delta} mm higher than the {other}."
+                "say": "The tail end of your {part} is a little higher than the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Tinggi ekor berbeda",
-                "say": "Ujung ekor {part} {delta} mm lebih tinggi dari {other}. Samakan keduanya dengan titik ujung."
+                "say": "Ujung ekor {part} lebih tinggi dari {other}. Samakan keduanya dengan titik ujung."
               },
               "en": {
                 "title": "Uneven tail heights",
-                "say": "The tail end of your {part} is {delta} mm higher than the {other}. Bring both to the end dots."
+                "say": "The tail end of your {part} is higher than the {other}. Bring both to the end dots."
               }
             },
             "large": {
               "id": {
                 "title": "Tinggi ekor jauh berbeda",
-                "say": "Ujung ekor {part} {delta} mm lebih tinggi dari {other}. Ulangi ekor sisi yang meleset."
+                "say": "Ujung ekor {part} lebih tinggi dari {other}. Ulangi ekor sisi yang meleset."
               },
               "en": {
                 "title": "Very uneven tails",
-                "say": "The tail end of your {part} is {delta} mm higher than the {other}. Redo the tail on the side that is off."
+                "say": "The tail end of your {part} is higher than the {other}. Redo the tail on the side that is off."
               }
             }
           },
@@ -3712,31 +3712,31 @@
             "slight": {
               "id": {
                 "title": "Panjang sedikit beda",
-                "say": "{part} sedikit lebih panjang dari {other} ({value}x)."
+                "say": "{part} sedikit lebih panjang dari {other}."
               },
               "en": {
                 "title": "Lengths slightly uneven",
-                "say": "Your {part} is a little longer than the {other} ({value}x)."
+                "say": "Your {part} is a little longer than the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Panjang berbeda",
-                "say": "{part} {value}x lebih panjang dari {other}. Pendekkan atau panjangkan ekor sampai titik ujung di kedua sisi."
+                "say": "{part} lebih panjang dari {other}. Pendekkan atau panjangkan ekor sampai titik ujung di kedua sisi."
               },
               "en": {
                 "title": "Uneven lengths",
-                "say": "Your {part} is {value}x longer than the {other}. Shorten or extend the tails to the end dots on both sides."
+                "say": "Your {part} is longer than the {other}. Shorten or extend the tails to the end dots on both sides."
               }
             },
             "large": {
               "id": {
                 "title": "Panjang jauh berbeda",
-                "say": "{part} {value}x lebih panjang dari {other}. Ulangi ekor sisi yang meleset dari titik ujungnya."
+                "say": "{part} lebih panjang dari {other}. Ulangi ekor sisi yang meleset dari titik ujungnya."
               },
               "en": {
                 "title": "Very uneven lengths",
-                "say": "Your {part} is {value}x longer than the {other}. Redo the tail of the side that missed its end dot."
+                "say": "Your {part} is longer than the {other}. Redo the tail of the side that missed its end dot."
               }
             }
           }
@@ -3757,31 +3757,31 @@
             "slight": {
               "id": {
                 "title": "Ketebalan sedikit beda",
-                "say": "{part} sedikit lebih tebal dari {other} ({value}x)."
+                "say": "{part} sedikit lebih tebal dari {other}."
               },
               "en": {
                 "title": "Thickness slightly uneven",
-                "say": "Your {part} is a little thicker than the {other} ({value}x)."
+                "say": "Your {part} is a little thicker than the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Ketebalan berbeda",
-                "say": "{part} {value}x lebih tebal dari {other}. Rapikan pinggiran bawah sisi yang tebal, atau isi sisi yang tipis."
+                "say": "{part} lebih tebal dari {other}. Rapikan pinggiran bawah sisi yang tebal, atau isi sisi yang tipis."
               },
               "en": {
                 "title": "Uneven thickness",
-                "say": "Your {part} is {value}x thicker than the {other}. Tidy the lower edge of the thick side, or fill the thin one."
+                "say": "Your {part} is thicker than the {other}. Tidy the lower edge of the thick side, or fill the thin one."
               }
             },
             "large": {
               "id": {
                 "title": "Ketebalan jauh berbeda",
-                "say": "{part} {value}x lebih tebal dari {other}. Ikuti garis panduan atas dan bawah di kedua sisi."
+                "say": "{part} lebih tebal dari {other}. Ikuti garis panduan atas dan bawah di kedua sisi."
               },
               "en": {
                 "title": "Very uneven thickness",
-                "say": "Your {part} is {value}x thicker than the {other}. Follow the top and bottom guide lines on both sides."
+                "say": "Your {part} is thicker than the {other}. Follow the top and bottom guide lines on both sides."
               }
             }
           }
@@ -3802,31 +3802,31 @@
             "slight": {
               "id": {
                 "title": "Kepekatan sedikit beda",
-                "say": "{part} sedikit lebih gelap dari {other} ({value}x)."
+                "say": "{part} sedikit lebih gelap dari {other}."
               },
               "en": {
                 "title": "Darkness slightly uneven",
-                "say": "Your {part} is a little darker than the {other} ({value}x)."
+                "say": "Your {part} is a little darker than the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Kepekatan berbeda",
-                "say": "{part} {value}x lebih gelap dari {other}. Sisir {part} dengan spoolie bersih atau tambah lapisan di {other}."
+                "say": "{part} lebih gelap dari {other}. Sisir {part} dengan spoolie bersih atau tambah lapisan di {other}."
               },
               "en": {
                 "title": "Uneven darkness",
-                "say": "Your {part} is {value}x darker than the {other}. Brush the {part} with a clean spoolie or add a layer to the {other}."
+                "say": "Your {part} is darker than the {other}. Brush the {part} with a clean spoolie or add a layer to the {other}."
               }
             },
             "large": {
               "id": {
                 "title": "Kepekatan jauh berbeda",
-                "say": "{part} {value}x lebih gelap dari {other}. Samakan dengan sisi yang paling mirip target."
+                "say": "{part} lebih gelap dari {other}. Samakan dengan sisi yang paling mirip garis panduan."
               },
               "en": {
                 "title": "Very uneven darkness",
-                "say": "Your {part} is {value}x darker than the {other}. Match both to the side closest to the target."
+                "say": "Your {part} is darker than the {other}. Match both to the side closest to the guide."
               }
             }
           },
@@ -3865,11 +3865,11 @@
           "message": {
             "id": {
               "title": "Wing pas",
-              "say": "Sudut dan panjang wing di {part} sudah sesuai target (meleset di bawah {value}°)."
+              "say": "Sudut dan panjang wing di {part} sudah sesuai garis panduan."
             },
             "en": {
               "title": "Wing is right",
-              "say": "The wing angle and length on your {part} match the target (off by less than {value}°)."
+              "say": "The wing angle and length on your {part} match the guide line."
             }
           }
         },
@@ -3945,31 +3945,31 @@
             "slight": {
               "id": {
                 "title": "Ada celah kecil ke bulu mata",
-                "say": "Di {zone} {part} ada kulit {value} mm antara garis dan bulu mata. Isi celah itu dengan titik-titik kecil di antara bulu mata."
+                "say": "Di {zone} {part} ada kulit antara garis dan bulu mata. Isi celah itu dengan titik-titik kecil di antara bulu mata."
               },
               "en": {
                 "title": "Small gap to the lashes",
-                "say": "At the {zone} of your {part} there is {value} mm of skin between the line and the lashes. Fill it with small dots between the lashes."
+                "say": "At the {zone} of your {part} there is bare skin between the line and the lashes. Fill it with small dots between the lashes."
               }
             },
             "clear": {
               "id": {
                 "title": "Garis tidak menempel ke bulu mata",
-                "say": "Garis di {zone} {part} mengambang {value} mm di atas bulu mata. Tarik kelopak sedikit, lalu isi celah dengan goresan pendek dari bulu mata ke garis."
+                "say": "Garis di {zone} {part} mengambang di atas bulu mata. Tarik kelopak sedikit, lalu isi celah dengan goresan pendek dari bulu mata ke garis."
               },
               "en": {
                 "title": "Line not touching the lashes",
-                "say": "The line at the {zone} of your {part} floats {value} mm above the lashes. Pull the lid slightly and fill the gap with short strokes from the lashes up to the line."
+                "say": "The line at the {zone} of your {part} floats above the lashes. Pull the lid slightly and fill the gap with short strokes from the lashes up to the line."
               }
             },
             "large": {
               "id": {
                 "title": "Garis jauh dari bulu mata",
-                "say": "Garis di {part} {value} mm di atas bulu mata, jadi terlihat seperti garis terpisah. Hapus dan gambar ulang mulai dari pangkal bulu mata."
+                "say": "Garis di {part} di atas bulu mata, jadi terlihat seperti garis terpisah. Hapus dan gambar ulang mulai dari pangkal bulu mata."
               },
               "en": {
                 "title": "Line far from the lashes",
-                "say": "The line on your {part} sits {value} mm above the lashes and looks separate. Remove it and redraw starting at the lash roots."
+                "say": "The line on your {part} sits above the lashes and looks separate. Remove it and redraw starting at the lash roots."
               }
             }
           }
@@ -3992,31 +3992,31 @@
             "slight": {
               "id": {
                 "title": "Mulai sedikit terlalu ke dalam",
-                "say": "Garis {part} mulai {delta} mm lebih ke dalam dari target. Usap ujung dalamnya dengan cotton bud."
+                "say": "Garis {part} mulai sedikit lebih ke dalam dari garis panduan. Usap ujung dalamnya dengan cotton bud."
               },
               "en": {
                 "title": "Starts slightly early",
-                "say": "The line on your {part} starts {delta} mm further in than the target. Wipe the inner end with a cotton bud."
+                "say": "The line on your {part} starts a little further in than the guide line. Wipe the inner end with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Mulai terlalu ke dalam",
-                "say": "Garis {part} mulai {delta} mm terlalu dekat ke sudut dalam, jadi mata terlihat lebih kecil. Hapus ujung dalam sampai titik awal."
+                "say": "Garis {part} mulai terlalu dekat ke sudut dalam, jadi mata terlihat lebih kecil. Hapus ujung dalam sampai titik awal."
               },
               "en": {
                 "title": "Starts too early",
-                "say": "The line on your {part} starts {delta} mm too close to the inner corner, which makes the eye look smaller. Remove the inner end back to the start dot."
+                "say": "The line on your {part} starts too close to the inner corner, which makes the eye look smaller. Remove the inner end back to the start dot."
               }
             },
             "large": {
               "id": {
                 "title": "Mulai jauh terlalu ke dalam",
-                "say": "Garis {part} masuk ke sudut dalam mata ({delta} mm). Hapus bagian dalam dan mulai lagi dari titik awal di layar."
+                "say": "Garis {part} masuk ke sudut dalam mata. Hapus bagian dalam dan mulai lagi dari titik awal di layar."
               },
               "en": {
                 "title": "Starts far too early",
-                "say": "The line on your {part} runs into the inner corner ({delta} mm). Remove the inner part and start again from the start dot on screen."
+                "say": "The line on your {part} runs into the inner corner. Remove the inner part and start again from the start dot on screen."
               }
             }
           }
@@ -4038,31 +4038,31 @@
             "slight": {
               "id": {
                 "title": "Mulai sedikit terlambat",
-                "say": "Garis {part} mulai {delta} mm setelah titik awal. Sambung tipis ke arah dalam."
+                "say": "Garis {part} mulai sedikit setelah titik awal. Sambung tipis ke arah dalam."
               },
               "en": {
                 "title": "Starts slightly late",
-                "say": "The line on your {part} starts {delta} mm after the start dot. Extend it thinly inward."
+                "say": "The line on your {part} starts a little after the start dot. Extend it thinly inward."
               }
             },
             "clear": {
               "id": {
                 "title": "Mulai terlalu ke luar",
-                "say": "Garis {part} mulai {delta} mm setelah titik awal. Sambung dengan garis tipis dari titik awal."
+                "say": "Garis {part} mulai setelah titik awal. Sambung dengan garis tipis dari titik awal."
               },
               "en": {
                 "title": "Starts too late",
-                "say": "The line on your {part} starts {delta} mm after the start dot. Join it with a thin line from the start dot."
+                "say": "The line on your {part} starts after the start dot. Join it with a thin line from the start dot."
               }
             },
             "large": {
               "id": {
                 "title": "Bagian dalam kosong",
-                "say": "Sepertiga dalam {part} belum digaris ({delta} mm). Ulangi langkah 2 dari titik awal."
+                "say": "Sepertiga dalam {part} belum digaris. Ulangi langkah 2 dari titik awal."
               },
               "en": {
                 "title": "Inner part empty",
-                "say": "The inner part of your {part} has no line ({delta} mm). Redo step 2 from the start dot."
+                "say": "The inner part of your {part} has no line. Redo step 2 from the start dot."
               }
             }
           }
@@ -4088,27 +4088,27 @@
             "slight": {
               "id": {
                 "title": "Wing sedikit terlalu naik",
-                "say": "Wing {part} {delta}° lebih naik dari target ({value}° vs {target}°). Usap sedikit sisi atas ujung wing dengan cotton bud."
+                "say": "Wing {part} sedikit lebih naik dari garis panduan. Usap sedikit sisi atas ujung wing dengan cotton bud."
               },
               "en": {
                 "title": "Wing slightly steep",
-                "say": "The wing on your {part} is {delta}° steeper than the target ({value}° vs {target}°). Wipe a little off the top of the wing tip with a cotton bud."
+                "say": "The wing on your {part} is a little steeper than the guide line. Wipe a little off the top of the wing tip with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Wing terlalu naik",
-                "say": "Wing {part} {delta}° lebih naik dari target. Hapus ujung wing, lalu tarik ulang dari pangkal wing ke titik ujung di layar."
+                "say": "Wing {part} lebih naik dari garis panduan. Hapus ujung wing, lalu tarik ulang dari pangkal wing ke titik ujung di layar."
               },
               "en": {
                 "title": "Wing too steep",
-                "say": "The wing on your {part} is {delta}° steeper than the target. Remove the tip, then draw again from the wing base to the end dot on screen."
+                "say": "The wing on your {part} is steeper than the guide line. Remove the tip, then draw again from the wing base to the end dot on screen."
               }
             },
             "large": {
               "id": {
                 "title": "Wing hampir tegak",
-                "say": "Wing {part} {value}° (target {target}°). Hapus wing dengan cotton bud dan micellar water, lalu ulangi langkah wing mengikuti garis panduan.",
+                "say": "Wing {part} arahnya salah. Hapus wing dengan cotton bud dan micellar water, lalu ulangi langkah wing mengikuti garis panduan.",
                 "steps": [
                   "Hapus wing saja, garis atas boleh dibiarkan.",
                   "Lihat lurus ke depan, jangan memejam.",
@@ -4117,7 +4117,7 @@
               },
               "en": {
                 "title": "Wing nearly vertical",
-                "say": "The wing on your {part} is {value}° (target {target}°). Remove it with a cotton bud and micellar water, then redo the wing along the guide.",
+                "say": "The wing on your {part} points the wrong way. Remove it with a cotton bud and micellar water, then redo the wing along the guide.",
                 "steps": [
                   "Remove just the wing; the upper line can stay.",
                   "Look straight ahead with your eyes open.",
@@ -4147,31 +4147,31 @@
             "slight": {
               "id": {
                 "title": "Wing sedikit terlalu datar",
-                "say": "Wing {part} {delta}° lebih datar dari target ({value}° vs {target}°). Tambah sedikit di sisi atas ujung wing."
+                "say": "Wing {part} sedikit lebih datar dari garis panduan. Tambah sedikit di sisi atas ujung wing."
               },
               "en": {
                 "title": "Wing slightly flat",
-                "say": "The wing on your {part} is {delta}° flatter than the target ({value}° vs {target}°). Add a little to the top of the wing tip."
+                "say": "The wing on your {part} is a little flatter than the guide line. Add a little to the top of the wing tip."
               }
             },
             "clear": {
               "id": {
                 "title": "Wing terlalu datar",
-                "say": "Wing {part} {delta}° lebih datar dari target, jadi matanya terlihat turun. Tarik garis baru dari pangkal wing sedikit lebih naik ke titik ujung, lalu hapus ujung lama."
+                "say": "Wing {part} lebih datar dari garis panduan, jadi matanya terlihat turun. Tarik garis baru dari pangkal wing sedikit lebih naik ke titik ujung, lalu hapus ujung lama."
               },
               "en": {
                 "title": "Wing too flat",
-                "say": "The wing on your {part} is {delta}° flatter than the target, which drags the eye down. Draw a new line from the wing base slightly higher to the end dot, then remove the old tip."
+                "say": "The wing on your {part} is flatter than the guide line, which drags the eye down. Draw a new line from the wing base slightly higher to the end dot, then remove the old tip."
               }
             },
             "large": {
               "id": {
                 "title": "Wing mendatar atau turun",
-                "say": "Wing {part} {value}° (target {target}°). Hapus wing dan ulangi mengikuti garis panduan ke arah ujung alis."
+                "say": "Wing {part} arahnya salah. Hapus wing dan ulangi mengikuti garis panduan ke arah ujung alis."
               },
               "en": {
                 "title": "Wing flat or dropping",
-                "say": "The wing on your {part} is {value}° (target {target}°). Remove it and redo it along the guide, aiming at the brow tail."
+                "say": "The wing on your {part} points the wrong way. Remove it and redo it along the guide, aiming at the brow tail."
               }
             }
           }
@@ -4194,31 +4194,31 @@
             "slight": {
               "id": {
                 "title": "Wing sedikit pendek",
-                "say": "Wing {part} {delta} mm lebih pendek dari target. Panjangkan ujungnya tipis sampai titik ujung."
+                "say": "Wing {part} sedikit lebih pendek dari garis panduan. Panjangkan ujungnya tipis sampai titik ujung."
               },
               "en": {
                 "title": "Wing slightly short",
-                "say": "The wing on your {part} is {delta} mm shorter than the target. Extend the tip thinly to the end dot."
+                "say": "The wing on your {part} is a little shorter than the guide line. Extend the tip thinly to the end dot."
               }
             },
             "clear": {
               "id": {
                 "title": "Wing terlalu pendek",
-                "say": "Wing {part} {delta} mm lebih pendek dari target. Sambung dari ujungnya ke titik ujung dengan garis yang makin tipis."
+                "say": "Wing {part} lebih pendek dari garis panduan. Sambung dari ujungnya ke titik ujung dengan garis yang makin tipis."
               },
               "en": {
                 "title": "Wing too short",
-                "say": "The wing on your {part} is {delta} mm shorter than the target. Extend from its tip to the end dot with a line that gets thinner."
+                "say": "The wing on your {part} is shorter than the guide line. Extend from its tip to the end dot with a line that gets thinner."
               }
             },
             "large": {
               "id": {
                 "title": "Wing hampir tidak ada",
-                "say": "Wing {part} kurang {delta} mm dari target. Ulangi langkah wing: tandai titik ujung, tarik garis ke sana, lalu isi."
+                "say": "Wing {part} kurang dari garis panduan. Ulangi langkah wing: tandai titik ujung, tarik garis ke sana, lalu isi."
               },
               "en": {
                 "title": "Wing nearly missing",
-                "say": "The wing on your {part} is {delta} mm short. Redo the wing step: mark the end dot, draw to it, then fill."
+                "say": "The wing on your {part} is short. Redo the wing step: mark the end dot, draw to it, then fill."
               }
             }
           }
@@ -4241,31 +4241,31 @@
             "slight": {
               "id": {
                 "title": "Wing sedikit panjang",
-                "say": "Wing {part} {delta} mm melewati titik ujung. Usap ujungnya dengan cotton bud yang diruncingkan."
+                "say": "Wing {part} sedikit melewati titik ujung. Usap ujungnya dengan cotton bud yang diruncingkan."
               },
               "en": {
                 "title": "Wing slightly long",
-                "say": "The wing on your {part} runs {delta} mm past the end dot. Wipe the tip with a pointed cotton bud."
+                "say": "The wing on your {part} runs a little past the end dot. Wipe the tip with a pointed cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Wing terlalu panjang",
-                "say": "Wing {part} {delta} mm lebih panjang dari target. Hapus ujung yang lewat dengan cotton bud dan micellar water, sapukan ke arah luar supaya ujungnya tetap runcing."
+                "say": "Wing {part} lebih panjang dari garis panduan. Hapus ujung yang lewat dengan cotton bud dan micellar water, sapukan ke arah luar supaya ujungnya tetap runcing."
               },
               "en": {
                 "title": "Wing too long",
-                "say": "The wing on your {part} is {delta} mm longer than the target. Remove the extra tip with a cotton bud and micellar water, sweeping outward so it stays sharp."
+                "say": "The wing on your {part} is longer than the guide line. Remove the extra tip with a cotton bud and micellar water, sweeping outward so it stays sharp."
               }
             },
             "large": {
               "id": {
                 "title": "Wing jauh terlalu panjang",
-                "say": "Wing {part} {delta} mm lewat dari target. Hapus wing dan gambar ulang sampai titik ujung saja."
+                "say": "Wing {part} lewat dari garis panduan. Hapus wing dan gambar ulang sampai titik ujung saja."
               },
               "en": {
                 "title": "Wing far too long",
-                "say": "The wing on your {part} runs {delta} mm past the target. Remove it and redraw only to the end dot."
+                "say": "The wing on your {part} runs past the guide line. Remove it and redraw only to the end dot."
               }
             }
           }
@@ -4289,31 +4289,31 @@
             "slight": {
               "id": {
                 "title": "Ujung wing sedikit tinggi",
-                "say": "Ujung wing {part} {delta} mm di atas titik ujung. Rapikan bagian atas ujungnya."
+                "say": "Ujung wing {part} sedikit di atas titik ujung. Rapikan bagian atas ujungnya."
               },
               "en": {
                 "title": "Wing tip slightly high",
-                "say": "The wing tip on your {part} is {delta} mm above the end dot. Tidy the top of the tip."
+                "say": "The wing tip on your {part} is a little above the end dot. Tidy the top of the tip."
               }
             },
             "clear": {
               "id": {
                 "title": "Ujung wing terlalu tinggi",
-                "say": "Ujung wing {part} {delta} mm di atas titik ujung. Hapus ujung dan tarik ulang ke titik ujung."
+                "say": "Ujung wing {part} di atas titik ujung. Hapus ujung dan tarik ulang ke titik ujung."
               },
               "en": {
                 "title": "Wing tip too high",
-                "say": "The wing tip on your {part} is {delta} mm above the end dot. Remove the tip and redraw to the end dot."
+                "say": "The wing tip on your {part} is above the end dot. Remove the tip and redraw to the end dot."
               }
             },
             "large": {
               "id": {
                 "title": "Ujung wing jauh terlalu tinggi",
-                "say": "Ujung wing {part} {delta} mm di atas target. Ulangi wing mengikuti garis panduan."
+                "say": "Ujung wing {part} di atas garis panduan. Ulangi wing mengikuti garis panduan."
               },
               "en": {
                 "title": "Wing tip far too high",
-                "say": "The wing tip on your {part} is {delta} mm above the target. Redo the wing along the guide."
+                "say": "The wing tip on your {part} is above the guide line. Redo the wing along the guide."
               }
             }
           }
@@ -4336,31 +4336,31 @@
             "slight": {
               "id": {
                 "title": "Ujung wing sedikit rendah",
-                "say": "Ujung wing {part} {delta} mm di bawah titik ujung. Tambah sedikit di sisi atas ujungnya."
+                "say": "Ujung wing {part} sedikit di bawah titik ujung. Tambah sedikit di sisi atas ujungnya."
               },
               "en": {
                 "title": "Wing tip slightly low",
-                "say": "The wing tip on your {part} is {delta} mm below the end dot. Add a little to the top of the tip."
+                "say": "The wing tip on your {part} is a little below the end dot. Add a little to the top of the tip."
               }
             },
             "clear": {
               "id": {
                 "title": "Ujung wing terlalu rendah",
-                "say": "Ujung wing {part} {delta} mm di bawah titik ujung. Tarik garis baru dari pangkal wing ke titik ujung dan hapus ujung yang lama."
+                "say": "Ujung wing {part} di bawah titik ujung. Tarik garis baru dari pangkal wing ke titik ujung dan hapus ujung yang lama."
               },
               "en": {
                 "title": "Wing tip too low",
-                "say": "The wing tip on your {part} is {delta} mm below the end dot. Draw a new line from the wing base to the end dot and remove the old tip."
+                "say": "The wing tip on your {part} is below the end dot. Draw a new line from the wing base to the end dot and remove the old tip."
               }
             },
             "large": {
               "id": {
                 "title": "Ujung wing jauh terlalu rendah",
-                "say": "Ujung wing {part} {delta} mm di bawah target. Ulangi wing mengikuti garis panduan."
+                "say": "Ujung wing {part} di bawah garis panduan. Ulangi wing mengikuti garis panduan."
               },
               "en": {
                 "title": "Wing tip far too low",
-                "say": "The wing tip on your {part} is {delta} mm below the target. Redo the wing along the guide."
+                "say": "The wing tip on your {part} is below the guide line. Redo the wing along the guide."
               }
             }
           }
@@ -4384,31 +4384,31 @@
             "slight": {
               "id": {
                 "title": "Ujung wing sedikit tumpul",
-                "say": "Ujung wing {part} selebar {value} mm. Runcingkan dengan cotton bud yang diusap ke arah luar."
+                "say": "Ujung wing {part} masih tumpul. Runcingkan dengan cotton bud yang diusap ke arah luar."
               },
               "en": {
                 "title": "Wing tip slightly blunt",
-                "say": "The wing tip on your {part} is {value} mm wide. Sharpen it with a cotton bud swept outward."
+                "say": "The wing tip on your {part} is wide. Sharpen it with a cotton bud swept outward."
               }
             },
             "clear": {
               "id": {
                 "title": "Ujung wing tumpul",
-                "say": "Ujung wing {part} tumpul ({value} mm). Usap sisi bawah ujung wing dengan cotton bud dan micellar water, dari pangkal ke ujung, supaya meruncing."
+                "say": "Ujung wing {part} tumpul. Usap sisi bawah ujung wing dengan cotton bud dan micellar water, dari pangkal ke ujung, supaya meruncing."
               },
               "en": {
                 "title": "Blunt wing tip",
-                "say": "The wing tip on your {part} is blunt ({value} mm). Sweep the underside of the tip from base to end with a cotton bud and micellar water so it tapers."
+                "say": "The wing tip on your {part} is blunt. Sweep the underside of the tip from base to end with a cotton bud and micellar water so it tapers."
               }
             },
             "large": {
               "id": {
                 "title": "Wing seperti kotak",
-                "say": "Ujung wing {part} tidak meruncing ({value} mm). Gambar ulang wing sebagai segitiga tipis: garis bawah dulu, lalu garis atas, lalu isi."
+                "say": "Ujung wing {part} tidak meruncing. Gambar ulang wing sebagai segitiga tipis: garis bawah dulu, lalu garis atas, lalu isi."
               },
               "en": {
                 "title": "Boxy wing",
-                "say": "The wing tip on your {part} does not taper ({value} mm). Redraw it as a thin triangle: bottom line first, then top line, then fill."
+                "say": "The wing tip on your {part} does not taper. Redraw it as a thin triangle: bottom line first, then top line, then fill."
               }
             }
           }
@@ -4431,31 +4431,31 @@
             "slight": {
               "id": {
                 "title": "Sambungan wing sedikit putus",
-                "say": "Ada celah {value} mm di sambungan wing {part}. Isi dengan goresan kecil."
+                "say": "Ada celah di sambungan wing {part}. Isi dengan goresan kecil."
               },
               "en": {
                 "title": "Small break at the wing",
-                "say": "There is a {value} mm gap where the wing meets the line on your {part}. Fill it with a small stroke."
+                "say": "There is a gap where the wing meets the line on your {part}. Fill it with a small stroke."
               }
             },
             "clear": {
               "id": {
                 "title": "Wing tidak tersambung",
-                "say": "Wing {part} terputus {value} mm dari garis atas. Sambungkan dari ujung luar garis ke pangkal wing."
+                "say": "Wing {part} terputus dari garis atas. Sambungkan dari ujung luar garis ke pangkal wing."
               },
               "en": {
                 "title": "Wing not joined",
-                "say": "The wing on your {part} is {value} mm away from the upper line. Join the outer end of the line to the wing base."
+                "say": "The wing on your {part} does not touch the upper line. Join the outer end of the line to the wing base."
               }
             },
             "large": {
               "id": {
                 "title": "Wing terpisah",
-                "say": "Wing {part} terpisah dari garis atas ({value} mm). Gambar ulang dari ujung luar mata langsung ke titik ujung."
+                "say": "Wing {part} terpisah dari garis atas. Gambar ulang dari ujung luar mata langsung ke titik ujung."
               },
               "en": {
                 "title": "Separate wing",
-                "say": "The wing on your {part} is separate from the upper line ({value} mm). Redraw it from the outer corner straight to the end dot."
+                "say": "The wing on your {part} is separate from the upper line. Redraw it from the outer corner straight to the end dot."
               }
             }
           }
@@ -4482,31 +4482,31 @@
             "slight": {
               "id": {
                 "title": "Ada bagian putus",
-                "say": "Garis {part} {value}% tersambung, ada putus di {zone}. Isi dengan goresan pendek."
+                "say": "Garis {part} ada yang putus di {zone}. Isi dengan goresan pendek."
               },
               "en": {
                 "title": "A small break",
-                "say": "The line on your {part} is {value}% joined, with a break in the {zone}. Fill it with a short stroke."
+                "say": "The line on your {part} has a small break in the {zone}. Fill it with a short stroke."
               }
             },
             "clear": {
               "id": {
                 "title": "Garis putus-putus",
-                "say": "Garis {part} baru {value}% tersambung, paling banyak putus di {zone}. Sambungkan titik demi titik dengan goresan pendek."
+                "say": "Garis {part} masih banyak putus, paling banyak di {zone}. Sambungkan titik demi titik dengan goresan pendek."
               },
               "en": {
                 "title": "Broken line",
-                "say": "The line on your {part} is only {value}% joined, mostly broken in the {zone}. Join it dot by dot with short strokes."
+                "say": "The line on your {part} has gaps, mostly in the {zone}. Join it dot by dot with short strokes."
               }
             },
             "large": {
               "id": {
                 "title": "Garis belum tersambung",
-                "say": "Garis {part} baru {value}% tersambung. Ulangi langkah 2: sambungkan semua titik dari dalam ke luar."
+                "say": "Garis {part} masih banyak putus. Ulangi langkah 2: sambungkan semua titik dari dalam ke luar."
               },
               "en": {
                 "title": "Line not joined yet",
-                "say": "The line on your {part} is only {value}% joined. Redo step 2: join all the dots from inner to outer."
+                "say": "The line on your {part} has big gaps. Redo step 2: join all the dots from inner to outer."
               }
             }
           }
@@ -4534,31 +4534,31 @@
             "slight": {
               "id": {
                 "title": "Garis sedikit tebal",
-                "say": "Garis di {zone} {part} {delta} mm lebih tebal dari target. Rapikan sisi atas garis dengan cotton bud."
+                "say": "Garis di {zone} {part} sedikit lebih tebal dari Try On. Rapikan sisi atas garis dengan cotton bud."
               },
               "en": {
                 "title": "Line slightly thick",
-                "say": "The line at the {zone} of your {part} is {delta} mm thicker than the target. Tidy its top edge with a cotton bud."
+                "say": "The line at the {zone} of your {part} is a little thicker than your try-on. Tidy its top edge with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Garis terlalu tebal",
-                "say": "Garis di {zone} {part} {delta} mm lebih tebal dari target, jadi kelopak tertutup. Usap sisi atas garis dengan cotton bud dan micellar water, sapukan ke arah luar."
+                "say": "Garis di {zone} {part} lebih tebal dari Try On, jadi kelopak tertutup. Usap sisi atas garis dengan cotton bud dan micellar water, sapukan ke arah luar."
               },
               "en": {
                 "title": "Line too thick",
-                "say": "The line at the {zone} of your {part} is {delta} mm thicker than the target and covers the lid. Wipe its top edge with a cotton bud and micellar water, sweeping outward."
+                "say": "The line at the {zone} of your {part} is thicker than your try-on and covers the lid. Wipe its top edge with a cotton bud and micellar water, sweeping outward."
               }
             },
             "large": {
               "id": {
                 "title": "Garis jauh terlalu tebal",
-                "say": "Garis di {zone} {part} {delta} mm lebih tebal dari target. Hapus dan gambar ulang tipis dulu; tebalkan sedikit demi sedikit."
+                "say": "Garis di {zone} {part} lebih tebal dari Try On. Hapus dan gambar ulang tipis dulu; tebalkan sedikit demi sedikit."
               },
               "en": {
                 "title": "Line far too thick",
-                "say": "The line at the {zone} of your {part} is {delta} mm thicker than the target. Remove it and redraw thin first; build up little by little."
+                "say": "The line at the {zone} of your {part} is thicker than your try-on. Remove it and redraw thin first; build up little by little."
               }
             }
           }
@@ -4585,31 +4585,31 @@
             "slight": {
               "id": {
                 "title": "Garis sedikit tipis",
-                "say": "Garis di {zone} {part} {delta} mm lebih tipis dari target. Tebalkan sedikit ke arah atas."
+                "say": "Garis di {zone} {part} sedikit lebih tipis dari Try On. Tebalkan sedikit ke arah atas."
               },
               "en": {
                 "title": "Line slightly thin",
-                "say": "The line at the {zone} of your {part} is {delta} mm thinner than the target. Thicken it slightly upward."
+                "say": "The line at the {zone} of your {part} is a little thinner than your try-on. Thicken it slightly upward."
               }
             },
             "clear": {
               "id": {
                 "title": "Garis terlalu tipis",
-                "say": "Garis di {zone} {part} {delta} mm lebih tipis dari target. Tambah satu goresan di atas garis yang ada."
+                "say": "Garis di {zone} {part} lebih tipis dari Try On. Tambah satu goresan di atas garis yang ada."
               },
               "en": {
                 "title": "Line too thin",
-                "say": "The line at the {zone} of your {part} is {delta} mm thinner than the target. Add one stroke on top of the existing line."
+                "say": "The line at the {zone} of your {part} is thinner than your try-on. Add one stroke on top of the existing line."
               }
             },
             "large": {
               "id": {
                 "title": "Garis hampir tidak terlihat",
-                "say": "Garis di {zone} {part} jauh lebih tipis dari target ({delta} mm). Ulangi garis dengan tekanan lebih kuat."
+                "say": "Garis di {zone} {part} jauh lebih tipis dari Try On. Ulangi garis dengan tekanan lebih kuat."
               },
               "en": {
                 "title": "Line barely visible",
-                "say": "The line at the {zone} of your {part} is much thinner than the target ({delta} mm). Redraw with more pressure."
+                "say": "The line at the {zone} of your {part} is much thinner than your try-on. Redraw with more pressure."
               }
             }
           }
@@ -4631,31 +4631,31 @@
             "slight": {
               "id": {
                 "title": "Warna garis sedikit pudar",
-                "say": "Garis {part} {value}% sepekat target. Tebalkan warna dengan satu lapis lagi."
+                "say": "Garis {part} sedikit lebih pudar dari Try On. Tebalkan warna dengan satu lapis lagi."
               },
               "en": {
                 "title": "Line slightly faded",
-                "say": "The line on your {part} is {value}% as dark as the target. Go over it once more."
+                "say": "The line on your {part} is a little lighter than your try-on. Go over it once more."
               }
             },
             "clear": {
               "id": {
                 "title": "Warna garis pudar",
-                "say": "Garis {part} baru {value}% sepekat target. Gambar lagi di atas garis yang sama, atau pakai eyeliner yang lebih pekat."
+                "say": "Garis {part} masih jauh lebih pudar dari Try On. Gambar lagi di atas garis yang sama, atau pakai eyeliner yang lebih pekat."
               },
               "en": {
                 "title": "Faded line",
-                "say": "The line on your {part} is only {value}% as dark as the target. Go over the same line again, or use a more pigmented liner."
+                "say": "The line on your {part} is much lighter than your try-on. Go over the same line again, or use a more pigmented liner."
               }
             },
             "large": {
               "id": {
                 "title": "Garis hampir tidak terlihat",
-                "say": "Garis {part} sangat pudar ({value}%). Pakai eyeliner cair atau spidol yang lebih pekat."
+                "say": "Garis {part} sangat pudar. Pakai eyeliner cair atau spidol yang lebih pekat."
               },
               "en": {
                 "title": "Line barely visible",
-                "say": "The line on your {part} is very faint ({value}%). Use a more pigmented liquid or felt-tip liner."
+                "say": "The line on your {part} is very faint. Use a more pigmented liquid or felt-tip liner."
               }
             }
           }
@@ -4677,31 +4677,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit belepotan di kelopak",
-                "say": "Ada noda kecil di kelopak {part} ({value}%). Bersihkan dengan cotton bud."
+                "say": "Ada noda kecil di kelopak {part}. Bersihkan dengan cotton bud."
               },
               "en": {
                 "title": "A small smudge on the lid",
-                "say": "There is a small smudge on the lid of your {part} ({value}%). Clean it with a cotton bud."
+                "say": "There is a small smudge on the lid of your {part}. Clean it with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Belepotan di kelopak",
-                "say": "Ada eyeliner menempel di kelopak {part} ({value}%), mungkin karena mata dibuka sebelum kering. Bersihkan dengan cotton bud dan micellar water, lalu tunggu 30 detik sebelum membuka mata."
+                "say": "Ada eyeliner menempel di kelopak {part}, mungkin karena mata dibuka sebelum kering. Bersihkan dengan cotton bud dan micellar water, lalu tunggu 30 detik sebelum membuka mata."
               },
               "en": {
                 "title": "Smudged on the lid",
-                "say": "Liner has transferred to the lid of your {part} ({value}%), maybe from opening the eye before it dried. Clean it with a cotton bud and micellar water, then wait 30 seconds before opening your eyes."
+                "say": "Liner has transferred to the lid of your {part}, maybe from opening the eye before it dried. Clean it with a cotton bud and micellar water, then wait 30 seconds before opening your eyes."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak noda di kelopak",
-                "say": "Banyak noda eyeliner di kelopak {part} ({value}%). Hapus semua dan ulangi; biarkan kering sebelum membuka mata."
+                "say": "Banyak noda eyeliner di kelopak {part}. Hapus semua dan ulangi; biarkan kering sebelum membuka mata."
               },
               "en": {
                 "title": "Lots of smudging",
-                "say": "There is a lot of liner on the lid of your {part} ({value}%). Remove it all and start again; let it dry before opening your eyes."
+                "say": "There is a lot of liner on the lid of your {part}. Remove it all and start again; let it dry before opening your eyes."
               }
             }
           }
@@ -4723,31 +4723,31 @@
             "slight": {
               "id": {
                 "title": "Sedikit noda di bawah mata",
-                "say": "Ada noda kecil di bawah {part} ({value}%). Bersihkan dengan cotton bud."
+                "say": "Ada noda kecil sedikit di bawah {part}. Bersihkan dengan cotton bud."
               },
               "en": {
                 "title": "A small mark under the eye",
-                "say": "There is a small mark under your {part} ({value}%). Clean it with a cotton bud."
+                "say": "There is a small mark under your {part}. Clean it with a cotton bud."
               }
             },
             "clear": {
               "id": {
                 "title": "Noda di bawah mata",
-                "say": "Eyeliner menempel di bawah {part} ({value}%). Bersihkan dengan cotton bud dan sedikit micellar water."
+                "say": "Eyeliner menempel di bawah {part}. Bersihkan dengan cotton bud dan sedikit micellar water."
               },
               "en": {
                 "title": "Marks under the eye",
-                "say": "Liner has transferred under your {part} ({value}%). Clean it with a cotton bud and a little micellar water."
+                "say": "Liner has transferred under your {part}. Clean it with a cotton bud and a little micellar water."
               }
             },
             "large": {
               "id": {
                 "title": "Banyak noda di bawah mata",
-                "say": "Banyak noda di bawah {part} ({value}%). Bersihkan dulu, lalu cek lagi sebelum foto."
+                "say": "Banyak noda di bawah {part}. Bersihkan dulu, lalu cek lagi sebelum foto."
               },
               "en": {
                 "title": "Lots of marks under the eye",
-                "say": "There are many marks under your {part} ({value}%). Clean them first, then check again before the photo."
+                "say": "There are many marks under your {part}. Clean them first, then check again before the photo."
               }
             }
           }
@@ -4824,21 +4824,21 @@
             "slight": {
               "id": {
                 "title": "Garis bawah belum penuh",
-                "say": "Garis bawah {part} baru {value}% dari target. Lanjutkan tipis ke arah dalam."
+                "say": "Garis bawah {part} masih terlalu pendek. Lanjutkan tipis ke arah dalam."
               },
               "en": {
                 "title": "Lower line not complete",
-                "say": "The lower line on your {part} is {value}% of the target. Continue it thinly inward."
+                "say": "The a little lower line on your {part} is too short. Continue it thinly inward."
               }
             },
             "clear": {
               "id": {
                 "title": "Garis bawah kurang",
-                "say": "Look Arabian butuh garis bawah; di {part} baru {value}%. Tarik garis tipis di bawah bulu mata bawah dari sudut luar ke dalam."
+                "say": "Look Arabian butuh garis bawah; di {part} belum ada. Tarik garis tipis di bawah bulu mata bawah dari sudut luar ke dalam."
               },
               "en": {
                 "title": "Lower line short",
-                "say": "Arabian needs a lower line; your {part} has {value}%. Draw a thin line under the lower lashes from the outer corner inward."
+                "say": "Arabian needs a lower line; your {part} is still missing most of it. Draw a thin line under the lower lashes from the outer corner inward."
               }
             },
             "large": {
@@ -4882,21 +4882,21 @@
             "clear": {
               "id": {
                 "title": "Garis bawah tidak ada di look ini",
-                "say": "Ada garis bawah di {part} ({value}%), padahal look pilihanmu tidak memakainya. Hapus dengan cotton bud kalau ingin sama dengan target."
+                "say": "Ada garis bawah di {part}, padahal look pilihanmu tidak memakainya. Hapus dengan cotton bud kalau ingin sama dengan garis panduan."
               },
               "en": {
                 "title": "Lower line not in this look",
-                "say": "There is a lower line on your {part} ({value}%), but your chosen look has none. Remove it with a cotton bud to match the target."
+                "say": "There is a lower line on your {part}, but your chosen look has none. Remove it with a cotton bud to match the guide line."
               }
             },
             "large": {
               "id": {
                 "title": "Garis bawah penuh",
-                "say": "Ada garis bawah penuh di {part}. Look pilihanmu tidak memakai garis bawah; hapus kalau ingin sama dengan target."
+                "say": "Ada garis bawah penuh di {part}. Look pilihanmu tidak memakai garis bawah; hapus kalau ingin sama dengan garis panduan."
               },
               "en": {
                 "title": "Full lower line",
-                "say": "There is a full lower line on your {part}. Your chosen look has none; remove it to match the target."
+                "say": "There is a full lower line on your {part}. Your chosen look has none; remove it to match the guide line."
               }
             }
           }
@@ -4919,31 +4919,31 @@
             "slight": {
               "id": {
                 "title": "Sudut wing sedikit beda",
-                "say": "Wing {part} {delta}° lebih naik dari {other}."
+                "say": "Wing {part} sedikit lebih naik dari {other}."
               },
               "en": {
                 "title": "Wing angles slightly uneven",
-                "say": "The wing on your {part} rises {delta}° more than on the {other}."
+                "say": "The wing on your {part} rises more than on the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Sudut wing berbeda",
-                "say": "Wing {part} {delta}° lebih naik dari {other}. Perbaiki sisi yang paling jauh dari titik ujungnya, lalu samakan sisi lain."
+                "say": "Wing {part} lebih naik dari {other}. Perbaiki sisi yang paling jauh dari titik ujungnya, lalu samakan sisi lain."
               },
               "en": {
                 "title": "Uneven wing angles",
-                "say": "The wing on your {part} rises {delta}° more than on the {other}. Fix the side furthest from its end dot, then match the other."
+                "say": "The wing on your {part} rises more than on the {other}. Fix the side furthest from its end dot, then match the other."
               }
             },
             "large": {
               "id": {
                 "title": "Sudut wing jauh berbeda",
-                "say": "Wing {part} {delta}° lebih naik dari {other}. Ulangi wing sisi yang meleset mengikuti garis panduan."
+                "say": "Wing {part} lebih naik dari {other}. Ulangi wing sisi yang meleset mengikuti garis panduan."
               },
               "en": {
                 "title": "Very uneven wings",
-                "say": "The wing on your {part} rises {delta}° more than on the {other}. Redo the wing on the side that is off, along the guide."
+                "say": "The wing on your {part} rises more than on the {other}. Redo the wing on the side that is off, along the guide."
               }
             }
           },
@@ -4965,31 +4965,31 @@
             "slight": {
               "id": {
                 "title": "Panjang wing sedikit beda",
-                "say": "Wing {part} {delta} mm lebih panjang dari {other}."
+                "say": "Wing {part} sedikit lebih panjang dari {other}."
               },
               "en": {
                 "title": "Wing lengths slightly uneven",
-                "say": "The wing on your {part} is {delta} mm longer than on the {other}."
+                "say": "The wing on your {part} is a little longer than on the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Panjang wing berbeda",
-                "say": "Wing {part} {delta} mm lebih panjang dari {other}. Samakan keduanya ke titik ujung."
+                "say": "Wing {part} lebih panjang dari {other}. Samakan keduanya ke titik ujung."
               },
               "en": {
                 "title": "Uneven wing lengths",
-                "say": "The wing on your {part} is {delta} mm longer than on the {other}. Bring both to the end dots."
+                "say": "The wing on your {part} is longer than on the {other}. Bring both to the end dots."
               }
             },
             "large": {
               "id": {
                 "title": "Panjang wing jauh berbeda",
-                "say": "Wing {part} {delta} mm lebih panjang dari {other}. Ulangi wing yang meleset dari titik ujungnya."
+                "say": "Wing {part} lebih panjang dari {other}. Ulangi wing yang meleset dari titik ujungnya."
               },
               "en": {
                 "title": "Very uneven wing lengths",
-                "say": "The wing on your {part} is {delta} mm longer than on the {other}. Redo the wing that missed its end dot."
+                "say": "The wing on your {part} is longer than on the {other}. Redo the wing that missed its end dot."
               }
             }
           },
@@ -5012,31 +5012,31 @@
             "slight": {
               "id": {
                 "title": "Tinggi ujung wing sedikit beda",
-                "say": "Ujung wing {part} {delta} mm lebih tinggi dari {other}."
+                "say": "Ujung wing {part} sedikit lebih tinggi dari {other}."
               },
               "en": {
                 "title": "Tip heights slightly uneven",
-                "say": "The wing tip on your {part} is {delta} mm higher than on the {other}."
+                "say": "The wing tip on your {part} is a little higher than on the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Tinggi ujung wing berbeda",
-                "say": "Ujung wing {part} {delta} mm lebih tinggi dari {other}. Bandingkan dengan ujung alis: kedua ujung wing harus sama jauhnya dari ujung alis."
+                "say": "Ujung wing {part} lebih tinggi dari {other}. Bandingkan dengan ujung alis: kedua ujung wing harus sama jauhnya dari ujung alis."
               },
               "en": {
                 "title": "Uneven tip heights",
-                "say": "The wing tip on your {part} is {delta} mm higher than on the {other}. Compare with the brow tails: both tips should be the same distance from them."
+                "say": "The wing tip on your {part} is higher than on the {other}. Compare with the brow tails: both tips should be the same distance from them."
               }
             },
             "large": {
               "id": {
                 "title": "Tinggi ujung wing jauh berbeda",
-                "say": "Ujung wing {part} {delta} mm lebih tinggi dari {other}. Ulangi wing sisi yang meleset."
+                "say": "Ujung wing {part} lebih tinggi dari {other}. Ulangi wing sisi yang meleset."
               },
               "en": {
                 "title": "Very uneven tips",
-                "say": "The wing tip on your {part} is {delta} mm higher than on the {other}. Redo the wing on the side that is off."
+                "say": "The wing tip on your {part} is higher than on the {other}. Redo the wing on the side that is off."
               }
             }
           },
@@ -5059,31 +5059,31 @@
             "slight": {
               "id": {
                 "title": "Ketebalan sedikit beda",
-                "say": "Garis {part} sedikit lebih tebal dari {other} ({value}x)."
+                "say": "Garis {part} sedikit lebih tebal dari {other}."
               },
               "en": {
                 "title": "Thickness slightly uneven",
-                "say": "The line on your {part} is a little thicker than on the {other} ({value}x)."
+                "say": "The line on your {part} is a little thicker than on the {other}."
               }
             },
             "clear": {
               "id": {
                 "title": "Ketebalan berbeda",
-                "say": "Garis {part} {value}x lebih tebal dari {other}. Tipiskan sisi atas garis yang tebal, atau tebalkan yang tipis."
+                "say": "Garis {part} lebih tebal dari {other}. Tipiskan sisi atas garis yang tebal, atau tebalkan yang tipis."
               },
               "en": {
                 "title": "Uneven thickness",
-                "say": "The line on your {part} is {value}x thicker than on the {other}. Thin the top of the thick line, or thicken the thin one."
+                "say": "The line on your {part} is thicker than on the {other}. Thin the top of the thick line, or thicken the thin one."
               }
             },
             "large": {
               "id": {
                 "title": "Ketebalan jauh berbeda",
-                "say": "Garis {part} {value}x lebih tebal dari {other}. Samakan keduanya dengan target di layar."
+                "say": "Garis {part} lebih tebal dari {other}. Samakan keduanya dengan garis panduan di layar."
               },
               "en": {
                 "title": "Very uneven thickness",
-                "say": "The line on your {part} is {value}x thicker than on the {other}. Match both to the target on screen."
+                "say": "The line on your {part} is thicker than on the {other}. Match both to the guide line on screen."
               }
             }
           }

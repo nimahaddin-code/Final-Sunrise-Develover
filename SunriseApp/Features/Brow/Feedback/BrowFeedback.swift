@@ -74,6 +74,7 @@ enum BrowFeedback {
             let brow = nearby.filter { skinNow - afterL($0.i) >= browDark }
             let r = LineProfile(brow.map { LineSample(local: $0.local, area: Double(before.samples[$0.i].area), dark: skinNow - afterL($0.i), index: $0.i) }, bin: 2)
             let targetIndices = Set(t.samples.map(\.index))
+            record.mark(side, target: targetIndices, product: product, after: after)
             let productShare = t.samples.filter { product.contains($0.index) }.reduce(0) { $0 + $1.area } / max(t.area, 1)
             guard productShare >= 0.15, let rs = r.shape() else {
                 record.fire("brow.none", side: side)

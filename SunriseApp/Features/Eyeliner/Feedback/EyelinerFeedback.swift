@@ -53,6 +53,7 @@ enum EyelinerFeedback {
             }
             let liner = nearby.filter { bare($0.i) - now($0.i) >= linerDark }
             let r = LineProfile(liner.map { LineSample(local: $0.local, area: Double(before.samples[$0.i].area), dark: bare($0.i) - now($0.i), index: $0.i) }, bin: 1)
+            record.mark(side, target: Set(t.samples.map(\.index)), product: Set(liner.map(\.i)), after: after)
             // Share of the target path (its columns) with liner on it.
             let targetColumns = Set(t.columns.keys), covered = targetColumns.filter { r.columns[$0] != nil }
             let coverage = targetColumns.isEmpty ? 0 : Double(covered.count) / Double(targetColumns.count) * 100
