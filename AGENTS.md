@@ -1,3 +1,10 @@
+## Brow filter over the natural brow (eraser off, temporary) — Khalish (2026-11-10)
+
+The natural-brow eraser (`BrowEraser`: push-pull fill + MI-GAN) is switched off for now: `BeautyBlushEngine.configure`
+sets `settings.hideNatural=false` whatever `EyebrowConfiguration.hideNaturalBrow` says, so the chosen brow picture is drawn
+straight over the user's own brow in Try On, captures and tutorial. Flags, handoff and eraser code are unchanged; restore
+with `settings.hideNatural=c.hideNaturalBrow` (comment in place). Not checked on a device.
+
 ## Merge: staging (onboarding animations, feedback Before fix) into E2E-Flow — 2026-11-10
 
 staging brought Khalish's onboarding animations and Nimah's feedback fixes (Before = the try-on photo, directional card

@@ -250,7 +250,10 @@ final class BeautyBlushEngine:@unchecked Sendable {
         settings.enabled=enabled
         if let c {
             settings.comparisonSplit=c.comparisonSplit;settings.browOnlySide=c.browOnlySide;settings.pigmentHalf=c.pigmentHalf ?? (c.comparisonSplit ? .left:.full);settings.isBrow=c.needsBrow;settings.withBlush=c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay
-            settings.style=c.blushStyle;settings.guide=c.showGuide || c.measuresBlushTarget;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay;settings.hideNatural=c.hideNaturalBrow
+            settings.style=c.blushStyle;settings.guide=c.showGuide || c.measuresBlushTarget;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay
+            // TEMP (Khalish 2026-11-10): natural-brow eraser off; the brow picture is drawn straight over the real brow.
+            // Restore: settings.hideNatural=c.hideNaturalBrow
+            settings.hideNatural=false
             let browDefault=SIMD3<Float>(0.2,0.13,0.09),blushDefault=SIMD3<Float>(0.9,0.3,0.45)
             settings.tint=c.layered ? c.browLayer.tint ?? browDefault:c.shadeTint ?? browDefault
             settings.intensity=c.layered ? c.browLayer.intensity:c.previewIntensity

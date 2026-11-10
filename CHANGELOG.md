@@ -1,3 +1,8 @@
+## 2026-11-10 — Brow filter over the natural brow (eraser off, temporary) — Khalish
+
+- `BeautyBlushEngine`: `settings.hideNatural` forced to `false`, so the brow overlay sits on the real brow instead of an
+  erased one. Restore line left as a comment.
+
 ## Merge: staging (onboarding animations, feedback Before fix) into E2E-Flow — 2026-11-10
 
 staging brought Khalish's onboarding animations and Nimah's feedback fixes (Before = the try-on photo, directional card
