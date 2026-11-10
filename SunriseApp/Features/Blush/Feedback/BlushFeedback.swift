@@ -199,8 +199,11 @@ enum BlushFeedback {
             let p = before.samples[i].position
             return SIMD2(abs(Double(p.x)) - abs(t.x), Double(p.y) - t.y)
         }
+        // Below the eyes only: lids and lashes change between the photos (a blink, light in the eye) and read as blush
+        // (device test 2026-11-10: "wipe off" on both eyes with no blush worn).
         let zone = both.filter {
             Double(before.samples[$0].position.x) * sign > 0 && simd_length(local($0)) <= 2.5 * radius
+                && before.samples[$0].position.y < before.eyeY - 8
         }
         // This cheek's own light: the skin around the field (outside the limit) should not change between the photos, so
         // its median change is taken out. Forehead and chin alone missed light that fell differently on one cheek.

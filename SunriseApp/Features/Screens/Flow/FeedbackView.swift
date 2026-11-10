@@ -313,7 +313,9 @@ struct FeedbackFixes: View {
                         .padding(.horizontal, 10).padding(.vertical, 4)
                         .background(AppColors.dandanPink.opacity(0.12), in: Capsule())
                     if let photo, case let marks = feedback.marks(for: first), !marks.isEmpty {
-                        FixCrop(photo: photo, marks: marks)
+                        // Nothing found: only where it should go; there is nothing to add to or wipe off yet.
+                        FixCrop(photo: photo, marks: first.rule.hasSuffix(".none")
+                                ? marks.map { .init(side: $0.side, target: $0.target, add: [], remove: []) } : marks)
                     }
                     Text(first.title).font(.system(size: 17, weight: .semibold))
                     Text(first.say).font(.system(size: 14)).foregroundStyle(AppColors.onboardingBody)
