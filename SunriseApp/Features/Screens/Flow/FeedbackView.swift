@@ -12,6 +12,8 @@ struct FeedbackView: View {
     @State private var progress = 0.0
     @State private var feedback: MakeupFeedback?
     @State private var opened: MakeupFeedback.Category?
+    /// The result photo lined up with the Before photo, the try-on taken at the desired-look shutter (`PhotoAlignment`).
+    @State private var alignedResult: UIImage?
     @AppStorage(DeveloperTools.key) private var developerTools = false
 
     var body: some View {
@@ -28,6 +30,9 @@ struct FeedbackView: View {
         .sheet(item: $opened) { category in FeedbackCategorySheet(category: category) }
         .task {
             guard feedback == nil else { return }
+            if let before = store.desired, let result = store.result {
+                alignedResult = PhotoAlignment.align(after: result, afterScan: store.resultScan, to: before, beforeScan: store.desiredScan)
+            }
             let request = MakeupFeedbackRequest(tool: handoff.tool, styleTitle: handoff.styleTitle,
                                                 desired: store.desired, result: store.result,
                                                 blushStyle: handoff.blushStyle, linerLook: handoff.linerLook,
@@ -87,7 +92,9 @@ struct FeedbackView: View {
                             .font(.system(size: 15))
                             .foregroundStyle(AppColors.onboardingBody)
                     }
-                    BeforeAfterSlider(before: store.bare ?? store.desired, after: store.alignedResult ?? store.result)
+                    // Before = the try-on photo (staging's fix). After = E2E-Flow's mesh-aligned result when it could be made,
+                    // else staging's eye alignment, else the photo as taken.
+                    BeforeAfterSlider(before: store.desired ?? store.bare, after: store.alignedResult ?? alignedResult ?? store.result)
                         .aspectRatio(362 / 236, contentMode: .fit)
                     if let score = feedback.score {
                         scoreCard(score: score, feedback: feedback)
@@ -224,7 +231,7 @@ struct FeedbackView: View {
     }
 }
 
-/// Before (bare face) and After (the result) in one frame, split by a line the person drags.
+/// Before (the try-on photo) and After (the result) in one frame, split by a line the person drags.
 private struct BeforeAfterSlider: View {
     let before: UIImage?
     let after: UIImage?

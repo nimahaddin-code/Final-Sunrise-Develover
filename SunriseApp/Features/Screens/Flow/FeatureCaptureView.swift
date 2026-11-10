@@ -161,7 +161,7 @@ struct FeatureCaptureView: View {
             defer { shooting = false }
             var pixels: ScreenPixels?
             var report = CaptureDiagnostics()
-            // The bare camera of this moment (SceneKit draws nothing for the capture): the feedback's "Before".
+            // The bare camera of this moment (SceneKit draws nothing for the capture): the Before's fallback when the try-on photo is missing.
             // `ARSCNView.snapshot()` comes at scale 1 (one point per pixel); the eyeliner is drawn in view points, so
             // at that scale it landed a third of the way, top left. Give it the view's size in points.
             let bare = Self.inPoints(view.snapshot(), of: view.bounds.size)

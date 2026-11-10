@@ -1,3 +1,10 @@
+## Merge: staging (onboarding animations, feedback Before fix) into E2E-Flow — 2026-11-10
+
+staging brought Khalish's onboarding animations and Nimah's feedback fixes (Before = the try-on photo, directional card
+notes, `PhotoAlignment` by the eyes). One code conflict, the Before / After slider: Before is now staging's
+`store.desired ?? store.bare`; After prefers E2E-Flow's mesh-aligned `store.alignedResult`, then staging's eye-aligned
+picture, then the photo as taken. Strings: staging's catalog plus 14 E2E-Flow keys. 379 Simulator tests pass.
+
 ## Tutorial step pictures — 2026-11-10
 
 `TutorialStepsSheet` shows the design team's stills instead of grey boxes: image sets `tutorial-brow-1…4` (brush up with the
@@ -36,6 +43,29 @@ desired photo's (least squares over about 200 points, normalised DLT) and redraw
 (`CIPerspectiveTransform`; skipped when a corner would move over 20%), which also takes out a few degrees of turn and nod;
 the eye fit is the fallback. So the live limits are easier again (off-axis and roll 5°, size 8%, centre 6% / 5%, gaze 10°;
 match to the desired pose 4°, 6%, 5%). The hint pill moved to the top, under the back / style / light row.
+## Feedback Before = the try-on photo — -Nimah (2026-11-10)
+
+Device test: the slider's Before showed the bare face. Before is now the try-on photo taken at the desired-look shutter
+(`MakeupFlowStore.desired`, the virtual makeup on); After (the result) is lined up with it (`PhotoAlignment`, eyes from
+`desiredScan`). The bare camera (`bare`) stays only as the fallback when there is no try-on photo. Not checked on a device.
+
+## Merge: Hanum's latest E2E-Flow into staging — -Nimah (2026-11-10)
+
+E2E-Flow (design sizes for brief, item sheet and feedback; Done at the bottom; two `FeedbackCategory` cases; eyeliner photo
+in points and normal blending; tutorial guides kept on their side; camera messages only while the face is lost) merged
+with staging's directional card notes and lined-up Before/After. `FeedbackView` is Hanum's layout; her `BeforeAfterSlider`
+now shows the lined-up After photo (`alignedResult`). `FeedbackCategory.isShade` is `self == .shade`. 372 Simulator tests
+pass; not checked on a device.
+
+## Feedback cards say which way; Before / After lined up — -Nimah (2026-11-09)
+
+As in the design: each card's note says which way it is off, from its worst message (`FeedbackNote`: "A little high", "Too
+heavy", "Far too short", or a phrase such as "Past the line", "Gaps to fill"; "Spot on" with no message; the score database
+label when a rule has no word), and the line beside the ring is built from the two cards, good first ("Your shade is spot
+on. Placement is a little high."). Coverage (gaps in the target) is told under Placement, since it follows where the makeup
+went. The slider's After photo is lined up with the bare Before photo (`PhotoAlignment`): each shutter records the eye
+centres on screen (`FaceScan.leftEye` / `rightEye`), and the result is moved, scaled and turned so its eyes land on the
+Before photo's eyes (left as it is beyond 1.6x or 25°). Tests in `BlushFeedbackTests`. Not checked on a device.
 
 ## Merge: staging (score database, brow colour) into E2E-Flow — 2026-11-10
 

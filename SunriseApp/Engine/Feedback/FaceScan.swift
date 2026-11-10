@@ -36,6 +36,9 @@ struct FaceScan: Sendable {
     /// The blush target outlines the engine drew on this frame, in the camera view's points.
     var outline: BlushGuideSnapshot?
     var viewport: CGSize
+    /// The eye centres on screen (camera view points), the person's own left and right: to line the photos up.
+    var leftEye: CGPoint? = nil
+    var rightEye: CGPoint? = nil
 }
 
 extension FaceScan {
@@ -111,7 +114,7 @@ extension FaceScan {
                         smile: max(shape(.mouthSmileLeft), shape(.mouthSmileRight)),
                         jawOpen: shape(.jawOpen), browRaise: max(shape(.browInnerUp), shape(.browOuterUpLeft), shape(.browOuterUpRight)),
                         ipd: simd_distance(leftEye, rightEye) * 1000, eyeY: (leftEye.y + rightEye.y) * 500,
-                        outline: outline, viewport: viewport)
+                        outline: outline, viewport: viewport, leftEye: l, rightEye: r)
     }
 }
 

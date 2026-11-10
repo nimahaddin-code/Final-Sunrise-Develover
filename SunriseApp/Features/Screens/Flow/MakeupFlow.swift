@@ -36,7 +36,7 @@ import UIKit
         }
     }
 
-    /// The bare camera at the desired-look shutter (no virtual makeup): the feedback's "Before".
+    /// The bare camera at the desired-look shutter (no virtual makeup); the feedback's Before falls back to it when there is no try-on photo.
     var bare: UIImage?
     /// Developer read-out of each shutter (shown on the feedback screen with developer tools on).
     var diagnostics: [CaptureStage: CaptureDiagnostics] = [:]
