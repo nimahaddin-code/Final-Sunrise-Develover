@@ -7,7 +7,7 @@ struct LinerLookPicker: View {
     let onSelect: (LinerLook?) -> Void
 
     var body: some View {
-        GlassPickerRow(title: selected.map { Text($0.title) } ?? Text("None"), selectedID: selected.map { "\($0.id)" } ?? "none", onCenter: { id in
+        GlassPickerRow(selectedID: selected.map { "\($0.id)" } ?? "none", onCenter: { id in
             onSelect(LinerLook.allCases.first { $0.id == id })
         }) {
             tile(isSelected: selected == nil, isNone: true, label: Text("No eyeliner"), id: "none") { onSelect(nil) } content: {

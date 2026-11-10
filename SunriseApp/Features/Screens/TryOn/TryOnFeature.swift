@@ -4,6 +4,8 @@ import SwiftUI
 /// shades, intensity, Continue); a tool only supplies its look row and, with developer tools on, its debug menu.
 @MainActor protocol TryOnFeature {
     func lookPicker(home: TryOnHomeModel) -> AnyView
+    /// The chosen look's name for the top row ("None" when the tool is off).
+    func styleName(home: TryOnHomeModel) -> Text
     /// nil: the tool has no debug menu.
     func debugMenu() -> AnyView?
 }

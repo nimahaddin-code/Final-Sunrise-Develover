@@ -11,5 +11,9 @@ struct BlushTryOnFeature: TryOnFeature {
         )
     }
 
+    func styleName(home: TryOnHomeModel) -> Text {
+        home.isOff ? Text("None") : Text(home.blushLook.title)
+    }
+
     func debugMenu() -> AnyView? { AnyView(BlushDebugMenu()) }
 }

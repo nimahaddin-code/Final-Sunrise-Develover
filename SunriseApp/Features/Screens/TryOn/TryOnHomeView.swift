@@ -148,6 +148,8 @@ struct TryOnHomeView: View {
                     .accessibilityAction { onBack() }
                     .sensoryFeedback(.impact, trigger: developerTools)
                 Spacer()
+                if home.canTry(home.tool) { styleNamePill }
+                Spacer()
                 ScreenLightButton(light: light, pulse: 0, plainGlass: true)
             }
             if developerTools {
@@ -162,6 +164,18 @@ struct TryOnHomeView: View {
         }
         .buttonStyle(.plain)
         .padding(AppSpacing.small)
+    }
+
+    /// The chosen look's name between back and the light: the same Liquid Glass as they have, as a capsule.
+    private var styleNamePill: some View {
+        home.tool.tryOnFeature.styleName(home: home)
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(.primary)
+            .lineLimit(1)
+            .padding(.horizontal, AppSpacing.medium)
+            .frame(height: 48)
+            .glassEffect(.regular, in: .capsule)
+            .accessibilityAddTraits(.isHeader)
     }
 
     /// Full-width button at the bottom, on to the photo of the desired look. A style must be on first.
