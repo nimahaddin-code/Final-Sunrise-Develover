@@ -1,7 +1,7 @@
-## 2026-11-10 — Feedback: fix first, marked on the photo -Nimah
+## 2026-11-10 — Feedback marks as dashed outlines -Nimah
 
-- `FeedbackView`: one "Fix this first" card with the result photo cropped and marked (add here / wipe off), the next fixes
-  numbered, and what went well. Feedback texts (en/id) no longer show millimetres, degrees or percentages.
+- Slider tags Expected / Result. The photo crop marks areas with dashed ellipses instead of dots. No blush found is told on
+  both cards and hides the praise.
 
 ## 2026-11-10 — Brow filter over the natural brow (eraser off, temporary) — Khalish
 

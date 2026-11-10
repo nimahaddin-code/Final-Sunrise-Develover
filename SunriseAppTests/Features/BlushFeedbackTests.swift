@@ -73,7 +73,7 @@ final class BlushFeedbackTests: XCTestCase {
         let feedback = try evaluate(after: scan(blushCentres: raised, radius: outerRadius, strength: 12))
         let high = feedback.items.filter { $0.title.localizedCaseInsensitiveContains("high") }
         XCTAssertEqual(high.count, 1, "\(feedback.items.map(\.title))")
-        XCTAssertTrue(high[0].say.contains("both cheeks"), high[0].say)
+        XCTAssertTrue(high[0].say.contains("both your cheeks"), high[0].say)
         XCTAssertLessThan(try XCTUnwrap(feedback.score), 0.9)
     }
 
@@ -168,7 +168,7 @@ final class BlushFeedbackTests: XCTestCase {
         let feedback = try evaluate(after: scan(blushCentres: [targets[0] + SIMD2(0, -9), targets[1]], radius: outerRadius, strength: 12))
         let first = try XCTUnwrap(feedback.fixes.first, "\(feedback.items.map(\.rule))")
         XCTAssertEqual(first.side, .left, first.rule)
-        let mark = try XCTUnwrap(feedback.mark(for: first))
+        let mark = try XCTUnwrap(feedback.marks(for: first).first)
         XCTAssertFalse(mark.target.isEmpty)
         XCTAssertFalse(mark.add.isEmpty, "the upper part of the target is bare")
         XCTAssertFalse(mark.remove.isEmpty, "blush went below the line")
@@ -197,17 +197,28 @@ final class BlushFeedbackTests: XCTestCase {
         print("FIXES-RENDER \(url.path)")
     }
 
+    /// Device test 2026-11-10: no blush, yet the Placement card said "Spot on" at 1% and "placement is right" was praised.
+    @MainActor func testNoBlushIsToldOnBothCardsAndNotPraised() throws {
+        let feedback = try evaluate(after: scan())
+        XCTAssertTrue(feedback.praise.isEmpty, "\(feedback.praise.map(\.rule))")
+        for card in feedback.categories {
+            XCTAssertNotEqual(card.label, "Spot on", card.id)
+            XCTAssertEqual(card.items.first?.rule, "blush.none", card.id)
+        }
+        try render(feedback, after: [], name: "blush-none")
+    }
+
     func testNoBlushSaysSo() throws {
         let feedback = try evaluate(after: scan())
         XCTAssertEqual(feedback.items.first?.title, "No blush found")
-        XCTAssertTrue(feedback.items.first?.say.contains("both cheeks") ?? false)
+        XCTAssertTrue(feedback.items.first?.say.contains("both your cheeks") ?? false)
     }
 
     /// Device test 2026-11-09: no blush worn, the head tilted and one cheek lit warmer; that cheek read as blush.
     func testABareCheekInWarmerLightIsNotBlush() throws {
         let feedback = try evaluate(after: scan(leftLight: Lab(-3, 4, 4)))
         XCTAssertEqual(feedback.items.first?.rule, "blush.none")
-        XCTAssertTrue(feedback.items.first?.say.contains("both cheeks") ?? false, feedback.items.first?.say ?? "")
+        XCTAssertTrue(feedback.items.first?.say.contains("both your cheeks") ?? false, feedback.items.first?.say ?? "")
     }
 
     func testTooHeavyBlushIsCalledHeavy() throws {

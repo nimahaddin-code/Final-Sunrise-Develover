@@ -2232,6 +2232,16 @@
         }
       }
     },
+    "Expected" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Target"
+          }
+        }
+      }
+    },
     "Explore calibration placeholder" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5026,6 +5036,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Ulangi pindai awal"
+          }
+        }
+      }
+    },
+    "Result" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hasilmu"
           }
         }
       }

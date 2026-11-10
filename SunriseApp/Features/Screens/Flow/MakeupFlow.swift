@@ -279,12 +279,10 @@ struct MakeupFeedback: Sendable, Equatable {
     /// What to fix, worst first: the measured messages without photo checks and praise.
     var fixes: [Item] { items.filter { $0.band != .ok && $0.side != nil } }
 
-    /// The mark for an item's side; both sides merged for an item about both.
-    func mark(for item: Item) -> Mark? {
-        guard let side = item.side else { return nil }
-        let own = marks.filter { side == .both || $0.side == side }
-        guard !own.isEmpty else { return nil }
-        return Mark(side: side, target: own.flatMap(\.target), add: own.flatMap(\.add), remove: own.flatMap(\.remove))
+    /// The marks for an item's side: one, or both sides for an item about both.
+    func marks(for item: Item) -> [Mark] {
+        guard let side = item.side else { return [] }
+        return marks.filter { !$0.target.isEmpty && (side == .both || $0.side == side) }
     }
 }
 

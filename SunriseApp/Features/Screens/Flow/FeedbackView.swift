@@ -256,9 +256,9 @@ private struct BeforeAfterSlider: View {
                 VStack {
                     Spacer()
                     HStack {
-                        tag("Before", dot: false)
+                        tag("Expected", dot: false)
                         Spacer()
-                        tag("After", dot: true)
+                        tag("Result", dot: true)
                     }
                     .padding(10)
                 }
@@ -312,8 +312,8 @@ struct FeedbackFixes: View {
                         .foregroundStyle(AppColors.dandanPink)
                         .padding(.horizontal, 10).padding(.vertical, 4)
                         .background(AppColors.dandanPink.opacity(0.12), in: Capsule())
-                    if let photo, let mark = feedback.mark(for: first), !mark.target.isEmpty {
-                        FixCrop(photo: photo, mark: mark)
+                    if let photo, case let marks = feedback.marks(for: first), !marks.isEmpty {
+                        FixCrop(photo: photo, marks: marks)
                     }
                     Text(first.title).font(.system(size: 17, weight: .semibold))
                     Text(first.say).font(.system(size: 14)).foregroundStyle(AppColors.onboardingBody)
@@ -364,46 +364,69 @@ struct FeedbackFixes: View {
     }
 }
 
-/// -Nimah: the result photo cropped to the fix's side, with the target as faint dots, the target spots still bare as
-/// rings ("add here") and the makeup outside the target filled ("wipe off").
+/// -Nimah: the result photo cropped to the fix, with dashed outlines instead of dots (device test 2026-11-10: filled dots
+/// hid the cheek and read as blush): white = the try-on area, pink = where to add, pink with a light fill = what to wipe
+/// off. Each outline is an ellipse fitted to that group of mesh points, with stray points left out.
 private struct FixCrop: View {
     let photo: UIImage
-    let mark: MakeupFeedback.Mark
+    let marks: [MakeupFeedback.Mark]
     static let aspect: CGFloat = 2.2
 
+    /// The outlines, in photo points.
+    private var shapes: (target: [Oval], add: [Oval], remove: [Oval]) {
+        func ovals(_ pick: (MakeupFeedback.Mark) -> [CGPoint], minimum: Int, unlessMostOfTarget: Bool = false) -> [Oval] {
+            marks.compactMap { mark in
+                let points = pick(mark)
+                // "Add here" over most of the target says nothing new: the target outline and the message tell it.
+                if unlessMostOfTarget, points.count * 10 > mark.target.count * 7 { return nil }
+                guard points.count >= minimum else { return nil }
+                return Oval(points.map { CGPoint(x: $0.x * photo.size.width, y: $0.y * photo.size.height) })
+            }
+        }
+        return (ovals(\.target, minimum: 6), ovals(\.add, minimum: 8, unlessMostOfTarget: true), ovals(\.remove, minimum: 8))
+    }
+
     var body: some View {
-        let rect = Self.crop(mark, photo: photo.size)
+        let shapes = self.shapes
+        let rect = Self.crop(shapes.target + shapes.add + shapes.remove, photo: photo.size)
         VStack(alignment: .leading, spacing: 6) {
             GeometryReader { proxy in
                 let size = proxy.size
-                let scale = size.width / max(rect.width * photo.size.width, 1)
+                let scale = size.width / max(rect.width, 1)
                 Image(uiImage: photo)
                     .resizable()
                     .frame(width: photo.size.width * scale, height: photo.size.height * scale)
-                    .offset(x: -rect.minX * photo.size.width * scale, y: -rect.minY * photo.size.height * scale)
+                    .offset(x: -rect.minX * scale, y: -rect.minY * scale)
                     .frame(width: size.width, height: size.height, alignment: .topLeading)
                     .clipped()
                     .overlay {
-                        Canvas { context, size in
-                            func place(_ p: CGPoint) -> CGPoint {
-                                CGPoint(x: (p.x - rect.minX) / rect.width * size.width, y: (p.y - rect.minY) / rect.height * size.height)
-                            }
-                            let r = max(1.4, size.width / 140)
-                            func dot(_ p: CGPoint, _ radius: CGFloat) -> Path {
-                                let c = place(p); return Path(ellipseIn: CGRect(x: c.x - radius, y: c.y - radius, width: radius * 2, height: radius * 2))
-                            }
+                        Canvas { context, _ in
+                            let place = CGAffineTransform(translationX: -rect.minX, y: -rect.minY)
+                                .concatenating(CGAffineTransform(scaleX: scale, y: scale))
+                            let dash = StrokeStyle(lineWidth: 2, lineCap: .round, dash: [6, 5])
                             let pink = AppColors.dandanPink
-                            for p in mark.target { context.fill(dot(p, r * 0.6), with: .color(pink.opacity(0.25))) }
-                            for p in mark.remove { context.fill(dot(p, r), with: .color(pink.opacity(0.6))) }
-                            for p in mark.add { context.stroke(dot(p, r), with: .color(pink), lineWidth: 1.2) }
+                            for oval in shapes.target {
+                                context.stroke(oval.path.applying(place), with: .color(.black.opacity(0.25)), style: StrokeStyle(lineWidth: 3.5, dash: [6, 5]))
+                                context.stroke(oval.path.applying(place), with: .color(.white), style: dash)
+                            }
+                            for oval in shapes.remove {
+                                context.fill(oval.path.applying(place), with: .color(pink.opacity(0.18)))
+                                context.stroke(oval.path.applying(place), with: .color(pink), style: StrokeStyle(lineWidth: 2))
+                            }
+                            for oval in shapes.add { context.stroke(oval.path.applying(place), with: .color(pink), style: dash) }
                         }
                     }
             }
             .aspectRatio(Self.aspect, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             HStack(spacing: 14) {
-                if !mark.add.isEmpty { legend(Circle().stroke(AppColors.dandanPink, lineWidth: 1.2), "Add here") }
-                if !mark.remove.isEmpty { legend(Circle().fill(AppColors.dandanPink.opacity(0.6)), "Wipe off") }
+                legend(Circle().stroke(AppColors.onboardingBody, style: StrokeStyle(lineWidth: 1.2, dash: [2.5, 2])), "Your try-on area")
+                if !shapes.add.isEmpty {
+                    legend(Circle().stroke(AppColors.dandanPink, style: StrokeStyle(lineWidth: 1.2, dash: [2.5, 2])), "Add here")
+                }
+                if !shapes.remove.isEmpty {
+                    legend(Circle().fill(AppColors.dandanPink.opacity(0.2)).overlay(Circle().stroke(AppColors.dandanPink, lineWidth: 1.2)), "Wipe off")
+                }
             }
         }
         .accessibilityElement(children: .ignore)
@@ -412,26 +435,51 @@ private struct FixCrop: View {
 
     private func legend(_ shape: some View, _ title: LocalizedStringKey) -> some View {
         HStack(spacing: 5) {
-            shape.frame(width: 9, height: 9)
+            shape.frame(width: 10, height: 10)
             Text(title).font(.system(size: 11)).foregroundStyle(AppColors.onboardingBody)
         }
     }
 
-    /// The part of the photo (0...1) around the mark, padded, at `aspect` in pixels and kept inside the photo.
-    static func crop(_ mark: MakeupFeedback.Mark, photo: CGSize) -> CGRect {
-        let points = mark.target + mark.add + mark.remove
-        guard let minX = points.map(\.x).min(), let maxX = points.map(\.x).max(),
-              let minY = points.map(\.y).min(), let maxY = points.map(\.y).max(), photo.width > 0, photo.height > 0 else {
-            return CGRect(x: 0, y: 0, width: 1, height: 1)
-        }
-        var w = max((maxX - minX) * 1.5, 0.3), h = max((maxY - minY) * 1.5, 0.05)
-        // Same shape as the frame: width / height in pixels = aspect.
-        let wanted = w * photo.width / aspect / photo.height
-        if h < wanted { h = wanted } else { w = h * photo.height * aspect / photo.width }
-        if w > 1 { h *= 1 / w; w = 1 }
-        if h > 1 { w *= 1 / h; h = 1 }
-        let x = min(max((minX + maxX) / 2 - w / 2, 0), 1 - w), y = min(max((minY + maxY) / 2 - h / 2, 0), 1 - h)
+    /// The part of the photo (points) around the outlines, padded, at `aspect`, kept inside the photo.
+    static func crop(_ ovals: [Oval], photo: CGSize) -> CGRect {
+        let box = ovals.map(\.path.boundingRect).reduce(CGRect.null) { $0.union($1) }
+        guard !box.isNull, photo.width > 0, photo.height > 0 else { return CGRect(origin: .zero, size: photo) }
+        var w = max(box.width * 1.4, photo.width * 0.3), h = max(box.height * 1.4, 1)
+        if w / h < aspect { w = h * aspect } else { h = w / aspect }
+        if w > photo.width { h *= photo.width / w; w = photo.width }
+        if h > photo.height { w *= photo.height / h; h = photo.height }
+        let x = min(max(box.midX - w / 2, 0), photo.width - w), y = min(max(box.midY - h / 2, 0), photo.height - h)
         return CGRect(x: x, y: y, width: w, height: h)
+    }
+}
+
+/// An ellipse round a group of points: their spread (two standard deviations along the main axes), after dropping points
+/// far from the rest (more than 2.5 times the median distance from the median point).
+struct Oval {
+    let center: CGPoint
+    let radii: CGSize
+    let angle: CGFloat
+
+    init(_ all: [CGPoint]) {
+        func median(_ v: [CGFloat]) -> CGFloat { let s = v.sorted(); return s.isEmpty ? 0 : s[s.count / 2] }
+        let mid = CGPoint(x: median(all.map(\.x)), y: median(all.map(\.y)))
+        let distances = all.map { hypot($0.x - mid.x, $0.y - mid.y) }
+        let limit = max(median(distances) * 2.5, 1)
+        let points = zip(all, distances).filter { $0.1 <= limit }.map(\.0)
+        let n = CGFloat(max(points.count, 1))
+        let c = CGPoint(x: points.reduce(0) { $0 + $1.x } / n, y: points.reduce(0) { $0 + $1.y } / n)
+        var xx: CGFloat = 0, yy: CGFloat = 0, xy: CGFloat = 0
+        for p in points { let dx = p.x - c.x, dy = p.y - c.y; xx += dx * dx; yy += dy * dy; xy += dx * dy }
+        xx /= n; yy /= n; xy /= n
+        let mean = (xx + yy) / 2, spread = ((xx - yy) * (xx - yy) / 4 + xy * xy).squareRoot()
+        center = c
+        radii = CGSize(width: max(2 * (mean + spread).squareRoot(), 4), height: max(2 * max(mean - spread, 0).squareRoot(), 4))
+        angle = 0.5 * atan2(2 * xy, xx - yy)
+    }
+
+    var path: Path {
+        Path(ellipseIn: CGRect(x: -radii.width, y: -radii.height, width: radii.width * 2, height: radii.height * 2))
+            .applying(CGAffineTransform(rotationAngle: angle).concatenating(CGAffineTransform(translationX: center.x, y: center.y)))
     }
 }
 

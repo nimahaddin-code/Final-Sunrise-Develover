@@ -185,7 +185,9 @@ struct FeedbackComposer {
                              ipdScale: ipdScale, look: look)
         // "Left and right match" next to a fix for one side only reads as a contradiction.
         let oneSided = hits.contains { $0.band != .ok && $0.side != .both }
-        result.praise = praise.filter { !(oneSided && $0.rule.contains(".praise.balance")) }
+        // Nothing found on a side: there is nothing to praise yet (device test 2026-11-10: "placement is right" with no blush).
+        let missing = hits.contains { $0.band != .ok && $0.rule.hasSuffix(".none") }
+        result.praise = missing ? [] : praise.filter { !(oneSided && $0.rule.contains(".praise.balance")) }
         result.marks = marks
         return result
     }
@@ -211,7 +213,8 @@ struct FeedbackComposer {
                     hit.rule.contains(".coverage.") ? "placement"
                         : FeedbackCategory(priority: hit.priority).isShade ? "shade" : "placement"
                 }
-                let own = all.filter { card($0) == group.id }
+                // Nothing found is told on both cards: there is no placement to be "spot on" either.
+                let own = all.filter { $0.rule.hasSuffix(".none") || card($0) == group.id }
                 let messages = own.compactMap { message(for: $0) }
                 // The card's short note says which way it is off ("A little high"), from its worst message; the score
                 // database's label (no direction) when no rule has a word for it.
@@ -264,7 +267,8 @@ struct FeedbackComposer {
     func fill(_ text: String, _ values: [String: String]) -> String {
         var out = text
         for (key, value) in values { out = out.replacingOccurrences(of: "{\(key)}", with: value) }
-        return out
+        // "your {part}" with both sides: "both your cheeks", not "your both cheeks".
+        return out.replacingOccurrences(of: "your both ", with: "both your ").replacingOccurrences(of: "Your both ", with: "Both your ")
     }
 
     func score(_ entries: [FeedbackScoreEntry]) -> Double? {
