@@ -131,16 +131,22 @@ struct TryOnHomeView: View {
     private var topButtons: some View {
         VStack(alignment: .leading, spacing: AppSpacing.small) {
             HStack {
-                Button(action: onBack) {
-                    Image(systemName: "chevron.left")
-                        .font(.title2.weight(.medium))
-                        .foregroundStyle(.primary)
-                        .frame(width: 48, height: 48)
-                        .glassEffect(.regular.interactive(), in: .circle)
-                }
-                .accessibilityLabel("Back to features")
-                .simultaneousGesture(LongPressGesture(minimumDuration: 1.2).onEnded { _ in developerTools.toggle() })
-                .sensoryFeedback(.impact, trigger: developerTools)
+                // Not a Button with a simultaneous long press: on iOS 26 that gesture can swallow the tap, so back did
+                // nothing. One gesture decides: a 1.2 s hold toggles developer tools, anything shorter goes back.
+                Image(systemName: "chevron.left")
+                    .font(.title2.weight(.medium))
+                    .foregroundStyle(.primary)
+                    .frame(width: 48, height: 48)
+                    .glassEffect(.regular.interactive(), in: .circle)
+                    .contentShape(Circle())
+                    .gesture(LongPressGesture(minimumDuration: 1.2)
+                        .onEnded { _ in developerTools.toggle() }
+                        .exclusively(before: TapGesture().onEnded { onBack() }))
+                    .accessibilityElement()
+                    .accessibilityLabel("Back to features")
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { onBack() }
+                    .sensoryFeedback(.impact, trigger: developerTools)
                 Spacer()
                 ScreenLightButton(light: light, pulse: 0, plainGlass: true)
             }
@@ -165,20 +171,23 @@ struct TryOnHomeView: View {
             home.deactivate()
             onContinue(handoff)
         } label: {
-            Text("Continue")
+            // Disabled looked exactly like enabled, so a tap with no look chosen seemed to do nothing: it now says why.
+            Text(canContinue ? "Continue" : "Pick a look to continue")
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(.white.opacity(canContinue ? 1 : 0.6))
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 // System glass tinted with the homepage's dark button colour, so it follows the Liquid Glass setting.
-                .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
+                .glassEffect(.regular.tint(AppColors.buttonInk.opacity(canContinue ? 1 : 0.5)).interactive(), in: .capsule)
         }
         .buttonStyle(.plain)
         // The page has no side padding, so the button keeps its own inset.
         .padding(.horizontal, AppSpacing.medium)
         .padding(.top, AppSpacing.small)
-        .disabled(!home.canTry(home.tool) || home.isOff)
+        .disabled(!canContinue)
     }
+
+    private var canContinue: Bool { home.canTry(home.tool) && !home.isOff }
 
     /// Opens the shade row and intensity bar; shows an X while they are open.
     private var paletteToggle: some View {
