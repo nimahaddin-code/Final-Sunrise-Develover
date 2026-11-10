@@ -180,7 +180,19 @@ struct FeedbackComposer {
     /// its own percentage, short label and every message of that category.
     func assemble(hits: [FeedbackHit], entries: [FeedbackScoreEntry], praise: [MakeupFeedback.Item],
                   notes: [MakeupFeedback.Item], tool: String = "", inputs: ScoreInputs = ScoreInputs(),
-                  ipdScale: Double = 1, look: String? = nil) -> MakeupFeedback {
+                  ipdScale: Double = 1, look: String? = nil, marks: [MakeupFeedback.Mark] = []) -> MakeupFeedback {
+        var result = compose(hits: hits, entries: entries, praise: praise, notes: notes, tool: tool, inputs: inputs,
+                             ipdScale: ipdScale, look: look)
+        // "Left and right match" next to a fix for one side only reads as a contradiction.
+        let oneSided = hits.contains { $0.band != .ok && $0.side != .both }
+        result.praise = praise.filter { !(oneSided && $0.rule.contains(".praise.balance")) }
+        result.marks = marks
+        return result
+    }
+
+    private func compose(hits: [FeedbackHit], entries: [FeedbackScoreEntry], praise: [MakeupFeedback.Item],
+                         notes: [MakeupFeedback.Item], tool: String, inputs: ScoreInputs,
+                         ipdScale: Double, look: String?) -> MakeupFeedback {
         let chosen = select(hits).compactMap { message(for: $0) }
         let all = select(hits, limit: .max)
         // With the score database: the design's two cards, Placement and Shade, scored from the measured differences.
@@ -245,7 +257,8 @@ struct FeedbackComposer {
         guard let rule = database.rule(hit.rule), let text = rule.messages?[hit.band.key]?.text(language) else { return nil }
         var values = hit.values
         values["part"] = partName(hit.side)
-        return MakeupFeedback.Item(title: text.title, say: fill(text.say, values), steps: text.steps ?? [], band: hit.band, rule: hit.rule)
+        return MakeupFeedback.Item(title: text.title, say: fill(text.say, values), steps: text.steps ?? [], band: hit.band, rule: hit.rule,
+                                   side: hit.side)
     }
 
     func fill(_ text: String, _ values: [String: String]) -> String {

@@ -75,6 +75,14 @@ final class LineFeedbackTests: XCTestCase {
         XCTAssertTrue(tail.say.contains("both brows"), tail.say)
     }
 
+    func testShortBrowTailIsMarkedWhereToAdd() throws {
+        let feedback = try browFeedback(brow(tailX: 50))
+        let first = try XCTUnwrap(feedback.fixes.first, "\(feedback.items.map(\.rule))")
+        let mark = try XCTUnwrap(feedback.mark(for: first), first.rule)
+        XCTAssertFalse(mark.add.isEmpty, "the end of the tail is bare")
+        XCTAssertEqual(feedback.marks.count, 2)
+    }
+
     func testBrowDrawnTooHighIsNamed() throws {
         let feedback = try browFeedback(brow(lift: 4))
         XCTAssertTrue(feedback.items.contains { $0.rule.hasPrefix("brow.head.too_high") || $0.rule.hasPrefix("brow.tail.too_high") },

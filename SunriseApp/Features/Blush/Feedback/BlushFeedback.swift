@@ -156,7 +156,7 @@ enum BlushFeedback {
             }
         }
         return composer.assemble(hits: hits, entries: entries, praise: items, notes: check.notes, tool: "blush", inputs: inputs,
-                                 ipdScale: scale, look: look)
+                                 ipdScale: scale, look: look, marks: cheeks.map(\.mark))
     }
 
     // MARK: Measuring one cheek
@@ -176,6 +176,8 @@ enum BlushFeedback {
         var barestZone: String, strongestZone: String
         /// Mean colour change inside the target, and blush area (mm²), for left/right comparison.
         var strength: Double, area: Double
+        /// Where it is on the result photo, for the feedback crop.
+        var mark: MakeupFeedback.Mark
     }
 
     static func measure(cheek: BlushGuideSnapshot.Cheek, screens: [CGPoint], both: [Int], before: FaceScan, after: FaceScan,
@@ -294,7 +296,8 @@ enum BlushFeedback {
                      areaRatio: blushArea / targetArea, intensityRatio: intensity,
                      spill: ["eye", "nose", "mouth", "ear", "jaw"].map { ($0, spill[$0] ?? 0) },
                      patchiness: patchiness, hueDelta: hue, barestZone: barest, strongestZone: strongest,
-                     strength: strength, area: blushArea)
+                     strength: strength, area: blushArea,
+                     mark: after.mark(sign > 0 ? .left : .right, target: Set(area), product: blush, limit: inside))
     }
 
     static func noBeforePhoto(_ composer: FeedbackComposer) -> MakeupFeedback {

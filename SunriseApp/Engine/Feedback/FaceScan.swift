@@ -275,3 +275,20 @@ enum FeedbackColor {
         return Float(sqrt(pow(dl / sl, 2) + pow(dc / sc, 2) + pow(dH / sh, 2) + rt * (dc / sc) * (dH / sh)))
     }
 }
+
+extension FaceScan {
+    /// Sample `i` on this photo, 0...1 across and down.
+    func photoPoint(_ i: Int) -> CGPoint {
+        let p = samples[i].screen
+        return CGPoint(x: p.x / max(viewport.width, 1), y: p.y / max(viewport.height, 1))
+    }
+
+    /// -Nimah: a side's mark for the feedback crop: the target, the target spots with no makeup and the makeup outside the
+    /// target, placed on this (result) photo. `limit`, when given, is how far makeup may go before it counts as outside.
+    func mark(_ side: FeedbackSide, target: Set<Int>, product: Set<Int>, limit: Set<Int>? = nil) -> MakeupFeedback.Mark {
+        let inside = limit ?? target
+        func points(_ set: Set<Int>) -> [CGPoint] { set.sorted().filter { samples.indices.contains($0) }.map(photoPoint) }
+        return MakeupFeedback.Mark(side: side, target: points(target), add: points(target.subtracting(product)),
+                                   remove: points(product.subtracting(inside)))
+    }
+}

@@ -2,6 +2,7 @@
 // and blush added where a test puts it. Real photos and thresholds still need calibrating on a device.
 import XCTest
 import simd
+import SwiftUI
 @testable import SunriseApp
 
 final class BlushFeedbackTests: XCTestCase {
@@ -142,6 +143,58 @@ final class BlushFeedbackTests: XCTestCase {
         let feedback = try evaluate(after: scan(blushCentres: [targets[0] + SIMD2(0, -9), targets[1]], radius: outerRadius, strength: 12))
         let low = try XCTUnwrap(feedback.items.first { $0.title.localizedCaseInsensitiveContains("low") }, "\(feedback.items.map(\.title))")
         XCTAssertTrue(low.say.contains("left cheek"), "x > 0 is the person's own left: \(low.say)")
+    }
+
+    /// -Nimah: beginners cannot measure millimetres or degrees on their own face; the photo crop shows where instead.
+    func testNoMessageShowsMeasurements() throws {
+        let url = try XCTUnwrap(Bundle.main.url(forResource: "makeup-feedback.database", withExtension: "json"))
+        let root = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any]
+        var says: [String] = []
+        func walk(_ x: Any) {
+            if let d = x as? [String: Any] {
+                for (k, v) in d { if k == "say", let s = v as? String { says.append(s) } else { walk(v) } }
+            } else if let a = x as? [Any] { a.forEach(walk) }
+        }
+        walk(try XCTUnwrap(root?["tools"])); walk(try XCTUnwrap(root?["capture"]))
+        XCTAssertGreaterThan(says.count, 400)
+        for say in says {
+            for number in ["{delta}", "{value}", "{target}", " mm", "°", "%"] {
+                XCTAssertFalse(say.contains(number), say)
+            }
+        }
+    }
+
+    @MainActor func testFirstFixIsMarkedOnItsCheek() throws {
+        let feedback = try evaluate(after: scan(blushCentres: [targets[0] + SIMD2(0, -9), targets[1]], radius: outerRadius, strength: 12))
+        let first = try XCTUnwrap(feedback.fixes.first, "\(feedback.items.map(\.rule))")
+        XCTAssertEqual(first.side, .left, first.rule)
+        let mark = try XCTUnwrap(feedback.mark(for: first))
+        XCTAssertFalse(mark.target.isEmpty)
+        XCTAssertFalse(mark.add.isEmpty, "the upper part of the target is bare")
+        XCTAssertFalse(mark.remove.isEmpty, "blush went below the line")
+        // The person's left cheek (x > 0) is on the photo's left half in the test's screen mapping.
+        XCTAssertLessThan(mark.target.map(\.x).reduce(0, +) / CGFloat(mark.target.count), 0.5)
+        XCTAssertTrue(feedback.praise.isEmpty || feedback.praise.allSatisfy { $0.band == .ok })
+        try render(feedback, after: [targets[0] + SIMD2(0, -9), targets[1]], name: "blush")
+    }
+
+    /// Draws the fixes with a plain synthetic photo for a look at the layout (saved next to the test logs; not compared).
+    @MainActor private func render(_ feedback: MakeupFeedback, after centres: [SIMD2<Float>], name: String) throws {
+        let photo = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 800)).image { context in
+            UIColor(red: 0.88, green: 0.72, blue: 0.62, alpha: 1).setFill(); context.fill(CGRect(x: 0, y: 0, width: 400, height: 800))
+            UIColor(red: 0.93, green: 0.5, blue: 0.58, alpha: 0.8).setFill()
+            for c in centres {
+                let p = screen(c), r = CGFloat(outerRadius) * 2
+                context.cgContext.fillEllipse(in: CGRect(x: p.x - r, y: p.y - r, width: r * 2, height: r * 2))
+            }
+        }
+        let renderer = ImageRenderer(content: FeedbackFixes(feedback: feedback, photo: photo).frame(width: 362).padding(16)
+            .background(Color(white: 0.97)))
+        renderer.scale = 2
+        let data = try XCTUnwrap(renderer.uiImage?.pngData())
+        let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("feedback-fixes-\(name).png")
+        try data.write(to: url)
+        print("FIXES-RENDER \(url.path)")
     }
 
     func testNoBlushSaysSo() throws {

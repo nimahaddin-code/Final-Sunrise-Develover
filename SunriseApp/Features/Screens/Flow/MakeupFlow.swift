@@ -223,6 +223,17 @@ struct MakeupFeedback: Sendable, Equatable {
         var band: FeedbackBand
         /// The database id of the rule, praise or photo check (for tests and calibration).
         var rule: String = ""
+        /// Which side it is about (left, right, both); nil for photo checks and praise.
+        var side: FeedbackSide? = nil
+    }
+
+    /// -Nimah: where to show a fix on the result photo, for one side. Points are 0...1 of the result photo (x across, y
+    /// down): the target as tried on, the target spots with no makeup ("add here") and the makeup outside it ("wipe off").
+    struct Mark: Sendable, Equatable {
+        var side: FeedbackSide
+        var target: [CGPoint]
+        var add: [CGPoint]
+        var remove: [CGPoint]
     }
 
     /// One card of the feedback screen: a group of rules (placement, shape, ...) with its own score.
@@ -260,6 +271,21 @@ struct MakeupFeedback: Sendable, Equatable {
     var placement: Part? = nil
     /// How close the colour is to the shade tried on; nil until the comparison measures it.
     var shade: Part? = nil
+    /// What went well (the database's praise), shown as ticks under the fixes.
+    var praise: [Item] = []
+    /// One per measured side, for the marked photo crop of the first fix.
+    var marks: [Mark] = []
+
+    /// What to fix, worst first: the measured messages without photo checks and praise.
+    var fixes: [Item] { items.filter { $0.band != .ok && $0.side != nil } }
+
+    /// The mark for an item's side; both sides merged for an item about both.
+    func mark(for item: Item) -> Mark? {
+        guard let side = item.side else { return nil }
+        let own = marks.filter { side == .both || $0.side == side }
+        guard !own.isEmpty else { return nil }
+        return Mark(side: side, target: own.flatMap(\.target), add: own.flatMap(\.add), remove: own.flatMap(\.remove))
+    }
 }
 
 /// Compares the desired-look photo with the result. The real comparison (placement from coordinates) is built
