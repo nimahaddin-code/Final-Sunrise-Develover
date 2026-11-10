@@ -1,5 +1,6 @@
 // The one-tool makeup flow: pick a tool, try it on, photograph the desired look, prepare, follow the tutorial side by
 // side, photograph the result, get feedback. Photos stay in memory for this run only; nothing is saved or uploaded.
+import CoreImage
 import SwiftUI
 import UIKit
 
@@ -40,7 +41,55 @@ import UIKit
     /// Developer read-out of each shutter (shown on the feedback screen with developer tools on).
     var diagnostics: [CaptureStage: CaptureDiagnostics] = [:]
 
-    func reset() { desired = nil; result = nil; desiredScan = nil; resultScan = nil; bare = nil; diagnostics = [:] }
+    /// Where both eyes were on screen at each shutter (view points), to line the result photo up with the desired one.
+    var eyes: [CaptureStage: EyePair] = [:]
+    /// The result photo turned, scaled and moved so its eyes sit where the desired photo's eyes are: the Before / After
+    /// slider shows this, so the split falls on the same place of the face. Nil when the eyes were not seen.
+    var alignedResult: UIImage?
+    /// The head's pose at each shutter (numbers only): the result photo must be taken in the desired photo's pose.
+    var poses: [CaptureStage: CapturePoseReading] = [:]
+
+    func reset() {
+        desired = nil; result = nil; desiredScan = nil; resultScan = nil; bare = nil; diagnostics = [:]; eyes = [:]; alignedResult = nil; poses = [:]
+    }
+}
+
+/// The two eye centres on screen, in view points (the photos are view-sized, so also photo points).
+struct EyePair: Equatable, Sendable {
+    var left: CGPoint
+    var right: CGPoint
+}
+
+extension EyePair {
+    /// The turn, scale and shift that carry `self` onto `target` (both eyes), or nil when it would be a big change
+    /// (different poses, or an eye mis-read): then the photo is better left as taken.
+    func transform(onto target: EyePair) -> CGAffineTransform? {
+        let a = CGVector(dx: right.x - left.x, dy: right.y - left.y)
+        let b = CGVector(dx: target.right.x - target.left.x, dy: target.right.y - target.left.y)
+        let lengthA = hypot(a.dx, a.dy), lengthB = hypot(b.dx, b.dy)
+        guard lengthA > 1, lengthB > 1 else { return nil }
+        let scale = lengthB / lengthA
+        var angle = atan2(b.dy, b.dx) - atan2(a.dy, a.dx)
+        if angle > .pi { angle -= 2 * .pi } else if angle < -.pi { angle += 2 * .pi }
+        guard (0.8...1.25).contains(scale), abs(angle) < 15 * .pi / 180 else { return nil }
+        return CGAffineTransform(translationX: -left.x, y: -left.y)
+            .concatenating(CGAffineTransform(scaleX: scale, y: scale))
+            .concatenating(CGAffineTransform(rotationAngle: angle))
+            .concatenating(CGAffineTransform(translationX: target.left.x, y: target.left.y))
+    }
+
+    /// `image` redrawn with its eyes on `target`'s eyes; uncovered edges are black.
+    static func align(_ image: UIImage, from eyes: EyePair, to target: EyePair) -> UIImage? {
+        guard let transform = eyes.transform(onto: target) else { return nil }
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = image.scale
+        return UIGraphicsImageRenderer(size: image.size, format: format).image { context in
+            UIColor.black.setFill()
+            context.fill(CGRect(origin: .zero, size: image.size))
+            context.cgContext.concatenate(transform)
+            image.draw(at: .zero)
+        }
+    }
 }
 
 /// -Nimah: what happened at a shutter, for developers: whether the makeup engine's picture could be read, the target
@@ -353,5 +402,118 @@ private struct PillGlass: ViewModifier {
 
     func body(content: Content) -> some View {
         if on { content.glassEffect(.regular, in: .capsule) } else { content }
+    }
+}
+
+/// A perspective map of the picture plane (3 x 3, last entry 1), fitted to many matching face points: unlike the two-eye
+/// fit it also takes out small differences in head turn and nod between the two photos, so the result photo is redrawn as if
+/// taken from the desired photo's angle (for the face; good for the few degrees the capture screen still allows).
+struct FaceHomography: Equatable {
+    /// Row-major h11 ... h32; h33 = 1.
+    var h: [Double]
+
+    func apply(_ p: CGPoint) -> CGPoint {
+        let x = Double(p.x), y = Double(p.y)
+        let w = h[6] * x + h[7] * y + 1
+        return CGPoint(x: (h[0] * x + h[1] * y + h[2]) / w, y: (h[3] * x + h[4] * y + h[5]) / w)
+    }
+
+    /// Least squares over the pairs (direct linear transform, points centred and scaled first for a stable solve).
+    /// Nil with fewer than 8 pairs or a degenerate fit.
+    static func fit(from source: [CGPoint], to target: [CGPoint]) -> FaceHomography? {
+        guard source.count == target.count, source.count >= 8 else { return nil }
+        func normaliser(_ points: [CGPoint]) -> (cx: Double, cy: Double, s: Double) {
+            let cx = points.map { Double($0.x) }.reduce(0, +) / Double(points.count)
+            let cy = points.map { Double($0.y) }.reduce(0, +) / Double(points.count)
+            let mean = points.map { hypot(Double($0.x) - cx, Double($0.y) - cy) }.reduce(0, +) / Double(points.count)
+            return (cx, cy, mean > 0 ? sqrt(2) / mean : 1)
+        }
+        let ns = normaliser(source), nt = normaliser(target)
+        // Normal equations AᵀA x = Aᵀb for the 8 unknowns.
+        var ata = [[Double]](repeating: [Double](repeating: 0, count: 8), count: 8)
+        var atb = [Double](repeating: 0, count: 8)
+        for (p, q) in zip(source, target) {
+            let x = (Double(p.x) - ns.cx) * ns.s, y = (Double(p.y) - ns.cy) * ns.s
+            let u = (Double(q.x) - nt.cx) * nt.s, v = (Double(q.y) - nt.cy) * nt.s
+            for (row, b) in [([x, y, 1, 0, 0, 0, -u * x, -u * y], u), ([0, 0, 0, x, y, 1, -v * x, -v * y], v)] {
+                for i in 0..<8 {
+                    atb[i] += row[i] * b
+                    for j in 0..<8 { ata[i][j] += row[i] * row[j] }
+                }
+            }
+        }
+        guard let n = solve(ata, atb) else { return nil }
+        // Undo the normalisation: H = Tt⁻¹ · Hn · Ts.
+        let hn = [[n[0], n[1], n[2]], [n[3], n[4], n[5]], [n[6], n[7], 1]]
+        let ts = [[ns.s, 0, -ns.s * ns.cx], [0, ns.s, -ns.s * ns.cy], [0, 0, 1]]
+        let ttInverse = [[1 / nt.s, 0, nt.cx], [0, 1 / nt.s, nt.cy], [0, 0, 1]]
+        let m = multiply(ttInverse, multiply(hn, ts))
+        guard abs(m[2][2]) > 1e-12 else { return nil }
+        let k = 1 / m[2][2]
+        return FaceHomography(h: [m[0][0], m[0][1], m[0][2], m[1][0], m[1][1], m[1][2], m[2][0], m[2][1]].map { $0 * k })
+    }
+
+    /// The fit for two captures: their mesh points that face the camera in both photos.
+    static func fit(result: CapturePoseReading, desired: CapturePoseReading) -> FaceHomography? {
+        guard result.meshPoints.count == desired.meshPoints.count, result.meshFront.count == result.meshPoints.count,
+              desired.meshFront.count == desired.meshPoints.count else { return nil }
+        let pairs = result.meshPoints.indices.filter { result.meshFront[$0] && desired.meshFront[$0] }
+        return fit(from: pairs.map { result.meshPoints[$0] }, to: pairs.map { desired.meshPoints[$0] })
+    }
+
+    /// Whether the map only nudges the picture (corners move under 20% of its size): otherwise the poses were too
+    /// different, or a point was misread, and the photo is better left alone.
+    func isGentle(for size: CGSize) -> Bool {
+        let corners = [CGPoint.zero, CGPoint(x: size.width, y: 0), CGPoint(x: 0, y: size.height), CGPoint(x: size.width, y: size.height)]
+        return corners.allSatisfy { c in
+            let m = apply(c)
+            return m.x.isFinite && m.y.isFinite && hypot(m.x - c.x, m.y - c.y) < 0.2 * max(size.width, size.height)
+        }
+    }
+
+    /// `image` redrawn through the map; uncovered edges are black.
+    func warp(_ image: UIImage) -> UIImage? {
+        guard isGentle(for: image.size), let input = CIImage(image: image),
+              let filter = CIFilter(name: "CIPerspectiveTransform") else { return nil }
+        let scale = image.scale, height = image.size.height
+        // Core Image counts pixels from the bottom left.
+        func vector(_ p: CGPoint) -> CIVector {
+            let m = apply(p)
+            return CIVector(x: m.x * scale, y: (height - m.y) * scale)
+        }
+        filter.setValue(input, forKey: kCIInputImageKey)
+        filter.setValue(vector(CGPoint(x: 0, y: 0)), forKey: "inputTopLeft")
+        filter.setValue(vector(CGPoint(x: image.size.width, y: 0)), forKey: "inputTopRight")
+        filter.setValue(vector(CGPoint(x: 0, y: height)), forKey: "inputBottomLeft")
+        filter.setValue(vector(CGPoint(x: image.size.width, y: height)), forKey: "inputBottomRight")
+        let frame = CGRect(x: 0, y: 0, width: image.size.width * scale, height: height * scale)
+        guard let output = filter.outputImage?.composited(over: CIImage(color: .black).cropped(to: frame)).cropped(to: frame),
+              let cg = CIContext().createCGImage(output, from: frame) else { return nil }
+        return UIImage(cgImage: cg, scale: scale, orientation: .up)
+    }
+
+    private static func multiply(_ a: [[Double]], _ b: [[Double]]) -> [[Double]] {
+        (0..<3).map { i in (0..<3).map { j in (0..<3).reduce(0) { $0 + a[i][$1] * b[$1][j] } } }
+    }
+
+    /// Gaussian elimination with partial pivoting.
+    private static func solve(_ a: [[Double]], _ b: [Double]) -> [Double]? {
+        var m = a, v = b
+        let n = v.count
+        for c in 0..<n {
+            guard let pivot = (c..<n).max(by: { abs(m[$0][c]) < abs(m[$1][c]) }), abs(m[pivot][c]) > 1e-12 else { return nil }
+            m.swapAt(c, pivot); v.swapAt(c, pivot)
+            for r in (c + 1)..<n {
+                let f = m[r][c] / m[c][c]
+                guard f != 0 else { continue }
+                for k in c..<n { m[r][k] -= f * m[c][k] }
+                v[r] -= f * v[c]
+            }
+        }
+        var x = [Double](repeating: 0, count: n)
+        for r in stride(from: n - 1, through: 0, by: -1) {
+            x[r] = (v[r] - ((r + 1)..<n).reduce(0) { $0 + m[r][$1] * x[$1] }) / m[r][r]
+        }
+        return x
     }
 }

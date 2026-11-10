@@ -87,7 +87,7 @@ struct FeedbackView: View {
                             .font(.system(size: 15))
                             .foregroundStyle(AppColors.onboardingBody)
                     }
-                    BeforeAfterSlider(before: store.bare ?? store.desired, after: store.result)
+                    BeforeAfterSlider(before: store.bare ?? store.desired, after: store.alignedResult ?? store.result)
                         .aspectRatio(362 / 236, contentMode: .fit)
                     if let score = feedback.score {
                         scoreCard(score: score, feedback: feedback)
@@ -121,12 +121,6 @@ struct FeedbackView: View {
             HStack {
                 circleButton(symbol: "chevron.left", label: "Done", action: onDone)
                 Spacer()
-                if let after = store.result {
-                    ShareLink(item: Image(uiImage: after), preview: SharePreview(lookTitle, image: Image(uiImage: after))) {
-                        circleLabel(symbol: "square.and.arrow.up")
-                    }
-                    .accessibilityLabel("Share photo")
-                }
             }
         }
         .padding(.top, AppSpacing.small)
@@ -155,7 +149,7 @@ struct FeedbackView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// Retry (back to the tutorial) and Done (home). Saving the photo is the share button at the top.
+    /// Retry (back to the tutorial) and Done (home).
     private var bottomBar: some View {
         HStack(spacing: 12) {
             circleButton(symbol: "arrow.clockwise", label: "Back to tutorial", action: onBackToTutorial)

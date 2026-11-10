@@ -1,3 +1,42 @@
+## Tutorial step pictures — 2026-11-10
+
+`TutorialStepsSheet` shows the design team's stills instead of grey boxes: image sets `tutorial-brow-1…4` (brush up with the
+spoolie, map from the nose, connect and fill, blend and clean up), `tutorial-liner-1…3` (dots, dashed line, filled liner)
+and `tutorial-blush-1` (dashed circle), 339 x 226 PNGs, shown full width at that shape. `TutorialStepsSheet.imageName(tab:step:)`
+maps a lesson to its picture (`Step.imageName`; the grey box stays for a missing one). `GuidedFlowTests` checks every lesson
+has its picture. Simulator tests only; the sheet was not opened on a device.
+
+## Before and after photos in one fixed position; result lined up by the eyes — 2026-11-10
+
+Both captures (`FeatureCaptureView`, desired and result) now need the same fixed position, so the Before / After slider
+compares like with like. `CapturePoseTracker` reads the shared ARKit session about 15 times a second;
+`CapturePoseCheck.read` projects an ellipse on the face (`CapturePoseCheck.face`, metres) with the makeup engine's projection,
+so `FaceFollowOutline` follows the head in 3D, and measures the off-axis angle (face forward vs camera), the eye line's roll
+and the eyes. `CapturePoseCheck.evaluate` asks, in this order: outline width within 8% of the oval (`CapturePoseCheck.oval`,
+also drawn by `FaceOvalGuide`), centred within 6% / 5% of the oval, off-axis under 6°, roll under 5° (looser values to stay
+in: no flicker), and otherwise gives one `CaptureHint` ("Move a little closer", "Turn your face a little to the left",
+"Lift your chin a little", ...; mirrored-picture directions). In position: the oval and hint turn green, the phone taps,
+and the shutter works only then. At each shutter the eyes are kept
+(`MakeupFlowStore.eyes`); the result photo is turned, scaled and moved so its eyes sit on the desired photo's
+(`EyePair.align`, skipped when the change would be over 25% or 15°) and the slider shows `alignedResult`. The measured
+feedback still uses the unaligned scans. All limits and the outline size are untuned guesses: tune on a device. New hint
+strings are not in the catalog yet. 374 Simulator tests pass (new: position checks, eye alignment); the camera parts need
+a device. Device round 1: the two photos still looked in different directions, so the eyes must now look into the camera
+(`CapturePoseReading.gazeDegrees` from `ARFaceAnchor.lookAtPoint`, under 10°; hint "Look at the camera, at the top of the
+screen"), the head limit is tighter (off-axis 4°), there is no auto-capture (the person takes the photo; the shutter still
+works only in position; hint "Perfect, take the photo"), and the oval is a little smaller (68% of the screen width, was
+78%), so the face sits a bit farther away. Device round 2 (still a visible difference): fixed limits are tighter (off-axis and roll 3°, size 5%, centre 4% / 3.5%,
+gaze 8°), and the result photo must also match the desired photo's own pose (`MakeupFlowStore.poses`,
+`CapturePoseCheck.match`: head turn on all axes within 2.5° of it (quaternion angle), distance within 3%, face centre within
+2.5% of the oval), since two photos each inside the fixed limits could differ by twice them. The oval turns green only
+after 3 readings in a row pass (`steadyReadings`, about 0.2 s), so one noisy ARKit frame cannot pass. Device round 3: 68% was too far to hold the phone steady; 74% was tried too; the oval is back to 78% of the screen width. Device round 4 (easy to reach, exact result): the result photo is now lined up through the face mesh, not only the eyes:
+each shutter keeps every 6th ARKit face-mesh vertex on screen (`CapturePoseReading.meshPoints`, same index = same skin in
+both photos) and whether it faces the camera; `FaceHomography` fits a perspective map from the result's points to the
+desired photo's (least squares over about 200 points, normalised DLT) and redraws the result through it
+(`CIPerspectiveTransform`; skipped when a corner would move over 20%), which also takes out a few degrees of turn and nod;
+the eye fit is the fallback. So the live limits are easier again (off-axis and roll 5°, size 8%, centre 6% / 5%, gaze 10°;
+match to the desired pose 4°, 6%, 5%). The hint pill moved to the top, under the back / style / light row.
+
 ## Merge: staging (score database, brow colour) into E2E-Flow — 2026-11-10
 
 staging brought Nimah's score database (`makeup-score.database.json`, Placement and Shade percentages with a label and a
@@ -6,7 +45,8 @@ description shown in the card's sheet), the brow colour check, and her merge of 
 `MakeupFeedback` keeps staging's `Category.description` and `Part` / `placement` / `shade`; `FeedbackComposer`'s score groups
 use E2E-Flow's two-case `FeedbackCategory` (`[.placement]`, `[.shade]`, the same rule priorities as staging's six groups),
 and the fallback `shade` part reads `.shade` (was `.finish`). Strings: staging's catalog plus 32 E2E-Flow keys. 370
-Simulator tests pass; not checked on a device.
+Simulator tests pass; not checked on a device. Feedback screen: the share button is gone from the top bar (back and the look's name only); the app has no way left to
+share or save the result photo from this screen.
 
 ## Feedback cards: Placement and Shade only; brief and popup to the design; eyeliner photo position — 2026-11-09
 
