@@ -288,6 +288,14 @@ enum BlushFeedback {
             hue = Double(FeedbackColor.hueDifference(FeedbackColor.hue(a: v.x, b: v.y), shadeHue))
         }
 
+        // For the photo mark only: the cheek itself, without mesh points of the lids, nostrils or lip corners that fell inside
+        // the outline on screen (device test 2026-11-10 showed dots on the eyes and mouth).
+        func cheekOnly(_ samples: [Int]) -> Set<Int> {
+            Set(samples.filter {
+                let p = before.samples[$0].position
+                return Double(p.x) * sign >= 20 && p.y < before.eyeY - 10 && simd_length(local($0)) <= 1.6 * radius
+            })
+        }
         let blushArea = areaOf(blush)
         let strength = blushInArea.isEmpty ? 0
             : Double(blushInArea.reduce(Float(0)) { $0 + (change[$1] ?? 0) }) / Double(blushInArea.count)
@@ -297,7 +305,7 @@ enum BlushFeedback {
                      spill: ["eye", "nose", "mouth", "ear", "jaw"].map { ($0, spill[$0] ?? 0) },
                      patchiness: patchiness, hueDelta: hue, barestZone: barest, strongestZone: strongest,
                      strength: strength, area: blushArea,
-                     mark: after.mark(sign > 0 ? .left : .right, target: Set(area), product: blush, limit: inside))
+                     mark: after.mark(sign > 0 ? .left : .right, target: cheekOnly(area), product: blush, limit: inside))
     }
 
     static func noBeforePhoto(_ composer: FeedbackComposer) -> MakeupFeedback {

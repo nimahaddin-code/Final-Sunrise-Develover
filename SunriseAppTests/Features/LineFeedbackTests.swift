@@ -72,13 +72,13 @@ final class LineFeedbackTests: XCTestCase {
     func testShortBrowTailIsNamed() throws {
         let feedback = try browFeedback(brow(tailX: 50))
         let tail = try XCTUnwrap(feedback.items.first { $0.rule == "brow.tail.too_short" }, "\(feedback.items.map(\.rule))")
-        XCTAssertTrue(tail.say.contains("both brows"), tail.say)
+        XCTAssertTrue(tail.say.contains("both your brows"), tail.say)
     }
 
     func testShortBrowTailIsMarkedWhereToAdd() throws {
         let feedback = try browFeedback(brow(tailX: 50))
         let first = try XCTUnwrap(feedback.fixes.first, "\(feedback.items.map(\.rule))")
-        let mark = try XCTUnwrap(feedback.mark(for: first), first.rule)
+        let mark = try XCTUnwrap(feedback.marks(for: first).first, first.rule)
         XCTAssertFalse(mark.add.isEmpty, "the end of the tail is bare")
         XCTAssertEqual(feedback.marks.count, 2)
     }
