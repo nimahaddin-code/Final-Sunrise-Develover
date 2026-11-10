@@ -29,6 +29,16 @@ The natural-brow eraser (`BrowEraser`: push-pull fill + MI-GAN) is switched off 
 sets `settings.hideNatural=false` whatever `EyebrowConfiguration.hideNaturalBrow` says, so the chosen brow picture is drawn
 straight over the user's own brow in Try On, captures and tutorial. Flags, handoff and eraser code are unchanged; restore
 with `settings.hideNatural=c.hideNaturalBrow` (comment in place). Not checked on a device.
+## Capture back to one oval, shutter always on — 2026-11-10
+
+The strict position for the before and after photos is removed at the team's request: one dashed oval again ("Fit your
+whole face inside the line" above the shutter), no face-following outline, green oval, tap, position hints, gaze check or
+match to the desired pose, and the shutter works whenever the camera does. Removed: `CaptureHint`, the limits,
+`CapturePoseCheck.evaluate` / `match`, `FaceFollowOutline`, `CaptureColors` and their tests. Kept: `CapturePoseTracker`
+reads the face in the background so the shutter still records the eyes and mesh points, and the result photo is still
+lined up with the desired one for the slider (`FaceHomography`, eye fit fallback). The oval stays 78% of the width. 375
+Simulator tests pass.
+
 ## Home title "Hi, pretty!" — 2026-11-10
 
 `FeatureHomeView`'s title is "Hi, pretty!" (was "Hi, fellas!"); Indonesian draft "Hai, cantik!" (`needs_review`).
