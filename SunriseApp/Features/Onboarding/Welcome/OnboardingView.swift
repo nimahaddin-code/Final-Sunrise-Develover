@@ -15,6 +15,8 @@ struct OnboardingWelcomeScreen: View {
     @State private var ringIn = false
     @State private var innerIn = false
     @State private var iconsIn = false
+    @State private var stepsIntroScheduled = false
+    @State private var compareIntroScheduled = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .largeTitle) private var headingSize: CGFloat = 32
     @ScaledMetric(relativeTo: .body) private var bodySize: CGFloat = 17
@@ -57,7 +59,15 @@ struct OnboardingWelcomeScreen: View {
     }
 
     private func advance() {
-        withAnimation { page = min(page + 1, 2) }
+        let next = min(page + 1, 2)
+        guard next != page else { return }
+        withAnimation { page = next }
+        playIntro(for: next)
+    }
+
+    /// Starts the current page's intro. Called both after a swipe and by Next, which changes the page before the art mounts.
+    private func playIntro(for index: Int) {
+        if index == 1 { playStepsIntro() } else if index == 2 { playCompareIntro() }
     }
 
     // MARK: Splash
@@ -104,8 +114,15 @@ struct OnboardingWelcomeScreen: View {
         .frame(maxWidth: .infinity)
     }
 
+    /// Page 3's ring and the space it needs: the ring, its two labels, and the swipe page's padding.
+    private func compareRing(height: CGFloat, width: CGFloat) -> CGFloat {
+        min(width - 48, max(height * 0.41, 310))
+    }
+
     private func content(height: CGFloat, width: CGFloat) -> some View {
         let buttonLabel: LocalizedStringKey = page == 2 ? "Get started" : "Next"
+        let artHeight = max(height * 0.40, 300)
+        let compareHeight = compareRing(height: height, width: width) + 82
         return ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 0) {
                 DandanWordmark(size: 34).padding(.top, 12)
@@ -118,8 +135,8 @@ struct OnboardingWelcomeScreen: View {
                     artThree(height: height, width: width).artPage().tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .onChange(of: page) { _, newPage in if newPage == 1 { playStepsIntro() } else if newPage == 2 { playCompareIntro() } }
-                .frame(height: max(height * 0.40, 300) + 50 + 32)
+                .onChange(of: page) { _, newPage in playIntro(for: newPage) }
+                .frame(height: max(artHeight + 82, compareHeight))
                 .padding(.horizontal, -24)
                 Spacer(minLength: 16)
                 // All three texts reserve the height; only the current one shows, crossfading.
@@ -277,14 +294,17 @@ struct OnboardingWelcomeScreen: View {
 
     /// Runs page 2's intro once, the first time the page is shown.
     private func playStepsIntro() {
-        guard !stepsIn else { return }
+        guard !stepsIntroScheduled else { return }
+        stepsIntroScheduled = true
         if reduceMotion {
             stepsIn = true
             stampIn = true
             return
         }
-        stepsIn = true
         Task {
+            // Next can select the page before its art is mounted; let it appear first so the cards start off-screen.
+            try? await Task.sleep(for: .milliseconds(100))
+            stepsIn = true
             try? await Task.sleep(for: .seconds(0.85))
             withAnimation(.spring(response: 0.28, dampingFraction: 0.5)) { stampIn = true }
         }
@@ -364,15 +384,18 @@ struct OnboardingWelcomeScreen: View {
 
     /// Runs page 3's intro once, the first time the page is shown.
     private func playCompareIntro() {
-        guard !ringIn else { return }
+        guard !compareIntroScheduled else { return }
+        compareIntroScheduled = true
         if reduceMotion {
             ringIn = true
             innerIn = true
             iconsIn = true
             return
         }
-        withAnimation(.easeInOut(duration: 0.9)) { ringIn = true }
         Task {
+            // As with page 2, wait for the page to mount when Next selects it.
+            try? await Task.sleep(for: .milliseconds(100))
+            withAnimation(.easeInOut(duration: 0.9)) { ringIn = true }
             try? await Task.sleep(for: .seconds(0.6))
             withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { innerIn = true }
             try? await Task.sleep(for: .seconds(0.4))
@@ -382,7 +405,7 @@ struct OnboardingWelcomeScreen: View {
 
     private func artThree(height: CGFloat, width: CGFloat) -> some View {
         Group {
-            let ring = min(width - 40, max(height * 0.34, 270))
+            let ring = compareRing(height: height, width: width)
             let photo = ring * 0.66
             let pinkLine = Color(red: 0xF6 / 255, green: 0xC3 / 255, blue: 0xD6 / 255)
             VStack(spacing: 14) {
