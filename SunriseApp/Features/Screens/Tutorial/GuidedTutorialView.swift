@@ -361,7 +361,6 @@ private struct TutorialScreen: View {
     /// The steps sheet ("Tutorial"). Opens by itself once, at the start, showing the current step only.
     @State private var showsSteps = false
     @State private var stepsDetent = TutorialStepsSheet.compact
-    @State private var openedSteps = false
     /// The first side is finished: the side-done card is up until "Do my right …" or "Replay left …".
     @State private var sideDone = false
     @State private var visible = false
@@ -372,6 +371,7 @@ private struct TutorialScreen: View {
     @StateObject private var advisor = CameraAdvisor(context: .tutorial)
     @StateObject private var light = ScreenLight()
     @Environment(\.scenePhase) private var scenePhase
+    @State private var openedSteps = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -434,6 +434,7 @@ private struct TutorialScreen: View {
         }
         .onAppear {
             visible = true; model.activate(); advisor.start(); light.resume()
+            // The steps sheet opens by itself at the start (by design), over the bottom bar until it is closed.
             if model.perSide && !openedSteps { openedSteps = true; showsSteps = true }
         }
         .onDisappear { visible = false; showsSteps = false; model.deactivate(); advisor.stop(); light.turnOff() }
