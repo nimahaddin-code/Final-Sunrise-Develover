@@ -23,6 +23,10 @@ struct AppRootView: View {
             }
                 .navigationDestination(for: AppRoute.self, destination: destination)
             }
+            // Hands are busy with makeup: the screen stays on from Try On to feedback; home lets it sleep again.
+            .onChange(of: navigator.tryOnPath.isEmpty, initial: true) { _, atHome in
+                UIApplication.shared.isIdleTimerDisabled = !atHome
+            }
         }
         }
     }
