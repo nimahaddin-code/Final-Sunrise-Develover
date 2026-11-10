@@ -223,27 +223,6 @@ struct BrowGeometry: Sendable {
         let s = (u - knots[i]) / max(knots[i + 1] - knots[i], 1e-4)
         return halves[i] + (halves[i + 1] - halves[i]) * max(0, min(1, s))
     }
-
-    /// Where the ray from `origin` through `through` crosses the centerline (searched a little past the head and
-    /// tail), for the nose-eye mapping lines.
-    func crossing(from origin: SIMD2<Float>, through: SIMD2<Float>) -> SIMD2<Float>? {
-        let direction = through - origin
-        guard simd_length(direction) > 1e-3 else { return nil }
-        var previous = centerline(-0.3).point
-        for i in 1...32 {
-            let current = centerline(-0.3 + 1.6 * Float(i) / 32).point
-            let edge = current - previous
-            let denominator = direction.x * edge.y - direction.y * edge.x
-            if abs(denominator) > 1e-6 {
-                let offset = previous - origin
-                let s = (offset.x * edge.y - offset.y * edge.x) / denominator
-                let r = (offset.x * direction.y - offset.y * direction.x) / denominator
-                if s > 0, (0...1).contains(r) { return origin + direction * s }
-            }
-            previous = current
-        }
-        return nil
-    }
 }
 
 /// One Euro smoothing for brow landmarks. Head motion follows the nose bridge with a quick filter; each point's

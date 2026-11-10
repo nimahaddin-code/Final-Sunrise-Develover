@@ -212,8 +212,9 @@ enum TutorialTab: CaseIterable, Identifiable {
         var value = brow.liveConfiguration
         // Brows and blush draw on one face mesh: a look beside the plain camera is the renderer's own left-half split.
         value.comparisonSplit = tab == .blush && compare.plainBesideLook != nil
-        // The brow overlay draws its own dots on the guide (`BrowTutorialOverlay`), so the engine's dashed mapping lines stay off.
-        value.showMappingFormula = false
+        // "Mark 3 points" (guide step 1) shows the engine's dashed nose-to-brow mapping lines with small pink dots and the
+        // overlay's pencil; the other steps use the overlay's own outline, so the lines stay off.
+        value.showMappingFormula = tab == .brows && guideStep == 1
         // The tutorial shows dashed nose-to-brow lines, not MediaPipe's landmark view.
         value.browTrackingOverlay = false
         // The filter the user picked on Try On, with its shade and strength (`applyShade`), is what the tutorial shows.

@@ -50,6 +50,8 @@ struct BrowTutorialOverlay: View {
     /// One brow in view points: its outline, centreline and the fraction of the way along it where the arch is.
     struct Shape {
         let upper: [CGPoint], lower: [CGPoint]
+        /// The engine's start, arch and end dots of the mapping step.
+        let mapped: [CGPoint]
         let height: CGFloat
         let arch: Double
         /// The brow's length in points and its slope (degrees, head to tail), so tools and marks scale and tilt with this face.
@@ -63,13 +65,15 @@ struct BrowTutorialOverlay: View {
             // Chaikin smoothing: the guide is the brow's own outline without landmark jitter or kinks.
             let up = Self.smooth(scaled(brow.upper)), low = Self.smooth(scaled(brow.lower))
             guard up.count > 1, low.count > 1 else { return nil }
-            upper = up; lower = low
+            upper = up; lower = low; mapped = scaled(brow.marks)
             let mid = (0...20).map { i in Self.point(up, Double(i) / 20).y + Self.point(low, Double(i) / 20).y }
             let top = mid.enumerated().min { $0.element < $1.element }?.offset ?? 10
             arch = max(0.4, min(0.7, Double(top) / 20))
             let head = Self.point(up, 0), tail = Self.point(up, 1)
             length = hypot(tail.x - head.x, tail.y - head.y)
-            angle = atan2(Double(tail.y - head.y), Double(tail.x - head.x)) * 180 / .pi
+            // The slope of the line, not its direction: the screen's left brow runs right to left, and its tools must not turn over.
+            let degrees = atan2(Double(tail.y - head.y), Double(tail.x - head.x)) * 180 / .pi
+            angle = degrees > 90 ? degrees - 180 : degrees < -90 ? degrees + 180 : degrees
             height = max(6, abs(Self.point(up, 0.5).y - Self.point(low, 0.5).y))
         }
 
@@ -139,8 +143,13 @@ struct BrowTutorialOverlay: View {
             g.stroke(b.outline, with: .color(glow.opacity(pulse(time, still: still))), lineWidth: max(10 * b.scale, b.height * 0.9))
         default: break
         }
-        g.stroke(b.outline, with: .color(AppColors.snow.opacity(0.95)), style: dotted(b.scale))
-        if step >= 1 {
+        if step != 1 {
+            // A dotted line along the brow's top and one along its bottom. Step 1 (mark 3 points) shows the engine's
+            // nose-to-brow mapping lines instead.
+            var edges = Path(); edges.addLines(b.upper); edges.addLines(b.lower)
+            g.stroke(edges, with: .color(AppColors.snow.opacity(0.95)), style: dotted(b.scale))
+        }
+        if step >= 2 {
             for (i, f) in b.marks.enumerated() where step > 1 || still || progress > Double(i) / 3 {
                 let c = b.center(f)
                 let r: CGFloat = 4.5 * b.scale
@@ -173,7 +182,8 @@ struct BrowTutorialOverlay: View {
             return (CGPoint(x: base.x, y: base.y + b.height * (0.9 - 1.8 * sweep)), 1)
         case 1:
             let i = min(2, Int(p * 3)), u = (p * 3).truncatingRemainder(dividingBy: 1)
-            return (b.center(b.marks[i]), sin(.pi * min(1, u * 1.2)))
+            // The engine's own three dots, so the pencil taps exactly on them.
+            return (b.mapped.count == 3 ? b.mapped[i] : b.center(b.marks[i]), sin(.pi * min(1, u * 1.2)))
         case 2:
             let f = b.arch + (1 - b.arch) * p
             let wobble = sin(p * 40) * b.height * 0.25

@@ -52,44 +52,47 @@ extension BeautyBlushEngine {
             }
         }
     }
-    struct MappingMark {let name:String;let point:SIMD2<Float>}
-    struct MappingBrow {let side:EyeSide;let origin:SIMD2<Float>;let marks:[MappingMark]}
-    /// Brow mapping, as a brow pencil is laid: every line starts at the side of the nose on that side (the widest point of
-    /// the nostril wing). Through the inner eye corner it marks where the brow starts, through the outer edge of the iris its
-    /// arch, through the outer eye corner its end. Each mark is where the line crosses the brow's centerline.
-    /// The nostril wing and the iris ring come from the full mesh, as offsets from the (steadied) ala and iris centre, so the
-    /// marks move with the same smoothing as the brow; without the mesh they are estimated from the eye.
+    /// The tutorial's guide for one brow, in image pixels: its top and bottom edges, head to tail, and the three points to
+    /// mark (start, arch, end).
+    struct GuideBrow {let upper:[SIMD2<Float>],lower:[SIMD2<Float>],marks:[SIMD2<Float>]}
+    /// Where the guide starts along the brow (MediaPipe's first brow points sit short of the brow's front) and how much of the
+    /// observed half thickness its edges keep (MediaPipe's rows lie just outside the hair). From one device screenshot.
+    static let guideHead:Float = -0.1,guideInset:Float=0.8
+    static func guideBrow(_ contour:BrowContour)->GuideBrow? {
+        guard let g=BrowGeometry(contour:contour) else {return nil}
+        func half(_ u:Float)->Float {g.observedHalf(u)*guideInset}
+        let us=(0...16).map {guideHead+(1-guideHead)*Float($0)/16}
+        // Arch: where the top edge stands highest over the head-to-tail line. The weighted middle of the highest quarter, so
+        // it does not jump from frame to frame on a flat brow.
+        let span=(0...12).map {0.35+0.5*Float($0)/12}
+        let heights=span.map {g.chordOffset($0)+half($0)}
+        let top=heights.max() ?? 0,floor=top-(top-(heights.min() ?? 0))*0.25
+        let weights=heights.map {max(0,$0-floor)},total=weights.reduce(0,+)
+        let arch=total>1e-5 ? zip(span,weights).map(*).reduce(0,+)/total:0.6
+        return GuideBrow(upper:us.map {g.point(u:$0,w:half($0))},lower:us.map {g.point(u:$0,w:-half($0))},
+                         marks:[g.point(u:guideHead,w:0),g.point(u:arch,w:half(arch)),g.point(u:1,w:0)])
+    }
+    struct MappingBrow {let side:EyeSide;let origin:SIMD2<Float>;let marks:[SIMD2<Float>]}
+    /// Brow mapping: three lines from the side of the nose on that side (the widest point of the nostril wing) to the guide's
+    /// own start, arch and end (`guideBrow`), so every dot sits on the brow outline the other steps show.
+    /// The nostril wing comes from the full mesh, as an offset from the (steadied) ala, so it moves with the same smoothing
+    /// as the brow; without the mesh the ala itself is used.
     static func mappingMarks(_ o:BrowObservation)->[MappingBrow] {
-        func offset(from base:Int,to target:Int)->SIMD2<Float>? {
-            o.mesh.count>max(base,target) ? o.mesh[target]-o.mesh[base]:nil
-        }
         var out:[MappingBrow]=[]
         for side in [EyeSide.subjectRight,.subjectLeft] {
-            guard let eye=o.eyes[side],let contour=o.brows[side],let brow=BrowGeometry(contour:contour) else {continue}
+            guard let eye=o.eyes[side],let contour=o.brows[side],let guide=guideBrow(contour) else {continue}
             let across=eye.outer-eye.inner
             let toEar=across/max(simd_length(across),1e-3)
-            // Which half of the mesh this eye is: the iris centre and ala nearest this eye's points.
+            // Which half of the mesh this eye is: the ala nearest this eye's.
             let mediaPipeLeftHalf=o.mesh.count>477 && simd_distance(o.mesh[98],eye.ala)<simd_distance(o.mesh[327],eye.ala)
-            let wing=offset(from:mediaPipeLeftHalf ? 98:327,to:mediaPipeLeftHalf ? 129:358)
-            let nose=eye.ala+(wing.map {simd_dot($0,toEar)>0 ? $0:.zero} ?? .zero)
-            let center:SIMD2<Float>=eye.iris ?? (eye.inner+eye.outer)/2
-            var irisEdge=center+across*0.2
-            if o.mesh.count>477,let iris=eye.iris {
-                let base=simd_distance(o.mesh[468],iris)<simd_distance(o.mesh[473],iris) ? 468:473
-                let ring=(base+1...base+4).compactMap {offset(from:base,to:$0)}
-                if let edge=ring.max(by: {simd_dot($0,toEar)<simd_dot($1,toEar)}),simd_dot(edge,toEar)>0 {irisEdge=center+edge}
-            }
-            let throughs:[(String,SIMD2<Float>)]=[("Start",eye.inner),("Arch",irisEdge),("End",eye.outer)]
-            var marks:[MappingMark]=[]
-            for (name,through) in throughs {
-                if let hit=brow.crossing(from:nose,through:through) {marks.append(MappingMark(name:name,point:hit))}
-            }
-            if !marks.isEmpty {out.append(MappingBrow(side:side,origin:nose,marks:marks))}
+            let (base,target)=mediaPipeLeftHalf ? (98,129):(327,358)
+            let wing=o.mesh.count>max(base,target) ? o.mesh[target]-o.mesh[base]:.zero
+            out.append(MappingBrow(side:side,origin:eye.ala+(simd_dot(wing,toEar)>0 ? wing:.zero),marks:guide.marks))
         }
         return out
     }
-    /// Tutorial brow mapping (white dashed lines from the nostril through inner eye corner, outer iris edge and outer eye
-    /// corner, a pink dot where each crosses the brow) and landmark debug dots, in clip space.
+    /// Tutorial brow mapping (white dashed lines from the nostril to the brow's start, arch and end, a pink dot on each)
+    /// and landmark debug dots, in clip space.
     static func browMarks(_ o:BrowObservation,display:CGAffineTransform,size:CGSize,landmarks:Bool,mapping:Bool,alpha:Float)->[MarkVertex] {
         var m=MarkBuilder(imageSize:o.imageSize,drawable:size,display:display)
         let thickness=m.thickness
@@ -98,12 +101,9 @@ extension BeautyBlushEngine {
             let line=SIMD4<Float>(1,1,1,0.75*alpha),ring=SIMD4<Float>(1,1,1,0.95*alpha),dot=SIMD4<Float>(0.93,0.3,0.52,alpha)
             let dash=thickness*5,gap=thickness*3.5
             for brow in mappingMarks(o) {
-                for mark in brow.marks {
-                    // Like a pencil held against the face: from beside the nostril on past the brow.
-                    let along=mark.point-brow.origin
-                    m.dashedLine(brow.origin+along*0.08,mark.point+along*0.22,line,width:1.6,dash:dash,gap:gap)
-                }
-                for mark in brow.marks {m.dot(mark.point,thickness*2.3,ring);m.dot(mark.point,thickness*1.6,dot)}
+                // All three meet beside the nostril and stop at their dot.
+                for mark in brow.marks {m.dashedLine(brow.origin,mark,line,width:1.6,dash:dash,gap:gap)}
+                for mark in brow.marks {m.dot(mark,thickness*1.5,ring);m.dot(mark,thickness*1.0,dot)}
             }
         }
         if landmarks {
@@ -191,11 +191,11 @@ extension BeautyBlushEngine {
         out.append(label("\(MediaPipeBrowTracker.noseBridge)",o.noseBridge))
         return out
     }
-    /// Both brow outlines in view-normalized positions, head to tail, left brow of the screen first.
+    /// Both brow guides (`guideBrow`) in view-normalized positions, head to tail, left brow of the screen first.
     static func browGuide(_ o:BrowObservation,display:CGAffineTransform)->BrowGuideSnapshot {
         let image=SIMD2(Float(o.imageSize.width),Float(o.imageSize.height))
         func view(_ p:SIMD2<Float>)->CGPoint {CGPoint(x:CGFloat(p.x/image.x),y:CGFloat(p.y/image.y)).applying(display)}
-        let brows=o.brows.values.map {BrowGuideSnapshot.Brow(upper:$0.upper.map(view),lower:$0.lower.map(view))}
+        let brows=o.brows.values.compactMap(guideBrow).map {BrowGuideSnapshot.Brow(upper:$0.upper.map(view),lower:$0.lower.map(view),marks:$0.marks.map(view))}
         return BrowGuideSnapshot(brows:brows.sorted {($0.upper.first?.x ?? 0)<($1.upper.first?.x ?? 0)})
     }
 }
