@@ -28,6 +28,8 @@ struct BrowGuideSnapshot: Equatable, Sendable {
     struct Brow: Equatable, Sendable {
         var upper: [CGPoint]
         var lower: [CGPoint]
+        /// The three points to mark: start, arch, end.
+        var marks: [CGPoint] = []
     }
     var brows: [Brow]
 }

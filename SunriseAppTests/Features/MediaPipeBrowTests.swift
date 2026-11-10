@@ -33,6 +33,34 @@ final class MediaPipeBrowTests: XCTestCase {
                                eyes: [.subjectRight: eye(-1), .subjectLeft: eye(1)], noseBridge: SIMD2(500, 330) + shift, pose: .frontal)
     }
 
+    func testTutorialGuideHasTwoEdgesInsideTheBrowAndMappingDotsOnIt() throws {
+        let o = observation()
+        for brow in BeautyBlushEngine.mappingMarks(o) {
+            let side: Float = brow.side == .subjectLeft ? 1 : -1
+            let contour = try XCTUnwrap(o.brows[brow.side]), guide = try XCTUnwrap(BeautyBlushEngine.guideBrow(contour))
+            XCTAssertEqual(guide.upper.count, guide.lower.count)
+            // Edges: top above bottom, both between MediaPipe's rows (6 px either side of the middle here).
+            for (top, bottom) in zip(guide.upper, guide.lower) {
+                XCTAssertLessThan(top.y, bottom.y)
+                XCTAssertEqual(simd_distance(top, bottom), 12 * BeautyBlushEngine.guideInset, accuracy: 1.5)
+            }
+            // The guide starts a little before MediaPipe's head (towards the nose) and ends at its tail.
+            XCTAssertLessThan(abs(guide.upper[0].x - 500), 80)
+            XCTAssertEqual(abs(try XCTUnwrap(guide.upper.last).x - 500), 180, accuracy: 3)
+            // Dots: start at the guide's head, arch on the top edge near the highest part, end at the tail.
+            XCTAssertEqual(brow.marks.count, 3)
+            XCTAssertEqual(brow.marks[0].x, (guide.upper[0].x + guide.lower[0].x) / 2, accuracy: 0.5)
+            XCTAssertEqual((brow.marks[1].x - 500) * side, 140, accuracy: 15)
+            XCTAssertLessThan(brow.marks[1].y, brow.marks[0].y)
+            XCTAssertEqual(brow.marks[2].x, 500 + side * 180, accuracy: 1)
+            // Lines start beside the nose on this brow's side.
+            XCTAssertEqual(brow.origin, try XCTUnwrap(o.eyes[brow.side]).ala)
+        }
+        XCTAssertEqual(BeautyBlushEngine.mappingMarks(o).count, 2)
+        let snapshot = BeautyBlushEngine.browGuide(o, display: .identity)
+        XCTAssertEqual(snapshot.brows.map(\.marks.count), [3, 3])
+    }
+
     @MainActor func testBrowShapeListIsTheNineNewShapesInPickerOrder() throws {
         let rules = try XCTUnwrap(MakeupRuleDatabase.shared)
         XCTAssertEqual(rules.eyebrow_presets.map(\.id), EyebrowStyle.allCases.compactMap(MakeupRuleDatabase.browID))

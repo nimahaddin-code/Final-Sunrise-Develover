@@ -88,11 +88,10 @@ struct StyleCircle<Content: View>: View {
     }
 }
 
-/// A label over a sideways row of `StyleCircle`s that works like an Instagram story filter strip: the circle in the
+/// A sideways row of `StyleCircle`s that works like an Instagram story filter strip: the circle in the
 /// middle is the chosen one. Scrolling snaps a circle to the middle and chooses it (`onCenter` gets its id); tapping a
 /// circle scrolls it to the middle. Each item gives itself `.id(...)`, equal to `selectedID` when chosen.
 struct GlassPickerRow<Content: View>: View {
-    let title: Text
     let selectedID: String
     var onCenter: (String) -> Void = { _ in }
     /// Height of the row; taller when the chosen circle is magnified.
@@ -103,9 +102,8 @@ struct GlassPickerRow<Content: View>: View {
     @State private var position: String?
 
     var body: some View {
+        // The style's name sits in Try On's top row, beside back and the light, not over this row.
         VStack(spacing: 6) {
-            // Colour comes from the screen: white over the camera, dark on Try On's light camera-off page.
-            title.font(.system(size: 15, weight: .regular))
             GeometryReader { geo in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) { content() }

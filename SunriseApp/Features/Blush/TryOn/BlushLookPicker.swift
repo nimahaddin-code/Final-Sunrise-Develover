@@ -9,8 +9,7 @@ struct BlushLookPicker: View {
     let onSelect: (BlushPlacementStyle?) -> Void
 
     var body: some View {
-        GlassPickerRow(title: selected.map { Text($0.title) } ?? Text("None"),
-                       selectedID: selected.map { "\($0.id)" } ?? "none", onCenter: { id in
+        GlassPickerRow(selectedID: selected.map { "\($0.id)" } ?? "none", onCenter: { id in
             onSelect(BlushPlacementStyle.referenceLooks.first(where: { $0.id == id }))
         }) {
             Button { onSelect(nil) } label: {

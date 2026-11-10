@@ -10,7 +10,7 @@ struct BrowOverlayPicker: View {
     private static let magnified: CGFloat = 60
 
     var body: some View {
-        GlassPickerRow(title: selected.map { Text($0.title) } ?? Text("None"), selectedID: selected?.assetName ?? "none", onCenter: { id in
+        GlassPickerRow(selectedID: selected?.assetName ?? "none", onCenter: { id in
             onSelect(overlays.first { $0.assetName == id })
         }, rowHeight: Self.magnified + 4, selectedWidth: Self.magnified) {
             // First: no overlay picture. The natural brow stays as the "Natural brow" toggle has it.

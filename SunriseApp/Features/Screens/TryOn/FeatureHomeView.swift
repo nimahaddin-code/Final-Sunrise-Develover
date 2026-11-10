@@ -2,7 +2,7 @@ import SwiftUI
 
 /// The first page after the welcome: the onboarding glow with "Hi, pretty!", a swipeable slider of tool cards (Eyeliner,
 /// Blush, Brows; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
-/// about it, and a dark "Start lesson" button for the selected tool. Plain SwiftUI, no camera.
+/// about it, and a dark "Start lesson" button for the selected tool; the cards themselves are not tappable (swipe only). Plain SwiftUI, no camera.
 struct FeatureHomeView: View {
     let onSelect: (TryOnTool) -> Void
 
@@ -79,18 +79,15 @@ struct FeatureHomeView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 0) {
                 ForEach(Self.order) { tool in
-                    Button { withAnimation(.snappy) { selected = tool } } label: {
-                        Image(Self.imageName(tool))
-                            .resizable().scaledToFit()
-                            .overlay(alignment: .bottomLeading) {
-                                HStack(spacing: 6) {
-                                    chip(Text("^[\(steps(tool)) step](inflect: true)"))
-                                    chip(Text("\(minutes(tool)) min"))
-                                }
-                                .padding(16)
+                    Image(Self.imageName(tool))
+                        .resizable().scaledToFit()
+                        .overlay(alignment: .bottomLeading) {
+                            HStack(spacing: 6) {
+                                chip(Text("^[\(steps(tool)) step](inflect: true)"))
+                                chip(Text("\(minutes(tool)) min"))
                             }
-                    }
-                    .buttonStyle(.plain)
+                            .padding(16)
+                        }
                     // The container already excludes the content margins below, so this is cardWidthFraction of the slider.
                     .containerRelativeFrame(.horizontal)
                     .scrollTransition(.interactive, axis: .horizontal) { content, phase in

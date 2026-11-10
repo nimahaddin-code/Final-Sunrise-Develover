@@ -13,7 +13,6 @@ struct TryOnHomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible=false
     @State private var showColours=false
-    @State private var paletteSource = PaletteSource.camera
     @StateObject private var light = ScreenLight()
     /// The shade row and intensity bar, opened by the palette button over the look row.
     @State private var showsShades = false
@@ -46,7 +45,7 @@ struct TryOnHomeView: View {
         .sensoryFeedback(.selection, trigger: light.isOn)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
         .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
-            PaletteColorPicker(initial:home.currentShade ?? home.swatches[0], source: paletteSource) { home.choose(shade:$0) }
+            PaletteColorPicker(initial:home.currentShade ?? home.swatches[0], featureName: home.tool.tryOnFeature.colourName) { home.choose(shade:$0) }
         }
         .onAppear {
             isVisible=true
@@ -148,6 +147,8 @@ struct TryOnHomeView: View {
                     .accessibilityAction { onBack() }
                     .sensoryFeedback(.impact, trigger: developerTools)
                 Spacer()
+                if home.canTry(home.tool) { styleNamePill }
+                Spacer()
                 ScreenLightButton(light: light, pulse: 0, plainGlass: true)
             }
             if developerTools {
@@ -162,6 +163,18 @@ struct TryOnHomeView: View {
         }
         .buttonStyle(.plain)
         .padding(AppSpacing.small)
+    }
+
+    /// The chosen look's name between back and the light: the same Liquid Glass as they have, as a capsule.
+    private var styleNamePill: some View {
+        home.tool.tryOnFeature.styleName(home: home)
+            .font(.system(size: 15, weight: .semibold))
+            .foregroundStyle(.primary)
+            .lineLimit(1)
+            .padding(.horizontal, AppSpacing.medium)
+            .frame(height: 48)
+            .glassEffect(.regular, in: .capsule)
+            .accessibilityAddTraits(.isHeader)
     }
 
     /// Full-width button at the bottom, on to the photo of the desired look. A style must be on first.
@@ -212,9 +225,9 @@ struct TryOnHomeView: View {
             .disabled(!home.canTry(home.tool))
     }
 
-    private func openPalette(_ source: PaletteSource) {
+    /// Opens the colour sheet on the back camera straight away.
+    private func openPalette() {
         home.deactivate()
-        paletteSource = source
         showColours = true
     }
 
@@ -248,11 +261,8 @@ struct TryOnHomeView: View {
             .accessibilityLabel(Text(shade.name))
             .accessibilityAddTraits(selected ? .isSelected : [])
         }
-        // The plus opens a menu: photograph a product, or pick a photo, then choose its colour in the sheet.
-        Menu {
-            Button { openPalette(.camera) } label: { Label("Take a Photo", systemImage: "camera") }
-            Button { openPalette(.library) } label: { Label("Choose From Photo", systemImage: "photo") }
-        } label: {
+        // The plus opens the colour sheet on the back camera; a photo can be picked from inside it.
+        Button { openPalette() } label: {
             Image(systemName: "plus").font(.title2.weight(.medium))
                 .foregroundStyle(AppColors.snow)
                 .frame(width: 48, height: 48)
@@ -270,7 +280,7 @@ private struct IntensityBar: View {
     let tint: Color
     @State private var isDragging = false
 
-    private let trackHeight: CGFloat = 20 // design: a full-width fade from soft mauve through the shade to near-black
+    private let trackHeight: CGFloat = 20 // a full-width fade from the shade, faint, to the shade at full strength
     private let thumbSize: CGFloat = 28
 
     var body: some View {
@@ -280,7 +290,8 @@ private struct IntensityBar: View {
             ZStack(alignment: .leading) {
                 // One glass capsule over the fade: no outline, no inner stroke.
                 Capsule()
-                    .fill(LinearGradient(colors: [AppColors.glassLight.opacity(0.5), tint, Color.black.opacity(0.9)],
+                    // Faint to full shade: the right end is the picked colour at full strength (was near-black for every shade).
+                    .fill(LinearGradient(colors: [tint.opacity(0.15), tint],
                                          startPoint: .leading, endPoint: .trailing))
                     .frame(height: trackHeight)
                     .glassCapsule(tint: tint.opacity(0.12), interactive: false)

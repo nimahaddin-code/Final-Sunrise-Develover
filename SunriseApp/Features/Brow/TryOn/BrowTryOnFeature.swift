@@ -6,5 +6,10 @@ struct BrowTryOnFeature: TryOnFeature {
         AnyView(BrowOverlayPicker(overlays: BrowOverlay.all, selected: home.browOverlay, onSelect: home.choose(browOverlay:)))
     }
 
+    func styleName(home: TryOnHomeModel) -> Text {
+        Text(home.browOverlay?.title ?? "None")
+    }
+    var colourName: String { String(localized: "brow") }
+
     func debugMenu() -> AnyView? { AnyView(BrowDebugMenu()) }
 }
