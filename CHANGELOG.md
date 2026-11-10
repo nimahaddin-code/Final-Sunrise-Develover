@@ -1,3 +1,8 @@
+## 2026-11-10 — Feedback Before is the try-on photo -Nimah
+
+- `FeedbackView`: the Before / After slider's Before is the try-on photo (desired-look shutter, virtual makeup on), not
+  the bare face; the After photo is lined up with it. Bare face only as fallback.
+
 ## Merge: Hanum's latest E2E-Flow into staging — -Nimah (2026-11-10)
 
 E2E-Flow (design sizes for brief, item sheet and feedback; Done at the bottom; two `FeedbackCategory` cases; eyeliner photo
@@ -5,11 +10,6 @@ in points and normal blending; tutorial guides kept on their side; camera messag
 with staging's directional card notes and lined-up Before/After. `FeedbackView` is Hanum's layout; her `BeforeAfterSlider`
 now shows the lined-up After photo (`alignedResult`). `FeedbackCategory.isShade` is `self == .shade`. 372 Simulator tests
 pass; not checked on a device.
-
-## 2026-11-10 — Feedback Before is the try-on photo -Nimah
-
-- `FeedbackView`: the Before / After slider's Before is the try-on photo (desired-look shutter, virtual makeup on), not
-  the bare face; the After photo is lined up with it. Bare face only as fallback.
 
 ## Feedback cards say which way; Before / After lined up — -Nimah (2026-11-09)
 
