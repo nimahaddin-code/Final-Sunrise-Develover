@@ -2979,12 +2979,12 @@
         }
       }
     },
-    "Hi, fellas!" : {
+    "Hi, pretty!" : {
       "localizations" : {
         "id" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Hai, kamu!"
+            "value" : "Hai, cantik!"
           }
         }
       }

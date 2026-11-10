@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// The first page after the welcome: the onboarding glow with "Hi, fellas!", a swipeable slider of tool cards (Eyeliner,
+/// The first page after the welcome: the onboarding glow with "Hi, pretty!", a swipeable slider of tool cards (Eyeliner,
 /// Blush, Brows; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
 /// about it, and a dark "Start lesson" button for the selected tool. Plain SwiftUI, no camera.
 struct FeatureHomeView: View {
@@ -17,7 +17,7 @@ struct FeatureHomeView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Hi, fellas!")
+                Text("Hi, pretty!")
                     .font(.system(size: 34, weight: .bold))
                     .foregroundStyle(AppColors.onboardingInk)
                 Text("What do you want to learn today?")

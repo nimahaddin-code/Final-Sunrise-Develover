@@ -7,6 +7,20 @@
 
 - `BeautyBlushEngine`: `settings.hideNatural` forced to `false`, so the brow overlay sits on the real brow instead of an
   erased one. Restore line left as a comment.
+## Home title "Hi, pretty!" — 2026-11-10
+
+`FeatureHomeView`'s title is "Hi, pretty!" (was "Hi, fellas!"); Indonesian draft "Hai, cantik!" (`needs_review`).
+
+## Navigation buttons that seemed dead — 2026-11-10
+
+A tester found back and continue buttons that did nothing. Code check of every route's buttons (`AppRootView.destination`):
+the wiring was right, three things stopped the taps. Try On's back was a `Button` with a simultaneous 1.2 s long press
+(developer tools); on iOS 26 that gesture can swallow the tap. It is now one gesture, `LongPressGesture.exclusively(before:
+TapGesture)`, with button traits and an accessibility action. Try On's Continue is disabled until a look is on, but looked
+the same as enabled: it now reads "Pick a look to continue" and dims. The tutorial's steps sheet still opens by itself at the start (by
+design), over the bottom bar until it is closed. The tutorial's back
+still steps back one step and leaves only from the first step. 379 Simulator tests pass; the taps were not checked on a
+device (the Simulator cannot get past Try On without a camera).
 
 ## Merge: staging (onboarding animations, feedback Before fix) into E2E-Flow — 2026-11-10
 
