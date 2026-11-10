@@ -5,6 +5,16 @@ struct OnboardingWelcomeScreen: View {
     let onStart: () -> Void
     @State private var page = 0
     @State private var showsSplash = true
+    /// Page 1: the cards fan out from one stack, then the stickers fade in and float.
+    @State private var deckOpen = false
+    @State private var stickersIn = false
+    /// Page 2: the step cards slide in from the right, top to bottom, then "3 easy steps" is stamped on.
+    @State private var stepsIn = false
+    @State private var stampIn = false
+    /// Page 3: the outer line draws round once (its dots orbiting), the inner circle follows, then the icons pop in and float.
+    @State private var ringIn = false
+    @State private var innerIn = false
+    @State private var iconsIn = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .largeTitle) private var headingSize: CGFloat = 32
     @ScaledMetric(relativeTo: .body) private var bodySize: CGFloat = 17
@@ -31,7 +41,19 @@ struct OnboardingWelcomeScreen: View {
 
     private func dismissSplash() {
         guard showsSplash else { return }
-        if reduceMotion { showsSplash = false } else { withAnimation(.easeInOut(duration: 0.45)) { showsSplash = false } }
+        if reduceMotion {
+            showsSplash = false
+            deckOpen = true
+            stickersIn = true
+            return
+        }
+        withAnimation(.easeInOut(duration: 0.45)) { showsSplash = false }
+        Task {
+            try? await Task.sleep(for: .seconds(0.35))
+            withAnimation(.spring(response: 0.7, dampingFraction: 0.72)) { deckOpen = true }
+            try? await Task.sleep(for: .seconds(0.55))
+            stickersIn = true
+        }
     }
 
     private func advance() {
@@ -92,10 +114,11 @@ struct OnboardingWelcomeScreen: View {
                 // not cut off at the margins; each picture keeps the margin itself.
                 TabView(selection: $page) {
                     artOne(height: height, width: width).artPage().tag(0)
-                    artTwo.artPage().tag(1)
+                    artTwo(width: width).artPage().tag(1)
                     artThree(height: height, width: width).artPage().tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
+                .onChange(of: page) { _, newPage in if newPage == 1 { playStepsIntro() } else if newPage == 2 { playCompareIntro() } }
                 .frame(height: max(height * 0.40, 300) + 50 + 32)
                 .padding(.horizontal, -24)
                 Spacer(minLength: 16)
@@ -172,10 +195,13 @@ struct OnboardingWelcomeScreen: View {
             let cardHeight = cardWidth * 1.55
             let photoHeight = cardWidth * 600 / 515
             ZStack {
+                // Closed deck: the back cards sit under the front card (its angle and place) until `deckOpen` fans them out.
                 blankCard(width: cardWidth * 0.86, height: photoHeight * 0.92)
-                    .rotationEffect(.degrees(-12)).offset(x: -cardWidth * 0.42, y: 4)
+                    .rotationEffect(.degrees(deckOpen ? -10 : 4))
+                    .offset(x: deckOpen ? -cardWidth * 0.08 : cardWidth * 0.30, y: deckOpen ? 4 : 0)
                 blankCard(width: cardWidth * 0.93, height: photoHeight * 0.96)
-                    .rotationEffect(.degrees(-8)).offset(x: -cardWidth * 0.14, y: 2)
+                    .rotationEffect(.degrees(deckOpen ? -6 : 4))
+                    .offset(x: deckOpen ? cardWidth * 0.08 : cardWidth * 0.30, y: deckOpen ? 2 : 0)
                 // The photo PNG is already rotated 4 degrees (transparent corners); the white card behind it takes the same angle.
                 ZStack {
                     RoundedRectangle(cornerRadius: 28, style: .continuous).fill(.white)
@@ -198,14 +224,19 @@ struct OnboardingWelcomeScreen: View {
                 // Stickers sit around the front card's centre, as fractions of its size.
                 let sx = cardWidth * 0.30
                 sticker("onb-sticker-brow-2", width: cardWidth * 0.40)
+                    .stickerMotion(shown: stickersIn, order: 0, still: reduceMotion)
                     .offset(x: sx + cardWidth * 0.42, y: -photoHeight * 0.39)
                 sticker("onb-sticker-brow-1", width: cardWidth * 0.32)
+                    .stickerMotion(shown: stickersIn, order: 1, still: reduceMotion)
                     .offset(x: sx - cardWidth * 0.33, y: -photoHeight * 0.20)
                 sticker("onb-sticker-blush", width: cardWidth * 0.27)
+                    .stickerMotion(shown: stickersIn, order: 2, still: reduceMotion)
                     .offset(x: sx - cardWidth * 0.26, y: photoHeight * 0.07)
                 sticker("onb-sticker-blush", width: cardWidth * 0.30)
+                    .stickerMotion(shown: stickersIn, order: 3, still: reduceMotion)
                     .offset(x: sx + cardWidth * 0.42, y: photoHeight * 0.09)
                 sticker("onb-sticker-lips", width: cardWidth * 0.29)
+                    .stickerMotion(shown: stickersIn, order: 4, still: reduceMotion)
                     .offset(x: sx - cardWidth * 0.25, y: photoHeight * 0.29)
                 HStack(spacing: 6) {
                     ForEach([0xE98BB5, 0xD07A70, 0xC9555E, 0xE79A70], id: \.self) { hex in
@@ -215,8 +246,14 @@ struct OnboardingWelcomeScreen: View {
                 .padding(.horizontal, 10).padding(.vertical, 8)
                 .background(.white, in: Capsule())
                 .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
-                .offset(x: -cardWidth * 0.62, y: -cardHeight * 0.36)
+                .rotationEffect(.degrees(-6))   // the middle card's angle
+                .offset(x: -cardWidth * 0.50, y: -cardHeight * 0.36)
+                // Fades in with the stickers, without floating.
+                .opacity(stickersIn ? 1 : 0)
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.4), value: stickersIn)
             }
+            // Centres the opened deck (back card's left edge to the front card's right edge) on the screen.
+            .offset(x: -cardWidth * 0.12)
             .frame(height: min(cardHeight + 24, artHeight + 40))
             .accessibilityHidden(true)
         }
@@ -238,24 +275,45 @@ struct OnboardingWelcomeScreen: View {
 
     // MARK: Page 2: step by step
 
-    private var artTwo: some View {
+    /// Runs page 2's intro once, the first time the page is shown.
+    private func playStepsIntro() {
+        guard !stepsIn else { return }
+        if reduceMotion {
+            stepsIn = true
+            stampIn = true
+            return
+        }
+        stepsIn = true
+        Task {
+            try? await Task.sleep(for: .seconds(0.85))
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.5)) { stampIn = true }
+        }
+    }
+
+    private func artTwo(width: CGFloat) -> some View {
         Group {
             VStack(spacing: 12) {
                 stepRow(image: "onb-step-1", title: "Find your apples", subtitle: "Step 1 · Smile wide", chip: .done)
                     .padding(.horizontal, 12)
                     .overlay(alignment: .topTrailing) {
+                        // Stamp: drops from large and tilted onto the card, with a short bounce.
                         Text("3 easy steps")
                             .font(.system(size: 13, weight: .semibold)).foregroundStyle(ink)
                             .padding(.horizontal, 12).padding(.vertical, 6)
                             .background(.white, in: Capsule())
                             .shadow(color: .black.opacity(0.14), radius: 6, y: 3)
-                            .rotationEffect(.degrees(8))
+                            .scaleEffect(stampIn ? 1 : 2.4)
+                            .rotationEffect(.degrees(stampIn ? 8 : -12))
+                            .opacity(stampIn ? 1 : 0)
                             .offset(x: 4, y: -14)
                     }
                     .padding(.top, 10)
+                    .slideIn(shown: stepsIn, order: 0, distance: width, still: reduceMotion)
                 stepRow(image: "onb-step-2", title: "Dab on the colour", subtitle: "Step 2 · Two light taps", chip: .start, strongShadow: true)
+                    .slideIn(shown: stepsIn, order: 1, distance: width, still: reduceMotion)
                 stepRow(image: "onb-step-3", title: "Blend it up and out", subtitle: "Step 3 · Circles to the temple", chip: .next)
                     .padding(.horizontal, 12)
+                    .slideIn(shown: stepsIn, order: 2, distance: width, still: reduceMotion)
             }
         }
     }
@@ -304,6 +362,24 @@ struct OnboardingWelcomeScreen: View {
 
     // MARK: Page 3: compare
 
+    /// Runs page 3's intro once, the first time the page is shown.
+    private func playCompareIntro() {
+        guard !ringIn else { return }
+        if reduceMotion {
+            ringIn = true
+            innerIn = true
+            iconsIn = true
+            return
+        }
+        withAnimation(.easeInOut(duration: 0.9)) { ringIn = true }
+        Task {
+            try? await Task.sleep(for: .seconds(0.6))
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.75)) { innerIn = true }
+            try? await Task.sleep(for: .seconds(0.4))
+            iconsIn = true
+        }
+    }
+
     private func artThree(height: CGFloat, width: CGFloat) -> some View {
         Group {
             let ring = min(width - 40, max(height * 0.34, 270))
@@ -311,19 +387,42 @@ struct OnboardingWelcomeScreen: View {
             let pinkLine = Color(red: 0xF6 / 255, green: 0xC3 / 255, blue: 0xD6 / 255)
             VStack(spacing: 14) {
                 ZStack {
-                    Circle().strokeBorder(pinkLine, lineWidth: 1.5).frame(width: ring, height: ring)
-                    ForEach([(-0.30, -0.92), (0.95, -0.18), (-0.88, 0.50), (0.45, 0.88)], id: \.0) { point in
-                        Circle().strokeBorder(pinkLine, lineWidth: 2).background(Circle().fill(.white))
-                            .frame(width: 12, height: 12)
-                            .offset(x: ring / 2 * point.0, y: ring / 2 * point.1)
+                    // Outer line: drawn round once from the top, clockwise.
+                    Circle().trim(from: 0, to: ringIn ? 1 : 0)
+                        .stroke(pinkLine, lineWidth: 1.5)
+                        .rotationEffect(.degrees(-90))
+                        .frame(width: ring - 1.5, height: ring - 1.5)
+                    // Its dots orbit slowly round the photo (one turn in 24 s) once the line is in.
+                    TimelineView(.animation(paused: reduceMotion || !ringIn)) { context in
+                        let turn = reduceMotion ? 0 : context.date.timeIntervalSinceReferenceDate / 24 * 360
+                        ZStack {
+                            ForEach([(-0.30, -0.92), (0.95, -0.18), (-0.88, 0.50), (0.45, 0.88)], id: \.0) { point in
+                                Circle().strokeBorder(pinkLine, lineWidth: 2).background(Circle().fill(.white))
+                                    .frame(width: 12, height: 12)
+                                    .offset(x: ring / 2 * point.0, y: ring / 2 * point.1)
+                            }
+                        }
+                        .rotationEffect(.degrees(turn.truncatingRemainder(dividingBy: 360)))
                     }
+                    .opacity(ringIn ? 1 : 0)
+                    .animation(reduceMotion ? nil : .easeOut(duration: 0.5), value: ringIn)
                     Circle().fill(.white).frame(width: ring * 0.82, height: ring * 0.82)
                         .shadow(color: .black.opacity(0.06), radius: 10, y: 4)
+                        .scaleEffect(innerIn ? 1 : 0.7)
+                        .opacity(innerIn ? 1 : 0)
                     splitPhoto(diameter: photo)
-                    bubble("checkmark.circle", tint: AppColors.onboardingInk).offset(x: -ring * 0.36, y: -ring * 0.36)
-                    bubble("sparkles", tint: AppColors.dandanPink).offset(x: ring * 0.46, y: -ring * 0.06)
-                    bubble("paintbrush.pointed", tint: AppColors.onboardingInk).offset(x: -ring * 0.44, y: ring * 0.30)
-                    bubble("face.smiling", tint: AppColors.onboardingInk).offset(x: ring * 0.34, y: ring * 0.38)
+                    bubble("checkmark.circle", tint: AppColors.onboardingInk)
+                        .stickerMotion(shown: iconsIn, order: 0, still: reduceMotion)
+                        .offset(x: -ring * 0.36, y: -ring * 0.36)
+                    bubble("sparkles", tint: AppColors.dandanPink)
+                        .stickerMotion(shown: iconsIn, order: 1, still: reduceMotion)
+                        .offset(x: ring * 0.46, y: -ring * 0.06)
+                    bubble("paintbrush.pointed", tint: AppColors.onboardingInk)
+                        .stickerMotion(shown: iconsIn, order: 2, still: reduceMotion)
+                        .offset(x: -ring * 0.44, y: ring * 0.30)
+                    bubble("face.smiling", tint: AppColors.onboardingInk)
+                        .stickerMotion(shown: iconsIn, order: 3, still: reduceMotion)
+                        .offset(x: ring * 0.34, y: ring * 0.38)
                 }
                 .frame(width: ring, height: ring)
                 .overlay(alignment: .topTrailing) {
@@ -430,7 +529,41 @@ private struct OnboardingPhoto: View {
     }
 }
 
+/// A page-1 sticker: fades and pops in when `shown` (staggered by `order`), then drifts and sways gently in a loop.
+/// `still` (Reduce Motion) shows it at once, without drifting.
+private struct StickerMotion: ViewModifier {
+    let shown: Bool
+    let order: Int
+    let still: Bool
+
+    func body(content: Content) -> some View {
+        // Each sticker gets its own period and phase so they never move in step.
+        let period = 2.6 + Double(order % 3) * 0.45
+        let phase = Double(order) * 1.3
+        TimelineView(.animation(paused: still || !shown)) { context in
+            let t = context.date.timeIntervalSinceReferenceDate * 2 * .pi / period + phase
+            content
+                .offset(x: still ? 0 : cos(t * 0.7) * 3, y: still ? 0 : sin(t) * 6)
+                .rotationEffect(.degrees(still ? 0 : sin(t * 0.8) * 3))
+        }
+        .opacity(shown ? 1 : 0)
+        .scaleEffect(shown ? 1 : 0.6)
+        .animation(still ? nil : .spring(response: 0.5, dampingFraction: 0.6).delay(Double(order) * 0.09), value: shown)
+    }
+}
+
 private extension View {
+    /// A page-2 step card: waits off the right edge until `shown`, then slides in, one after another by `order`.
+    func slideIn(shown: Bool, order: Int, distance: CGFloat, still: Bool) -> some View {
+        offset(x: shown ? 0 : distance)
+            .opacity(shown ? 1 : 0)
+            .animation(still ? nil : .spring(response: 0.5, dampingFraction: 0.82).delay(Double(order) * 0.15), value: shown)
+    }
+
+    func stickerMotion(shown: Bool, order: Int, still: Bool) -> some View {
+        modifier(StickerMotion(shown: shown, order: order, still: still))
+    }
+
     /// One onboarding picture inside the edge-to-edge swipe area: centred, with the page's 24 pt side margin.
     func artPage() -> some View {
         frame(maxWidth: 560).padding(.horizontal, 24).padding(.vertical, 16).frame(maxWidth: .infinity, maxHeight: .infinity)
