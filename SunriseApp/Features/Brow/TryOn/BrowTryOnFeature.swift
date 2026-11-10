@@ -9,6 +9,7 @@ struct BrowTryOnFeature: TryOnFeature {
     func styleName(home: TryOnHomeModel) -> Text {
         Text(home.browOverlay?.title ?? "None")
     }
+    var colourName: String { String(localized: "brow") }
 
     func debugMenu() -> AnyView? { AnyView(BrowDebugMenu()) }
 }

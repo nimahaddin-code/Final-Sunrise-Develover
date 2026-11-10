@@ -57,13 +57,13 @@ struct PalettePhoto: @unchecked Sendable {
     }
 }
 
-/// The sheet behind the "+" button: photograph a makeup product, then drag the pin to the colour to use.
-/// Photos stay in memory and are never saved or uploaded.
-enum PaletteSource { case camera, library }
+/// The sheet behind the "+" button, opened on the back camera: photograph a makeup product (or pick a photo with the
+/// button at the left), then drag the pin to the colour to use. Photos stay in memory and are never saved or uploaded.
 
 struct PaletteColorPicker: View {
     let initial: MakeupShade
-    let source: PaletteSource
+    /// "blush", "brow" or "eyeliner", for the title.
+    let featureName: String
     let onApply: (MakeupShade) -> Void
     @State private var showsLibrary = false
     @Environment(\.dismiss) private var dismiss
@@ -74,53 +74,62 @@ struct PaletteColorPicker: View {
     @State private var selection: PhotosPickerItem?
     @State private var error: String?
 
-    private static let frameSize = CGSize(width: 330, height: 350)
+    private static let frameSize = CGSize(width: 340, height: 460)
     private static let pinSize: CGFloat = 40
     /// The pin's tip sits this far above the finger, so the tip and the colour under it stay in view while dragging.
     private static let fingerGap: CGFloat = 56
 
-    init(initial: MakeupShade, source: PaletteSource = .camera, onApply: @escaping (MakeupShade) -> Void) {
+    init(initial: MakeupShade, featureName: String, onApply: @escaping (MakeupShade) -> Void) {
         self.initial = initial
-        self.source = source
+        self.featureName = featureName
         self.onApply = onApply
         _color = State(initialValue: initial.color)
     }
 
     var body: some View {
-        VStack(spacing: AppSpacing.large) {
-            VStack(spacing: 4) {
-                Text(photo == nil ? "Capture Your Product" : "Select Your Shade")
-                    .font(.system(size: 20, weight: .semibold))
-                    .accessibilityAddTraits(.isHeader)
-                Text(photo == nil ? "Place your makeup in good lighting for the most accurate match."
-                                  : "Drag the picker to select the exact color.")
-                    .font(.system(size: 15))
-                    .multilineTextAlignment(.center)
-            }
+        VStack(spacing: AppSpacing.medium) {
+            header
             viewfinder
             if let error {
                 Text(error).font(AppTypography.caption).multilineTextAlignment(.center)
             }
+            Spacer(minLength: 0)
             controls
         }
-        .padding(.top, AppSpacing.extraLarge)
+        .padding(.top, AppSpacing.medium)
+        .padding(.bottom, AppSpacing.large)
         .padding(.horizontal, AppSpacing.medium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .foregroundStyle(AppColors.snow)
-        .presentationBackground(AppColors.sheet)
-        .presentationDetents([.height(560), .large])
+        .foregroundStyle(AppColors.onboardingInk)
+        .environment(\.colorScheme, .light)
+        .presentationBackground(Color.white)
+        .presentationDetents([.large])
         .presentationCornerRadius(40)
         .presentationDragIndicator(.visible)
-        .task {
-            if source == .library { showsLibrary = true } else { await camera.start() }
-        }
+        .task { await camera.start() }
         .photosPicker(isPresented: $showsLibrary, selection: $selection, matching: .images)
-        .onChange(of: showsLibrary) { _, isShown in
-            // Cancelled without a photo: fall back to photographing the product.
-            if !isShown && selection == nil && photo == nil { Task { await camera.start() } }
-        }
         .onDisappear { camera.stop() }
         .task(id: selection) { await loadSelection() }
+    }
+
+    /// Close at the left, the title in the middle.
+    private var header: some View {
+        ZStack {
+            Text(photo == nil ? "Add your \(featureName) colour" : "Select Your Shade")
+                .font(.system(size: 17, weight: .semibold))
+                .accessibilityAddTraits(.isHeader)
+            HStack {
+                Button { dismiss() } label: {
+                    Image(systemName: "xmark").font(.system(size: 18, weight: .medium))
+                        .frame(width: 44, height: 44)
+                        .glassEffect(.regular.interactive(), in: .circle)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close")
+                Spacer()
+            }
+        }
+        .padding(.top, AppSpacing.small)
     }
 
     // MARK: Viewfinder and photo
@@ -132,14 +141,25 @@ struct PaletteColorPicker: View {
             } else {
                 switch camera.state {
                 case .running: ProductCameraPreview(session: camera.session)
-                case .idle: ProgressView().tint(AppColors.snow)
+                case .idle: ProgressView()
                 case .denied: unavailable("Allow camera access in Settings to photograph your product.")
                 case .unavailable: unavailable("The camera is not available. You can choose a photo instead.")
                 }
             }
         }
+        .overlay(alignment: .bottom) {
+            if photo == nil && camera.state == .running {
+                Text("Point your camera at a product or a swatch on skin.")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(AppColors.snow)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, AppSpacing.medium).padding(.vertical, 12)
+                    .background(.black.opacity(0.35), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .padding(AppSpacing.medium)
+            }
+        }
         .frame(width: Self.frameSize.width, height: Self.frameSize.height)
-        .background(Color.black.opacity(0.35))
+        .background(Color.black.opacity(0.08))
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 
@@ -180,7 +200,7 @@ struct PaletteColorPicker: View {
             PhotosPicker(selection: $selection, matching: .images) {
                 Label("Choose from Photos", systemImage: "photo")
             }
-            .buttonStyle(.borderedProminent).tint(AppColors.flamingo)
+            .buttonStyle(.borderedProminent).tint(AppColors.buttonInk)
         }
         .padding(AppSpacing.medium)
     }
@@ -189,16 +209,30 @@ struct PaletteColorPicker: View {
 
     @ViewBuilder private var controls: some View {
         if photo == nil {
-            Button(action: snap) {
-                ZStack {
-                    Circle().strokeBorder(AppColors.snow.opacity(0.65), lineWidth: 5).frame(width: 84, height: 84)
-                    Circle().fill(AppColors.snow).frame(width: 66, height: 66)
+            HStack {
+                Button { showsLibrary = true } label: {
+                    Image(systemName: "photo.badge.plus").font(.system(size: 22, weight: .regular))
+                        .frame(width: 56, height: 56)
+                        .glassEffect(.regular.interactive(), in: .circle)
                 }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Choose from Photos")
+                Spacer()
+                Button(action: snap) {
+                    ZStack {
+                        Circle().strokeBorder(AppColors.buttonInk, lineWidth: 5).frame(width: 84, height: 84)
+                        Circle().fill(AppColors.buttonInk).frame(width: 66, height: 66)
+                    }
+                }
+                .buttonStyle(.plain)
+                .disabled(camera.state != .running)
+                .opacity(camera.state == .running ? 1 : 0.4)
+                .accessibilityLabel("Take photo of product")
+                Spacer()
+                // Keeps the shutter in the middle.
+                Color.clear.frame(width: 56, height: 56)
             }
-            .buttonStyle(.plain)
-            .disabled(camera.state != .running)
-            .opacity(camera.state == .running ? 1 : 0.4)
-            .accessibilityLabel("Take photo of product")
+            .padding(.horizontal, AppSpacing.small)
         } else {
             HStack {
                 roundButton("arrow.counterclockwise", label: "Retake", action: retake)
@@ -206,7 +240,7 @@ struct PaletteColorPicker: View {
                 Button(action: apply) {
                     Text("Done").font(.headline).foregroundStyle(AppColors.snow)
                         .padding(.horizontal, 28).frame(height: 48)
-                        .glassCapsule(tint: AppColors.glassSelected)
+                        .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Use this colour")
@@ -216,7 +250,7 @@ struct PaletteColorPicker: View {
     }
 
     private func roundButton(_ symbol: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
-        GlassCircleButton(symbol: symbol, size: 48, tint: AppColors.glassSelected, label: label, action: action)
+        GlassCircleButton(symbol: symbol, size: 48, tint: Color.black.opacity(0.12), label: label, action: action)
     }
 
     // MARK: Actions

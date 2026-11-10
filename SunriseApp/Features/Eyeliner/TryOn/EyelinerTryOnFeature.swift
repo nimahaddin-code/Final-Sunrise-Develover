@@ -15,6 +15,7 @@ struct EyelinerTryOnFeature: TryOnFeature {
     func styleName(home: TryOnHomeModel) -> Text {
         home.isOff ? Text("None") : Text(home.linerLook.title)
     }
+    var colourName: String { String(localized: "eyeliner") }
 
     func debugMenu() -> AnyView? { nil }
 }

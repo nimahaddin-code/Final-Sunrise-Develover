@@ -6,6 +6,8 @@ import SwiftUI
     func lookPicker(home: TryOnHomeModel) -> AnyView
     /// The chosen look's name for the top row ("None" when the tool is off).
     func styleName(home: TryOnHomeModel) -> Text
+    /// What the colour sheet calls the feature: "Add your blush colour".
+    var colourName: String { get }
     /// nil: the tool has no debug menu.
     func debugMenu() -> AnyView?
 }

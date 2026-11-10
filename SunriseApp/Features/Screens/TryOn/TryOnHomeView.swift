@@ -13,7 +13,6 @@ struct TryOnHomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var isVisible=false
     @State private var showColours=false
-    @State private var paletteSource = PaletteSource.camera
     @StateObject private var light = ScreenLight()
     /// The shade row and intensity bar, opened by the palette button over the look row.
     @State private var showsShades = false
@@ -46,7 +45,7 @@ struct TryOnHomeView: View {
         .sensoryFeedback(.selection, trigger: light.isOn)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
         .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
-            PaletteColorPicker(initial:home.currentShade ?? home.swatches[0], source: paletteSource) { home.choose(shade:$0) }
+            PaletteColorPicker(initial:home.currentShade ?? home.swatches[0], featureName: home.tool.tryOnFeature.colourName) { home.choose(shade:$0) }
         }
         .onAppear {
             isVisible=true
@@ -226,9 +225,9 @@ struct TryOnHomeView: View {
             .disabled(!home.canTry(home.tool))
     }
 
-    private func openPalette(_ source: PaletteSource) {
+    /// Opens the colour sheet on the back camera straight away.
+    private func openPalette() {
         home.deactivate()
-        paletteSource = source
         showColours = true
     }
 
@@ -262,11 +261,8 @@ struct TryOnHomeView: View {
             .accessibilityLabel(Text(shade.name))
             .accessibilityAddTraits(selected ? .isSelected : [])
         }
-        // The plus opens a menu: photograph a product, or pick a photo, then choose its colour in the sheet.
-        Menu {
-            Button { openPalette(.camera) } label: { Label("Take a Photo", systemImage: "camera") }
-            Button { openPalette(.library) } label: { Label("Choose From Photo", systemImage: "photo") }
-        } label: {
+        // The plus opens the colour sheet on the back camera; a photo can be picked from inside it.
+        Button { openPalette() } label: {
             Image(systemName: "plus").font(.title2.weight(.medium))
                 .foregroundStyle(AppColors.snow)
                 .frame(width: 48, height: 48)
