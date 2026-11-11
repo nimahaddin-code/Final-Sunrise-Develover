@@ -27,6 +27,11 @@ private final class FrameSink: NSObject, AVCaptureVideoDataOutputSampleBufferDel
     private nonisolated let sink = FrameSink()
     private nonisolated(unsafe) var isConfigured = false
     private let context = CIContext()
+    @Published private(set) var position = AVCaptureDevice.Position.back
+    @Published private(set) var hasTorch = false
+    @Published private(set) var torchOn = false
+    @Published private(set) var zoomed = false
+    private nonisolated(unsafe) var currentDevice: AVCaptureDevice?
 
     func start() async {
         let granted: Bool
@@ -44,11 +49,73 @@ private final class FrameSink: NSObject, AVCaptureVideoDataOutputSampleBufferDel
             }
         }
         state = started ? .running : .unavailable
+        refreshDeviceInfo()
     }
 
     func stop() {
-        queue.async { if self.session.isRunning { self.session.stopRunning() } }
+        queue.async {
+            self.setTorchLocked(false)
+            if self.session.isRunning { self.session.stopRunning() }
+        }
+        torchOn = false
         if state == .running { state = .idle }
+    }
+
+    /// Swaps between the back and front camera. The front picture is mirrored so the snapshot matches the preview.
+    func flip() {
+        guard state == .running else { return }
+        let target: AVCaptureDevice.Position = position == .back ? .front : .back
+        queue.async {
+            self.setTorchLocked(false)
+            guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: target),
+                  let input = try? AVCaptureDeviceInput(device: device) else { return }
+            self.session.beginConfiguration()
+            for old in self.session.inputs { self.session.removeInput(old) }
+            if self.session.canAddInput(input) { self.session.addInput(input); self.currentDevice = device }
+            if let connection = self.session.outputs.first?.connection(with: .video) {
+                if connection.isVideoRotationAngleSupported(90) { connection.videoRotationAngle = 90 }
+                if connection.isVideoMirroringSupported {
+                    connection.automaticallyAdjustsVideoMirroring = false
+                    connection.isVideoMirrored = target == .front
+                }
+            }
+            self.session.commitConfiguration()
+        }
+        torchOn = false; zoomed = false
+        position = target
+        Task { try? await Task.sleep(for: .milliseconds(150)); refreshDeviceInfo() }
+    }
+
+    func toggleTorch() { setTorch(!torchOn) }
+
+    func setTorch(_ on: Bool) {
+        guard hasTorch else { return }
+        torchOn = on
+        queue.async { self.setTorchLocked(on) }
+    }
+
+    /// Toggles between 1x and 2x (clamped to what the camera allows).
+    func toggleZoom() {
+        let next = !zoomed
+        zoomed = next
+        queue.async {
+            guard let device = self.currentDevice, (try? device.lockForConfiguration()) != nil else { return }
+            device.videoZoomFactor = next ? min(2, device.activeFormat.videoMaxZoomFactor) : 1
+            device.unlockForConfiguration()
+        }
+    }
+
+    private func refreshDeviceInfo() {
+        queue.async {
+            let torch = self.currentDevice?.hasTorch ?? false
+            Task { @MainActor in self.hasTorch = torch }
+        }
+    }
+
+    private nonisolated func setTorchLocked(_ on: Bool) {
+        guard let device = currentDevice, device.hasTorch, (try? device.lockForConfiguration()) != nil else { return }
+        device.torchMode = on ? .on : .off
+        device.unlockForConfiguration()
     }
 
     /// The newest frame, centre-cropped to `aspect` (width / height) so it matches the viewfinder, as JPEG data.
@@ -78,6 +145,7 @@ private final class FrameSink: NSObject, AVCaptureVideoDataOutputSampleBufferDel
         session.sessionPreset = .photo
         guard session.canAddInput(input) else { return false }
         session.addInput(input)
+        currentDevice = device
         let output = AVCaptureVideoDataOutput()
         output.alwaysDiscardsLateVideoFrames = true
         output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]

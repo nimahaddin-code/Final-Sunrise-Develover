@@ -216,6 +216,8 @@ enum TutorialTab: CaseIterable, Identifiable {
         // "Mark 3 points" (guide step 1) shows the engine's dashed nose-to-brow mapping lines with small pink dots and the
         // overlay's pencil; the other steps use the overlay's own outline, so the lines stay off.
         value.showMappingFormula = tab == .brows && guideStep == 1
+        // One side at a time: the lines only on the brow being done (screen left = the user's right brow, mirrored).
+        value.mappingSide = perSide ? (side == .leading ? EyeSide.subjectRight : .subjectLeft) : nil
         // The tutorial shows dashed nose-to-brow lines, not MediaPipe's landmark view.
         value.browTrackingOverlay = false
         // The filter the user picked on Try On, with its shade and strength (`applyShade`), is what the tutorial shows.

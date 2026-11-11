@@ -288,14 +288,17 @@ final class LinerFrameRelay: @unchecked Sendable {
 
     /// Starts the one camera. Blush and eyebrow are placed as soon as it runs, whichever tools are on, so switching a
     /// look on later is immediate.
-    func activate() {
+    /// `resettingChoices: false` keeps the chosen tool, brow picture and enabled tools (e.g. coming back from the colour sheet).
+    func activate(resettingChoices: Bool = true) {
         // -Nimah: A late permission response must not revive the home camera behind a scan/tutorial.
         guard !active else { return }
         // Cold and warm starts show the tool this screen was opened for, with the brow's no-overlay tile
         // selected. Choosing a brow overlay enables it; other tools keep their choice.
-        tool = focusTool ?? .eyebrow
-        enabled.remove(.eyebrow)
-        browOverlay = nil
+        if resettingChoices {
+            tool = focusTool ?? .eyebrow
+            enabled.remove(.eyebrow)
+            browOverlay = nil
+        }
         active=true
         isComparing=false
         syncLiner()

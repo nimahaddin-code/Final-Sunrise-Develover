@@ -58,7 +58,7 @@ struct PalettePhoto: @unchecked Sendable {
 }
 
 /// The sheet behind the "+" button, opened on the back camera: photograph a makeup product (or pick a photo with the
-/// button at the left), then drag the pin to the colour to use. Photos stay in memory and are never saved or uploaded.
+/// button at the left), then drag the loupe to the colour to use. Photos stay in memory and are never saved or uploaded.
 
 struct PaletteColorPicker: View {
     let initial: MakeupShade
@@ -74,10 +74,11 @@ struct PaletteColorPicker: View {
     @State private var selection: PhotosPickerItem?
     @State private var error: String?
 
-    private static let frameSize = CGSize(width: 340, height: 460)
-    private static let pinSize: CGFloat = 40
-    /// The pin's tip sits this far above the finger, so the tip and the colour under it stay in view while dragging.
-    private static let fingerGap: CGFloat = 56
+    /// Measured from the available width (aspect 0.8); the default is used until the first layout.
+    @State private var frameSize = CGSize(width: 340, height: 425)
+    /// Where the loupe was when the current drag began.
+    @State private var dragAnchor: CGPoint?
+    private static let loupeSize: CGFloat = 96
 
     init(initial: MakeupShade, featureName: String, onApply: @escaping (MakeupShade) -> Void) {
         self.initial = initial
@@ -98,8 +99,13 @@ struct PaletteColorPicker: View {
         }
         .padding(.top, AppSpacing.medium)
         .padding(.bottom, AppSpacing.large)
-        .padding(.horizontal, AppSpacing.medium)
+        .padding(.horizontal, 12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        // The viewfinder takes the sheet's width (12 pt each side) at 4:5, shorter on small screens so the buttons fit.
+        .onGeometryChange(for: CGSize.self, of: { $0.size }) { sheet in
+            let width = max(sheet.width - 24, 1)
+            frameSize = CGSize(width: width, height: max(min(width / 0.8, sheet.height - 300), 200).rounded())
+        }
         .foregroundStyle(AppColors.onboardingInk)
         .environment(\.colorScheme, .light)
         .presentationBackground(Color.white)
@@ -115,7 +121,7 @@ struct PaletteColorPicker: View {
     /// Close at the left, the title in the middle.
     private var header: some View {
         ZStack {
-            Text(photo == nil ? "Add your \(featureName) colour" : "Select Your Shade")
+            Text("Pick your \(featureName) colour")
                 .font(.system(size: 17, weight: .semibold))
                 .accessibilityAddTraits(.isHeader)
             HStack {
@@ -148,48 +154,85 @@ struct PaletteColorPicker: View {
             }
         }
         .overlay(alignment: .bottom) {
-            if photo == nil && camera.state == .running {
-                Text("Point your camera at a product or a swatch on skin.")
+            if photo != nil || camera.state == .running {
+                Text(photo == nil ? "Point your camera at a product or a swatch on skin." : "Tap and drag the circle to pick the color.")
                     .font(.system(size: 15, weight: .medium))
                     .foregroundStyle(AppColors.snow)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, AppSpacing.medium).padding(.vertical, 12)
-                    .background(.black.opacity(0.35), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .padding(.horizontal, 16).padding(.vertical, 10)
+                    .background(.black.opacity(0.35), in: Capsule())
                     .padding(AppSpacing.medium)
             }
         }
-        .frame(width: Self.frameSize.width, height: Self.frameSize.height)
-        .background(Color.black.opacity(0.08))
+        .overlay(alignment: .topLeading) {
+            if photo == nil && camera.state == .running && camera.hasTorch {
+                overlayCircle(systemImage: camera.torchOn ? "bolt.fill" : "bolt.slash.fill", label: "Torch", action: camera.toggleTorch)
+                    .padding(12)
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if photo == nil && camera.state == .running {
+                overlayCircle(text: camera.zoomed ? "2x" : "1x", label: "Zoom", action: camera.toggleZoom).padding(12)
+            }
+        }
+        .frame(width: frameSize.width, height: frameSize.height)
+        .background(Color(white: 0.2))
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+    }
+
+    private func overlayCircle(systemImage: String? = nil, text: String? = nil, label: LocalizedStringKey,
+                               action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Group {
+                if let systemImage { Image(systemName: systemImage).font(.system(size: 14, weight: .semibold)) }
+                else if let text { Text(text).font(.system(size: 13, weight: .semibold)) }
+            }
+            .foregroundStyle(AppColors.snow)
+            .frame(width: 32, height: 32)
+            .background(.black.opacity(0.35), in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 
     private func pickSurface(_ photo: PalettePhoto) -> some View {
         ZStack {
             Image(decorative: photo.image, scale: 1).resizable().scaledToFit()
-            if let marker {
-                pin.position(x: marker.x, y: marker.y - (Self.pinSize + 18) / 2)
-            }
+            if let marker { loupe.position(marker) }
         }
+        .frame(width: frameSize.width, height: frameSize.height)
         .contentShape(Rectangle())
         .gesture(DragGesture(minimumDistance: 0).onChanged { drag in
-            let tip = CGPoint(x: drag.location.x, y: drag.location.y - Self.fingerGap)
-            if let picked = photo.sample(at: tip, in: Self.frameSize) {
-                color = Color(uiColor: picked)
-                marker = tip
+            if dragAnchor == nil {
+                // Grabbing the loupe moves it from where it is; elsewhere it jumps to the touch, then follows.
+                if let marker, hypot(drag.startLocation.x - marker.x, drag.startLocation.y - marker.y) <= Self.loupeSize / 2 {
+                    dragAnchor = marker
+                } else {
+                    dragAnchor = drag.startLocation
+                }
             }
-        })
-        .accessibilityLabel("Product photo. Drag the pin to a colour.")
+            guard let anchor = dragAnchor else { return }
+            let rect = PalettePhoto.imageRect(image: CGSize(width: photo.width, height: photo.height), in: frameSize)
+            let point = CGPoint(x: min(max(anchor.x + drag.translation.width, rect.minX), rect.maxX - 0.5),
+                                y: min(max(anchor.y + drag.translation.height, rect.minY), rect.maxY - 0.5))
+            if let picked = photo.sample(at: point, in: frameSize) {
+                color = Color(uiColor: picked)
+                marker = point
+            }
+        }.onEnded { _ in dragAnchor = nil })
+        .accessibilityLabel("Product photo. Drag the circle to a colour.")
     }
 
-    /// A teardrop pin whose tip sits on the sampled point and whose head shows the colour under it.
-    private var pin: some View {
-        ZStack(alignment: .top) {
-            PinTip().fill(AppColors.snow).frame(width: 22, height: 26).offset(y: Self.pinSize - 10)
-            Circle().fill(AppColors.snow).frame(width: Self.pinSize, height: Self.pinSize)
-                .overlay(Circle().fill(color).padding(4))
+    /// A see-through loupe centred on the sampled point: only its rings and cross are drawn.
+    private var loupe: some View {
+        ZStack {
+            Circle().strokeBorder(AppColors.snow, lineWidth: 4)
+            Circle().strokeBorder(AppColors.snow, lineWidth: 1.5).frame(width: 60, height: 60)
+            Rectangle().fill(AppColors.snow).frame(width: 18, height: 2)
+            Rectangle().fill(AppColors.snow).frame(width: 2, height: 18)
         }
-        .frame(width: Self.pinSize, height: Self.pinSize + 18, alignment: .top)
-        .shadow(color: .black.opacity(0.3), radius: 3, y: 1)
+        .frame(width: Self.loupeSize, height: Self.loupeSize)
+        .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
         .allowsHitTesting(false)
     }
 
@@ -210,18 +253,12 @@ struct PaletteColorPicker: View {
     @ViewBuilder private var controls: some View {
         if photo == nil {
             HStack {
-                Button { showsLibrary = true } label: {
-                    Image(systemName: "photo.badge.plus").font(.system(size: 22, weight: .regular))
-                        .frame(width: 56, height: 56)
-                        .glassEffect(.regular.interactive(), in: .circle)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Choose from Photos")
+                greyCircle("photo.badge.plus", label: "Choose from Photos") { showsLibrary = true }
                 Spacer()
                 Button(action: snap) {
                     ZStack {
-                        Circle().strokeBorder(AppColors.buttonInk, lineWidth: 5).frame(width: 84, height: 84)
-                        Circle().fill(AppColors.buttonInk).frame(width: 66, height: 66)
+                        Circle().strokeBorder(Color.black, lineWidth: 5).frame(width: 84, height: 84)
+                        Circle().fill(Color.black).frame(width: 66, height: 66)
                     }
                 }
                 .buttonStyle(.plain)
@@ -229,34 +266,45 @@ struct PaletteColorPicker: View {
                 .opacity(camera.state == .running ? 1 : 0.4)
                 .accessibilityLabel("Take photo of product")
                 Spacer()
-                // Keeps the shutter in the middle.
-                Color.clear.frame(width: 56, height: 56)
+                greyCircle("arrow.triangle.2.circlepath", label: "Switch camera", action: camera.flip)
+                    .disabled(camera.state != .running)
+                    .opacity(camera.state == .running ? 1 : 0.4)
             }
             .padding(.horizontal, AppSpacing.small)
         } else {
-            HStack {
-                roundButton("arrow.counterclockwise", label: "Retake", action: retake)
-                Spacer()
-                Button(action: apply) {
-                    Text("Done").font(.headline).foregroundStyle(AppColors.snow)
-                        .padding(.horizontal, 28).frame(height: 48)
-                        .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
+            VStack(spacing: AppSpacing.medium) {
+                Button(action: retake) {
+                    Label("Retake", systemImage: "arrow.clockwise")
+                        .font(.system(size: 17, weight: .semibold)).foregroundStyle(AppColors.dandanPink)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Use this colour")
+                Button(action: apply) {
+                    Text("Add this colour").font(.system(size: 17, weight: .semibold)).foregroundStyle(AppColors.snow)
+                        .frame(maxWidth: .infinity).frame(height: 56)
+                        .background(AppColors.buttonInk, in: Capsule())
+                        .shadow(color: .black.opacity(0.15), radius: 8, y: 3)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Add this colour")
             }
-            .padding(.horizontal, AppSpacing.small)
         }
     }
 
-    private func roundButton(_ symbol: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
-        GlassCircleButton(symbol: symbol, size: 48, tint: Color.black.opacity(0.12), label: label, action: action)
+    private func greyCircle(_ symbol: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol).font(.system(size: 26, weight: .regular)).foregroundStyle(AppColors.buttonInk)
+                .frame(width: 84, height: 84)
+                .background(Color(white: 0.96), in: Circle())
+                .shadow(color: .black.opacity(0.12), radius: 6, y: 2)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
     }
 
     // MARK: Actions
 
     private func snap() {
-        guard let data = camera.snapshot(aspect: Self.frameSize.width / Self.frameSize.height) else {
+        guard let data = camera.snapshot(aspect: frameSize.width / frameSize.height) else {
             error = String(localized: "Could not take the photo. Try again.")
             return
         }
@@ -265,7 +313,7 @@ struct PaletteColorPicker: View {
     }
 
     private func retake() {
-        photo = nil; marker = nil; error = nil; selection = nil
+        photo = nil; marker = nil; dragAnchor = nil; error = nil; selection = nil
         Task { await camera.start() }
     }
 
@@ -298,21 +346,10 @@ struct PaletteColorPicker: View {
         }
         photo = decoded
         error = nil
-        let centre = CGPoint(x: Self.frameSize.width / 2, y: Self.frameSize.height / 2)
-        if let picked = decoded.sample(at: centre, in: Self.frameSize) {
+        let centre = CGPoint(x: frameSize.width / 2, y: frameSize.height / 2)
+        if let picked = decoded.sample(at: centre, in: frameSize) {
             color = Color(uiColor: picked)
             marker = centre
         }
-    }
-}
-
-private struct PinTip: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
-        path.closeSubpath()
-        return path
     }
 }

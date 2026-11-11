@@ -231,7 +231,7 @@ extension BeautyBlushEngine {
         if s.tracking,let observation {marks=Self.browTrackingMarks(observation,raw:detected,display:display,size:size,tracked:tracked)}
         else if let observation,tracked,debugView==2 || (s.guide && s.mapping) {
             // The guide does not wait for the hand mask, or it would vanish whenever the mask is late.
-            marks=Self.browMarks(observation,display:display,size:size,landmarks:debugView==2,mapping:s.guide && s.mapping,alpha:1)
+            marks=Self.browMarks(observation,display:display,size:size,landmarks:debugView==2,mapping:s.guide && s.mapping,mappingSide:s.mappingSide,alpha:1)
         }
         do {
             // One buffer per frame slot, like `browVertices`: reused while it is big enough, else replaced by a power-of-two size.
