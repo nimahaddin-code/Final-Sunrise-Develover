@@ -22,8 +22,9 @@ final class MakeupPreferenceTests:XCTestCase {
         XCTAssertEqual(model.side,.trailing)
         XCTAssertEqual(model.stepIndex,0)
         XCTAssertEqual(model.compare,.plainGuide)
-        model.cycleCompare()   // the desired look on the finished side
-        XCTAssertEqual(model.compare,.tryOnGuide)
+        model.cycleCompare()   // the desired look on the finished side, and the guide off on this one
+        XCTAssertEqual(model.compare,.tryOnPlain)
+        XCTAssertFalse(model.compare.showsGuide)
         XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
         XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectRight)
         XCTAssertFalse(model.retreat())   // back to the first side's last step

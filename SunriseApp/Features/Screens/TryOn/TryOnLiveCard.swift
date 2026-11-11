@@ -190,7 +190,12 @@ struct CameraZoomModifier: ViewModifier {
         content
             .environment(\.cameraZoom, current)
             .scaleEffect(current, anchor: UnitPoint(x: 0.5, y: 0.42))
+            // The scaled camera takes no touches: `.clipped()` only cuts what is drawn, and the enlarged camera view kept
+            // catching taps past its frame, over the tutorial's Back / Next and Try On's controls. Nothing inside needs
+            // a touch; the pinch below belongs to the clipped frame.
+            .allowsHitTesting(false)
             .clipped()
+            .contentShape(Rectangle())
             .gesture(MagnificationGesture()
                 .updating($pinch) { value, state, _ in state = value }
                 .onEnded { value in zoom = min(max(zoom * value, Self.range.lowerBound), Self.range.upperBound) })

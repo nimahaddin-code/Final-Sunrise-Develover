@@ -94,18 +94,21 @@ struct FeedbackView: View {
                     }
                     // Before = the try-on photo (staging's fix). After = E2E-Flow's mesh-aligned result when it could be made,
                     // else staging's eye alignment, else the photo as taken.
-                    BeforeAfterSlider(before: store.desired ?? store.bare, after: store.alignedResult ?? alignedResult ?? store.result)
+                    BeforeAfterSlider(before: focused(store.desired ?? store.bare),
+                                      after: focused(store.alignedResult ?? alignedResult ?? store.result))
                         .aspectRatio(362 / 236, contentMode: .fit)
+                    // Design 18: "What we think", then the overall ring, then the Placement and Shade cards.
+                    if feedback.score != nil || !feedback.categories.isEmpty {
+                        Text("What we think")
+                            .font(.system(size: 22, weight: .bold))
+                            .padding(.top, 4)
+                    }
                     if let score = feedback.score {
                         scoreCard(score: score, feedback: feedback)
-                        FeedbackFixes(feedback: feedback, photo: store.result)
                     } else {
                         ForEach(feedback.items, id: \.self) { FeedbackMessageRow(item: $0).feedbackCard() }
                     }
                     if !feedback.categories.isEmpty {
-                        Text("What we think")
-                            .font(.system(size: 22, weight: .bold))
-                            .padding(.top, 4)
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
                             ForEach(feedback.categories) { category in
                                 Button { opened = category } label: { FeedbackCategoryCard(category: category) }
@@ -114,11 +117,15 @@ struct FeedbackView: View {
                             }
                         }
                     }
+                    if feedback.score != nil { FeedbackFixes(feedback: feedback, photo: store.result) }
                     if developerTools { diagnostics }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, AppSpacing.large)
             }
+            .scrollIndicators(.hidden)
+            // Retake (back to the tutorial) and Done (home), pinned under the scroll as in the design.
+            bottomBar
         }
         .transition(.opacity)
     }
@@ -155,6 +162,13 @@ struct FeedbackView: View {
         }
         .feedbackCard()
         .accessibilityElement(children: .combine)
+    }
+
+    /// Brows and eyeliner compare the eye area only (the same crop as the brief, `LookBriefView.crop`), so the difference is
+    /// big enough to see; blush keeps the whole face. Both photos are lined up first, so one crop fits both.
+    private func focused(_ image: UIImage?) -> UIImage? {
+        guard let image, handoff.tool != .blush else { return image }
+        return LookBriefView.crop(image, for: handoff.tool)
     }
 
     /// Retry (back to the tutorial) and Done (home).
