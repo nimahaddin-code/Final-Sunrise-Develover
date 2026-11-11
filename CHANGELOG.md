@@ -1,3 +1,12 @@
+## Screen light stays while zoomed, brighter — 2026-11-11
+
+The screen light used to be an inset of the camera picture itself (26 pt plus a 26 pt blur, white page behind), so zooming
+the camera zoomed the white edge away. It is now `ScreenLightFrame` (`Engine/Camera/ScreenLight.swift`): a white frame drawn
+over the camera, outside the zoom, 64 pt wide with a soft inner edge, so more of the screen is white. Used by the tutorial
+(full-bleed card) and Try On (`TryOnLiveCard`). The zoom chip moves in past the frame while the light is on
+(`EnvironmentValues.screenLightInset`). The phone brightness was already at full. 380 Simulator tests pass; the look needs a
+device.
+
 ## Tutorial swipe, bigger step text, compare without the guide; feedback buttons and eye-area slider — 2026-11-11
 
 E2E-Flow was fast-forwarded to staging first (`3f6957d`). Tutorial: a horizontal swipe on the camera moves to the next step

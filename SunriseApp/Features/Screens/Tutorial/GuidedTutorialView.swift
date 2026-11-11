@@ -552,10 +552,10 @@ private struct TutorialScreen: View {
         ZStack {
             Group {
                 if !lit { Color.black }
-                // Light on: the picture fades softly into the white screen instead of ending in a hard edge.
                 cameraContent
+                    .environment(\.screenLightInset, lit && fullBleed ? ScreenLightFrame.defaultWidth * 0.6 : 0)
                     .mask {
-                        if fullBleed && !lit {
+                        if fullBleed {
                             bottomRounded
                         } else {
                             RoundedRectangle(cornerRadius: lit ? cornerRadius * 2 : cornerRadius, style: .continuous)
@@ -563,6 +563,9 @@ private struct TutorialScreen: View {
                                 .blur(radius: lit ? 26 : 0)
                         }
                     }
+                // Light on: a white frame over the camera, not an inset of the camera itself, so zooming in never zooms
+                // the light away.
+                if fullBleed { ScreenLightFrame(light: light).clipShape(bottomRounded) }
             }
             .ignoresSafeArea(edges: fullBleed ? .top : [])
             if flashing { Color.white.ignoresSafeArea().allowsHitTesting(false) }
