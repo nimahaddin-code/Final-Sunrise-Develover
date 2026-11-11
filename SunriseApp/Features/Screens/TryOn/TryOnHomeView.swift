@@ -44,7 +44,7 @@ struct TryOnHomeView: View {
         .toolbar(.hidden, for: .navigationBar)
         .sensoryFeedback(.selection, trigger: light.isOn)
         .sensoryFeedback(.selection, trigger: home.currentShade?.id)
-        .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate() } }) {
+        .sheet(isPresented:$showColours,onDismiss:{ if isVisible { home.activate(resettingChoices: false) } }) {
             PaletteColorPicker(initial:home.currentShade ?? home.swatches[0], featureName: home.tool.tryOnFeature.colourName) { home.choose(shade:$0) }
         }
         .onAppear {
@@ -64,7 +64,7 @@ struct TryOnHomeView: View {
         ZStack(alignment: .bottom) {
             // -Nimah: Dismantle the face camera while the palette picker owns the rear camera.
             if showColours {
-                RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(AppColors.cocoa)
+                RoundedRectangle(cornerRadius:AppSpacing.cornerRadius).fill(Color(white: 0.15))
                     .overlay(Text("Choosing makeup colour")).ignoresSafeArea()
             } else {
                 TryOnLiveCard(home: home, light: light, showsLightButton: false,

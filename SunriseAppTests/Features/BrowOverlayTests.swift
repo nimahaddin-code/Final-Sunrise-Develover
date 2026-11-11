@@ -150,6 +150,19 @@ final class BrowOverlayTests: XCTestCase {
         home.deactivate()
     }
 
+    @MainActor func testReactivatingWithoutResetKeepsTheBrowChoice() {
+        let home = TryOnHomeModel(plan: MakeupPlan(shape: .heart), assessment: .init(shape: .heart, origin: .analysis), checker: MockFaceTrackingChecker())
+        home.choose(browOverlay: BrowOverlay.all[1])
+        home.deactivate()
+        home.activate(resettingChoices: false)
+        XCTAssertEqual(home.browOverlay, BrowOverlay.all[1])
+        XCTAssertTrue(home.enabled.contains(.eyebrow))
+        home.deactivate()
+        home.activate()
+        XCTAssertNil(home.browOverlay, "a plain activate still resets")
+        home.deactivate()
+    }
+
     func testBrowFramesAreLimitedToTheMaximumRate() {
         // A 60 Hz camera: every other frame is handed on at 30 fps, and a slower cap drops more.
         var last = -Double.infinity, kept = 0
