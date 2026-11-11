@@ -38,7 +38,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
     struct Field {var ellipse:SIMD4<Float>;var shape:SIMD4<Float>;var limits:SIMD4<Float>}
     struct Bake {var left:Field;var right:Field;var bridge=Field(ellipse:.zero,shape:.zero,limits:.zero);var paint=SIMD4<Float>.zero;var options=SIMD4<Float>.zero;var mouth=SIMD4<Float>.zero}
     struct Settings {
-        var comparisonSplit=false;var browOnlySide:EyeSide?;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()
+        var comparisonSplit=false;var browOnlySide:EyeSide?;var mappingSide:EyeSide?;var enabled=false;var tint=SIMD3<Float>(0.9,0.3,0.45);var intensity:Float=0.72;var style=BlushPlacementStyle.cheekbone;var browStyle=EyebrowStyle.softNatural;var browOverlay:BrowOverlay?;var isBrow=false;var guide=false;var mapping=false;var tracking=false;var hideNatural=false;var viewport=CGSize.zero;var orientation=UIInterfaceOrientation.portrait;var epoch=UUID()
         /// Blush drawn too (on the brow path when the brow is also on). Its own shade and strength: brow and blush differ.
         var pigmentHalf=PigmentHalf.full
         var withBlush=false;var blushTint=SIMD3<Float>(0.9,0.3,0.45);var blushIntensity:Float=0.72
@@ -249,7 +249,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         }
         settings.enabled=enabled
         if let c {
-            settings.comparisonSplit=c.comparisonSplit;settings.browOnlySide=c.browOnlySide;settings.pigmentHalf=c.pigmentHalf ?? (c.comparisonSplit ? .left:.full);settings.isBrow=c.needsBrow;settings.withBlush=c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay
+            settings.comparisonSplit=c.comparisonSplit;settings.browOnlySide=c.browOnlySide;settings.mappingSide=c.mappingSide;settings.pigmentHalf=c.pigmentHalf ?? (c.comparisonSplit ? .left:.full);settings.isBrow=c.needsBrow;settings.withBlush=c.needsBlush;settings.browStyle=c.style;settings.browOverlay=c.browOverlay
             settings.style=c.blushStyle;settings.guide=c.showGuide || c.measuresBlushTarget;settings.mapping=c.showMappingFormula;settings.tracking=c.browTrackingOverlay
             // TEMP (Khalish 2026-11-10): natural-brow eraser off; the brow picture is drawn straight over the real brow.
             // Restore: settings.hideNatural=c.hideNaturalBrow

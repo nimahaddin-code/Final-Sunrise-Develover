@@ -51,6 +51,8 @@ struct EyebrowConfiguration: Equatable, Sendable {
     var pigmentHalf: PigmentHalf? = nil
     /// Tutorial Brows compare: draw the look on this brow only (the subject's own side); nil = both.
     var browOnlySide:EyeSide?
+    /// Tutorial brow mapping lines on this brow only (the side being done); nil = both.
+    var mappingSide:EyeSide?
     // -Nimah: Region/style selection untuk dua modul pada shared tracking pipeline.
     var region:FaceGuideRegion = .eyebrows
     var foreheadStyle:ForeheadStyle = .hairline

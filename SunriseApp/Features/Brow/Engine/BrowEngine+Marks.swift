@@ -93,14 +93,14 @@ extension BeautyBlushEngine {
     }
     /// Tutorial brow mapping (white dashed lines from the nostril to the brow's start, arch and end, a pink dot on each)
     /// and landmark debug dots, in clip space.
-    static func browMarks(_ o:BrowObservation,display:CGAffineTransform,size:CGSize,landmarks:Bool,mapping:Bool,alpha:Float)->[MarkVertex] {
+    static func browMarks(_ o:BrowObservation,display:CGAffineTransform,size:CGSize,landmarks:Bool,mapping:Bool,mappingSide:EyeSide?=nil,alpha:Float)->[MarkVertex] {
         var m=MarkBuilder(imageSize:o.imageSize,drawable:size,display:display)
         let thickness=m.thickness
         if mapping {
             // Soft white dashes and small pink dots ringed in white, like a pencil-mapping camera effect.
             let line=SIMD4<Float>(1,1,1,0.75*alpha),ring=SIMD4<Float>(1,1,1,0.95*alpha),dot=SIMD4<Float>(0.93,0.3,0.52,alpha)
             let dash=thickness*5,gap=thickness*3.5
-            for brow in mappingMarks(o) {
+            for brow in mappingMarks(o) where mappingSide == nil || brow.side == mappingSide {
                 // All three meet beside the nostril and stop at their dot.
                 for mark in brow.marks {m.dashedLine(brow.origin,mark,line,width:1.6,dash:dash,gap:gap)}
                 for mark in brow.marks {m.dot(mark,thickness*1.5,ring);m.dot(mark,thickness*1.0,dot)}
