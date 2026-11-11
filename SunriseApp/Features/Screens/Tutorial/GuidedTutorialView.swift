@@ -172,13 +172,14 @@ enum TutorialTab: CaseIterable, Identifiable {
         compare = Self.sideLayout(side: side, lookBeside: showsLookBeside)
     }
 
-    /// The guide on the side being done; the plain camera, or the desired look, on the other.
+    /// The guide on the side being done, the plain camera on the other. Compare on: the guide comes off, so the side being
+    /// done is the plain camera (the eye and brow stay visible while applying), and the desired look is on the other side.
     private static func sideLayout(side: HorizontalEdge, lookBeside: Bool) -> TutorialCompare {
         switch (side, lookBeside) {
         case (.leading, false): .guidePlain
-        case (.leading, true): .guideTryOn
+        case (.leading, true): .plainTryOn
         case (.trailing, false): .plainGuide
-        case (.trailing, true): .tryOnGuide
+        case (.trailing, true): .tryOnPlain
         }
     }
 
@@ -454,6 +455,8 @@ private struct TutorialScreen: View {
         VStack(spacing: 0) {
             card
                 .frame(maxHeight: .infinity)
+                .contentShape(Rectangle())
+                .simultaneousGesture(stepSwipe)
             bottomBar
                 .padding(.horizontal, AppSpacing.medium)
                 .padding(.vertical, AppSpacing.small)
@@ -500,6 +503,22 @@ private struct TutorialScreen: View {
     /// The tutorial is over: the result photo in the flow, the photo screen otherwise.
     private func finish() {
         if let onFinished { leave(onFinished) } else { model.enterPhoto() }
+    }
+
+    /// Swipe left for the next step, right for the previous one, within the side being done: a swipe never finishes a side
+    /// or leaves the tutorial (Next / Finish and Back do that).
+    private var stepSwipe: some Gesture {
+        DragGesture(minimumDistance: 30).onEnded { value in
+            let dx = value.translation.width, dy = value.translation.height
+            guard !sideDone, !model.photoMode, abs(dx) > 60, abs(dx) > abs(dy) * 1.5 else { return }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                if dx < 0 {
+                    if !model.isSideLastStep { _ = model.advance() }
+                } else if model.stepIndex > 0 {
+                    _ = model.retreat()
+                }
+            }
+        }
     }
 
     private func back() {
@@ -688,12 +707,13 @@ private struct TutorialScreen: View {
             if advisor.message != nil {
                 CameraGuidanceCaption(advisor: advisor, lightOn: light.isOn, stepLabel: nil, stepText: nil)
             } else {
+                // Larger than before (15 medium), so the step reads at a glance while applying.
                 Text(lessons[index].instruction)
-                    .font(.system(size: 15, weight: .medium))
+                    .font(.system(size: 19, weight: .semibold))
                     .multilineTextAlignment(.center)
                     .foregroundStyle(lit ? Color.black : AppColors.snow)
-                    .shadow(color: .black.opacity(lit ? 0 : 0.45), radius: 3, y: 1)
-                    .frame(maxWidth: 260)
+                    .shadow(color: .black.opacity(lit ? 0 : 0.6), radius: 4, y: 1)
+                    .frame(maxWidth: 320)
                     .fixedSize(horizontal: false, vertical: true)
                     .id(index)
                     .transition(.opacity)

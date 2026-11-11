@@ -1,3 +1,17 @@
+## Tutorial swipe, bigger step text, compare without the guide; feedback buttons and eye-area slider — 2026-11-11
+
+E2E-Flow was fast-forwarded to staging first (`3f6957d`). Tutorial: a horizontal swipe on the camera moves to the next step
+(left) or the previous one (right), within the side being done (`GuidedTutorialView.stepSwipe`; a swipe never finishes a
+side or leaves the tutorial). The step instruction over the camera is 19 pt semibold (was 15 medium). The compare button in
+the per-side tutorial now takes the guide off: the side being done shows the plain camera and the other side the desired
+look (`sideLayout`: `.plainTryOn` / `.tryOnPlain`, were `.guideTryOn` / `.tryOnGuide`), so the eye and brow are not covered
+while applying. Feedback: the retake (↻, back to the tutorial) and Done buttons are back at the bottom (the merge had left
+`bottomBar` unused); order as design 18: slider, "What we think", ring, the two cards, then the fix-first card. Brows and
+eyeliner compare only the eye area in the slider (`FeedbackView.focused`, the brief's `LookBriefView.crop`); blush keeps
+the whole face. 380 Simulator tests pass; swipe, compare and the crop need a device. Zoom: with the camera zoomed, the tutorial's Back / Next did nothing: `CameraZoomModifier` scales the camera with
+`scaleEffect`, and `.clipped()` only cuts the drawing, so the enlarged camera view kept catching taps over the bottom bar
+(and Try On's controls). The scaled content now has `allowsHitTesting(false)`; the pinch stays on the clipped frame.
+
 ## 2026-11-10 — Feedback: no marks on the eyes -Nimah
 
 - Blush is searched below the eyes only; "No blush found" shows just the try-on area on the photo.
