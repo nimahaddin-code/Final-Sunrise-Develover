@@ -62,6 +62,33 @@ struct ScreenLightGlow: View {
     }
 }
 
+/// The screen light as a soft white frame drawn over the camera (sibling of the camera, so a zoomed picture never zooms
+/// it away), fading into the picture. Wider than the old inset of the camera picture (26 pt plus 26 pt blur), so more of
+/// the screen is white and lights the face.
+struct ScreenLightFrame: View {
+    @ObservedObject var light: ScreenLight
+    static let defaultWidth: CGFloat = 64
+    var width: CGFloat = defaultWidth
+
+    var body: some View {
+        Color.white
+            .mask {
+                ZStack {
+                    Rectangle()
+                    RoundedRectangle(cornerRadius: width, style: .continuous)
+                        .padding(width)
+                        .blur(radius: width * 0.45)
+                        .blendMode(.destinationOut)
+                }
+                .compositingGroup()
+            }
+            .opacity(light.isOn ? 1 : 0)
+            .animation(.easeInOut(duration: 0.25), value: light.isOn)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+}
+
 /// The light button. `pulse` changes each time the "too dark" message appears, to show her where it is.
 struct ScreenLightButton: View {
     @ObservedObject var light: ScreenLight

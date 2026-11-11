@@ -105,14 +105,12 @@ struct TryOnLiveCard: View {
                 BrowTrackingOverlayView(feed: camera.browTracking)
             }
         }
-        // The screen light: the picture's edge melts into the white screen, which is what lights the face.
-        .mask {
-            RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous)
-                .padding(light.isOn ? 26 : 0)
-                .blur(radius: light.isOn ? 26 : 0)
-        }
+        .mask { RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous) }
         // Pinch or tap the chip to zoom the picture and its overlays together; the light and captions stay put.
         .cameraZoom()
+        .environment(\.screenLightInset, light.isOn ? ScreenLightFrame.defaultWidth * 0.6 : 0)
+        // The screen light: a white frame over the camera, outside the zoom, so zooming in keeps it.
+        .overlay { ScreenLightFrame(light: light).clipShape(RoundedRectangle(cornerRadius: AppSpacing.cornerRadius, style: .continuous)) }
         .overlay(alignment: .topLeading) {
             if showsLightButton { ScreenLightButton(light: light, pulse: advisor.darkPulse).padding(AppSpacing.small) }
         }
@@ -181,6 +179,8 @@ struct CameraZoomModifier: ViewModifier {
     static let range: ClosedRange<CGFloat> = 1...3
 
     var enabled = true
+    /// How far the screen light's frame reaches in from the edge while it is on: the chip moves in past it.
+    @Environment(\.screenLightInset) private var lightInset
     @State private var zoom: CGFloat = 1
     @GestureState private var pinch: CGFloat = 1
 
@@ -212,7 +212,8 @@ struct CameraZoomModifier: ViewModifier {
                         .glassEffect(.regular.tint(AppColors.buttonInk).interactive(), in: .capsule)
                 }
                 .buttonStyle(.plain)
-                .padding(.trailing, AppSpacing.small)
+                .padding(.trailing, AppSpacing.small + lightInset)
+                .animation(.easeInOut(duration: 0.25), value: lightInset)
                 .accessibilityLabel("Zoom")
                 .accessibilityValue(String(format: "%.1f times", current)) }
             }
@@ -224,11 +225,17 @@ extension View {
 }
 
 private struct CameraZoomKey: EnvironmentKey { static let defaultValue: CGFloat = 1 }
+private struct ScreenLightInsetKey: EnvironmentKey { static let defaultValue: CGFloat = 0 }
 
 extension EnvironmentValues {
     /// The current camera zoom, so thin overlay strokes can stay the same on-screen width while the picture scales.
     var cameraZoom: CGFloat {
         get { self[CameraZoomKey.self] }
         set { self[CameraZoomKey.self] = newValue }
+    }
+    /// Set by a screen while its light frame (`ScreenLightFrame`) is on, so controls near the edge stay clear of it.
+    var screenLightInset: CGFloat {
+        get { self[ScreenLightInsetKey.self] }
+        set { self[ScreenLightInsetKey.self] = newValue }
     }
 }
