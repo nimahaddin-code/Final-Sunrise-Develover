@@ -428,8 +428,8 @@ private struct TutorialScreen: View {
             if model.brow.availability == .supported { await camera.requestPermission() }
         }
         .sheet(isPresented: $showsSteps) {
-            TutorialStepsSheet(steps: stepTexts, current: currentStepInSheet, expanded: stepsDetent == .large) { showsSteps = false }
-                .presentationDetents([TutorialStepsSheet.compact, .large], selection: $stepsDetent)
+            TutorialStepsSheet(steps: stepTexts, current: currentStepInSheet) { showsSteps = false }
+                .presentationDetents([TutorialStepsSheet.compact], selection: $stepsDetent)
                 .presentationBackgroundInteraction(.enabled(upThrough: TutorialStepsSheet.compact))
                 .presentationContentInteraction(.resizes)
                 .presentationDragIndicator(.visible)

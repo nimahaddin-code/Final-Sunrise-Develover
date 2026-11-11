@@ -47,14 +47,17 @@ enum LinerLook: String, CaseIterable, Identifiable, Sendable {
     case classic, cat, puppy, foxy, arabian, natural
 
     var id: String { rawValue }
+    /// The looks Try On offers: with a wing or without one. The other presets stay for the planner and the tests.
+    static let offered: [LinerLook] = [.classic, .natural]
+
     var title: LocalizedStringResource {
         switch self {
-        case .classic: "Classic"
+        case .classic: "Winged"
         case .cat: "Cat"
         case .puppy: "Puppy"
         case .foxy: "Foxy"
         case .arabian: "Arabian"
-        case .natural: "Natural"
+        case .natural: "No-wing"
         }
     }
 }

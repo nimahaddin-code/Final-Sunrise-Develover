@@ -1,3 +1,12 @@
+## Eyeliner: winged or no wing; steps sheet pages sideways — 2026-11-11
+
+Try On's eyeliner picker offers two looks only (`LinerLook.offered`): "Winged" (`.classic`, the fitted line with its wing)
+and "No-wing" (`.natural`); their titles changed from "Classic" / "Natural", so the pill reads "Winged eyeliner" /
+"No-wing eyeliner". The other presets (cat, puppy, foxy, arabian) stay for the planner and tests. `TutorialStepsSheet`
+shows one step per page and the person swipes sideways between them (page dots under the card); it opens on the step being
+done and follows it. The vertical list, "Swipe for more" and the large detent are gone (one 430 pt height). New strings
+not in the catalog yet. 380 Simulator tests pass; not checked on a device.
+
 ## Screen light stays while zoomed, brighter — 2026-11-11
 
 The screen light used to be an inset of the camera picture itself (26 pt plus a 26 pt blur, white page behind), so zooming

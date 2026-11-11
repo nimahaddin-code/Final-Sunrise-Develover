@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Horizontal list of the eyeliner looks as small pictures of an eye wearing each one, like the brow pictures.
+/// Horizontal list of the eyeliner looks (`LinerLook.offered`: winged or no wing) as small pictures of an eye wearing each
+/// one, like the brow pictures.
 /// The first tile (no sign) is the liner off. The pictures are drawn, not photographs: they show the shape of each look.
 struct LinerLookPicker: View {
     let selected: LinerLook?
@@ -8,12 +9,12 @@ struct LinerLookPicker: View {
 
     var body: some View {
         GlassPickerRow(selectedID: selected.map { "\($0.id)" } ?? "none", onCenter: { id in
-            onSelect(LinerLook.allCases.first { $0.id == id })
+            onSelect(LinerLook.offered.first { $0.id == id })
         }) {
             tile(isSelected: selected == nil, isNone: true, label: Text("No eyeliner"), id: "none") { onSelect(nil) } content: {
                 EmptyView()
             }
-            ForEach(LinerLook.allCases) { look in
+            ForEach(LinerLook.offered) { look in
                 tile(isSelected: selected == look, isNone: false, label: Text(look.title), id: "\(look.id)") { onSelect(look) } content: {
                     LinerLookThumbnail(look: look, ink: StylePalette.brow).equatable().frame(width: 30, height: 20)
                 }
