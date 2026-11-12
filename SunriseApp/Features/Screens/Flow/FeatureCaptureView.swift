@@ -142,6 +142,7 @@ struct FeatureCaptureView: View {
         Task { @MainActor in
             defer { shooting = false }
             var pixels: ScreenPixels?
+            var shot: ScreenShot?
             var report = CaptureDiagnostics()
             // The bare camera of this moment (SceneKit draws nothing for the capture): the Before's fallback when the try-on photo is missing.
             // `ARSCNView.snapshot()` comes at scale 1 (one point per pixel); the eyeliner is drawn in view points, so
@@ -155,8 +156,9 @@ struct FeatureCaptureView: View {
             report.framesBefore = makeup?.beauty?.presentedFrames ?? 0
             if let makeup, let engine = makeup.beauty, report.layerShown {
                 let started = Date()
-                pixels = await engine.readScreen()
-                if pixels == nil { report.readTries += 1; pixels = await engine.readScreen() }
+                shot = await engine.readScreen()
+                if shot == nil { report.readTries += 1; shot = await engine.readScreen() }
+                pixels = shot?.pixels
                 report.readTries += 1
                 report.readMilliseconds = Int(Date().timeIntervalSince(started) * 1000)
                 report.read = pixels != nil ? .read : .timedOut
@@ -168,7 +170,19 @@ struct FeatureCaptureView: View {
                 pixels = ScreenPixels(image: image)
             }
             let outline = handoff.tool == .blush ? home.camera.blushGuide.snapshot : nil
-            scanned = FaceScan.measure(view: view, outline: outline, rendered: pixels)
+            // One moment for everything: the face, its colours, the eyes and the head pose are measured on the camera frame
+            // the photo was drawn from, so every point sits on the photo's pixels even if the head moved during the shutter.
+            // Without the engine's picture (layer hidden, timed out) the live frame is used, as before.
+            if let shot, let face = shot.face {
+                scanned = FaceScan.measure(frame: shot.frame, face: face, viewport: view.bounds.size, outline: outline, rendered: pixels)
+                if let reading = CapturePoseCheck.read(shot.frame, viewSize: view.bounds.size) {
+                    shotPose = reading
+                    shotEyes = reading.eyes
+                }
+                report.sameFrame = true
+            } else {
+                scanned = FaceScan.measure(view: view, outline: outline, rendered: pixels)
+            }
             report.outline = outline != nil
             report.face = scanned != nil
             diagnostics = report

@@ -1,4 +1,5 @@
 import SwiftUI
+import simd
 
 /// After the result photo: a loading state while `provider` compares the photos, then the feedback (design "18 · Your
 /// feedback"): the look's name, a headline from the score, Before / After with a slider, the score ring with what to fix
@@ -118,7 +119,10 @@ struct FeedbackView: View {
                         }
                     }
                     if feedback.score != nil { FeedbackFixes(feedback: feedback, photo: store.result) }
-                    if developerTools { diagnostics }
+                    if developerTools {
+                        diagnostics
+                        FeedbackPointCheck(store: store, feedback: feedback)
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, AppSpacing.large)
@@ -247,6 +251,72 @@ struct FeedbackView: View {
 }
 
 /// Before (the try-on photo) and After (the result) in one frame, split by a line the person drags.
+/// -Nimah: developer check that the feedback reads the right spots. Each photo with the points measured on it: a sparse
+/// grid of face-mesh points (white), the eye centres (cyan) and, pink, what the feedback takes as the target: on Expected
+/// the points the virtual makeup changed, on Result the target of every mark. Pink should sit exactly on the try-on makeup;
+/// if it is shifted, the points do not match the photo's pixels.
+struct FeedbackPointCheck: View {
+    @ObservedObject var store: MakeupFlowStore
+    let feedback: MakeupFeedback
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(verbatim: "Developer: points on the photos").font(.caption.weight(.semibold))
+            HStack(alignment: .top, spacing: 8) {
+                panel("Expected", photo: store.desired, scan: store.desiredScan, target: store.desiredScan.map(Self.changed) ?? [])
+                panel("Result", photo: store.result, scan: store.resultScan, target: feedback.marks.flatMap(\.target))
+            }
+            Text(verbatim: "white: mesh · cyan: eyes · pink: target. Pink should sit on the makeup.")
+                .font(.caption2.monospaced())
+        }
+        .foregroundStyle(AppColors.onboardingBody)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Points (0...1 on the photo) whose colour the virtual makeup changed by more than 8 ΔE.
+    static func changed(_ scan: FaceScan) -> [CGPoint] {
+        scan.samples.indices.filter { i in
+            let s = scan.samples[i]
+            guard s.visible, let shown = s.rendered else { return false }
+            return simd_distance(shown, s.lab) > 8
+        }.map(scan.photoPoint)
+    }
+
+    @ViewBuilder private func panel(_ title: String, photo: UIImage?, scan: FaceScan?, target: [CGPoint]) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(verbatim: "\(title): \(scan == nil ? "no scan" : "\(target.count) target")").font(.caption2.monospaced())
+            if let photo {
+                Image(uiImage: photo)
+                    .resizable()
+                    .aspectRatio(photo.size, contentMode: .fit)
+                    .overlay {
+                        Canvas { context, size in
+                            func dot(_ p: CGPoint, _ r: CGFloat, _ color: Color) {
+                                let c = CGPoint(x: p.x * size.width, y: p.y * size.height)
+                                context.fill(Path(ellipseIn: CGRect(x: c.x - r, y: c.y - r, width: 2 * r, height: 2 * r)), with: .color(color))
+                            }
+                            if let scan {
+                                for i in stride(from: 0, to: scan.samples.count, by: 25) where scan.samples[i].visible {
+                                    dot(scan.photoPoint(i), 0.6, .white.opacity(0.7))
+                                }
+                            }
+                            for p in target { dot(p, 0.8, .pink.opacity(0.8)) }
+                            if let scan {
+                                for eye in [scan.leftEye, scan.rightEye].compactMap({ $0 }) {
+                                    dot(CGPoint(x: eye.x / max(scan.viewport.width, 1), y: eye.y / max(scan.viewport.height, 1)), 2.5, .cyan)
+                                }
+                            }
+                        }
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            } else {
+                Text(verbatim: "no photo").font(.caption2.monospaced())
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
 private struct BeforeAfterSlider: View {
     let before: UIImage?
     let after: UIImage?

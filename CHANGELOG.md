@@ -1,3 +1,8 @@
+## 2026-11-12 — Feedback measured on the photo's own frame -Nimah
+
+- The face mesh, colours, eyes and pose are read from the camera frame the photo was drawn from, not a later live frame.
+- Developer tools: points on the Expected / Result photos (mesh, eyes, target) to check they sit on the makeup.
+
 ## Screen light stays while zoomed, brighter — 2026-11-11
 
 The screen light used to be an inset of the camera picture itself (26 pt plus a 26 pt blur, white page behind), so zooming
