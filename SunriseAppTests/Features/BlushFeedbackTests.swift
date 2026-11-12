@@ -178,6 +178,17 @@ final class BlushFeedbackTests: XCTestCase {
         try render(feedback, after: [targets[0] + SIMD2(0, -9), targets[1]], name: "blush")
     }
 
+    /// The developer point check marks, on Expected, only the points the virtual blush changed: they sit on its circles.
+    func testPointCheckMarksTheVirtualBlush() {
+        let points = FeedbackPointCheck.changed(scan(rendered: true))
+        XCTAssertFalse(points.isEmpty)
+        let centres = targets.map { screen($0) }
+        for p in points {
+            let photo = CGPoint(x: p.x * 400, y: p.y * 800)
+            XCTAssertTrue(centres.contains { hypot($0.x - photo.x, $0.y - photo.y) <= CGFloat(outerRadius) * 2 * 1.2 }, "\(photo)")
+        }
+    }
+
     /// Draws the fixes with a plain synthetic photo for a look at the layout (saved next to the test logs; not compared).
     @MainActor private func render(_ feedback: MakeupFeedback, after centres: [SIMD2<Float>], name: String) throws {
         let photo = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 800)).image { context in

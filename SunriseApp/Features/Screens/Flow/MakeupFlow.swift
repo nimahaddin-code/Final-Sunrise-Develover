@@ -101,11 +101,13 @@ struct CaptureDiagnostics: Hashable, Sendable {
     var readTries = 0, readMilliseconds = 0
     var framesBefore = 0
     var outline = false, face = false
+    /// The face was measured on the frame the photo was drawn from (else on the live frame after it).
+    var sameFrame = false
 
     var line: String {
         "engine \(engine ? "yes" : "no") · layer \(layerShown ? "shown" : "hidden") · drawing \(engineOn ? "on" : "off") · "
             + "screen \(read.rawValue)\(readTries > 0 ? " (\(readTries)x, \(readMilliseconds) ms)" : "") · frames \(framesBefore) · "
-            + "target \(outline ? "yes" : "no") · face \(face ? "yes" : "no")"
+            + "target \(outline ? "yes" : "no") · face \(face ? "yes" : "no") · frame \(sameFrame ? "same" : "live")"
     }
 }
 

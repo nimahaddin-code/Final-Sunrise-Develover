@@ -408,7 +408,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         #if !targetEnvironment(simulator)
         drawable.addPresentedHandler { [weak self] _ in self?.queue.async { [weak self] in self?.presentedFrames += 1 } }
         #endif
-        copyForReaders(drawable.texture,command)
+        copyForReaders(drawable.texture,command,frame:frame)
         command.present(drawable)
         let ts=frame.timestamp
         if blush.tracked && blush.opacity>0.9 {pigmentFrames += 1;lastError=nil}
@@ -563,17 +563,24 @@ final class BeautyBlushEngine:@unchecked Sendable {
 
 // -Nimah: the shutter's copy of the picture on screen (camera + virtual makeup). `ARSCNView.snapshot()` only has the
 // SceneKit camera under this layer, so the desired-look photo lost the blush and brow.
+/// What the engine presented, with the camera frame it was drawn from: the feedback measures the face on that same frame,
+/// so its points sit on the photo's pixels even when the head moved during the shutter.
+struct ScreenShot:@unchecked Sendable {
+    let pixels:ScreenPixels
+    let frame:ARFrame
+    var face:ARFaceAnchor? {frame.anchors.lazy.compactMap {$0 as? ARFaceAnchor}.first(where:\.isTracked)}
+}
 final class ScreenReader:@unchecked Sendable {
-    private let lock=NSLock();private var done=false;private let deliver:@Sendable (ScreenPixels?)->Void
-    init(_ deliver:@escaping @Sendable (ScreenPixels?)->Void) {self.deliver=deliver}
-    func finish(_ pixels:ScreenPixels?) {
+    private let lock=NSLock();private var done=false;private let deliver:@Sendable (ScreenShot?)->Void
+    init(_ deliver:@escaping @Sendable (ScreenShot?)->Void) {self.deliver=deliver}
+    func finish(_ shot:ScreenShot?) {
         lock.lock();let first = !done;done=true;lock.unlock()
-        if first {deliver(pixels)}
+        if first {deliver(shot)}
     }
 }
 extension BeautyBlushEngine {
-    /// The next picture this engine presents, or nil when it draws nothing within `timeout` (layer off, no face yet).
-    func readScreen(timeout:Double=1.5) async->ScreenPixels? {
+    /// The next picture this engine presents and its camera frame, or nil when it draws nothing within `timeout`.
+    func readScreen(timeout:Double=1.5) async->ScreenShot? {
         await withCheckedContinuation { continuation in
             let reader=ScreenReader {continuation.resume(returning:$0)}
             lock.lock();screenReaders.append(reader);lock.unlock()
@@ -581,7 +588,8 @@ extension BeautyBlushEngine {
         }
     }
     /// Copies the drawable into CPU memory for waiting shutters, after the frame's drawing and before it is presented.
-    func copyForReaders(_ texture:MTLTexture,_ command:MTLCommandBuffer) {
+    /// `frame` is the camera frame this drawable was drawn from (held only while a shutter waits).
+    func copyForReaders(_ texture:MTLTexture,_ command:MTLCommandBuffer,frame:ARFrame) {
         lock.lock();let readers=screenReaders;screenReaders=[];lock.unlock()
         guard !readers.isEmpty else{return}
         let width=texture.width,height=texture.height,row=width*4
@@ -593,8 +601,8 @@ extension BeautyBlushEngine {
         blit.endEncoding()
         command.addCompletedHandler { _ in
             let bytes=Array(UnsafeBufferPointer(start:buffer.contents().assumingMemoryBound(to:UInt8.self),count:row*height))
-            let pixels=ScreenPixels(width:width,height:height,bytesPerRow:row,bytes:bytes)
-            readers.forEach {$0.finish(pixels)}
+            let shot=ScreenShot(pixels:ScreenPixels(width:width,height:height,bytesPerRow:row,bytes:bytes),frame:frame)
+            readers.forEach {$0.finish(shot)}
         }
     }
 }

@@ -1,3 +1,19 @@
+## Feedback measured on the photo's own frame; developer point check — -Nimah (2026-11-12)
+
+The photos are no longer matched to a scan pose, so the feedback relies on the ARKit mesh being read on the picture it
+compares. At the shutter three moments were mixed: the photo and the virtual-makeup colours came from the frame the engine
+drew, the face mesh and skin colours from `session.currentFrame` after the read-back finished (a frame or more later), and
+the eyes / pose for the slider from the pose tracker's last reading. A head or phone that moved in between put the points
+beside the makeup. Now `copyForReaders` hands the shutter the `ARFrame` it drew (`ScreenShot`: pixels + frame) and
+`FeatureCaptureView.shoot` measures `FaceScan`, the eyes and `CapturePoseReading` on that frame; without the engine's
+picture it falls back to the live frame as before. The developer read-out says `frame same` or `frame live`. Still not on
+the same frame: the eyeliner target on Expected (drawn by SwiftUI from the live tracking).
+
+Developer tools on the feedback screen add `FeedbackPointCheck`: both photos with a sparse mesh grid (white), eye centres
+(cyan) and the target (pink: on Expected the points the virtual makeup changed by more than 8 ΔE, on Result the marks'
+targets). Pink should sit on the try-on makeup. Test `testPointCheckMarksTheVirtualBlush`; 382 Simulator tests pass. Not
+checked on a device.
+
 ## Screen light stays while zoomed, brighter — 2026-11-11
 
 The screen light used to be an inset of the camera picture itself (26 pt plus a 26 pt blur, white page behind), so zooming
