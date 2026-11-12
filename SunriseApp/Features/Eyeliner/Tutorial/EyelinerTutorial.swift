@@ -5,6 +5,8 @@ import SwiftUI
 extension GuidedTutorialModel {
     /// Only the Arabian look has a lower line to mark and fill.
     var linerShowsLower: Bool { handoff.linerLook == .arabian }
+    /// Winged looks: the tutorial teaches only the wing (`LinerStepGeometry(wing:)`).
+    var linerTeachesWing: Bool { handoff.linerLook.hasWing }
 
     /// Three steps for every look (`LinerTutorialStep`); where the dots sit is what changes with the look.
     static let linerLessons = [

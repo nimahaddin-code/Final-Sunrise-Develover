@@ -12,21 +12,26 @@ final class MakeupPreferenceTests:XCTestCase {
         let model=GuidedTutorialModel(checker:MockFaceTrackingChecker(),assessment:.standardLook,plan:MakeupPlan(shape:.oval),
             handoff:.init(tool:.eyebrow,shades:[:],intensities:[:],browOverlay:.standard,hideNaturalBrow:true),perSide:true)
         let steps=model.lessons.count
-        // The guide on the screen's left half (the user's right brow), nothing drawn on the other brow.
-        XCTAssertEqual(model.compare,.guidePlain)
-        XCTAssertNil(model.liveConfiguration.browOverlay)
-        XCTAssertFalse(model.liveConfiguration.hideNaturalBrow)
+        // First side: the guide on the screen's left half (the user's right brow), the desired look ("filter") on the other.
+        XCTAssertEqual(model.compare,.guideTryOn)
+        XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
+        XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectLeft)
+        model.cycleCompare()   // guide off, filter still on
+        XCTAssertEqual(model.compare,.plainTryOn)
+        model.cycleCompare()   // guide back on
+        XCTAssertEqual(model.compare,.guideTryOn)
         for _ in 1..<steps { XCTAssertFalse(model.advance()) }
         XCTAssertFalse(model.isFinalStep)
         XCTAssertFalse(model.advance())   // first side done: the other side, from step 1
         XCTAssertEqual(model.side,.trailing)
         XCTAssertEqual(model.stepIndex,0)
+        // Second side: no filter (the first side already has the real makeup), guide on, then off.
         XCTAssertEqual(model.compare,.plainGuide)
-        model.cycleCompare()   // the desired look on the finished side, and the guide off on this one
-        XCTAssertEqual(model.compare,.tryOnPlain)
+        XCTAssertNil(model.liveConfiguration.browOverlay)
+        model.cycleCompare()
+        XCTAssertEqual(model.compare,.plain)
         XCTAssertFalse(model.compare.showsGuide)
-        XCTAssertEqual(model.liveConfiguration.browOverlay,.standard)
-        XCTAssertEqual(model.liveConfiguration.browOnlySide,.subjectRight)
+        XCTAssertNil(model.liveConfiguration.browOverlay)
         XCTAssertFalse(model.retreat())   // back to the first side's last step
         XCTAssertEqual(model.side,.leading)
         XCTAssertEqual(model.stepIndex,steps-1)

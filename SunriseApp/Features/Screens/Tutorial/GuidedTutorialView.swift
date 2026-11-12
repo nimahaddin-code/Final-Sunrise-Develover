@@ -118,8 +118,8 @@ enum TutorialTab: CaseIterable, Identifiable {
     let perSide: Bool
     /// The half of the screen being done. The front camera is mirrored, so `.leading` is the user's right side.
     @Published private(set) var side = HorizontalEdge.leading
-    /// Per side: the desired look on the other half instead of the plain camera.
-    @Published private(set) var showsLookBeside = false
+    /// The compare button: the guide taken off the side being done, so the eye stays visible while applying.
+    @Published private(set) var guideHidden = false
     private let linerStyle: LinerStyle?
     private var bag = Set<AnyCancellable>()
     // -Nimah: Hidden tutorial tabs must not start a second detector during navigation.
@@ -144,7 +144,7 @@ enum TutorialTab: CaseIterable, Identifiable {
             BrowSpriteStore.shared.prepare(overlay)
             if overlay.is3D { BrowHairStore.shared.prepare() }
         }
-        if perSide { compare = Self.sideLayout(side: .leading, lookBeside: false) }
+        if perSide { compare = Self.sideLayout(side: .leading, guideHidden: false) }
         // The brow model owns the step index for brows/blush; forward its changes so the screen redraws.
         brow.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }.store(in: &bag)
     }
@@ -168,18 +168,19 @@ enum TutorialTab: CaseIterable, Identifiable {
 
     func cycleCompare() {
         guard perSide else { compare = compare.next; return }
-        showsLookBeside.toggle()
-        compare = Self.sideLayout(side: side, lookBeside: showsLookBeside)
+        guideHidden.toggle()
+        compare = Self.sideLayout(side: side, guideHidden: guideHidden)
     }
 
-    /// The guide on the side being done, the plain camera on the other. Compare on: the guide comes off, so the side being
-    /// done is the plain camera (the eye and brow stay visible while applying), and the desired look is on the other side.
-    private static func sideLayout(side: HorizontalEdge, lookBeside: Bool) -> TutorialCompare {
-        switch (side, lookBeside) {
-        case (.leading, false): .guidePlain
+    /// What each half shows; the compare button switches the guide on the side being done on and off.
+    /// First side: the desired look ("filter") on the other half, guide on / off.
+    /// Second side: no filter (the first side already has the real makeup to compare with), guide on / off.
+    private static func sideLayout(side: HorizontalEdge, guideHidden: Bool) -> TutorialCompare {
+        switch (side, guideHidden) {
+        case (.leading, false): .guideTryOn
         case (.leading, true): .plainTryOn
         case (.trailing, false): .plainGuide
-        case (.trailing, true): .tryOnPlain
+        case (.trailing, true): .plain
         }
     }
 
@@ -202,7 +203,9 @@ enum TutorialTab: CaseIterable, Identifiable {
 
     private func moveTo(side new: HorizontalEdge, step: Int) {
         side = new
-        compare = Self.sideLayout(side: new, lookBeside: showsLookBeside)
+        // A new side starts with its guide on.
+        guideHidden = false
+        compare = Self.sideLayout(side: new, guideHidden: false)
         switch tab { case .eyeliner: linerStep = step; case .brows: browStep = step; case .blush: blushStep = step }
     }
 
@@ -648,7 +651,7 @@ private struct TutorialScreen: View {
                         if let side = model.compare.side(of: .guide) {
                             LinerStepGuide(model: model.liner, step: LinerTutorialStep(rawValue: index) ?? .markDots,
                                            paused: advisor.pausesAnimation, dimmed: advisor.isDimmed, side: side,
-                                           showsLower: model.linerShowsLower)
+                                           showsLower: model.linerShowsLower, teachesWing: model.linerTeachesWing)
                                 .id(index)
                         }
                     }

@@ -14,7 +14,7 @@ struct TutorialStepsSheet: View {
     /// The sheet's height: one step's card with its picture.
     static let compact = PresentationDetent.height(430)
 
-    let steps: [Stepl]
+    let steps: [Step]
     /// The step being done; `steps.count` when the side is finished (every step reads "Done").
     let current: Int
     let onClose: () -> Void

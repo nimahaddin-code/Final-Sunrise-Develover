@@ -1,11 +1,28 @@
-## Eyeliner: winged or no wing; steps sheet pages sideways — 2026-11-11
+## Eyeliner tutorial: wing looks teach the wing, others the lash curve — 2026-11-12
 
-Try On's eyeliner picker offers two looks only (`LinerLook.offered`): "Winged" (`.classic`, the fitted line with its wing)
-and "No-wing" (`.natural`); their titles changed from "Classic" / "Natural", so the pill reads "Winged eyeliner" /
-"No-wing eyeliner". The other presets (cat, puppy, foxy, arabian) stay for the planner and tests. `TutorialStepsSheet`
-shows one step per page and the person swipes sideways between them (page dots under the card); it opens on the step being
-done and follows it. The vertical list, "Swipe for more" and the large detent are gone (one 430 pt height). New strings
-not in the catalog yet. 380 Simulator tests pass; not checked on a device.
+The team grouped the six eyeliner looks (`LinerLook.hasWing`): winged = Classic, Cat, Puppy, Foxy; no wing = Arabian,
+Natural (Arabian's short flick under the lower lashes counts as no wing). Try On still lists all six. The tutorial
+(`LinerStepGuide(teachesWing:)`, `LinerStepGeometry(wing:)`, from `GuidedTutorialModel.linerTeachesWing`): winged looks
+show only the wing's triangle at the outer corner, three dots (outer corner, the wing's end, a point on the lid about 70%
+along the lash line), outlined and filled as a triangle; no-wing looks show four dots along the lash curve and the line
+without the wing (`upperLiner`; Arabian keeps its lower line). The step copy still says "Mark 4 points" for both. Also
+fixes a typo in the pushed `c635a0d` (`[Stepl]` in `TutorialStepsSheet`, which did not compile) and restores the six-look
+eyeliner picker after the two-look trial. 383 Simulator tests pass (new: grouping, triangle, lash-curve dots); the guide on
+a face needs a device. Device round 1: the wing guide was a plain triangle; its outline now follows the eye (outer corner straight to the tip,
+a soft curve dipping toward the eye back to the lid point, then along the lash line to the corner), dots unchanged. Try On
+now offers four wings after the team's reference shapes (`LinerLook.offered`, in this order), told apart mostly by their
+angle: Cat (unchanged: 0.36 wing lifting 20°), Classic (unchanged: the fitted line with its wing at 6-10°), Kitten (new: a
+short 0.16 wing at 6°) and Puppy (reshaped: a long thin 0.42 wing dipping 6°, no lower line; was -18° with a lower line).
+Foxy, Arabian and Natural stay in code but are not offered. New string "Kitten" not in the catalog. Compare button, per side (`GuidedTutorialModel.sideLayout`, `guideHidden`): first side = guide on + the desired look
+("filter") on the other half, then guide off + filter on; second side = guide on with no filter (the first side already has
+the real makeup), then guide off. Each side starts with its guide on.
+
+## Tutorial steps sheet pages sideways — 2026-11-11
+
+`TutorialStepsSheet` shows one step per page and the person swipes sideways between them (page dots under the card); it
+opens on the step being done and follows it. The vertical list, "Swipe for more" and the large detent are gone (one 430 pt
+height). (A two-look eyeliner picker, "Winged" / "No-wing", was tried in the same commit and reverted: Try On lists all six
+looks again while the team sorts them.) 380 Simulator tests pass; not checked on a device.
 
 ## Screen light stays while zoomed, brighter — 2026-11-11
 
