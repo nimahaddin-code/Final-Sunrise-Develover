@@ -81,6 +81,22 @@ struct FeatureHomeView: View {
                 ForEach(Self.order) { tool in
                     Image(Self.imageName(tool))
                         .resizable().scaledToFit()
+                        .overlay(alignment: .topLeading) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(name(tool))
+                                    .textCase(.uppercase)
+                                    .font(.system(size: 30, weight: .black).width(.expanded))
+                                    .foregroundStyle(Self.titleColor(tool))
+                                    .minimumScaleFactor(0.7)
+                                    .lineLimit(1)
+                                Text(tagline(tool))
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(Self.titleColor(tool).opacity(0.8))
+                                    .lineLimit(1)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 24)
+                        }
                         .overlay(alignment: .bottomLeading) {
                             HStack(spacing: 6) {
                                 chip(Text("^[\(steps(tool)) step](inflect: true)"))
@@ -149,6 +165,24 @@ struct FeatureHomeView: View {
         case .blush: "Blush"
         case .eyebrow: "Brows"
         case .lips: "Lips"
+        }
+    }
+
+    private func tagline(_ tool: TryOnTool) -> LocalizedStringKey {
+        switch tool {
+        case .eyeliner: "Wings & lines"
+        case .blush: "Soft flush, fresh glow"
+        case .eyebrow: "Shape & fill"
+        case .lips: "Colour & shape"
+        }
+    }
+
+    private static func titleColor(_ tool: TryOnTool) -> Color {
+        switch tool {
+        case .eyeliner: Color(red: 0xF2 / 255, green: 0xA6 / 255, blue: 0xC8 / 255)
+        case .blush: Color(red: 0xFC / 255, green: 0xE4 / 255, blue: 0xF4 / 255)
+        case .eyebrow: Color(red: 0x5A / 255, green: 0x2E / 255, blue: 0x12 / 255)
+        case .lips: Color(red: 0xFF / 255, green: 0xE3 / 255, blue: 0xE0 / 255)
         }
     }
 
