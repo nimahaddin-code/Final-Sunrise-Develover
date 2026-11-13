@@ -1,3 +1,5 @@
+import Foundation
+
 enum AppTab: Hashable { case tryOn, discover, myLooks }
 
 /// The makeup flow, one tool at a time: home -> `tryOn` -> `capture(.desired)` -> `lookBrief` -> `recommendedTutorial`
@@ -14,6 +16,8 @@ enum AppRoute: Hashable {
     case recommendedTutorial(TutorialHandoff, attempt: Int = 0)
     /// Loading while the photos are compared, then the feedback.
     case feedback(TutorialHandoff)
+    /// -Nimah: a saved look from My Looks, read only, with Try again.
+    case myLook(UUID)
 }
 
 /// Which photo the capture screen takes.

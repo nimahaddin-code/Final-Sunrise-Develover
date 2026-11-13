@@ -147,6 +147,7 @@ final class MyLookStoreTests: XCTestCase {
         XCTAssertEqual(draft.tool, "blush")
         XCTAssertEqual(draft.lookId, BlushPlacementStyle.allCases.first?.rawValue)
         XCTAssertEqual(draft.rules.map(\.id), ["blush.offset.too_high", "blush.praise.shade"])
+        XCTAssertEqual(draft.rules.map(\.kind), [.fix, .praise])
         XCTAssertEqual(draft.rules.first?.band, "slight")
         XCTAssertEqual(draft.score.placement, 0.55)
         XCTAssertEqual(draft.shades.first?.hex, "#FF8000")
@@ -162,5 +163,124 @@ final class MyLookStoreTests: XCTestCase {
         let image = try XCTUnwrap(UIImage(data: data))
         XCTAssertEqual(max(image.size.width * image.scale, image.size.height * image.scale), 1280, accuracy: 1)
         XCTAssertLessThan(data.count, 1_000_000)
+    }
+
+    // MARK: Prompt 2: target, feedback told again, Try again
+
+    private func scan() -> FaceScan {
+        let samples = (0..<50).map { i in
+            FaceScan.Sample(position: SIMD3(Float(i), -Float(i), 1), area: 0.5, lab: Lab(60, 12, 14),
+                            rendered: i.isMultiple(of: 2) ? Lab(50, 30, 10) : nil, screen: CGPoint(x: Double(i) * 2, y: 300.5),
+                            visible: i != 3)
+        }
+        let outline = BlushGuideSnapshot(cheeks: [.init(inner: [CGPoint(x: 1, y: 2)], outer: [CGPoint(x: 3, y: 4)],
+                                                        center: CGPoint(x: 5, y: 6), outward: CGPoint(x: 7, y: 8))])
+        return FaceScan(samples: samples, yaw: 2, pitch: -1, roll: 0.5, blink: 0, smile: 0.1, jawOpen: 0, browRaise: 0,
+                        ipd: 63, eyeY: 30, outline: outline, viewport: CGSize(width: 400, height: 800),
+                        leftEye: CGPoint(x: 150, y: 300), rightEye: CGPoint(x: 250, y: 300))
+    }
+
+    func testTargetIsSavedAndReadBack() async throws {
+        let store = store()
+        var withTarget = draft()
+        withTarget.targetScan = scan()
+        let look = try await store.save(withTarget)
+        let read = await store.target(look)
+        let target = try XCTUnwrap(read)
+        let original = scan()
+        XCTAssertEqual(target.samples.count, original.samples.count)
+        XCTAssertEqual(target.samples[4].position, original.samples[4].position)
+        XCTAssertEqual(target.samples[4].rendered, original.samples[4].rendered)
+        XCTAssertNil(target.samples[5].rendered)
+        XCTAssertFalse(target.samples[3].visible)
+        XCTAssertEqual(target.samples[7].screen, original.samples[7].screen)
+        XCTAssertEqual(target.outline, original.outline)
+        XCTAssertEqual(target.leftEye, original.leftEye)
+        XCTAssertEqual(target.viewport, original.viewport)
+        // A retry with no new target keeps the saved one.
+        let again = try await store.save(draft())
+        let kept = await store.target(again)
+        XCTAssertNotNil(kept)
+    }
+
+    private func savedLook(language: String) -> MyLook {
+        var look = MyLook(tool: "eyeliner", lookId: "cat", title: "Cat eyeliner", createdAt: Date(),
+                          score: MyLook.Score(overall: 0.6, placement: 0.5, shade: 0.7, date: Date()))
+        look.language = language
+        look.rules = [
+            MyLook.Rule(id: "eyeliner.lash_gap", band: "slight", side: "left", kind: .fix, values: ["zone": "outer third"],
+                        cards: ["placement"], top: true),
+            MyLook.Rule(id: "eyeliner.none", band: "large", side: "right", kind: .fix, cards: ["placement", "shade"]),
+        ]
+        look.marks = [MyLook.Mark(side: "left", target: [CGPoint(x: 0.4, y: 0.4)], add: [], remove: [])]
+        return look
+    }
+
+    func testSavedFeedbackIsToldAgain() throws {
+        let database = try XCTUnwrap(FeedbackDatabase.load())
+        let feedback = MyLookFeedback.feedback(for: savedLook(language: "en"), database: database, language: .en)
+        XCTAssertEqual(feedback.score, 0.6)
+        XCTAssertEqual(feedback.items.first?.rule, "eyeliner.lash_gap")
+        XCTAssertEqual(feedback.fixes.first?.side, .left)
+        XCTAssertTrue(try XCTUnwrap(feedback.items.first).say.contains("outer third"))
+        XCTAssertEqual(feedback.categories.map(\.id), ["placement", "shade"])
+        XCTAssertEqual(feedback.categories.first?.items.count, 2, "nothing found is told on both cards")
+        XCTAssertEqual(feedback.categories.last?.items.map(\.rule), ["eyeliner.none"])
+        XCTAssertEqual(feedback.marks.count, 1)
+        for item in feedback.categories.flatMap(\.items) { XCTAssertFalse(item.say.contains("{"), item.say) }
+    }
+
+    func testSavedFeedbackFollowsTheCurrentLanguage() throws {
+        let database = try XCTUnwrap(FeedbackDatabase.load())
+        let feedback = MyLookFeedback.feedback(for: savedLook(language: "en"), database: database, language: .id)
+        let say = try XCTUnwrap(feedback.items.first).say
+        XCTAssertTrue(say.contains("sepertiga luar"), say)
+        XCTAssertFalse(say.contains("outer third"), say)
+    }
+
+    func testDraftKeepsTopCardsAndWords() {
+        var feedback = MakeupFeedback(score: 0.5, headline: "", comments: [])
+        let gap = MakeupFeedback.Item(title: "", say: "", steps: [], band: .slight, rule: "eyeliner.lash_gap", side: .left,
+                                      values: ["zone": "outer third"])
+        let none = MakeupFeedback.Item(title: "", say: "", steps: [], band: .large, rule: "eyeliner.none", side: .right)
+        feedback.items = [gap]
+        feedback.categories = [.init(id: "placement", title: "", symbol: "", percent: 0.5, label: "", items: [gap, none]),
+                               .init(id: "shade", title: "", symbol: "", percent: 0.5, label: "", items: [none])]
+        let rules = MyLookDraft.rules(feedback)
+        XCTAssertEqual(rules.map(\.id), ["eyeliner.lash_gap", "eyeliner.none"])
+        XCTAssertEqual(rules[0].top, true)
+        XCTAssertEqual(rules[0].values?["zone"], "outer third")
+        XCTAssertEqual(rules[1].cards, ["placement", "shade"])
+    }
+
+    func testTryAgainUsesTheSameChoices() throws {
+        var look = MyLook(tool: "blush", lookId: BlushPlacementStyle.sunkissed.rawValue, title: "Sunkissed blush",
+                          createdAt: Date(), score: MyLook.Score(date: Date()))
+        let palette = try XCTUnwrap(MakeupPalette.shades(for: .blush).first)
+        look.shades = [MyLook.Shade(palette)]
+        look.intensity = 0.35
+        let handoff = try XCTUnwrap(MyLookFeedback.handoff(for: look))
+        XCTAssertEqual(handoff.tool, .blush)
+        XCTAssertEqual(handoff.blushStyle, .sunkissed)
+        XCTAssertEqual(handoff.shades[.blush]?.id, palette.id)
+        XCTAssertEqual(handoff.intensities[.blush], 0.35)
+        XCTAssertEqual(handoff.enabled, [.blush])
+        XCTAssertEqual(handoff.lookId, look.lookId, "the retry's feedback updates this same look")
+
+        var custom = look
+        custom.shades = [MyLook.Shade(id: "custom.x", name: "Custom colour", hex: "#FF8000", source: .product, opacity: 0.6)]
+        let made = try XCTUnwrap(MyLookFeedback.handoff(for: custom)?.shades[.blush])
+        XCTAssertEqual(made.red, 1, accuracy: 0.01)
+        XCTAssertEqual(made.green, 128.0 / 255, accuracy: 0.01)
+        XCTAssertEqual(made.opacity, 0.6)
+    }
+
+    func testCardShowsWhichWayTheScoreWent() {
+        var look = MyLook(tool: "blush", lookId: "a", title: "A", createdAt: Date(), score: MyLook.Score(overall: 0.8, date: Date()))
+        XCTAssertEqual(MyLookCard.trend(look), 0)
+        look.previousScores = [MyLook.Score(overall: 0.6, date: Date())]
+        XCTAssertEqual(MyLookCard.trend(look), 1)
+        look.previousScores = [MyLook.Score(overall: 0.9, date: Date())]
+        XCTAssertEqual(MyLookCard.trend(look), -1)
     }
 }

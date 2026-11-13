@@ -1,5 +1,5 @@
-// -Nimah: the saved looks, one folder each: Application Support/MyLooks/<id>/ with look.json, expected.jpg and
-// result.jpg. Files are readable only while the phone is unlocked (complete file protection) and are left out of the
+// -Nimah: the saved looks, one folder each: Application Support/MyLooks/<id>/ with look.json, expected.jpg, result.jpg,
+// compare.jpg (the result lined up for the slider) and target.scan (`MyLookTarget`). Files are readable only while the phone is unlocked (complete file protection) and are left out of the
 // iCloud / computer backup. Nothing else of a run is kept; nothing leaves the phone.
 // Plain files rather than SwiftData: two photos and one small JSON per look, no queries, and older schema versions
 // decode with defaults (`MyLook.init(from:)`).
@@ -28,7 +28,8 @@ actor MyLookStore {
         return MyLookStore(root: support.appendingPathComponent("MyLooks", isDirectory: true))
     }
 
-    static let lookFile = "look.json", expectedFile = "expected.jpg", resultFile = "result.jpg"
+    static let lookFile = "look.json", expectedFile = "expected.jpg", resultFile = "result.jpg", compareFile = "compare.jpg"
+    enum Photo: Sendable { case expected, result, compare }
 
     // MARK: Reading
 
@@ -41,9 +42,26 @@ actor MyLookStore {
     func get(_ id: UUID) -> MyLook? { read(folder: folder(id)) }
 
     /// A saved photo's file, nil when the look has none.
-    func photoURL(_ look: MyLook, expected: Bool) -> URL? {
-        guard let name = expected ? look.expectedPhoto : look.resultPhoto else { return nil }
-        return folder(look.id).appendingPathComponent(name)
+    func photoURL(_ look: MyLook, expected: Bool) -> URL? { photoURL(look, expected ? .expected : .result) }
+
+    func photoURL(_ look: MyLook, _ photo: Photo) -> URL? {
+        let name = switch photo {
+        case .expected: look.expectedPhoto
+        case .result: look.resultPhoto
+        case .compare: look.comparePhoto
+        }
+        return name.map { folder(look.id).appendingPathComponent($0) }
+    }
+
+    /// A saved photo's JPEG bytes.
+    func photo(_ look: MyLook, _ photo: Photo) -> Data? {
+        photoURL(look, photo).flatMap { try? Data(contentsOf: $0) }
+    }
+
+    /// The try-on's measured target, nil when the look has none (saved before schema 2, or no face at the shutter).
+    func target(_ look: MyLook) -> FaceScan? {
+        guard let name = look.targetScan, let data = try? Data(contentsOf: folder(look.id).appendingPathComponent(name)) else { return nil }
+        return try? MyLookTarget.decode(data)
     }
 
     // MARK: Writing
@@ -69,11 +87,20 @@ actor MyLookStore {
         look.score = draft.score
         look.rules = draft.rules
         look.marks = draft.marks
+        look.language = draft.language
+        look.schemaVersion = MyLook.currentSchema
 
         let folder = folder(look.id)
         try prepare(folder)
         look.expectedPhoto = try replace(Self.expectedFile, with: draft.expectedJPEG, in: folder)
         look.resultPhoto = try replace(Self.resultFile, with: draft.resultJPEG, in: folder)
+        look.comparePhoto = try replace(Self.compareFile, with: draft.compareJPEG, in: folder)
+        // A retry without a new desired photo keeps the target it was scored against.
+        if let scan = draft.targetScan {
+            let data: Data
+            do { data = try MyLookTarget.encode(scan) } catch { throw StoreError.writeFailed(error.localizedDescription) }
+            look.targetScan = try replace(MyLookTarget.fileName, with: data, in: folder)
+        }
         try write(look, to: folder)
         return look
     }

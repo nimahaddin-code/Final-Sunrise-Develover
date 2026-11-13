@@ -234,6 +234,9 @@ struct MakeupFeedback: Sendable, Equatable {
         var rule: String = ""
         /// Which side it is about (left, right, both); nil for photo checks and praise.
         var side: FeedbackSide? = nil
+        /// The words that filled the message's placeholders ({zone}, {other}, ...; {part} comes from `side`), kept so a
+        /// saved look can tell the same message again (`MyLookFeedback`).
+        var values: [String: String] = [:]
     }
 
     /// -Nimah: where to show a fix on the result photo, for one side. Points are 0...1 of the result photo (x across, y
