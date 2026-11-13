@@ -262,7 +262,7 @@ struct FeedbackComposer {
         var values = hit.values
         values["part"] = partName(hit.side)
         return MakeupFeedback.Item(title: text.title, say: fill(text.say, values), steps: text.steps ?? [], band: hit.band, rule: hit.rule,
-                                   side: hit.side)
+                                   side: hit.side, values: hit.values)
     }
 
     func fill(_ text: String, _ values: [String: String]) -> String {
@@ -295,7 +295,7 @@ struct FeedbackComposer {
         guard let p = tool.praise.first(where: { $0.id == id }) else { return nil }
         let text = p.message.text(language)
         var all = values; all["part"] = all["part"] ?? partName(.both)
-        return MakeupFeedback.Item(title: text.title, say: fill(text.say, all), steps: [], band: .ok, rule: id)
+        return MakeupFeedback.Item(title: text.title, say: fill(text.say, all), steps: [], band: .ok, rule: id, values: values)
     }
 }
 
@@ -343,7 +343,7 @@ struct FeedbackPhotoCheck {
         let text = rule.message.text(composer.language)
         let blocks = override ?? rule.blocking
         let item = MakeupFeedback.Item(title: text.title, say: composer.fill(text.say, values), steps: text.steps ?? [],
-                                       band: blocks ? .large : .slight, rule: id)
+                                       band: blocks ? .large : .slight, rule: id, values: values)
         if blocks { if !blocking.contains(item) { blocking.append(item) } } else if !notes.contains(item) { notes.append(item) }
     }
 }

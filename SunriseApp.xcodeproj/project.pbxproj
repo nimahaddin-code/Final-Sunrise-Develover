@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D7100000000000000000022 /* MyLookTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000021 /* MyLookTarget.swift */; };
+		4D7100000000000000000024 /* MyLookFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000023 /* MyLookFeedback.swift */; };
+		4D7100000000000000000026 /* MyLookViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000025 /* MyLookViews.swift */; };
 		4D7100000000000000000002 /* MyLook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000001 /* MyLook.swift */; };
 		4D7100000000000000000004 /* MyLookStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000003 /* MyLookStore.swift */; };
 		4D7100000000000000000006 /* MyLookStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000005 /* MyLookStoreTests.swift */; };
@@ -217,6 +220,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D7100000000000000000021 /* MyLookTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLookTarget.swift; sourceTree = "<group>"; };
+		4D7100000000000000000023 /* MyLookFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLookFeedback.swift; sourceTree = "<group>"; };
+		4D7100000000000000000025 /* MyLookViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLookViews.swift; sourceTree = "<group>"; };
 		4D7100000000000000000001 /* MyLook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLook.swift; sourceTree = "<group>"; };
 		4D7100000000000000000003 /* MyLookStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLookStore.swift; sourceTree = "<group>"; };
 		4D7100000000000000000005 /* MyLookStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLookStoreTests.swift; sourceTree = "<group>"; };
@@ -442,6 +448,9 @@
 			children = (
 				4D7100000000000000000001 /* MyLook.swift */,
 				4D7100000000000000000003 /* MyLookStore.swift */,
+				4D7100000000000000000021 /* MyLookTarget.swift */,
+				4D7100000000000000000023 /* MyLookFeedback.swift */,
+				4D7100000000000000000025 /* MyLookViews.swift */,
 			);
 			path = MyLooks;
 			sourceTree = "<group>";
@@ -1216,6 +1225,9 @@
 				11B500000000000000000002 /* LipStyle.swift in Sources */,
 				4D7100000000000000000002 /* MyLook.swift in Sources */,
 				4D7100000000000000000004 /* MyLookStore.swift in Sources */,
+				4D7100000000000000000022 /* MyLookTarget.swift in Sources */,
+				4D7100000000000000000024 /* MyLookFeedback.swift in Sources */,
+				4D7100000000000000000026 /* MyLookViews.swift in Sources */,
 				11B500000000000000000004 /* LipsTryOnFeature.swift in Sources */,
 				11B500000000000000000006 /* LipShape.swift in Sources */,
 				11B500000000000000000008 /* LipOverlayModel.swift in Sources */,

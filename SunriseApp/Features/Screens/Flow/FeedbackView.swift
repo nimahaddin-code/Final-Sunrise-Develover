@@ -10,6 +10,8 @@ struct FeedbackView: View {
     let provider: any MakeupFeedbackProviding
     /// -Nimah: where the finished look is saved once the feedback is shown (My Looks); nil saves nothing.
     var looks: MyLookStore? = nil
+    /// A look opened from My Looks: read only (nothing is measured or saved), with Try again, rename and delete.
+    var saved: SavedLookActions? = nil
     let onBackToTutorial: () -> Void
     let onDone: () -> Void
     @State private var progress = 0.0
@@ -20,6 +22,9 @@ struct FeedbackView: View {
     @AppStorage(DeveloperTools.key) private var developerTools = false
     /// The small note after saving to My Looks.
     @State private var toast: SaveToast?
+    @State private var renaming = false
+    @State private var newTitle = ""
+    @State private var confirmDelete = false
 
     var body: some View {
         Group {
@@ -35,7 +40,7 @@ struct FeedbackView: View {
         .sheet(item: $opened) { category in FeedbackCategorySheet(category: category) }
         .task {
             guard feedback == nil else { return }
-            if let before = store.desired, let result = store.result {
+            if saved == nil, let before = store.desired, let result = store.result {
                 alignedResult = PhotoAlignment.align(after: result, afterScan: store.resultScan, to: before, beforeScan: store.desiredScan)
             }
             let request = MakeupFeedbackRequest(tool: handoff.tool, styleTitle: handoff.styleTitle,
@@ -64,11 +69,14 @@ struct FeedbackView: View {
         }
     }
 
-    /// The photos as they are shown here (cropped and lined up), JPEG, with the scores and messages by id.
+    /// The whole photos (cropped again when shown), the result lined up for the slider, the try-on's measured target for
+    /// "Try again", and the scores and messages by id.
     private func save(_ feedback: MakeupFeedback, to looks: MyLookStore) async {
         let draft = MyLookDraft(feedback: feedback, handoff: handoff, date: Date(),
-                                expectedJPEG: MyLookDraft.jpeg(focused(store.desired ?? store.bare)),
-                                resultJPEG: MyLookDraft.jpeg(focused(store.alignedResult ?? alignedResult ?? store.result)))
+                                expectedJPEG: MyLookDraft.jpeg(store.desired ?? store.bare),
+                                resultJPEG: MyLookDraft.jpeg(store.result),
+                                compareJPEG: MyLookDraft.jpeg(store.alignedResult ?? alignedResult),
+                                targetScan: store.desiredScan)
         do {
             try await looks.save(draft)
             toast = .saved
@@ -166,17 +174,61 @@ struct FeedbackView: View {
                 .padding(.bottom, AppSpacing.large)
             }
             .scrollIndicators(.hidden)
-            // Retake (back to the tutorial) and Done (home), pinned under the scroll as in the design.
-            bottomBar
+            // Retake (back to the tutorial) and Done (home), pinned under the scroll as in the design; a saved look has
+            // Try again and its menu instead.
+            if let saved { savedBar(saved) } else { bottomBar }
         }
         .transition(.opacity)
+        .alert("Rename look", isPresented: $renaming) {
+            TextField("Look name", text: $newTitle)
+            Button("Save") { saved?.onRename(newTitle) }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Up to 30 characters.")
+        }
+        .confirmationDialog("Delete this look?", isPresented: $confirmDelete, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) { saved?.onDelete() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("The photos and the result will be removed from your phone.")
+        }
+    }
+
+    /// My Looks: a privacy line, then Try again and the menu (rename, delete).
+    private func savedBar(_ saved: SavedLookActions) -> some View {
+        VStack(spacing: 8) {
+            Text("Your photos are only saved on this phone. You can delete them any time.")
+                .font(.system(size: 12))
+                .foregroundStyle(AppColors.onboardingBody)
+                .multilineTextAlignment(.center)
+            HStack(spacing: 12) {
+                Menu {
+                    Button { newTitle = saved.title; renaming = true } label: { Label("Rename", systemImage: "pencil") }
+                    Button(role: .destructive) { confirmDelete = true } label: { Label("Delete", systemImage: "trash") }
+                } label: {
+                    circleLabel(symbol: "ellipsis")
+                }
+                .accessibilityLabel("More")
+                Button(action: saved.onRetry) {
+                    Text("Try again")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .background(AppColors.buttonInk, in: Capsule())
+                        .shadow(color: .black.opacity(0.2), radius: 14, y: 6)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, AppSpacing.small)
     }
 
     private var topBar: some View {
         ZStack {
-            Text(lookTitle).font(.system(size: 15, weight: .semibold)).lineLimit(1).padding(.horizontal, 64)
+            Text(saved?.title ?? lookTitle).font(.system(size: 15, weight: .semibold)).lineLimit(1).padding(.horizontal, 64)
             HStack {
-                circleButton(symbol: "chevron.left", label: "Done", action: onDone)
+                circleButton(symbol: "chevron.left", label: saved == nil ? "Done" : "Back", action: onDone)
                 Spacer()
             }
         }
@@ -209,8 +261,9 @@ struct FeedbackView: View {
     /// Brows and eyeliner compare the eye area only (the same crop as the brief, `LookBriefView.crop`), so the difference is
     /// big enough to see; blush keeps the whole face. Both photos are lined up first, so one crop fits both.
     private func focused(_ image: UIImage?) -> UIImage? {
-        guard let image, handoff.tool != .blush else { return image }
-        return LookBriefView.crop(image, for: handoff.tool)
+        // Looks saved before schema 2 kept their photos already cropped.
+        if saved?.photosCropped == true { return image }
+        return MyLookFeedback.focused(image, tool: handoff.tool)
     }
 
     /// Retry (back to the tutorial) and Done (home).
@@ -291,6 +344,15 @@ struct FeedbackView: View {
 }
 
 /// Before (the try-on photo) and After (the result) in one frame, split by a line the person drags.
+/// -Nimah: a look opened from My Looks: its title and what its buttons do.
+struct SavedLookActions {
+    var title: String
+    var photosCropped = false
+    var onRetry: () -> Void
+    var onRename: (String) -> Void
+    var onDelete: () -> Void
+}
+
 /// -Nimah: what happened when the look was saved to My Looks.
 enum SaveToast: Equatable {
     case saved, storageFull, failed

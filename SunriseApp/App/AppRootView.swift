@@ -19,10 +19,10 @@ struct AppRootView: View {
             } else {
         // One feature at a time: home -> Try On -> photo -> brief -> tutorial -> photo -> feedback -> home.
         NavigationStack(path: $navigator.tryOnPath) {
-            FeatureHomeView { tool in
+            FeatureHomeView(onSelect: { tool in
                 flow.reset()
                 navigator.open(.tryOn(tool), in: .tryOn)
-            }
+            }, looks: container.myLooks, onOpenLook: { id in navigator.open(.myLook(id), in: .tryOn) })
                 .navigationDestination(for: AppRoute.self, destination: destination)
             }
             // Hands are busy with makeup: the screen stays on from Try On to feedback; home lets it sleep again.
@@ -37,6 +37,23 @@ struct AppRootView: View {
     // Without an eye scan the eyeliner is the natural line.
     private let plan=MakeupPlan(shape:.oval)
     private let assessment=FaceShapeAssessment.standardLook
+
+    /// -Nimah: "Try again" from My Looks. With the look's saved expected photo and measured target it goes straight to the
+    /// tutorial, and the next feedback is scored against that same target (and updates the same look). Without them (a
+    /// look saved before targets were kept, or no photo) it starts again from Try On with the look's tool.
+    private func retry(_ look: MyLook, expected: UIImage?, target: FaceScan?) {
+        guard let handoff = MyLookFeedback.handoff(for: look) else { return }
+        flow.reset()
+        if let expected, let target, !look.photosCropped {
+            flow.desired = expected
+            flow.desiredScan = target
+            navigator.returnToRoot(of: .tryOn)
+            navigator.open(.recommendedTutorial(handoff), in: .tryOn)
+        } else {
+            navigator.returnToRoot(of: .tryOn)
+            navigator.open(.tryOn(handoff.tool), in: .tryOn)
+        }
+    }
 
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
@@ -65,6 +82,10 @@ struct AppRootView: View {
                              flow.reset()
                              navigator.returnToRoot(of: .tryOn)
                          })
+        case .myLook(let id):
+            MyLookDetailView(id: id, store: container.myLooks, onRetry: { look, expected, target in
+                retry(look, expected: expected, target: target)
+            }, onDeleted: { navigator.returnToRoot(of: .tryOn) }, onBack: { navigator.goBack(in: .tryOn) })
         }
     }
 }
