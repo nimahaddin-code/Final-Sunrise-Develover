@@ -1,3 +1,20 @@
+## Blush: five looks from the design, then Youthful — -Nimah (2026-11-13)
+
+Try On offers six blush looks (`BlushPlacementStyle.referenceLooks`, in this order): Cheekbone, Apple, Sunkissed, Lifted,
+Soft Sweep (the design's five) and Youthful (kept at the end, the user's choice). New cases `cheekboneLook`, `appleLook`,
+`softSweep` with presets `blush.look.cheekbone` / `.apple` / `.soft_sweep` in `makeup-reference.database.json`: copies of
+Youthful (same strength, softness, edge feather, eye clearance) with their own place in the measured cheek corridor:
+Cheekbone a diagonal band toward the temple (16°, slight curve), Apple a round patch (same reach across and up), Soft Sweep
+a wide flat oval going outward (5°). The old `.cheekbone` / `.apple` cases stay the face-shape catalog's research presets
+(`blush.cheekbone` / `blush.apple`), so their raw values were not reused. Being reference looks, the new ones get the
+landmark cheek fit, the target outline on the desired-look photo, the tutorial overlay, the brief and the feedback
+(`tools.blush.looks` in `makeup-feedback.database.json` lists their raw values; no look-only rules for them; the score
+database is the same for every look). Titles are the look name only; the flow adds "blush" (`styleTitle`: "Cheekbone
+blush"). `BlushStyleIcon` now draws a face in three-quarter view (brow, eye, nose, lips, hair) with each look's patch.
+New descriptions and names have Indonesian and Chinese drafts (`needs_review`); "Cheekbone" now stays English in Indonesian,
+like the other look names. A saved choice of a legacy style maps Apple / centre cheek to Apple and cheekbone / high
+cheekbone to Cheekbone. Sizes are untuned guesses on synthetic faces; nothing checked on a device.
+
 ## My Looks: saved looks (model + storage) — -Nimah (2026-11-13)
 
 PRD "My Looks", prompt 1. Every feedback that finishes is saved on the phone: `MyLook` (Features/MyLooks/MyLook.swift)

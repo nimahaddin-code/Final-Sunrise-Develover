@@ -37,6 +37,12 @@ extension ToolInfo {
             String(localized: "A warm wash across both cheeks and the top of your nose, like you just came back from the sun.")
         case .lifted:
             String(localized: "Colour swept from the outer cheek up toward your temples, so your face looks lifted and more defined.")
+        case .cheekboneLook:
+            String(localized: "A soft band along your cheekbones, angled toward the temples, so your cheekbones stand out.")
+        case .appleLook:
+            String(localized: "A round, rosy patch on the apples of your cheeks, the spot that lifts when you smile.")
+        case .softSweep:
+            String(localized: "A soft oval of colour across the middle of your cheeks, blended outward for an easy, natural flush.")
         default:
             String(localized: "A soft wash of colour on your cheeks, blended out so no edge shows.")
         }

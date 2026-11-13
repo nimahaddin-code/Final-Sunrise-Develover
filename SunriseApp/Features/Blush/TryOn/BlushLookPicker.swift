@@ -1,6 +1,6 @@
 import SwiftUI
 
-// -Nimah: Placement and shade are independent. User requested these three creative alternatives.
+// -Nimah: Placement and shade are independent. The looks are `BlushPlacementStyle.referenceLooks`, in the design order.
 /// The blush looks as glass circles over the bottom of the camera card; the first circle is no blush (`nil`).
 /// Moved from TryOnHomeView unchanged, so the blush owner edits blush choices without touching the Try On screen.
 struct BlushLookPicker: View {

@@ -3,8 +3,11 @@ import Foundation
 import simd
 
 enum BlushPlacementStyle:String,CaseIterable,Identifiable,Sendable {
-    case youthful,sunkissed,lifted,apple,cheekbone,outerSweep,highLift,wideHorizontal,centerCheek,centerDown,upperInner,templeSweep,diagonalBlend,placementDots,innerCheek
-    static let referenceLooks:[Self]=[.youthful,.sunkissed,.lifted]
+    case youthful,sunkissed,lifted,cheekboneLook,appleLook,softSweep,apple,cheekbone,outerSweep,highLift,wideHorizontal,centerCheek,centerDown,upperInner,templeSweep,diagonalBlend,placementDots,innerCheek
+    /// The looks Try On offers, in the design's order (2026-11-13), then Youthful. `cheekboneLook` and `appleLook` are the
+    /// design's Cheekbone and Apple looks (`blush.look.*` presets, landmark fitted like the others); `cheekbone` and `apple`
+    /// stay the research presets the face-shape catalog names (`MakeupPreferences`).
+    static let referenceLooks:[Self]=[.cheekboneLook,.appleLook,.sunkissed,.lifted,.softSweep,.youthful]
     var isReferenceLook:Bool {Self.referenceLooks.contains(self)}
     var id:String { rawValue }
     var title:String {
@@ -12,6 +15,9 @@ enum BlushPlacementStyle:String,CaseIterable,Identifiable,Sendable {
         case .youthful:return String(localized: "Youthful")
         case .sunkissed:return String(localized: "Sunkissed")
         case .lifted:return String(localized: "Lifted")
+        case .cheekboneLook:return String(localized: "Cheekbone")
+        case .appleLook:return String(localized: "Apple")
+        case .softSweep:return String(localized: "Soft Sweep")
         case .apple:return String(localized: "Apple of cheeks")
         case .cheekbone:return String(localized: "Cheekbone")
         case .outerSweep:return String(localized: "Outer sweep")
@@ -31,6 +37,9 @@ enum BlushPlacementStyle:String,CaseIterable,Identifiable,Sendable {
         case .youthful:return "Focus color on the middle cheeks; softly blend the edges."
         case .sunkissed:return "Blend a soft horizontal wash over the cheeks and upper nose bridge; keep nostrils clear."
         case .lifted:return "Sweep from the outer cheek upward toward the temple, below the eyes."
+        case .cheekboneLook:return "Blend a diagonal band along the cheekbone, from the outer cheek toward the temple."
+        case .appleLook:return "Dab a round patch on the apple of each cheek and soften the edge."
+        case .softSweep:return "Sweep a soft horizontal oval across the middle of the cheek, blending outward."
         case .apple:return "Place blush in the compact apple zones. Keep the boundary soft."
         case .cheekbone:return "Apply near the upper cheekbone zones, below the eyes. Blend outward softly."
         case .outerSweep:return "Keep blush on the outer cheeks and blend along the elongated guide."

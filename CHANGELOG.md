@@ -1,3 +1,8 @@
+## 2026-11-13 — Blush: five looks from the design -Nimah
+
+- Try On offers Cheekbone, Apple, Sunkissed, Lifted, Soft Sweep, then Youthful; three new `blush.look.*` presets sized like the others.
+- Each look works through capture, brief, tutorial and feedback; new look icons drawn as three-quarter faces. Not checked on a device.
+
 ## 2026-11-13 — My Looks: saved looks -Nimah
 
 - Each finished feedback is saved on the phone (`MyLookStore`): photos, scores, shade, strength, rule ids; same look = one entry with attempts.

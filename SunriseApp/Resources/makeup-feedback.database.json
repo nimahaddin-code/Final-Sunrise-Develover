@@ -769,7 +769,10 @@
       "looks": [
         "youthful",
         "sunkissed",
-        "lifted"
+        "lifted",
+        "cheekboneLook",
+        "appleLook",
+        "softSweep"
       ],
       "praise": [
         {
