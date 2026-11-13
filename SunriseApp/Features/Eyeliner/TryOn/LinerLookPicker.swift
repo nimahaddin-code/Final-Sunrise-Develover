@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Horizontal list of the eyeliner looks as small pictures of an eye wearing each one, like the brow pictures.
+/// Horizontal list of the four wings Try On offers (`LinerLook.offered`) as small pictures of an eye wearing each one, like
+/// the brow pictures.
 /// The first tile (no sign) is the liner off. The pictures are drawn, not photographs: they show the shape of each look.
 struct LinerLookPicker: View {
     let selected: LinerLook?
@@ -8,12 +9,12 @@ struct LinerLookPicker: View {
 
     var body: some View {
         GlassPickerRow(selectedID: selected.map { "\($0.id)" } ?? "none", onCenter: { id in
-            onSelect(LinerLook.allCases.first { $0.id == id })
+            onSelect(LinerLook.offered.first { $0.id == id })
         }) {
             tile(isSelected: selected == nil, isNone: true, label: Text("No eyeliner"), id: "none") { onSelect(nil) } content: {
                 EmptyView()
             }
-            ForEach(LinerLook.allCases) { look in
+            ForEach(LinerLook.offered) { look in
                 tile(isSelected: selected == look, isNone: false, label: Text(look.title), id: "\(look.id)") { onSelect(look) } content: {
                     LinerLookThumbnail(look: look, ink: StylePalette.brow).equatable().frame(width: 30, height: 20)
                 }
@@ -48,10 +49,11 @@ struct LinerLookThumbnail: View, Equatable {
         switch look {
         case .classic: Shape(wing: 0.22, angle: 8, thickness: 0.07, lower: 0)
         case .cat: Shape(wing: 0.40, angle: 22, thickness: 0.10, lower: 0)
-        case .puppy: Shape(wing: 0.30, angle: -18, thickness: 0.09, lower: 0.4)
+        case .puppy: Shape(wing: 0.46, angle: -6, thickness: 0.06, lower: 0)
         case .foxy: Shape(wing: 0.44, angle: 26, thickness: 0.08, lower: 0.5, inner: 0.1)
         case .arabian: Shape(wing: 0.24, angle: 6, thickness: 0.09, lower: 1)
         case .natural: Shape(wing: 0, angle: 0, thickness: 0.04, lower: 0)
+        case .kitten: Shape(wing: 0.17, angle: 7, thickness: 0.07, lower: 0)
         }
     }
 

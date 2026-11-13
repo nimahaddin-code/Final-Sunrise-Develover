@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// The tutorial's steps sheet ("Tutorial"): at its compact height only the current step with "Swipe for more"; dragged up,
-/// every step with its picture and a Done / Now / Up next badge. Pictures are the design team's stills
-/// (`TutorialStepsSheet.imageName(tab:step:)`).
+/// The tutorial's steps sheet ("Tutorial"): the step being done, with its picture and a Done / Now / Up next badge. It
+/// follows the camera screen's step; there is no paging to other steps. Pictures are the design team's stills (`TutorialStepsSheet.imageName(tab:step:)`).
 struct TutorialStepsSheet: View {
     struct Step {
         let title: Text
@@ -11,50 +10,29 @@ struct TutorialStepsSheet: View {
         var imageName: String? = nil
     }
 
-    /// The sheet's first height: the current step's card.
-    static let compact = PresentationDetent.height(400)
+    /// The sheet's height: one step's card with its picture.
+    static let compact = PresentationDetent.height(430)
 
     let steps: [Step]
     /// The step being done; `steps.count` when the side is finished (every step reads "Done").
     let current: Int
-    let expanded: Bool
     let onClose: () -> Void
+
+    private var shownStep: Int { min(current, steps.count - 1) }
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            if expanded {
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 24) {
-                            ForEach(steps.indices, id: \.self) { index in
-                                row(steps[index], index: index).id(index)
-                            }
-                        }
-                        .padding(.horizontal, AppSpacing.large)
-                        .padding(.top, AppSpacing.small)
-                        .padding(.bottom, AppSpacing.large * 2)
-                    }
-                    .scrollIndicators(.hidden)
-                    // Scroll only as far as needed to show the current step: the first step opens at the top of the list.
-                    .onAppear { if current > 0 { proxy.scrollTo(min(current, steps.count - 1)) } }
-                    .onChange(of: current) { _, step in withAnimation { proxy.scrollTo(min(step, steps.count - 1)) } }
-                }
-            } else {
-                row(steps[min(current, steps.count - 1)], index: min(current, steps.count - 1))
-                    .padding(.horizontal, AppSpacing.large)
-                    .padding(.top, AppSpacing.small)
-                Spacer(minLength: 0)
-                if steps.count > 1 {
-                    VStack(spacing: 2) {
-                        Image(systemName: "chevron.compact.up").font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(AppColors.dandanPink)
-                        Text("Swipe for more").font(.system(size: 13))
-                            .foregroundStyle(AppColors.onboardingInk)
-                    }
-                    .padding(.bottom, AppSpacing.medium)
-                    .accessibilityHidden(true)
-                }
+            // Only the step being done, so the sheet always matches the camera screen (no paging between steps).
+            if steps.indices.contains(shownStep) {
+                row(steps[shownStep], index: shownStep)
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.top, AppSpacing.small)
+                .padding(.bottom, AppSpacing.medium)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .id(shownStep)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.2), value: shownStep)
             }
         }
         .presentationBackground(.white)

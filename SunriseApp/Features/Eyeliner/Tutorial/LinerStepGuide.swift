@@ -27,31 +27,56 @@ struct LinerStepGeometry {
     /// The closed liner outlines: the upper liner with its wing merged in, and the wing on its own when it starts apart
     /// from the liner (`upperLiner` alone stops at the outer corner and leaves the wing out).
     let shapes: [[CGPoint]]
-    /// Inner corner, middle, outer corner, the wing's end when the look has one, then the lower line's start when it has one.
+    /// Winged looks: the outer corner, the wing's end and a point on the lid (the wing's triangle). Other looks: four
+    /// points along the lash curve, inner corner first, then the lower line's start when it has one.
     let dots: [CGPoint]
+    /// Which dot is the wing's end (drawn a little bigger); nil without a wing.
+    let tipIndex: Int?
+    /// What the pen follows on the fill step: the lash line, or the wing's triangle.
+    let penPath: [CGPoint]
 
     /// `showsLower`: only the look that really has a lower line (Arabian) gets its dot, dashes and fill.
-    init(_ guide: LinerGuide, showsLower: Bool = false) {
+    /// `wing`: the look is taught by its wing only (`LinerLook.hasWing`): dots, outline and fill are the triangle at the
+    /// outer corner. Otherwise only the line along the lash curve is taught, with no dot toward a wing.
+    init(_ guide: LinerGuide, showsLower: Bool = false, wing: Bool = false) {
         // `upperLiner` is the lash-line side followed by the outer edge reversed, so its first half is the lash line.
         let lash = Array(guide.upperLiner.prefix(guide.upperLiner.count / 2))
         let lower = showsLower ? Array(guide.lowerLiner.prefix(guide.lowerLiner.count / 2)) : []
         self.lash = lash
-        self.lower = lower
-        var shapes = [guide.outlines.first ?? guide.upperLiner]
-        if let tip = guide.anchors.wingTip, !guide.wing.isEmpty,
-           !shapes[0].contains(where: { hypot($0.x - tip.x, $0.y - tip.y) < 0.5 }) {
-            shapes.append(guide.wing)
+        if wing, let tip = guide.anchors.wingTip, lash.count > 2, let outer = lash.last {
+            // The wing, shaped by the eye: from the outer corner straight out to the tip, back to the lid about 70% along
+            // the lash line in a soft curve that dips toward the eye, then along the lash line itself to the outer corner.
+            // Dots stay three: outer corner, tip, lid point.
+            let lidIndex = Int(Double(lash.count - 1) * 0.7)
+            let lid = lash[lidIndex]
+            let control = CGPoint(x: (tip.x + lid.x) / 2 + (outer.x - (tip.x + lid.x) / 2) * 0.35,
+                                  y: (tip.y + lid.y) / 2 + (outer.y - (tip.y + lid.y) / 2) * 0.35)
+            let top = (1...9).map { i -> CGPoint in
+                let t = CGFloat(i) / 10, u = 1 - t
+                return CGPoint(x: u * u * tip.x + 2 * u * t * control.x + t * t * lid.x,
+                               y: u * u * tip.y + 2 * u * t * control.y + t * t * lid.y)
+            }
+            let wingShape = [outer, tip] + top + Array(lash[lidIndex...])
+            self.lower = []
+            self.shapes = [wingShape]
+            self.dots = [outer, tip, lid]
+            self.tipIndex = 1
+            self.penPath = wingShape
+            return
         }
-        self.shapes = shapes
+        self.lower = lower
+        // The line along the lash curve only: `upperLiner` stops at the outer corner, without the wing.
+        self.shapes = [guide.upperLiner]
         var dots: [CGPoint] = []
-        if let first = lash.first, let last = lash.last {
-            dots = [first, lash[lash.count / 2], last]
+        if lash.count > 3, let last = lash.last {
+            dots = [lash[0], lash[(lash.count - 1) / 3], lash[(lash.count - 1) * 2 / 3], last]
         } else {
             dots = [guide.anchors.upperStart, guide.anchors.outerCorner]
         }
-        if let tip = guide.anchors.wingTip { dots.append(tip) }
         if let start = lower.first { dots.append(start) }
         self.dots = dots
+        self.tipIndex = nil
+        self.penPath = lash
     }
 }
 
@@ -96,6 +121,8 @@ struct LinerStepGuide: View {
     var side: HorizontalEdge?
     /// The look has a lower line, so the guide shows its dot, outline and fill.
     var showsLower = false
+    /// The look is winged: the guide teaches only the wing's triangle (`LinerStepGeometry(wing:)`).
+    var teachesWing = false
     @Environment(\.cameraZoom) private var zoom
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var clock = StepClock()
@@ -146,7 +173,7 @@ struct LinerStepGuide: View {
             // canvas filter, not a `.shadow` modifier, so the canvas itself is redrawn every tick.
             context.addFilter(.shadow(color: .black.opacity(0.35), radius: 1.5, x: 0, y: 0))
             for eye in frame.eyes where eye.alpha > 0.05 {
-                let geometry = LinerStepGeometry(eye.guide, showsLower: showsLower)
+                let geometry = LinerStepGeometry(eye.guide, showsLower: showsLower, wing: teachesWing)
                 let map = { (points: [CGPoint]) in points.map { frame.mapping.map($0) } }
                 let inner = frame.mapping.map(eye.guide.anchors.innerCorner)
                 let outer = frame.mapping.map(eye.guide.anchors.outerCorner)
@@ -182,15 +209,15 @@ struct LinerStepGuide: View {
                         context.stroke(lowerPath, with: .color(.white.opacity(0.8)),
                                        style: StrokeStyle(lineWidth: max(eyeWidth * 0.012, 1 * thin), lineCap: .round))
                     }
-                    let lash = map(geometry.lash)
-                    if playing, lash.count > 1 {
-                        // Back and forth along the lash line, a bit under two passes in 3 s.
+                    let pen = map(geometry.penPath)
+                    if playing, pen.count > 1 {
+                        // Back and forth along the lash line (or round the wing), a bit under two passes in 3 s.
                         let along = 0.5 - 0.5 * cos(progress * .pi * 3)
-                        penTip = Self.path(lash).trimmedPath(from: 0, to: along).currentPoint
+                        penTip = Self.path(pen).trimmedPath(from: 0, to: along).currentPoint
                     }
                 }
 
-                drawDots(&context, dots: dots, hasWing: eye.guide.anchors.wingTip != nil, eyeWidth: eyeWidth, thin: thin, pulse: pulse)
+                drawDots(&context, dots: dots, tipIndex: geometry.tipIndex, eyeWidth: eyeWidth, thin: thin, pulse: pulse)
                 if let penTip { drawPen(&context, tip: penTip, eyeWidth: eyeWidth, roll: roll) }
             }
         }
@@ -216,10 +243,10 @@ struct LinerStepGuide: View {
         return tip
     }
 
-    private func drawDots(_ context: inout GraphicsContext, dots: [CGPoint], hasWing: Bool, eyeWidth: Double, thin: CGFloat, pulse: Double) {
+    private func drawDots(_ context: inout GraphicsContext, dots: [CGPoint], tipIndex: Int?, eyeWidth: Double, thin: CGFloat, pulse: Double) {
         for (index, point) in dots.enumerated() {
             // The wing's end is a little bigger than the others.
-            let isTip = hasWing && index == 3
+            let isTip = index == tipIndex
             // Dots scale with the eye on screen; the floor keeps them visible when the eye is tiny.
             let radius = max(eyeWidth * (isTip ? 0.034 : 0.025), (isTip ? 1.8 : 1.4) * thin)
             let dot = Path(ellipseIn: CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2))

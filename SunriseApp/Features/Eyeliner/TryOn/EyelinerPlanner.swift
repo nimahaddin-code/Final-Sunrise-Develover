@@ -42,11 +42,25 @@ struct EyelinerPlan: Sendable {
     }
 }
 
-/// The six eyeliner looks offered on Try On, after the reference sheet (a seventh state, no liner, is the tool being off).
+/// The eyeliner looks: Try On offers the four in `offered` (no liner is the tool being off); the others stay as presets.
 enum LinerLook: String, CaseIterable, Identifiable, Sendable {
-    case classic, cat, puppy, foxy, arabian, natural
+    case classic, cat, puppy, foxy, arabian, natural, kitten
 
     var id: String { rawValue }
+    /// The team's grouping for the tutorial: winged looks are taught by their wing (a triangle at the outer corner), the
+    /// others by the line along the lash curve. Arabian's short flick under the lower lashes counts as no wing.
+    var hasWing: Bool {
+        switch self {
+        case .classic, .cat, .puppy, .foxy, .kitten: true
+        case .arabian, .natural: false
+        }
+    }
+
+    /// The four wings Try On offers, after the team's reference shapes. What sets them apart is mostly the angle: Cat
+    /// lifts sharply, Classic lifts less, Kitten is a short wing with only a slight lift, Puppy runs long and dips a little.
+    /// Foxy, Arabian and Natural stay for the planner and tests.
+    static let offered: [LinerLook] = [.cat, .classic, .kitten, .puppy]
+
     var title: LocalizedStringResource {
         switch self {
         case .classic: "Classic"
@@ -55,6 +69,7 @@ enum LinerLook: String, CaseIterable, Identifiable, Sendable {
         case .foxy: "Foxy"
         case .arabian: "Arabian"
         case .natural: "Natural"
+        case .kitten: "Kitten"
         }
     }
 }
@@ -108,10 +123,9 @@ enum EyelinerPlanner {
             style = LinerStyle(innerWidth: 0.006, outerWidth: 0.034, midWidth: 0.016, start: 0, wingLength: 0.36,
                                wingAngle: 20, wingBase: .horizontal, shade: base.shade)
         case .puppy:
-            // Soft, rounded line that runs long past the outer corner and droops downward along the eye's shape, with a short lower line.
-            style = LinerStyle(innerWidth: 0.012, outerWidth: 0.034, midWidth: 0.026, start: 0, wingLength: 0.32,
-                               wingAngle: -18, wingBase: .horizontal,
-                               lowerLine: LowerLine(enabled: true, extent: 0.4, thickness: 0.010), shade: base.shade)
+            // Reference shape 4: a long, thin wing that runs out past the corner and dips a little.
+            style = LinerStyle(innerWidth: 0.005, outerWidth: 0.024, midWidth: 0.012, start: 0, wingLength: 0.42,
+                               wingAngle: -6, wingBase: .horizontal, shade: base.shade)
         case .foxy:
             // Thin line that reaches past the inner corner toward the nose, sharp long wing aimed at the brow tail,
             // lower line meeting it.
@@ -127,6 +141,10 @@ enum EyelinerPlanner {
         case .natural:
             style = naturalLine
             style.shade = base.shade
+        case .kitten:
+            // Reference shape 3: a short wing with only a slight lift.
+            style = LinerStyle(innerWidth: 0.006, outerWidth: 0.028, midWidth: 0.014, start: 0, wingLength: 0.16,
+                               wingAngle: 6, wingBase: .horizontal, shade: base.shade)
         }
         return style
     }

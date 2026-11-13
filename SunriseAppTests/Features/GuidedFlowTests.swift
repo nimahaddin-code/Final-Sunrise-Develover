@@ -138,3 +138,40 @@ extension GuidedFlowTests {
         }
     }
 }
+
+// MARK: Eyeliner tutorial, wing or no wing
+
+extension GuidedFlowTests {
+    private func guide(withTip: Bool) -> LinerGuide {
+        let lash = (0..<8).map { CGPoint(x: 100 + Double($0) * 10, y: 200 - Double($0)) }
+        let edge = lash.reversed().map { CGPoint(x: $0.x, y: $0.y - 6) }
+        let tip = CGPoint(x: 200, y: 180)
+        return LinerGuide(upperLiner: lash + edge, tightline: [], wing: withTip ? [lash[7], tip] : [], lowerLiner: [],
+                          outlines: [lash + edge],
+                          anchors: LinerAnchors(innerCorner: lash[0], outerCorner: lash[7], upperStart: lash[0],
+                                                wingRoot: withTip ? lash[7] : nil, wingTip: withTip ? tip : nil))
+    }
+
+    func testEyelinerLooksAreGroupedByWing() {
+        XCTAssertEqual(LinerLook.allCases.filter { !$0.hasWing }, [.arabian, .natural])
+        XCTAssertEqual(LinerLook.offered, [.cat, .classic, .kitten, .puppy])
+        XCTAssertTrue(LinerLook.offered.allSatisfy(\.hasWing))
+    }
+
+    func testWingedTutorialMarksOnlyTheWingTriangle() {
+        let geometry = LinerStepGeometry(guide(withTip: true), wing: true)
+        XCTAssertEqual(geometry.dots.count, 3)
+        XCTAssertEqual(geometry.dots[1], CGPoint(x: 200, y: 180), "the wing's end")
+        XCTAssertEqual(geometry.tipIndex, 1)
+        // The outline follows the eye (curved edges), so it has more points than the three dots.
+        XCTAssertGreaterThan(geometry.shapes[0].count, 3)
+        XCTAssertEqual(geometry.shapes[0].first, geometry.dots[0])
+    }
+
+    func testNoWingTutorialMarksOnlyTheLashCurve() {
+        let geometry = LinerStepGeometry(guide(withTip: true), wing: false)
+        XCTAssertEqual(geometry.dots.count, 4)
+        XCTAssertFalse(geometry.dots.contains(CGPoint(x: 200, y: 180)), "no dot toward a wing")
+        XCTAssertNil(geometry.tipIndex)
+    }
+}
