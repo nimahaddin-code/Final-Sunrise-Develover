@@ -1,3 +1,8 @@
+## 2026-11-13 — Desired photo always has the look on -Nimah
+
+- The Expected shutter for blush and brows waits for a picture with the makeup on the face; no silent plain photo.
+- If the look does not show within about 3 s, the camera stays on and asks to take it again.
+
 ## 2026-11-13 — Feedback: smiling no longer hides the feedback -Nimah
 
 - `capture.smiling` is a note instead of a retake; the scores and fixes show. The note is not shown on the feedback screen yet.
