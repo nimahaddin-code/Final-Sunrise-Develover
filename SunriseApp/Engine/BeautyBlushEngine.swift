@@ -408,7 +408,7 @@ final class BeautyBlushEngine:@unchecked Sendable {
         #if !targetEnvironment(simulator)
         drawable.addPresentedHandler { [weak self] _ in self?.queue.async { [weak self] in self?.presentedFrames += 1 } }
         #endif
-        copyForReaders(drawable.texture,command,frame:frame)
+        copyForReaders(drawable.texture,command,frame:frame,makeup:s.pigmentHalf != PigmentHalf.none && blush.tracked && blush.opacity>0.9)
         command.present(drawable)
         let ts=frame.timestamp
         if blush.tracked && blush.opacity>0.9 {pigmentFrames += 1;lastError=nil}
@@ -572,7 +572,13 @@ struct ScreenShot:@unchecked Sendable {
 }
 final class ScreenReader:@unchecked Sendable {
     private let lock=NSLock();private var done=false;private let deliver:@Sendable (ScreenShot?)->Void
-    init(_ deliver:@escaping @Sendable (ScreenShot?)->Void) {self.deliver=deliver}
+    /// Waits for a frame with the makeup drawn on the face (the desired-look photo), not just the camera.
+    let needsMakeup:Bool
+    init(needsMakeup:Bool=false,_ deliver:@escaping @Sendable (ScreenShot?)->Void) {self.needsMakeup=needsMakeup;self.deliver=deliver}
+    /// Who gets this picture now and who keeps waiting: readers that need the makeup wait while it is not drawn.
+    static func split(_ readers:[ScreenReader],makeup:Bool)->(now:[ScreenReader],waiting:[ScreenReader]) {
+        (readers.filter {makeup || !$0.needsMakeup},readers.filter {!makeup && $0.needsMakeup})
+    }
     func finish(_ shot:ScreenShot?) {
         lock.lock();let first = !done;done=true;lock.unlock()
         if first {deliver(shot)}
@@ -580,17 +586,23 @@ final class ScreenReader:@unchecked Sendable {
 }
 extension BeautyBlushEngine {
     /// The next picture this engine presents and its camera frame, or nil when it draws nothing within `timeout`.
-    func readScreen(timeout:Double=1.5) async->ScreenShot? {
+    /// `needsMakeup`: the next picture with the makeup on the face (skips frames before the look appears or while the face
+    /// is lost), so the desired-look photo always has the filter.
+    func readScreen(timeout:Double=1.5,needsMakeup:Bool=false) async->ScreenShot? {
         await withCheckedContinuation { continuation in
-            let reader=ScreenReader {continuation.resume(returning:$0)}
+            let reader=ScreenReader(needsMakeup:needsMakeup) {continuation.resume(returning:$0)}
             lock.lock();screenReaders.append(reader);lock.unlock()
             DispatchQueue.global().asyncAfter(deadline:.now()+timeout) {reader.finish(nil)}
         }
     }
     /// Copies the drawable into CPU memory for waiting shutters, after the frame's drawing and before it is presented.
     /// `frame` is the camera frame this drawable was drawn from (held only while a shutter waits).
-    func copyForReaders(_ texture:MTLTexture,_ command:MTLCommandBuffer,frame:ARFrame) {
-        lock.lock();let readers=screenReaders;screenReaders=[];lock.unlock()
+    /// `makeup`: this picture has the makeup drawn on the face; readers that need it wait for such a picture.
+    func copyForReaders(_ texture:MTLTexture,_ command:MTLCommandBuffer,frame:ARFrame,makeup:Bool=true) {
+        lock.lock()
+        let (readers,waiting)=ScreenReader.split(screenReaders,makeup:makeup)
+        screenReaders=waiting
+        lock.unlock()
         guard !readers.isEmpty else{return}
         let width=texture.width,height=texture.height,row=width*4
         guard texture.pixelFormat == .bgra8Unorm_srgb || texture.pixelFormat == .bgra8Unorm,

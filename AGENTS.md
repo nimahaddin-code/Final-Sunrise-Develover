@@ -1,3 +1,15 @@
+## Desired photo always has the look on — -Nimah (2026-11-13)
+
+Device test (Cheekbone blush): the Expected photo was the plain camera, so the slider showed no filter and the feedback had
+no target (1%, "Not found yet" on both cards). The shutter took the engine's next picture, which can be drawn before the
+look is on the face (just opened, cheek landmarks not ready, face lost for a frame), and when no picture came it silently
+fell back to the plain snapshot. Now the desired shutter for blush and brows asks for a picture with the makeup drawn
+(`readScreen(needsMakeup:)`; `copyForReaders(makeup:)` is true for blush when tracked with full opacity and pigment on, for
+brows when the strip or 3D hair is drawn and visible; `ScreenReader.split`). Without one in two tries (about 3 s) no photo
+is taken: the camera stays on and the hint says "The filter isn't on your face yet. Hold still and take it again."
+Eyeliner and lips (drawn into the photo afterwards) and the result photo are unchanged. Not confirmed on a device which
+of the causes it was; the developer read-out still shows the shutter details. 415 Simulator tests pass.
+
 ## Feedback: smiling is a note, not a retake — -Nimah (2026-11-13)
 
 Device test: a relaxed face (Youthful) read as smiling (ARKit `mouthSmileLeft` or `Right` > 0.3 on either photo) and the

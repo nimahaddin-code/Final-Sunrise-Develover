@@ -9638,6 +9638,16 @@
         }
       }
     },
+    "The filter isn't on your face yet. Hold still and take it again." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Filternya belum nempel di wajahmu. Diam sebentar, lalu foto lagi ya."
+          }
+        }
+      }
+    },
     "The front has soft colour with no hard starting edge." : {
       "comment" : "Text for a step in a tutorial.",
       "extractionState" : "stale",
