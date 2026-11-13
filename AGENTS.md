@@ -14,6 +14,28 @@ Developer tools on the feedback screen add `FeedbackPointCheck`: both photos wit
 targets). Pink should sit on the try-on makeup. Test `testPointCheckMarksTheVirtualBlush`; 382 Simulator tests pass. Not
 checked on a device.
 
+## Lips: fourth tool (card, three lipstick shapes, tutorial) — Khalish (2026-11-11)
+
+`TryOnTool.lips` runs through the same one-tool flow as the others. Home: a fourth card on the right (order Eyeliner, Blush,
+Brows, Lips; `home-card-lips`). Try On: `LipsTryOnFeature` (`Features/Lips/TryOn/`) lists three shapes, `LipStyle`: Natural
+(the person's own lip line), Full (past the lip line in the middle, `LipShape.fullReach` = 3.5% of the mouth's width,
+nothing at the corners) and Gradient (strong in the middle, 30% at the edge); five shades (`MakeupPalette.lipShades`,
+approximate, not product colours) plus the colour sheet and the intensity bar. Drawing: a 2D overlay like the eyeliner.
+`LipOverlayModel` (`Features/Lips/Engine/`) sends ARKit's frames to its own `MediaPipeEyeLandmarkProvider`, which now also
+returns the lips (`EyeLandmarkFrame.lips`: outer edge and mouth opening, 20 points each, MediaPipe's FACEMESH_LIPS), carries
+the newest result with the head on every frame and publishes it in view points; `LipShape` turns it into the fills that
+`LipOverlayView` (live) and `LipShape.compose` (the desired-look photo) both draw, normal blending, mouth opening left out.
+`LinerFrameRelay` feeds both overlays (`setLipsEnabled`). Tutorial: `TutorialTab.lips`, three steps for every shape
+(`GuidedTutorialModel.lipLessons`: mark, connect, fill), one half of the lips then the other like the other tools;
+`LipStepGuide` draws the marks, the dashed outline and the pulsing fill on the person's own lips (for Gradient on the middle
+of the lips); the steps sheet and the side-done card ("Left side done!") work as before. Not done: lips feedback is not
+measured (`MeasuredFeedbackProvider` gives the placeholder, and the feedback screen says "Scores for lips are coming soon"
+over the Before / After slider); the kit items have no pictures or popups. Placeholders to replace: `home-card-lips` and
+`tutorial-lips-1…3` are drawn by a script, not the design team's art; `LookBriefView.crop` for lips is a guess. New
+strings have Indonesian drafts (`needs_review`). 389 Simulator tests pass (new: `LipShapeTests`); the home card, Try On
+row, brief and steps sheet were seen on the Simulator (iPhone 17 Pro, iOS 26.5), but it has no camera: the lipstick on a face, its colour and edge, the
+head-carry anchors (`LipOverlayModel.mouthAnchors`, rough) and the tutorial guide were never seen and need a device.
+
 ## Screen light stays while zoomed, brighter — 2026-11-11
 
 The screen light used to be an inset of the camera picture itself (26 pt plus a 26 pt blur, white page behind), so zooming
@@ -1305,7 +1327,7 @@ SunriseApp/
     Theme/                AppColors, AppSpacing, AppTypography (use these, never hard-coded values)
     Components/           GlassKit (frosted glass buttons and pills)
   Features/
-    Blush/ Brow/ Eyeliner/  one folder per tool: TryOn/ (pickers, looks, config), Engine/ (drawing), Tutorial/ (steps), Info/ (look, kit)
+    Blush/ Brow/ Eyeliner/ Lips/  one folder per tool: TryOn/ (pickers, looks, config), Engine/ (drawing), Tutorial/ (steps), Info/ (look, kit)
     Screens/              screens that show all tools: TryOn/, Comparison/, Preparation/, Tutorial/, Feedback/
     Onboarding/           Welcome/ (shown once); Splash/, Pages/, CompactOpening/ + EntryFlowView (new flow)
   Resources/              Assets.xcassets (named colours), Localizable.xcstrings
@@ -1318,7 +1340,7 @@ SunriseAppTests/
 ## Navigation
 
 - The app opens on the welcome (once per `AppNavigator.currentWelcomeVersion`; with `NewFlow` on, the entry screens
-  first), then `FeatureHomeView` (a slider of three tool cards, no camera). Routes (`AppRoute`): `tryOn`, `capture`,
+  first), then `FeatureHomeView` (a slider of four tool cards, no camera). Routes (`AppRoute`): `tryOn`, `capture`,
   `lookBrief`, `recommendedTutorial`, `feedback` (order in the top section); `AppRootView.destination` builds them. To add a
   screen: add a case, its destination, and push it with `navigator.open(route, in: .tryOn)`; `goBack(in:)`,
   `restartTutorial()` and `returnToRoot(of:)` move back.

@@ -1,12 +1,12 @@
 import SwiftUI
 
 /// The first page after the welcome: the onboarding glow with "Hi, pretty!", a swipeable slider of tool cards (Eyeliner,
-/// Blush, Brows; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
+/// Blush, Brows, Lips; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
 /// about it, and a dark "Start lesson" button for the selected tool; the cards themselves are not tappable (swipe only). Plain SwiftUI, no camera.
 struct FeatureHomeView: View {
     let onSelect: (TryOnTool) -> Void
 
-    private static let order: [TryOnTool] = [.eyeliner, .blush, .eyebrow]
+    private static let order: [TryOnTool] = [.eyeliner, .blush, .eyebrow, .lips]
     private static let cardWidthFraction: CGFloat = 0.68
 
     @State private var selected: TryOnTool? = .blush
@@ -139,6 +139,7 @@ struct FeatureHomeView: View {
         case .eyeliner: "home-card-eyeliner"
         case .blush: "home-card-blush"
         case .eyebrow: "home-card-brows"
+        case .lips: "home-card-lips"
         }
     }
 
@@ -147,6 +148,7 @@ struct FeatureHomeView: View {
         case .eyeliner: "Eyeliner"
         case .blush: "Blush"
         case .eyebrow: "Brows"
+        case .lips: "Lips"
         }
     }
 
@@ -155,6 +157,7 @@ struct FeatureHomeView: View {
         case .eyeliner: "A liner shape that suits your eyes."
         case .blush: "A soft flush placed right for your cheeks."
         case .eyebrow: "Fuller, tidy brows that frame your face."
+        case .lips: "A lip colour and shape that suits you."
         }
     }
 
@@ -163,6 +166,7 @@ struct FeatureHomeView: View {
         case .eyeliner: GuidedTutorialModel.linerLessons.count
         case .blush: GuidedTutorialModel.blushLessons.count
         case .eyebrow: GuidedTutorialModel.browLessons.count
+        case .lips: GuidedTutorialModel.lipLessons.count
         }
     }
 

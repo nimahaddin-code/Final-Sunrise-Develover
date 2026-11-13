@@ -179,13 +179,14 @@ struct LookBriefView: View {
             .underline(item.info != nil, color: AppColors.dandanPink)
     }
 
-    /// The part of the full-page photo the brief shows: both brows and eyes, both eyes, or the face for blush, at the
+    /// The part of the full-page photo the brief shows: both brows and eyes, both eyes, the mouth, or the face for blush, at the
     /// picture's 1.85 : 1. Placeholder positions (centre height, width as fractions of the photo), not checked on a device.
     static func crop(_ image: UIImage, for tool: TryOnTool) -> UIImage {
         let (centerY, widthFraction): (CGFloat, CGFloat) = switch tool {
         case .eyebrow: (0.37, 0.86)
         case .eyeliner: (0.39, 0.78)
         case .blush: (0.46, 1)
+        case .lips: (0.56, 0.7)
         }
         let size = image.size
         let width = size.width * widthFraction

@@ -128,7 +128,8 @@ extension GuidedFlowTests {
     func testEveryTutorialStepHasItsPicture() {
         let lessons: [(TutorialTab, Int)] = [(.brows, GuidedTutorialModel.browLessons.count),
                                              (.eyeliner, GuidedTutorialModel.linerLessons.count),
-                                             (.blush, GuidedTutorialModel.blushLessons.count)]
+                                             (.blush, GuidedTutorialModel.blushLessons.count),
+                                             (.lips, GuidedTutorialModel.lipLessons.count)]
         for (tab, count) in lessons {
             for step in 0..<count {
                 let name = TutorialStepsSheet.imageName(tab: tab, step: step)

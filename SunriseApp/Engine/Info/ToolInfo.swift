@@ -38,6 +38,7 @@ struct ToolInfo: Identifiable {
         case .blush: blush(handoff)
         case .eyebrow: brow(handoff)
         case .eyeliner: eyeliner(handoff)
+        case .lips: lips(handoff)
         }
     }
 

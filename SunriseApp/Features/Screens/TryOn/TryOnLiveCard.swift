@@ -100,6 +100,9 @@ struct TryOnLiveCard: View {
             LinerOverlayView(model: home.liner, isVisible: !home.isComparing)
                 .opacity(advisor.isDimmed ? Self.dimmedOpacity : 1)
                 .animation(.easeInOut(duration: 0.25), value: advisor.isDimmed)
+            LipOverlayView(model: home.lips, isVisible: !home.isComparing)
+                .opacity(advisor.isDimmed ? Self.dimmedOpacity : 1)
+                .animation(.easeInOut(duration: 0.25), value: advisor.isDimmed)
             if home.tool == .eyebrow && EyebrowConfiguration.showsBrowTracking && home.browLandmarksVisible
                 && !home.isOff && !home.isComparing {
                 BrowTrackingOverlayView(feed: camera.browTracking)

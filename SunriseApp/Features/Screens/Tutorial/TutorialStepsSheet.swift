@@ -136,6 +136,7 @@ struct TutorialStepsSheet: View {
         case .brows: ("tutorial-brow", 4)
         case .eyeliner: ("tutorial-liner", 3)
         case .blush: ("tutorial-blush", 1)
+        case .lips: ("tutorial-lips", 3)
         }
         return (0..<count).contains(step) ? "\(prefix)-\(step + 1)" : nil
     }

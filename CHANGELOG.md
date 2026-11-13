@@ -3,6 +3,14 @@
 - The face mesh, colours, eyes and pose are read from the camera frame the photo was drawn from, not a later live frame.
 - Developer tools: points on the Expected / Result photos (mesh, eyes, target) to check they sit on the makeup.
 
+## Lips: fourth tool (card, three lipstick shapes, tutorial) — 2026-11-11
+
+`TryOnTool.lips`: a fourth home card on the right, Try On with three lipstick shapes (`LipStyle`: Natural, Full, Gradient)
+and five shades, and the tutorial with its steps sheet (three steps, one half of the lips then the other). Drawn as a 2D
+overlay from MediaPipe's lip points (`LipOverlayModel`, `LipShape`, `LipOverlayView`; `EyeLandmarkFrame.lips`), also into
+the desired-look photo. Lips feedback is not measured yet (placeholder). `home-card-lips` and `tutorial-lips-1…3` are
+drawn placeholders. 389 Simulator tests pass; not checked on a device (the Simulator has no camera).
+
 ## Screen light stays while zoomed, brighter — 2026-11-11
 
 The screen light used to be an inset of the camera picture itself (26 pt plus a 26 pt blur, white page behind), so zooming

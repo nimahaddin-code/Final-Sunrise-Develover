@@ -2,9 +2,9 @@ import ARKit
 import Combine
 import SwiftUI
 
-/// The three makeup tools on the Try On home screen.
+/// The makeup tools on the Try On home screen.
 enum TryOnTool: CaseIterable, Identifiable, Hashable {
-    case blush, eyeliner, eyebrow
+    case blush, eyeliner, eyebrow, lips
 
     var id: Self { self }
 
@@ -13,6 +13,7 @@ enum TryOnTool: CaseIterable, Identifiable, Hashable {
         case .blush: "Blush"
         case .eyeliner: "Eyeliner"
         case .eyebrow: "Eyebrow"
+        case .lips: "Lips"
         }
     }
 
@@ -21,6 +22,7 @@ enum TryOnTool: CaseIterable, Identifiable, Hashable {
         case .blush: "paintbrush.pointed"
         case .eyeliner: "eye"
         case .eyebrow: "eyebrow"
+        case .lips: "mouth"
         }
     }
 
@@ -29,6 +31,7 @@ enum TryOnTool: CaseIterable, Identifiable, Hashable {
         case .blush: .blush
         case .eyeliner: .eyeliner
         case .eyebrow: .eyebrow
+        case .lips: .lips
         }
     }
 }
@@ -54,22 +57,29 @@ final class LinerFrameRelay: @unchecked Sendable {
     private let lock = NSLock()
     private var pending = false
     private var isEnabled = false
+    private var lipsEnabled = false
     private weak var model: LinerOverlayModel?
+    /// The lipstick overlay reads the same frames (each overlay ignores them while it has no style).
+    private weak var lips: LipOverlayModel?
 
-    @MainActor init(model: LinerOverlayModel) { self.model = model }
+    @MainActor init(model: LinerOverlayModel, lips: LipOverlayModel? = nil) { self.model = model; self.lips = lips }
 
     /// Frames are only handed over while the eyeliner is on; otherwise 60 main-thread hops a second would do nothing.
     func setEnabled(_ value: Bool) { lock.lock(); isEnabled = value; lock.unlock() }
+    func setLipsEnabled(_ value: Bool) { lock.lock(); lipsEnabled = value; lock.unlock() }
 
     func deliver(_ frame: ARFrame, _ face: ARFaceAnchor) {
         lock.lock()
         // No frame-rate cap: a blink lasts about 150 ms, so every camera frame counts for the liner.
-        if pending || !isEnabled { lock.unlock(); return }
+        if pending || !(isEnabled || lipsEnabled) { lock.unlock(); return }
         pending = true
         lock.unlock()
         let box = Box(frame: frame, face: face)
         DispatchQueue.main.async { [self] in
-            MainActor.assumeIsolated { model?.submit(box.frame, face: box.face) }
+            MainActor.assumeIsolated {
+                model?.submit(box.frame, face: box.face)
+                lips?.submit(box.frame, face: box.face)
+            }
             lock.lock(); pending = false; lock.unlock()
         }
     }
@@ -111,7 +121,10 @@ final class LinerFrameRelay: @unchecked Sendable {
     let brow: EyebrowViewModel
     let camera = FaceCameraState()
     let liner = LinerOverlayModel()
+    /// The lipstick, a 2D overlay like the eyeliner.
+    let lips = LipOverlayModel()
     let relay: LinerFrameRelay
+    @Published private(set) var lipStyle: LipStyle = .natural
     private var linerStyle: LinerStyle?
     private var linerIsNeutral = true
     /// Which of the six eyeliner looks is shown (none is the eyeliner tool being off).
@@ -133,11 +146,11 @@ final class LinerFrameRelay: @unchecked Sendable {
         linerIsNeutral = plan.eyeliner.isNeutral
         if case .eyeliner(let style)? = recommendation?.style { linerStyle = style; linerRecommendation = recommendation } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: .blush)
-        relay = LinerFrameRelay(model: liner)
+        relay = LinerFrameRelay(model: liner, lips: lips)
         shades = [.blush: MakeupPalette.shades(for:.blush).first ?? MakeupPalette.pink, .eyebrow: MakeupPalette.shades(for:.eyebrow).first ?? MakeupPalette.referenceBrown,
-                  .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown]
+                  .eyeliner: recommendation?.style.shade ?? MakeupPalette.brown, .lips: MakeupPalette.lipShades[0]]
         intensities = [.blush: Double(MakeupRuleDatabase.shared?.palettes.first(where:{$0.category=="blush"})?.intensity.default.value ?? 0.72), .eyebrow: BrowOverlay.defaultIntensity,
-                       .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner)]
+                       .eyeliner: MakeupTextureRenderer.startingIntensity(for: .eyeliner), .lips: Self.defaultIntensity]
         // The style picker mutates the nested brow model. Forward those
         // changes so the live camera representable receives a new
         // configuration immediately instead of waiting for another home-level
@@ -156,6 +169,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         case .eyebrow:return brow.selectedBrow != nil
         case .blush:return brow.selectedBlush != nil
         case .eyeliner:return linerStyle != nil
+        case .lips:return true
         }
     }
     var recommendationTitle: String {
@@ -163,6 +177,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         case .eyebrow:return brow.selectedBrow?.title ?? String(localized:"Eyebrow unavailable")
         case .blush:return blushLook.title
         case .eyeliner:return linerIsNeutral ? String(localized:"Natural line") : String(localized:"Eyeliner fitted to your eye scan")
+        case .lips:return lipStyle.title
         }
     }
     func updateRecommendations(face: FaceShapeResult?, eyes: EyeShapeResult?) {
@@ -212,7 +227,7 @@ final class LinerFrameRelay: @unchecked Sendable {
     /// What the tutorial starts from: every tool's last choice, and which tools have makeup on.
     /// With `focusTool` set (one tool per flow), only that tool goes on to the capture, tutorial and feedback.
     var tutorialHandoff: TutorialHandoff {
-        TutorialHandoff(tool: tool, shades: shades, intensities: intensities, linerLook: linerLook, blushStyle: blushLook,
+        TutorialHandoff(tool: tool, shades: shades, intensities: intensities, linerLook: linerLook, lipStyle: lipStyle, blushStyle: blushLook,
                         browOverlay: browOverlay, hideNaturalBrow: !naturalBrowVisible,
                         enabled: focusTool.map { enabled.intersection([$0]) } ?? enabled)
     }
@@ -224,6 +239,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         intensities.merge(handoff.intensities) { _, new in new }
         if let style = handoff.blushStyle, style.isReferenceLook { blushLook = style }
         linerLook = handoff.linerLook
+        lipStyle = handoff.lipStyle
         browOverlay = handoff.browOverlay
         naturalBrowVisible = !handoff.hideNaturalBrow
         // -Nimah: not filtered by `canTry`: right after `activate()` the brow model is still loading, so blush was dropped
@@ -257,7 +273,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         }
         shades[tool] = shade
         enabled.insert(tool)
-        if tool == .eyeliner { syncLiner() }
+        if tool == .eyeliner || tool == .lips { syncLiner() }
     }
 
     func choose(browOverlay overlay: BrowOverlay?) {
@@ -273,9 +289,15 @@ final class LinerFrameRelay: @unchecked Sendable {
         syncLiner()
     }
 
+    func setLipStyle(_ style: LipStyle) {
+        lipStyle = style
+        enabled.insert(.lips)
+        syncLiner()
+    }
+
     func turnOff() {
         enabled.remove(tool)
-        if tool == .eyeliner { syncLiner() }
+        if tool == .eyeliner || tool == .lips { syncLiner() }
     }
 
     func setIntensity(_ value: Double) {
@@ -283,7 +305,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         guard tool != .eyebrow || browOverlay != nil else { return }
         intensities[tool] = min(max(value, 0), 1)
         enabled.insert(tool)
-        if tool == .eyeliner { syncLiner() }
+        if tool == .eyeliner || tool == .lips { syncLiner() }
     }
 
     /// Starts the one camera. Blush and eyebrow are placed as soon as it runs, whichever tools are on, so switching a
@@ -318,6 +340,8 @@ final class LinerFrameRelay: @unchecked Sendable {
         active=false; activation?.cancel(); activation=nil
         relay.setEnabled(false)
         liner.stop()
+        relay.setLipsEnabled(false)
+        lips.stop()
         camera.stopSession?()
         camera.suspend()
         recordLiveState()
@@ -334,8 +358,10 @@ final class LinerFrameRelay: @unchecked Sendable {
                      tint: shades[tool].map { SIMD3(Float($0.red), Float($0.green), Float($0.blue)) })
     }
 
-    /// The liner is a 2D overlay fed by MediaPipe; it runs only while the eyeliner is on.
+    /// The liner is a 2D overlay fed by MediaPipe; it runs only while the eyeliner is on. The lipstick is the other 2D
+    /// overlay and is brought up to date with it.
     private func syncLiner() {
+        syncLips()
         guard active, enabled.contains(.eyeliner), let linerStyle else {
             relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
@@ -343,5 +369,15 @@ final class LinerFrameRelay: @unchecked Sendable {
         }
         relay.setEnabled(true)
         liner.setStyle(EyelinerPlanner.style(linerStyle, look: linerLook), shade: shades[.eyeliner], intensity: intensities[.eyeliner] ?? 1)
+    }
+
+    private func syncLips() {
+        guard active, enabled.contains(.lips) else {
+            relay.setLipsEnabled(false)
+            lips.setStyle(nil, shade: nil, intensity: 1)
+            return
+        }
+        relay.setLipsEnabled(true)
+        lips.setStyle(lipStyle, shade: shades[.lips], intensity: intensities[.lips] ?? Self.defaultIntensity)
     }
 }

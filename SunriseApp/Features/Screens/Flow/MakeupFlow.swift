@@ -118,6 +118,7 @@ extension TutorialHandoff {
         case .blush: String(localized: "\(blushStyle?.title ?? String(localized: "Your")) blush")
         case .eyebrow: String(localized: "\(browOverlay?.title ?? String(localized: "Natural")) brows")
         case .eyeliner: String(localized: "\(String(localized: linerLook.title)) eyeliner")
+        case .lips: String(localized: "\(lipStyle.title) lips")
         }
     }
 }
@@ -153,6 +154,11 @@ extension TryOnTool {
                                       text: "Eyeliner in a pen. The felt tip draws a thin, dark line right along your upper lashes.",
                                       tip: "Hold it like a pen and draw short strokes."))
         ]
+        // No pictures yet, so no popups: the cards show the symbols.
+        case .lips: [
+            MakeupKitItem(id: "lipstick", kind: .product, symbol: "mouth.fill", title: "Lipstick", detail: "A bullet or a liquid one"),
+            MakeupKitItem(id: "lipliner", kind: .tool, symbol: "pencil", title: "Lip liner", detail: "Or the edge of your lipstick")
+        ]
         }
     }
 
@@ -162,6 +168,7 @@ extension TryOnTool {
         case .blush: MakeupKitItem(id: "pads", kind: .forMistakes, symbol: "circle", title: "Cotton pads", detail: "to apply the micellar water")
         case .eyebrow: MakeupKitItem(id: "buds", kind: .forMistakes, symbol: "circle", title: "Cotton buds", detail: "to wipe small edges")
         case .eyeliner: MakeupKitItem(id: "buds", kind: .forMistakes, symbol: "circle", title: "Cotton buds", detail: "pointed ones fix small lines")
+        case .lips: MakeupKitItem(id: "buds", kind: .forMistakes, symbol: "circle", title: "Cotton buds", detail: "to tidy the edge")
         }
         return [
             MakeupKitItem(id: "micellar", kind: .forMistakes, symbol: "drop", title: "Micellar water", detail: "wipes off mistakes",
@@ -314,7 +321,8 @@ struct MeasuredFeedbackProvider: MakeupFeedbackProviding {
     var fallback: any MakeupFeedbackProviding = PlaceholderFeedbackProvider()
 
     func feedback(for request: MakeupFeedbackRequest, progress: @escaping @MainActor @Sendable (Double) -> Void) async -> MakeupFeedback {
-        guard let database = FeedbackDatabase.load() else { return await fallback.feedback(for: request, progress: progress) }
+        // Lips are not measured yet: the placeholder says so.
+        guard request.tool != .lips, let database = FeedbackDatabase.load() else { return await fallback.feedback(for: request, progress: progress) }
         await progress(0.1)
         let language = FeedbackLanguage.current
         let tool = request.tool
@@ -329,6 +337,8 @@ struct MeasuredFeedbackProvider: MakeupFeedbackProviding {
             case .blush: BlushFeedback.evaluate(blush, database: database, language: language)
             case .eyebrow: BrowFeedback.evaluate(line, database: database, language: language)
             case .eyeliner: EyelinerFeedback.evaluate(line, database: database, language: language)
+            // Not reached: lips left above.
+            case .lips: MakeupFeedback(score: nil, headline: "", comments: [])
             }
         }.value
         // A short, steady finish so the loading screen does not flash.
@@ -398,6 +408,7 @@ struct StylePill: View {
         case .blush: Color(red: 0xF4 / 255, green: 0x9A / 255, blue: 0xB8 / 255)
         case .eyebrow: Color(red: 0x6B / 255, green: 0x4A / 255, blue: 0x35 / 255)
         case .eyeliner: AppColors.buttonInk
+        case .lips: Color(red: 0xC7 / 255, green: 0x1A / 255, blue: 0x2B / 255)
         }
     }
 
