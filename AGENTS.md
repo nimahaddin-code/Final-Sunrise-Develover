@@ -1,3 +1,20 @@
+## My Looks: saved looks (model + storage) — -Nimah (2026-11-13)
+
+PRD "My Looks", prompt 1. Every feedback that finishes is saved on the phone: `MyLook` (Features/MyLooks/MyLook.swift)
+holds the tool (`TryOnTool.storageKey`), the look id (blush style / liner look / brow overlay id / lip style), title and
+default title, dates, attempt count, the shade (hex, palette or product: a "custom." id comes from the colour sheet's
+product photo), strength, the scores (overall, placement, shade), the feedback as rule ids + band + side (never text, so it
+reads in the current language later), the first fix's marks, earlier scores and the two photo file names. `MyLookStore`
+(an actor; plain files, not SwiftData: one small JSON and two JPEGs per look, no queries) keeps
+Application Support/MyLooks/<id>/{look.json, expected.jpg, result.jpg}, with complete file protection and the store left
+out of backups. The same tool + look again updates its entry (photos, scores, shade, strength; old score to
+`previousScores`, attempt + 1, title kept). Titles are trimmed, at most 30 characters, empty = the default
+(`handoff.styleTitle`). `FeedbackView` saves once per visit when the feedback is on screen (the photos as shown there:
+cropped, lined up, at most 1280 px, JPEG 0.8) and shows a toast: "Saved to My Looks", storage full, or failed; the feedback
+stays either way. A run left before Feedback saves nothing. Face and eye shape are not filled yet (the flow uses the
+standard look, no scan). No Home card, detail or retry yet (prompt 2). 404 Simulator tests pass (new `MyLookStoreTests`);
+not checked on a device.
+
 ## Tutorial steps sheet: current step only, tap outside closes — 2026-11-13
 
 `TutorialStepsSheet` shows only the step being done (no sideways paging, no page dots), so it always matches the camera
