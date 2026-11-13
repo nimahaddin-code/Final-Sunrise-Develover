@@ -1,3 +1,7 @@
+## 2026-11-13 — Feedback: smiling no longer hides the feedback -Nimah
+
+- `capture.smiling` is a note instead of a retake; the scores and fixes show. The note is not shown on the feedback screen yet.
+
 ## 2026-11-13 — Blush: five looks from the design -Nimah
 
 - Try On offers Cheekbone, Apple, Sunkissed, Lifted, Soft Sweep, then Youthful; three new `blush.look.*` presets sized like the others.
