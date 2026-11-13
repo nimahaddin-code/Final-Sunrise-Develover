@@ -11,6 +11,12 @@
             "state" : "needs_review",
             "value" : "Bibir %@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@唇妆"
+          }
         }
       }
     },
@@ -42,6 +48,12 @@
             "state" : "needs_review",
             "value" : "Blush %@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@腮红"
+          }
         }
       }
     },
@@ -54,6 +66,12 @@
             "state" : "needs_review",
             "value" : "Alis %@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@眉形"
+          }
         }
       }
     },
@@ -65,6 +83,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Eyeliner %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@眼线"
           }
         }
       }
@@ -94,6 +118,12 @@
             "state" : "needs_review",
             "value" : "%lld mnt"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld 分钟"
+          }
         }
       }
     },
@@ -106,6 +136,12 @@
             "state" : "needs_review",
             "value" : "%lld persen"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld%%"
+          }
         }
       }
     },
@@ -115,6 +151,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "^[%lld langkah](inflect: true)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%lld 步"
           }
         }
       }
@@ -127,6 +169,12 @@
             "state" : "needs_review",
             "value" : "01 Pink"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "01 粉色"
+          }
         }
       }
     },
@@ -138,6 +186,12 @@
             "state" : "needs_review",
             "value" : "02 Peach"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "02 蜜桃"
+          }
         }
       }
     },
@@ -147,6 +201,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "3 langkah gampang"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "简单 3 步"
           }
         }
       }
@@ -159,6 +219,12 @@
             "state" : "needs_review",
             "value" : "03 Pink Winter"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "03 冬日粉"
+          }
         }
       }
     },
@@ -170,6 +236,12 @@
             "state" : "needs_review",
             "value" : "04 Mauve kalem"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "04 灰调藕紫"
+          }
         }
       }
     },
@@ -179,6 +251,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "92% mirip"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "匹配度 92%"
           }
         }
       }
@@ -192,6 +270,12 @@
             "state" : "needs_review",
             "value" : "Brush besar yang bulat dan lembut. Ratain blush tipis-tipis, jadi glow-nya halus tanpa garis tegas."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一支又大又软的圆头刷。它能把腮红轻轻扫开，妆感柔和，没有生硬的边缘。"
+          }
         }
       }
     },
@@ -201,6 +285,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Yang stik atau yang cair"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "口红管或唇釉都可以"
           }
         }
       }
@@ -212,6 +302,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Brush yang bersih"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一支干净的刷子"
           }
         }
       }
@@ -225,6 +321,12 @@
             "state" : "needs_review",
             "value" : "Yang model spidol paling gampang dikontrol"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "软头眼线笔最好控制"
+          }
         }
       }
     },
@@ -237,6 +339,12 @@
             "state" : "needs_review",
             "value" : "Kelopak rata, lipatannya hampir nggak kelihatan."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼皮平整，几乎看不到褶皱。"
+          }
         }
       }
     },
@@ -247,6 +355,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Rona pink segar di pipi bagian depan, bikin wajahmu kelihatan lebih fresh dan imut."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在苹果肌上扫出清新的红润感，让脸看起来更柔和、更年轻。"
           }
         }
       }
@@ -260,6 +374,12 @@
             "state" : "needs_review",
             "value" : "Air pembersih yang lembut. Tuang dikit ke kapas atau cotton bud, terus hapus yang meleset."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一款温和的卸妆水。在化妆棉或棉签上倒一点，就能把画错的地方擦掉。"
+          }
         }
       }
     },
@@ -271,6 +391,12 @@
             "state" : "needs_review",
             "value" : "Tipis-tipis aja di atasnya, biar blush-nya awet seharian."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "最后薄薄扫一层，腮红会更持久。"
+          }
         }
       }
     },
@@ -281,6 +407,12 @@
             "state" : "needs_review",
             "value" : "Bentuk eyeliner yang pas buat matamu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "适合你眼型的眼线。"
+          }
         }
       }
     },
@@ -290,6 +422,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Warna dan bentuk bibir yang pas buat kamu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "适合你的唇色和唇形。"
           }
         }
       }
@@ -308,6 +446,12 @@
             "state" : "needs_review",
             "value" : "Sedikit panduan. Glow yang khas kamu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一点点指引，属于你的好气色。"
+          }
         }
       }
     },
@@ -320,6 +464,12 @@
             "state" : "needs_review",
             "value" : "Sikat spiral kecil, kayak sikat maskara yang bersih. Buat nyisir bulu alis ke atas dan nge-blend garis pensil."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一支小螺旋刷，就像干净的睫毛膏刷头。它能把眉毛向上梳，并柔化眉笔的线条。"
+          }
         }
       }
     },
@@ -331,6 +481,12 @@
             "state" : "needs_review",
             "value" : "Brush blush yang lembut"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一支柔软的腮红刷"
+          }
         }
       }
     },
@@ -340,6 +496,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Rona blush lembut di posisi yang pas buat pipimu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "位置刚好的柔和腮红。"
           }
         }
       }
@@ -351,6 +513,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Rona lembut di pipi, di-blend sampai nggak ada garis tepinya."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在脸颊上轻扫一层柔和的颜色，晕开到看不出边缘。"
           }
         }
       }
@@ -364,6 +532,12 @@
             "state" : "needs_review",
             "value" : "Pensil tipis buat ngisi alis. Pilih warna yang sedikit lebih terang dari rambutmu biar natural."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一支用来填补眉毛的细眉笔。选比发色浅一点的颜色，看起来更自然。"
+          }
         }
       }
     },
@@ -374,6 +548,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Rona hangat di kedua pipi sampai ke hidung, kayak habis main di pantai."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从两颊到鼻梁扫上一层暖色，像刚晒完太阳回来一样。"
           }
         }
       }
@@ -386,6 +566,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Dahi lebih lebar, makin ke bawah makin ramping sampai dagu yang lancip."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "额头较宽，向下收窄到较窄的下颌和尖下巴。"
           }
         }
       }
@@ -405,6 +591,12 @@
             "state" : "needs_review",
             "value" : "Hasil tangkapan kamera asli. Framing atau cahaya yang berbeda bisa memengaruhi perbandingan. Tanpa penilaian kecantikan atau penilaian otomatis."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这是相机实拍的照片。构图或光线不同会影响对比。不做颜值打分，也不做自动评估。"
+          }
         }
       }
     },
@@ -417,6 +609,12 @@
             "state" : "needs_review",
             "value" : "Ambil warna dari produkmu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从产品上取色"
+          }
         }
       }
     },
@@ -426,6 +624,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tambah di sini"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "补在这里"
           }
         }
       }
@@ -443,6 +647,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tambah warna ini"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "添加这个颜色"
           }
         }
       }
@@ -462,6 +672,12 @@
             "state" : "needs_review",
             "value" : "Sesudah"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "之后"
+          }
         }
       }
     },
@@ -479,6 +695,12 @@
             "state" : "needs_review",
             "value" : "Makeup disesuaikan otomatis · jaga wajahmu tetap terlihat"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在自动对齐妆容 · 请保持脸部可见"
+          }
         }
       }
     },
@@ -488,6 +710,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Selesai!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "全部完成！"
           }
         }
       }
@@ -499,6 +727,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Izinkan akses kamera di Pengaturan untuk memotret paletmu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "请在“设置”中允许使用相机，才能拍摄你的彩妆盘。"
           }
         }
       }
@@ -512,6 +746,12 @@
             "state" : "needs_review",
             "value" : "Izinkan kamera di Pengaturan dulu, ya, biar bisa foto produkmu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "请在“设置”中允许使用相机，才能拍摄你的产品。"
+          }
         }
       }
     },
@@ -524,6 +764,12 @@
             "state" : "needs_review",
             "value" : "Almond"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "杏仁眼"
+          }
         }
       }
     },
@@ -533,6 +779,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Dikit lagi!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "就差一点！"
           }
         }
       }
@@ -566,12 +818,26 @@
             "state" : "needs_review",
             "value" : "Apel pipi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "苹果肌"
+          }
         }
       }
     },
     "Apply and Blend" : {
       "comment" : "Title of the first step of the blush tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上色并晕染"
+          }
+        }
+      }
     },
     "AR and the camera are not implemented. The next proof of concept will render blush on the tracked face mesh. Other makeup overlays remain out of scope." : {
       "extractionState" : "manual",
@@ -586,6 +852,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "AR dan kamera belum diterapkan. Uji coba berikutnya akan menampilkan blush pada mesh wajah yang terlacak. Overlay makeup lainnya belum termasuk."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "AR 和相机尚未实现。下一个概念验证会在追踪到的面部网格上渲染腮红。其他妆容叠加不在范围内。"
           }
         }
       }
@@ -605,6 +877,12 @@
             "state" : "needs_review",
             "value" : "AR tersedia di iPhone yang didukung. Tutorial manual bisa dipakai di semua perangkat. Penempatan hanya panduan perkiraan, bukan analisis bentuk wajah otomatis."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "AR 仅在支持的 iPhone 上可用。手动教程适用于所有设备。位置只是大致的指引，不是自动脸型分析。"
+          }
         }
       }
     },
@@ -614,6 +892,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Arabian"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "阿拉伯式"
           }
         }
       }
@@ -633,6 +917,12 @@
             "state" : "needs_review",
             "value" : "Gambar hanya ilustrasi. Inspirasi yang diunggah tidak dianalisis otomatis."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "图片仅作示意。上传的灵感图不会被自动分析。"
+          }
         }
       }
     },
@@ -643,6 +933,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "B201 Bistre"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "B201 深褐"
           }
         }
       }
@@ -655,6 +951,12 @@
             "state" : "needs_review",
             "value" : "B202 Cokelat"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "B202 棕色"
+          }
         }
       }
     },
@@ -666,6 +968,12 @@
             "state" : "needs_review",
             "value" : "B203 Cokelat tua"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "B203 巧克力"
+          }
         }
       }
     },
@@ -676,6 +984,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "B204 Tan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "B204 浅棕"
           }
         }
       }
@@ -695,6 +1009,12 @@
             "state" : "needs_review",
             "value" : "Pink muda"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "婴儿粉"
+          }
         }
       }
     },
@@ -707,6 +1027,12 @@
             "state" : "needs_review",
             "value" : "Kembali"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "返回"
+          }
         }
       }
     },
@@ -718,6 +1044,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Balik ke menu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "返回功能列表"
           }
         }
       }
@@ -744,6 +1076,12 @@
             "state" : "needs_review",
             "value" : "Balik ke tutorial"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "返回教程"
+          }
         }
       }
     },
@@ -767,6 +1105,12 @@
             "state" : "needs_review",
             "value" : "Proporsinya seimbang: sedikit lebih panjang dari lebarnya, rahang sedikit lebih ramping dari dahi."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "比例均衡：长度略大于宽度，下颌比额头稍窄。"
+          }
         }
       }
     },
@@ -778,6 +1122,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Seimbang, sudut luarnya meruncing lembut."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "比例均衡，眼尾微微收窄。"
           }
         }
       }
@@ -795,6 +1145,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Berdasarkan bentuk wajah yang tersimpan. Langsung coba, lalu ikuti tutorialnya."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "根据你保存的脸型推荐。直接试妆，再跟着教程画。"
           }
         }
       }
@@ -814,6 +1170,12 @@
             "state" : "needs_review",
             "value" : "Sebelum"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "之前"
+          }
         }
       }
     },
@@ -832,6 +1194,12 @@
             "state" : "needs_review",
             "value" : "Sebelum & sesudah"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "前后对比"
+          }
         }
       }
     },
@@ -849,6 +1217,12 @@
             "state" : "needs_review",
             "value" : "Sebelum dan sesudah"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "前后对比"
+          }
         }
       }
     },
@@ -858,6 +1232,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto sebelum dan sesudah"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "前后对比照片"
           }
         }
       }
@@ -890,6 +1270,12 @@
             "state" : "needs_review",
             "value" : "Berry"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "莓果色"
+          }
         }
       }
     },
@@ -908,6 +1294,12 @@
             "state" : "needs_review",
             "value" : "Bistre"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "深褐"
+          }
         }
       }
     },
@@ -917,6 +1309,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Langkah-langkah singkat dan panduan di wajahmu nunjukin harus di mana dan seberapa banyak."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "小步骤加上实时面部指引，告诉你画在哪里、画多少。"
           }
         }
       }
@@ -930,12 +1328,26 @@
             "state" : "needs_review",
             "value" : "Hitam"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "黑色"
+          }
         }
       }
     },
     "Blend and Clean Up" : {
       "comment" : "Instruction shown over the camera in the Brows tab of the guided tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "晕染并修整"
+          }
+        }
+      }
     },
     "Blend inward" : {
       "localizations" : {
@@ -943,6 +1355,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blend ke dalam"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "向内晕染"
           }
         }
       }
@@ -954,12 +1372,26 @@
             "state" : "needs_review",
             "value" : "Blend ke atas dan ke luar"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "向上向外晕开"
+          }
         }
       }
     },
     "Blend the front and clean up." : {
       "comment" : "Instruction to blend the front of the brow and clean up.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "晕开眉头，再修整边缘。"
+          }
+        }
+      }
     },
     "Blonde" : {
       "comment" : "Name of a makeup shade.",
@@ -969,6 +1401,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pirang"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "金色"
           }
         }
       }
@@ -982,12 +1420,26 @@
             "state" : "needs_review",
             "value" : "Bingkai biru"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "蓝色相框"
+          }
         }
       }
     },
     "blush" : {
       "comment" : "The name of the colour to be used in the debug menu.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "腮红"
+          }
+        }
+      }
     },
     "Blush" : {
       "comment" : "Makeup category for a blush.",
@@ -997,6 +1449,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blush"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "腮红"
           }
         }
       }
@@ -1009,6 +1467,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blush-nya belum bisa tampil"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "腮红渲染暂不可用"
           }
         }
       }
@@ -1027,6 +1491,12 @@
             "state" : "needs_review",
             "value" : "Penempatan awal blush: %@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "腮红起始位置：%@"
+          }
         }
       }
     },
@@ -1038,6 +1508,12 @@
             "state" : "needs_review",
             "value" : "Lengkung tebal"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "浓挑眉"
+          }
         }
       }
     },
@@ -1048,6 +1524,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lurus tebal"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "浓平眉"
           }
         }
       }
@@ -1078,7 +1560,15 @@
     },
     "brow" : {
       "comment" : "The name of the colour for the brow.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉毛"
+          }
+        }
+      }
     },
     "Brow 1" : {
       "localizations" : {
@@ -1086,6 +1576,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Brow 1"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉形 1"
           }
         }
       }
@@ -1096,6 +1592,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Brow 2"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉形 2"
           }
         }
       }
@@ -1108,6 +1610,12 @@
             "state" : "needs_review",
             "value" : "Alis dan blush belum tersedia: kontur awal belum tertangkap"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉毛和腮红不可用：没有采集到初始轮廓"
+          }
         }
       }
     },
@@ -1118,6 +1626,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Kontur alis tidak bisa dicocokkan dari pindai awal. Hasil wajah dan matamu tetap tersimpan. Kamu bisa lanjut dengan makeup yang tersedia."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "初次扫描没能拟合出眉毛轮廓。你的脸型和眼型结果已保留，可以继续使用可用的妆容。"
           }
         }
       }
@@ -1130,6 +1644,12 @@
             "state" : "needs_review",
             "value" : "Penyesuaian alis belum tersedia"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉毛拟合不可用"
+          }
         }
       }
     },
@@ -1139,6 +1659,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pensil alis"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉笔"
           }
         }
       }
@@ -1163,6 +1689,12 @@
             "state" : "needs_review",
             "value" : "Cokelat"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "棕色"
+          }
         }
       }
     },
@@ -1174,6 +1706,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Alis"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉毛"
           }
         }
       }
@@ -1211,16 +1749,38 @@
             "state" : "needs_review",
             "value" : "Sisir ke atas sebelum diisi, dan sekali lagi sesudahnya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "填色前先向上梳一遍，填完再梳一遍。"
+          }
         }
       }
     },
     "Brush Your Brows" : {
       "comment" : "Title of the first step in the Brows tab of the guided tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "梳理眉毛"
+          }
+        }
+      }
     },
     "Brush your brows up with a spoolie." : {
       "comment" : "Instruction shown over the camera in the Brows tab of the guided tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用螺旋刷把眉毛向上梳。"
+          }
+        }
+      }
     },
     "Brush your brows up with your spoolie." : {
       "comment" : "Instruction for the first step of the Brows tab, showing how to draw the brow with a pencil.",
@@ -1273,6 +1833,12 @@
             "state" : "needs_review",
             "value" : "Kalibrasi belum diterapkan. Kamera tidak aktif dan belum ada wajah terdeteksi. Layar ini hanya contoh titik integrasi nanti."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "校准尚未实现。相机没有运行，也没有检测到人脸。此页面只用来演示之后的接入点。"
+          }
         }
       }
     },
@@ -1291,6 +1857,12 @@
             "state" : "needs_review",
             "value" : "Akses kamera mati. Izinkan di Pengaturan atau lanjut dengan tutorial manual."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "相机权限已关闭。请在“设置”中允许访问，或继续使用手动教程。"
+          }
         }
       }
     },
@@ -1303,6 +1875,12 @@
             "state" : "needs_review",
             "value" : "Kamera berhenti"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "相机已停止"
+          }
         }
       }
     },
@@ -1314,6 +1892,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Kamera nggak bisa dipakai"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "相机不可用"
           }
         }
       }
@@ -1332,6 +1916,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto sesudah"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拍摄妆后照"
           }
         }
       }
@@ -1356,6 +1946,12 @@
             "state" : "needs_review",
             "value" : "Cat eye"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "猫眼"
+          }
         }
       }
     },
@@ -1366,6 +1962,12 @@
             "state" : "needs_review",
             "value" : "Tengah · blend ke bawah"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "中间 · 向下晕染"
+          }
         }
       }
     },
@@ -1375,6 +1977,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tengah pipi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "脸颊中央"
           }
         }
       }
@@ -1393,6 +2001,12 @@
             "state" : "needs_review",
             "value" : "Ganti warna bingkai"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "更换相框颜色"
+          }
         }
       }
     },
@@ -1405,6 +2019,12 @@
             "state" : "needs_review",
             "value" : "Lagi ngecek hasilmu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在检查你的妆容"
+          }
         }
       }
     },
@@ -1414,6 +2034,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tulang pipi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "颧骨"
           }
         }
       }
@@ -1426,6 +2052,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tulang pipi paling lebar, dahi dan rahangnya lebih ramping."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "颧骨是最宽的位置，额头和下颌较窄。"
           }
         }
       }
@@ -1445,6 +2077,12 @@
             "state" : "needs_review",
             "value" : "Cokelat tua"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "巧克力"
+          }
         }
       }
     },
@@ -1461,6 +2099,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pilih bentuk wajah secara manual jika belum ada hasil pindai."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没有扫描结果时，可以手动选择脸型。"
           }
         }
       }
@@ -1480,6 +2124,12 @@
             "state" : "needs_review",
             "value" : "Pilih look favoritmu. Belajar satu langkah demi satu langkah, dengan panduan blush langsung di wajahmu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选一个你喜欢的妆容。一步一步学，腮红指引会实时显示在你脸上。"
+          }
         }
       }
     },
@@ -1497,6 +2147,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pilih foto, lalu pilih gaya tutorial sendiri. Tanpa analisis makeup otomatis."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选一张照片，再自己选择教程风格。不包含自动妆容分析。"
           }
         }
       }
@@ -1529,6 +2185,12 @@
             "state" : "needs_review",
             "value" : "Pilih dari Foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从相册选择"
+          }
         }
       }
     },
@@ -1540,6 +2202,12 @@
             "state" : "needs_review",
             "value" : "Pilih warna makeup"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选择妆容颜色"
+          }
         }
       }
     },
@@ -1550,6 +2218,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lagi pilih warna makeup"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在选择妆容颜色"
           }
         }
       }
@@ -1563,6 +2237,12 @@
             "state" : "needs_review",
             "value" : "Dipilih dari bentuk matamu, bukan bentuk wajah."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "根据你的眼型选择，而不是脸型。"
+          }
         }
       }
     },
@@ -1573,6 +2253,12 @@
             "state" : "needs_review",
             "value" : "Classic"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "经典"
+          }
         }
       }
     },
@@ -1582,6 +2268,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Classic Red"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "经典红"
           }
         }
       }
@@ -1643,6 +2335,12 @@
             "state" : "needs_review",
             "value" : "Tutup"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "关闭"
+          }
         }
       }
     },
@@ -1652,6 +2350,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tutup pilihan warna"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "关闭颜色"
           }
         }
       }
@@ -1663,6 +2367,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pilih yang mirip shade tadi. Cream gampang nyatu sama kulit kalau ditepuk."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选接近你所选色号的颜色。膏状腮红轻拍后会融入肌肤。"
           }
         }
       }
@@ -1689,6 +2399,12 @@
             "state" : "needs_review",
             "value" : "Berdekatan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼距近"
+          }
         }
       }
     },
@@ -1698,6 +2414,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Warna & bentuk"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "颜色与唇形"
           }
         }
       }
@@ -1711,6 +2433,12 @@
             "state" : "needs_review",
             "value" : "Warna buat pipimu. Ada yang bentuk powder di compact, ada juga cream di stik atau pot kecil."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "给脸颊上色的产品。有粉饼状的粉质腮红，也有棒状或小罐装的膏状腮红。"
+          }
         }
       }
     },
@@ -1722,6 +2450,12 @@
             "state" : "needs_review",
             "value" : "Disapukan dari pipi luar naik ke pelipis, biar wajahmu kelihatan lebih tirus dan terangkat."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从脸颊外侧向太阳穴斜扫，让脸看起来更上扬、更立体。"
+          }
         }
       }
     },
@@ -1731,6 +2465,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Warna"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "颜色"
           }
         }
       }
@@ -1744,6 +2484,12 @@
             "state" : "needs_review",
             "value" : "Nyisir bulu alis ke atas"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把眉毛向上梳"
+          }
         }
       }
     },
@@ -1755,6 +2501,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bandingin"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "对比"
           }
         }
       }
@@ -1768,6 +2520,12 @@
             "state" : "needs_review",
             "value" : "Bandingin sama tanpa makeup"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "和素颜对比"
+          }
         }
       }
     },
@@ -1777,6 +2535,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bandingin bibirmu sama try-on kamu. Skor buat bibir segera hadir."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把你的唇妆和试妆效果对比一下。唇妆评分即将推出。"
           }
         }
       }
@@ -1794,6 +2558,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Perbandingan akan menampilkan foto asli pengguna di tahap berikutnya. Belum ada foto, penilaian, atau penyimpanan di kerangka ini."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "之后的版本会在对比中显示用户实拍照片。此框架中没有拍摄、评分或保存功能。"
           }
         }
       }
@@ -1813,6 +2583,12 @@
             "state" : "needs_review",
             "value" : "Selesaikan tutorial kamera dan simpan foto Sebelum dan Sesudah di sini."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "完成一次相机教程，把前后对比照保存在这里。"
+          }
         }
       }
     },
@@ -1823,6 +2599,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Selesaikan pindai mata untuk mendapat rekomendasi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "完成眼部扫描即可获得推荐"
           }
         }
       }
@@ -1835,20 +2617,50 @@
             "state" : "needs_review",
             "value" : "Selesaikan pindai wajah dulu. Jika bentuk ini belum punya referensi, makeup tetap mati."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "请先完成面部扫描。如果这个脸型还没有参考，妆容会保持关闭。"
+          }
         }
       }
     },
     "Connect and Fill" : {
       "comment" : "Instruction shown over the camera in the Brows tab of the guided tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "连线并填色"
+          }
+        }
+      }
     },
     "Connect the Dots" : {
       "comment" : "The title of a step in the eyeliner tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把点连起来"
+          }
+        }
+      }
     },
     "Connect the dots and fill from the middle out." : {
       "comment" : "Instruction shown over the camera in the Brows tab of the guided tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把点连起来，再从中间向外填色。"
+          }
+        }
+      }
     },
     "Connect the dots into one thin line." : {
       "extractionState" : "stale",
@@ -1863,7 +2675,15 @@
     },
     "Connect the dots to create a thin eyeliner outline." : {
       "comment" : "Text for the second step of the eyeliner tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把点连起来，画出细细的眼线轮廓。"
+          }
+        }
+      }
     },
     "Connect the Marks" : {
       "localizations" : {
@@ -1871,6 +2691,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sambungin Tandanya"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把标记连起来"
           }
         }
       }
@@ -1882,6 +2708,12 @@
             "state" : "needs_review",
             "value" : "Sambungin tandanya biar jadi garis bentuk bibir."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把标记连起来，勾出唇形。"
+          }
         }
       }
     },
@@ -1891,6 +2723,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lanjut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "继续"
           }
         }
       }
@@ -1902,6 +2740,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lanjut dengan makeup yang tersedia"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "使用可用的妆容继续"
           }
         }
       }
@@ -1921,6 +2765,12 @@
             "state" : "needs_review",
             "value" : "Lanjut dengan tutorial manual"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "继续手动教程"
+          }
         }
       }
     },
@@ -1932,6 +2782,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lanjut tanpa foto"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不拍照继续"
           }
         }
       }
@@ -1951,6 +2807,12 @@
             "state" : "needs_review",
             "value" : "Pink dingin"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "冷调粉"
+          }
         }
       }
     },
@@ -1963,6 +2825,12 @@
             "state" : "needs_review",
             "value" : "Coral"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "珊瑚色"
+          }
         }
       }
     },
@@ -1972,6 +2840,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Coral Pink"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "珊瑚粉"
           }
         }
       }
@@ -1996,6 +2870,12 @@
             "state" : "needs_review",
             "value" : "Cotton bud"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "棉签"
+          }
         }
       }
     },
@@ -2008,6 +2888,12 @@
             "state" : "needs_review",
             "value" : "Kapas"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "化妆棉"
+          }
         }
       }
     },
@@ -2018,6 +2904,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto ini nggak bisa dibuka. Coba foto lain, ya."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法打开这张照片，换一张试试。"
           }
         }
       }
@@ -2031,6 +2923,12 @@
             "state" : "needs_review",
             "value" : "Fotonya gagal diambil. Coba sekali lagi, ya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拍照失败，请再试一次。"
+          }
         }
       }
     },
@@ -2041,6 +2939,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blush cream atau liquid"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "膏状或液体腮红"
           }
         }
       }
@@ -2054,6 +2958,12 @@
             "state" : "needs_review",
             "value" : "Melengkung"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "弯眉"
+          }
         }
       }
     },
@@ -2064,6 +2974,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lengkung halus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "弯挑眉"
           }
         }
       }
@@ -2076,6 +2992,12 @@
             "state" : "needs_review",
             "value" : "Warna pilihanmu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自定义颜色"
+          }
         }
       }
     },
@@ -2087,12 +3009,26 @@
             "state" : "needs_review",
             "value" : "Warna makeup kustom"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自定义妆容颜色"
+          }
         }
       }
     },
     "Dab a little blush inside the circle, then blend outward." : {
       "comment" : "Instruction shown over the camera in the Blush tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在圆圈内点一点腮红，再向外晕开。"
+          }
+        }
+      }
     },
     "Dab a little blush inside the small circle." : {
       "extractionState" : "stale",
@@ -2111,6 +3047,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tepuk warnanya"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "轻拍上色"
           }
         }
       }
@@ -2134,6 +3076,12 @@
             "state" : "needs_review",
             "value" : "Basahi dulu, lalu tekan-tekan di pinggirnya biar nge-blend."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "先把它打湿，再按压边缘把颜色晕开。"
+          }
         }
       }
     },
@@ -2142,6 +3090,12 @@
       "isCommentAutoGenerated" : true,
       "localizations" : {
         "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "dandan"
+          }
+        },
+        "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "dandan"
@@ -2157,6 +3111,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Cokelat tua"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "深棕色"
           }
         }
       }
@@ -2176,6 +3136,12 @@
             "state" : "needs_review",
             "value" : "Hapus look"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "删除妆容"
+          }
         }
       }
     },
@@ -2193,6 +3159,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hapus look ini"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "删除这个妆容"
           }
         }
       }
@@ -2229,6 +3201,12 @@
             "state" : "needs_review",
             "value" : "Dukungan perangkat belum diperiksa. Hanya layanan contoh."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "尚未检查设备是否支持。仅为模拟服务。"
+          }
         }
       }
     },
@@ -2238,6 +3216,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blend diagonal"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "斜向晕染"
           }
         }
       }
@@ -2250,6 +3234,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Diamond"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "菱形脸"
           }
         }
       }
@@ -2268,20 +3258,50 @@
             "state" : "needs_review",
             "value" : "Jelajahi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "发现"
+          }
         }
       }
     },
     "Do my right brow" : {
       "comment" : "A button that triggers the same tutorial for the user's right brow.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "画右边眉毛"
+          }
+        }
+      }
     },
     "Do my right cheek" : {
       "comment" : "A button that triggers the same tutorial on the other cheek.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "画右边脸颊"
+          }
+        }
+      }
     },
     "Do my right eye" : {
       "comment" : "A button that triggers the same tutorial for the user's right eye.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "画右眼"
+          }
+        }
+      }
     },
     "Do my right side" : {
       "localizations" : {
@@ -2289,6 +3309,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lanjut sisi kanan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "画右边"
           }
         }
       }
@@ -2302,6 +3328,12 @@
             "state" : "needs_review",
             "value" : "Selesai"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "完成"
+          }
         }
       }
     },
@@ -2313,6 +3345,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Turun"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "下垂眼"
           }
         }
       }
@@ -2357,6 +3395,12 @@
             "state" : "needs_review",
             "value" : "Data tidak bisa dimuat."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法加载内容。"
+          }
         }
       }
     },
@@ -2369,6 +3413,12 @@
             "state" : "needs_review",
             "value" : "Jaraknya pas"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼距适中"
+          }
         }
       }
     },
@@ -2378,6 +3428,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Target"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "预期"
           }
         }
       }
@@ -2396,6 +3452,12 @@
             "state" : "needs_review",
             "value" : "Jelajahi contoh kalibrasi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "查看校准占位页"
+          }
         }
       }
     },
@@ -2412,6 +3474,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Jelajahi contoh perbandingan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "查看对比占位页"
           }
         }
       }
@@ -2430,6 +3498,12 @@
             "state" : "needs_review",
             "value" : "Jelajahi contoh panduan langsung"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "查看实时指引占位页"
+          }
         }
       }
     },
@@ -2446,6 +3520,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Jelajahi contoh impor referensi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "查看参考导入占位页"
           }
         }
       }
@@ -2464,6 +3544,12 @@
             "state" : "needs_review",
             "value" : "Jelajahi kerangka"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "查看框架"
+          }
         }
       }
     },
@@ -2480,6 +3566,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Jelajahi kerangka proyek SunriseApp. Semua referensi dan data tersimpan adalah contoh. Kamera, AR, impor foto, dan penyimpanan belum diterapkan. Onboarding diulang saat aplikasi dibuka ulang."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "查看 SunriseApp 项目框架。所有参考和已保存内容都是示例数据。相机、AR、照片导入和保存尚未实现。重启 App 后引导页会重置。"
           }
         }
       }
@@ -2498,6 +3590,12 @@
             "state" : "needs_review",
             "value" : "Scan mata"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼部扫描"
+          }
         }
       }
     },
@@ -2509,6 +3607,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Alis"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉毛"
           }
         }
       }
@@ -2527,6 +3631,12 @@
             "state" : "needs_review",
             "value" : "Gaya awal alis: %@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉毛起始样式：%@"
+          }
         }
       }
     },
@@ -2539,12 +3649,26 @@
             "state" : "needs_review",
             "value" : "Alis belum bisa dipakai"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉毛不可用"
+          }
         }
       }
     },
     "eyeliner" : {
       "comment" : "The name of the eyeliner colour.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼线"
+          }
+        }
+      }
     },
     "Eyeliner" : {
       "comment" : "Display name for the eyeliner category.",
@@ -2554,6 +3678,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Eyeliner"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼线"
           }
         }
       }
@@ -2566,6 +3696,12 @@
             "state" : "needs_review",
             "value" : "Eyeliner yang disesuaikan sama matamu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "根据眼部扫描贴合的眼线"
+          }
         }
       }
     },
@@ -2577,6 +3713,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Eyeliner bentuk pen. Ujungnya bikin garis tipis dan tegas pas di bulu mata atas."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "笔状的眼线。软头笔尖能沿着上睫毛根部画出细而深的线。"
           }
         }
       }
@@ -2621,6 +3763,12 @@
             "state" : "needs_review",
             "value" : "Kalibrasi wajah"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "面部校准"
+          }
         }
       }
     },
@@ -2639,6 +3787,12 @@
             "state" : "needs_review",
             "value" : "Hadap kamera dengan cahaya merata sejauh panjang lengan. Diam selama dua detik. Kalibrasi memeriksa kestabilan pelacakan, bukan bentuk wajahmu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在均匀的光线下，隔一臂的距离面对相机，保持两秒不动。校准检查的是追踪稳定性，不是你的脸型。"
+          }
         }
       }
     },
@@ -2651,6 +3805,12 @@
             "state" : "needs_review",
             "value" : "Kamera berhenti mengenali wajahmu. Coba lagi, ya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "面部追踪意外停止。"
+          }
         }
       }
     },
@@ -2662,6 +3822,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hadapkan wajahmu lurus ke HP."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正对着手机。"
           }
         }
       }
@@ -2686,12 +3852,26 @@
             "state" : "needs_review",
             "value" : "Feedback-nya segera hadir"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "反馈功能即将推出"
+          }
         }
       }
     },
     "Fill and Finish" : {
       "comment" : "The title of the third step in the eyeliner tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "填色并完成"
+          }
+        }
+      }
     },
     "Fill from the middle to the tail, lightly." : {
       "comment" : "Instruction for filling in the brow from the middle to the tail, lightly.",
@@ -2713,12 +3893,26 @@
             "state" : "needs_review",
             "value" : "Isi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "填色"
+          }
         }
       }
     },
     "Fill in the eyeliner frame, keeping it close to your lashes." : {
       "comment" : "Fill and finish step of the eyeliner tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把眼线轮廓填满，尽量贴近睫毛根部。"
+          }
+        }
+      }
     },
     "Fill in the shape with lipstick, from the middle out." : {
       "localizations" : {
@@ -2726,6 +3920,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Isi bentuknya pakai lipstik, dari tengah ke luar."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用口红把唇形填满，从中间向外涂。"
           }
         }
       }
@@ -2780,6 +3980,12 @@
             "state" : "needs_review",
             "value" : "Temukan glow-ku"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "找到我的好气色"
+          }
         }
       }
     },
@@ -2789,6 +3995,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Cari bagian pipi yang menonjol"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "找到苹果肌"
           }
         }
       }
@@ -2801,6 +4013,12 @@
             "state" : "needs_review",
             "value" : "Ujung jari"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "指腹"
+          }
         }
       }
     },
@@ -2810,6 +4028,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hasil akhir"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "完成"
           }
         }
       }
@@ -2828,6 +4052,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Selesaikan tutorial manual"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "完成手动教程"
           }
         }
       }
@@ -2880,6 +4110,12 @@
             "state" : "needs_review",
             "value" : "Masukin seluruh wajahmu ke dalam garis"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把整张脸放进线框里"
+          }
         }
       }
     },
@@ -2889,6 +4125,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Benerin ini dulu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "先改这里"
           }
         }
       }
@@ -2902,6 +4144,12 @@
             "state" : "needs_review",
             "value" : "Datar horizontal"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "水平横扫"
+          }
         }
       }
     },
@@ -2912,6 +4160,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lurus datar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "平直眉"
           }
         }
       }
@@ -2924,6 +4178,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Brush fluffy"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "蓬松刷"
           }
         }
       }
@@ -2948,6 +4208,12 @@
             "state" : "needs_review",
             "value" : "Buat yang meleset"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "画错时用"
+          }
         }
       }
     },
@@ -2960,6 +4226,12 @@
             "state" : "needs_review",
             "value" : "Dahi, tulang pipi, dan rahang lebarnya mirip, dengan garis rahang yang tegas."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "额头、颧骨和下颌宽度相近，下颌线条分明有棱角。"
+          }
         }
       }
     },
@@ -2971,6 +4243,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foxy"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "狐狸眼"
           }
         }
       }
@@ -2995,6 +4273,12 @@
             "state" : "needs_review",
             "value" : "Full"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "丰满"
+          }
         }
       }
     },
@@ -3006,6 +4290,12 @@
             "state" : "needs_review",
             "value" : "Lengkung penuh"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "粗挑眉"
+          }
         }
       }
     },
@@ -3015,6 +4305,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Alis lebih penuh dan rapi yang membingkai wajahmu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "更饱满、更整齐的眉毛，衬托你的脸型。"
           }
         }
       }
@@ -3033,6 +4329,12 @@
             "state" : "needs_review",
             "value" : "Integrasi nanti: PhotosPicker sistem, pratinjau gambar, dan penanganan error impor."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "之后接入：系统照片选择器、图片预览和导入错误处理。"
+          }
         }
       }
     },
@@ -3042,6 +4344,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Yuk, mulai"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "开始吧"
           }
         }
       }
@@ -3094,12 +4402,26 @@
             "state" : "needs_review",
             "value" : "Oke, paham"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "知道了"
+          }
         }
       }
     },
     "Grab your brow pencil and mark 3 points." : {
       "comment" : "Instruction shown over the camera in the Brows tab of the guided tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拿起眉笔，标出 3 个点。"
+          }
+        }
+      }
     },
     "Gradient" : {
       "localizations" : {
@@ -3107,6 +4429,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Gradient"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "渐变"
           }
         }
       }
@@ -3120,6 +4448,12 @@
             "state" : "needs_review",
             "value" : "Panduan di kiri"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "指引在左边"
+          }
         }
       }
     },
@@ -3131,6 +4465,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Panduan di kiri, look di kanan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左边是指引，右边是妆效"
           }
         }
       }
@@ -3144,6 +4484,12 @@
             "state" : "needs_review",
             "value" : "Panduan di kanan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "指引在右边"
+          }
         }
       }
     },
@@ -3156,6 +4502,12 @@
             "state" : "needs_review",
             "value" : "Hati"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "心形脸"
+          }
         }
       }
     },
@@ -3166,6 +4518,12 @@
             "state" : "needs_review",
             "value" : "Segini miripnya hasilmu sama Try On tadi."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "来看看你和试妆效果有多接近。"
+          }
         }
       }
     },
@@ -3175,6 +4533,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hai, cantik!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "嗨，美女！"
           }
         }
       }
@@ -3188,6 +4552,12 @@
             "state" : "needs_review",
             "value" : "Lengkung tinggi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "高挑眉"
+          }
         }
       }
     },
@@ -3197,6 +4567,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tulang pipi tinggi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "高颧骨"
           }
         }
       }
@@ -3210,6 +4586,12 @@
             "state" : "needs_review",
             "value" : "Pegang kayak pulpen, terus gores pendek-pendek."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "像握笔一样拿着，一小段一小段地画。"
+          }
         }
       }
     },
@@ -3221,6 +4603,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pegang HP-mu lurus, sejajar mata."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把手机拿正，与眼睛齐平。"
           }
         }
       }
@@ -3234,6 +4622,12 @@
             "state" : "needs_review",
             "value" : "Hooded"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "内双"
+          }
         }
       }
     },
@@ -3243,6 +4637,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blend horizontal"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "横向晕染"
           }
         }
       }
@@ -3256,6 +4656,12 @@
             "state" : "needs_review",
             "value" : "Aku belum lihat wajahmu nih. Pegang HP-mu kayak lagi ngaca."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "我还看不到你。像照镜子一样拿着手机吧。"
+          }
         }
       }
     },
@@ -3268,6 +4674,12 @@
             "state" : "needs_review",
             "value" : "Izinkan kamera dulu, ya, biar jadi cermin kamu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "我需要用相机来当你的镜子。"
+          }
         }
       }
     },
@@ -3279,6 +4691,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Aku tungguin di sini. Balik lagi kalau udah siap, ya."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "我在这里等你，准备好了再回来。"
           }
         }
       }
@@ -3297,6 +4715,12 @@
             "state" : "needs_review",
             "value" : "Hasil dukungan buatan: didukung. Ini tidak berarti sesi kamera aktif."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "注入的支持结果：支持。这不代表相机会话正在运行。"
+          }
         }
       }
     },
@@ -3309,6 +4733,12 @@
             "state" : "needs_review",
             "value" : "Ketebalan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "浓度"
+          }
         }
       }
     },
@@ -3320,6 +4750,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Agak gelap nih. Tap lampunya atau hadap ke jendela."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "有点暗。点一下补光灯，或者面向窗户。"
           }
         }
       }
@@ -3344,6 +4780,12 @@
             "state" : "needs_review",
             "value" : "Siapin di dekatmu · buat yang meleset"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "放在手边 · 画错时用"
+          }
         }
       }
     },
@@ -3367,6 +4809,12 @@
             "state" : "needs_review",
             "value" : "Di atas ujung hidung dan di luar garis pupil, ukurannya ngikutin pipimu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保持在鼻尖上方、瞳孔外侧，并按你的脸颊大小调整。"
+          }
         }
       }
     },
@@ -3378,6 +4826,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tetap di luar garis pupilmu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保持在瞳孔外侧。"
           }
         }
       }
@@ -3404,15 +4858,53 @@
         }
       }
     },
+    "Language" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Bahasa"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "语言"
+          }
+        }
+      }
+    },
     "Left brow done!" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左边眉毛完成！"
+          }
+        }
+      }
     },
     "Left cheek done!" : {
-
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左边脸颊完成！"
+          }
+        }
+      }
     },
     "Left eye done!" : {
       "comment" : "A title for a card that appears when the user has finished one side of a tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左眼完成！"
+          }
+        }
+      }
     },
     "Left side" : {
       "comment" : "The title of the side of the face that is being done.",
@@ -3434,6 +4926,12 @@
             "state" : "needs_review",
             "value" : "Sisi kiri selesai!"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左边完成！"
+          }
         }
       }
     },
@@ -3445,6 +4943,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Panjang dan lebarnya mirip, pipinya penuh dan rahangnya membulat lembut."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "长度和宽度相近，脸颊饱满，下颌线条柔和圆润。"
           }
         }
       }
@@ -3463,6 +4967,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Yuk temukan wajahmu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "先来找到你的脸"
           }
         }
       }
@@ -3489,6 +4999,12 @@
             "state" : "needs_review",
             "value" : "Cukup kamu aja di kamera, ya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "画面里只留你一个人吧。"
+          }
         }
       }
     },
@@ -3499,6 +5015,12 @@
             "state" : "needs_review",
             "value" : "Ambil fotonya sekali lagi, ya, biar bisa kami cek."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "再拍一张吧，这样我们才能检查。"
+          }
         }
       }
     },
@@ -3508,6 +5030,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Yuk, coba lagi!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "再试一次吧！"
           }
         }
       }
@@ -3530,6 +5058,12 @@
             "state" : "needs_review",
             "value" : "Lifted"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "提拉"
+          }
         }
       }
     },
@@ -3541,6 +5075,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lampu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "补光灯"
           }
         }
       }
@@ -3554,6 +5094,12 @@
             "state" : "needs_review",
             "value" : "Lebih terang dari rambutmu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "比发色浅一点"
+          }
         }
       }
     },
@@ -3566,6 +5112,12 @@
             "state" : "needs_review",
             "value" : "Tebal garis, titik mulai, dan wing-nya dipilih dari bentuk matamu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "线条粗细、起点和眼尾都根据你的眼型选择。"
+          }
         }
       }
     },
@@ -3575,6 +5127,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lip liner"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "唇线笔"
           }
         }
       }
@@ -3586,6 +5144,12 @@
             "state" : "needs_review",
             "value" : "Bibir"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "唇妆"
+          }
         }
       }
     },
@@ -3596,6 +5160,12 @@
             "state" : "needs_review",
             "value" : "lipstik"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "口红"
+          }
         }
       }
     },
@@ -3605,6 +5175,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lipstik"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "口红"
           }
         }
       }
@@ -3617,6 +5193,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Liquid liner"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼线液笔"
           }
         }
       }
@@ -3646,6 +5228,12 @@
             "state" : "needs_review",
             "value" : "Panduan AR langsung"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时 AR 指引"
+          }
         }
       }
     },
@@ -3664,6 +5252,12 @@
             "state" : "needs_review",
             "value" : "Panduan kamera langsung"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时相机指引"
+          }
         }
       }
     },
@@ -3675,6 +5269,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Panduan live belum bisa dipakai"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时指引不可用"
           }
         }
       }
@@ -3688,6 +5288,12 @@
             "state" : "needs_review",
             "value" : "Try On live butuh iPhone dengan kamera depan TrueDepth (yang ada Face ID)."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时试妆需要配备原深感前置摄像头的 iPhone。"
+          }
         }
       }
     },
@@ -3699,6 +5305,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Try On live belum bisa dipakai"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时试妆不可用"
           }
         }
       }
@@ -3718,6 +5330,12 @@
             "state" : "needs_review",
             "value" : "Memuat look"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在加载妆容"
+          }
         }
       }
     },
@@ -3728,6 +5346,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Memuat palet"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在加载彩妆盘"
           }
         }
       }
@@ -3747,6 +5371,12 @@
             "state" : "needs_review",
             "value" : "Memuat foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在加载照片"
+          }
         }
       }
     },
@@ -3765,6 +5395,12 @@
             "state" : "needs_review",
             "value" : "Memuat foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在加载照片"
+          }
         }
       }
     },
@@ -3781,6 +5417,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Memuat referensi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在加载参考"
           }
         }
       }
@@ -3799,6 +5441,12 @@
             "state" : "needs_review",
             "value" : "Memuat data contoh"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在加载示例内容"
+          }
         }
       }
     },
@@ -3810,6 +5458,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Look di kiri, panduan di kanan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左边是妆效，右边是指引"
           }
         }
       }
@@ -3823,6 +5477,12 @@
             "state" : "needs_review",
             "value" : "Look di kiri, kamera polos di kanan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左边是妆效，右边是原相机"
+          }
         }
       }
     },
@@ -3835,6 +5495,12 @@
             "state" : "needs_review",
             "value" : "Lihat lurus ke kamera, biar makeup-nya pas posisinya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正视相机，以便定位妆容"
+          }
         }
       }
     },
@@ -3846,6 +5512,12 @@
             "state" : "needs_review",
             "value" : "Bedak tabur"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "散粉"
+          }
         }
       }
     },
@@ -3855,6 +5527,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pas buat kamu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "为你定制"
           }
         }
       }
@@ -3866,6 +5544,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Warna makeup"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "妆容颜色"
           }
         }
       }
@@ -3879,6 +5563,12 @@
             "state" : "needs_review",
             "value" : "Makeup-nya lagi nggak bisa tampil sebentar"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "妆容暂时不可用"
+          }
         }
       }
     },
@@ -3888,6 +5578,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "makeup yang pas buat wajahmu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "为你的脸定制的妆容"
           }
         }
       }
@@ -3907,6 +5603,12 @@
             "state" : "needs_review",
             "value" : "Ilustrasi penempatan makeup"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "妆容位置示意图"
+          }
         }
       }
     },
@@ -3918,6 +5620,12 @@
             "state" : "needs_review",
             "value" : "Persiapan makeup belum tersedia"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "妆容准备不可用"
+          }
         }
       }
     },
@@ -3928,6 +5636,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Spons makeup"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "美妆蛋"
           }
         }
       }
@@ -3947,20 +5661,50 @@
             "state" : "needs_review",
             "value" : "Tutorial manual · kamera mati"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "手动教程 · 相机已关闭"
+          }
         }
       }
     },
     "Map Your Brows" : {
       "comment" : "Instruction shown over the camera in the Brows tab of the guided tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "定位眉形"
+          }
+        }
+      }
     },
     "Mark 4 points along the eyeliner guide." : {
       "comment" : "Instruction for the first step of the eyeliner tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "沿着眼线指引标出 4 个点。"
+          }
+        }
+      }
     },
     "Mark the Guide" : {
       "comment" : "Title of the first step in the eyeliner tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "标出指引点"
+          }
+        }
+      }
     },
     "Mark the points along the lip guide." : {
       "localizations" : {
@@ -3968,6 +5712,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tandai titik-titik di sepanjang panduan bibir."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "沿着唇部指引标出各个点。"
           }
         }
       }
@@ -3978,6 +5728,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tandai Bentuknya"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "标出唇形"
           }
         }
       }
@@ -4015,6 +5771,12 @@
             "state" : "needs_review",
             "value" : "Mauve"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "藕紫"
+          }
         }
       }
     },
@@ -4027,6 +5789,12 @@
             "state" : "needs_review",
             "value" : "Micellar water"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "卸妆水"
+          }
         }
       }
     },
@@ -4036,6 +5804,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Mocha"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "摩卡"
           }
         }
       }
@@ -4054,6 +5828,12 @@
             "state" : "needs_review",
             "value" : "KOLEKSI CONTOH · BUKAN HASIL TERSIMPANMU"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "模拟合集 · 不是你保存的结果"
+          }
         }
       }
     },
@@ -4065,6 +5845,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Monolid"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "单眼皮"
           }
         }
       }
@@ -4078,6 +5864,12 @@
             "state" : "needs_review",
             "value" : "Mundur sedikit dari layar, ya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "脸离屏幕再远一点。"
+          }
         }
       }
     },
@@ -4090,6 +5882,12 @@
             "state" : "needs_review",
             "value" : "Geser rambut atau tanganmu dulu, biar wajahmu kelihatan."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把头发或手移开，让我能看到你的脸。"
+          }
         }
       }
     },
@@ -4101,6 +5899,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Wajib ada"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "必备"
           }
         }
       }
@@ -4120,6 +5924,12 @@
             "state" : "needs_review",
             "value" : "Mauve kalem"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "灰调藕紫"
+          }
         }
       }
     },
@@ -4137,6 +5947,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "MVP · Blush satu-satunya overlay AR. Langkah lain manual. Foto kamera tetap di perangkat ini."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "MVP · 只有腮红有 AR 叠加，其他步骤为手动。相机照片只保存在这台设备上。"
           }
         }
       }
@@ -4156,6 +5972,12 @@
             "state" : "needs_review",
             "value" : "Inspirasi saya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "我的灵感"
+          }
         }
       }
     },
@@ -4172,6 +5994,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Look Saya"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "我的妆容"
           }
         }
       }
@@ -4191,6 +6019,12 @@
             "state" : "needs_review",
             "value" : "Tutorial saya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "我的教程"
+          }
         }
       }
     },
@@ -4202,6 +6036,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Natural"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自然"
           }
         }
       }
@@ -4215,6 +6055,12 @@
             "state" : "needs_review",
             "value" : "Garis natural"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自然眼线"
+          }
         }
       }
     },
@@ -4225,6 +6071,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Garis natural · pindai matamu untuk gaya yang pas"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "自然眼线 · 扫描眼睛可获得贴合的样式"
           }
         }
       }
@@ -4238,6 +6090,12 @@
             "state" : "needs_review",
             "value" : "Biru navy"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "藏蓝"
+          }
         }
       }
     },
@@ -4250,6 +6108,12 @@
             "state" : "needs_review",
             "value" : "Bukan dua-duanya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "都不是"
+          }
         }
       }
     },
@@ -4259,6 +6123,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lanjut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "下一步"
           }
         }
       }
@@ -4277,6 +6147,12 @@
             "state" : "needs_review",
             "value" : "Langkah berikutnya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "下一步"
+          }
         }
       }
     },
@@ -4289,6 +6165,12 @@
             "state" : "needs_review",
             "value" : "Pelan-pelan aja, biar aku bisa ngikutin."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "慢一点，我才跟得上。"
+          }
         }
       }
     },
@@ -4298,6 +6180,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Keren!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "画得不错！"
           }
         }
       }
@@ -4311,6 +6199,12 @@
             "state" : "needs_review",
             "value" : "Tanpa alis"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不叠加眉形"
+          }
         }
       }
     },
@@ -4322,6 +6216,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Nggak punya brush? Pakai ujung jari juga bisa."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没有刷子？用指腹也可以。"
           }
         }
       }
@@ -4340,6 +6240,12 @@
             "state" : "needs_review",
             "value" : "Tidak ada pratinjau kamera atau simulasi pelacakan wajah."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不显示相机预览，也不显示模拟的面部追踪。"
+          }
         }
       }
     },
@@ -4356,6 +6262,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hasil mata belum jelas · gaya awal netral"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼型结果不明确 · 使用中性起始样式"
           }
         }
       }
@@ -4374,6 +6286,12 @@
             "state" : "needs_review",
             "value" : "Belum ada data"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没有内容"
+          }
         }
       }
     },
@@ -4391,6 +6309,12 @@
             "state" : "needs_review",
             "value" : "Tanpa eyeliner"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不画眼线"
+          }
         }
       }
     },
@@ -4400,6 +6324,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tanpa lipstik"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不涂口红"
           }
         }
       }
@@ -4412,6 +6342,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tanpa makeup"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无妆容"
           }
         }
       }
@@ -4464,6 +6400,12 @@
             "state" : "needs_review",
             "value" : "Belum ada foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没有照片"
+          }
         }
       }
     },
@@ -4475,6 +6417,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Belum ada foto"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "还没有拍照"
           }
         }
       }
@@ -4493,6 +6441,12 @@
             "state" : "needs_review",
             "value" : "Belum ada referensi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没有参考"
+          }
         }
       }
     },
@@ -4503,6 +6457,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Belum ada rekomendasi buat bentuk wajah ini"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这个脸型没有保存的推荐"
           }
         }
       }
@@ -4521,6 +6481,12 @@
             "state" : "needs_review",
             "value" : "Tidak ada langkah"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没有步骤"
+          }
         }
       }
     },
@@ -4530,6 +6496,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tidak ada"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无"
           }
         }
       }
@@ -4543,6 +6515,12 @@
             "state" : "needs_review",
             "value" : "Nggak ada yang disimpan atau di-upload."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "不会保存或上传任何内容。"
+          }
         }
       }
     },
@@ -4552,6 +6530,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Nggak ada yang perlu dibenerin. Pertahankan caranya, ya."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这里不用改，继续这样画就好。"
           }
         }
       }
@@ -4565,12 +6549,26 @@
             "state" : "needs_review",
             "value" : "Lebih panjang dari lebarnya, sisi wajahnya cukup lurus."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "长度明显大于宽度，两侧线条比较直。"
+          }
         }
       }
     },
     "Now" : {
       "comment" : "A label for the current step in the tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "当前"
+          }
+        }
+      }
     },
     "Now dab outward, blending into your skin." : {
       "extractionState" : "stale",
@@ -4590,20 +6588,50 @@
             "state" : "needs_review",
             "value" : "Sekarang sama di sisi kanan bibirmu, biar dua sisinya sama."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "现在右边嘴唇也这样画，让两边对称。"
+          }
         }
       }
     },
     "Now the same on your right brow, so both sides match." : {
       "comment" : "A description of the second step of the brows tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "现在右边眉毛也这样画，让两边对称。"
+          }
+        }
+      }
     },
     "Now the same on your right cheek, so both sides match." : {
       "comment" : "A description of the second step of a brows, eyeliner and blush tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "现在右边脸颊也这样画，让两边对称。"
+          }
+        }
+      }
     },
     "Now the same on your right eye, so both sides match." : {
       "comment" : "A description of the second step of the brows-first tutorial.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "现在右眼也这样画，让两边对称。"
+          }
+        }
+      }
     },
     "Oblong" : {
       "comment" : "Displayed in a list of face shapes.",
@@ -4613,6 +6641,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lonjong"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "长形脸"
           }
         }
       }
@@ -4625,6 +6659,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Mati"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "关"
           }
         }
       }
@@ -4644,6 +6684,12 @@
             "state" : "needs_review",
             "value" : "OK"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "好"
+          }
         }
       }
     },
@@ -4655,6 +6701,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Nyala"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "开"
           }
         }
       }
@@ -4684,6 +6736,12 @@
             "state" : "needs_review",
             "value" : "Hanya navigasi langkah yang berfungsi. Instruksi tutorial, pelacakan progres, dan semua overlay AR belum diterapkan."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "只有步骤切换可用。教程说明、完成记录和所有 AR 叠加尚未实现。"
+          }
         }
       }
     },
@@ -4696,6 +6754,12 @@
             "state" : "needs_review",
             "value" : "Terbuka dan bulat, bagian putih matanya lebih kelihatan di atas atau bawah iris."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼睛又大又圆，虹膜上方或下方露出较多眼白。"
+          }
         }
       }
     },
@@ -4707,6 +6771,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Buka Studio Alis & Blush buat atur posisinya."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "打开眉毛与腮红工作室，设置位置偏好。"
           }
         }
       }
@@ -4731,6 +6801,12 @@
             "state" : "needs_review",
             "value" : "Atau ujung lipstikmu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "或者用口红的边缘"
+          }
         }
       }
     },
@@ -4742,6 +6818,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Atau ujung jarimu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "或者用指腹"
           }
         }
       }
@@ -4760,6 +6842,12 @@
             "state" : "needs_review",
             "value" : "Gaya eyeliner lain tetap ada di Try On. Pindai ulang hanya jika ingin memperbarui hasil tersimpan."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "试妆里仍可选择其他眼线样式。只有想更新保存的结果时才需要重新扫描。"
+          }
         }
       }
     },
@@ -4769,6 +6857,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sapuan luar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "外侧斜扫"
           }
         }
       }
@@ -4782,6 +6876,12 @@
             "state" : "needs_review",
             "value" : "Oval"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "鹅蛋脸"
+          }
         }
       }
     },
@@ -4793,6 +6893,12 @@
             "state" : "needs_review",
             "value" : "Palet dari Foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从相册选彩妆盘"
+          }
         }
       }
     },
@@ -4803,6 +6909,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto palet. Ketuk warna, atau pakai pemilih warna di atas."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "彩妆盘照片。点一下颜色，或使用上方的取色器。"
           }
         }
       }
@@ -4822,6 +6934,12 @@
             "state" : "needs_review",
             "value" : "Peach"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "蜜桃"
+          }
         }
       }
     },
@@ -4832,6 +6950,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sudut runcing"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "棱角眉"
           }
         }
       }
@@ -4856,6 +6980,12 @@
             "state" : "needs_review",
             "value" : "Sempurna!"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "完美！"
+          }
         }
       }
     },
@@ -4867,6 +6997,12 @@
             "state" : "needs_review",
             "value" : "Warna foto hanya perkiraan: cahaya dan kamera memengaruhi hasilnya. Foto tetap di perangkat ini dan tidak disimpan aplikasi."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "照片上的颜色只是近似值：光线和相机都会影响结果。照片只留在这台设备上，App 不会保存。"
+          }
         }
       }
     },
@@ -4876,6 +7012,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto bagian yang perlu dibenerin"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "需要修改部位的照片"
           }
         }
       }
@@ -4899,6 +7041,12 @@
             "state" : "needs_review",
             "value" : "Foto palet"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拍摄彩妆盘"
+          }
         }
       }
     },
@@ -4916,12 +7064,26 @@
             "state" : "needs_review",
             "value" : "Impor foto akan diterapkan di sini. Tidak ada pustaka foto yang dibuka, tidak ada gambar diimpor, dan analisis makeup otomatis tidak direncanakan di tahap ini."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "照片导入会在这里实现。目前不会打开相册，也不会导入图片；这个阶段没有自动妆容分析的计划。"
+          }
         }
       }
     },
     "Pick a look to continue" : {
       "comment" : "A button title that appears when the user hasn't selected a look to continue to the desired-look",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选一个妆容再继续"
+          }
+        }
+      }
     },
     "Pick your %@ colour" : {
       "extractionState" : "manual",
@@ -4937,6 +7099,12 @@
             "state" : "needs_review",
             "value" : "Pilih warna %@ kamu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "选择你的%@颜色"
+          }
         }
       }
     },
@@ -4946,6 +7114,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Cubit layar buat zoom."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "双指张开可以放大。"
           }
         }
       }
@@ -4965,6 +7139,12 @@
             "state" : "needs_review",
             "value" : "Pink"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "粉色"
+          }
         }
       }
     },
@@ -4976,6 +7156,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bingkai pink"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "粉色相框"
           }
         }
       }
@@ -5000,6 +7186,12 @@
             "state" : "needs_review",
             "value" : "Posisi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "位置"
+          }
         }
       }
     },
@@ -5009,6 +7201,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Titik panduan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "位置标记点"
           }
         }
       }
@@ -5022,6 +7220,12 @@
             "state" : "needs_review",
             "value" : "Feedback posisi %@ kamu bakal muncul di sini."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的%@位置反馈会显示在这里。"
+          }
         }
       }
     },
@@ -5033,6 +7237,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Kamera polos"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "原相机"
           }
         }
       }
@@ -5046,6 +7256,12 @@
             "state" : "needs_review",
             "value" : "Kamera polos di kiri, look di kanan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "左边是原相机，右边是妆效"
+          }
         }
       }
     },
@@ -5058,12 +7274,26 @@
             "state" : "needs_review",
             "value" : "Plum"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "梅子色"
+          }
         }
       }
     },
     "Point your camera at a product or a swatch on skin." : {
       "comment" : "A description of the viewfinder's text.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把相机对准产品，或涂在皮肤上的试色。"
+          }
+        }
+      }
     },
     "pointed ones fix small lines" : {
       "comment" : "Text for a tip in the Makeup Kit.",
@@ -5073,6 +7303,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "yang runcing buat rapiin garis kecil"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "尖头的可以修小细线"
           }
         }
       }
@@ -5084,6 +7320,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Blush powder, atau lip tint yang ditepuk tipis-tipis"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "粉质腮红，或轻轻点上的唇釉"
           }
         }
       }
@@ -5097,6 +7339,12 @@
             "state" : "needs_review",
             "value" : "Powder atau cream"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "粉质或膏状"
+          }
         }
       }
     },
@@ -5108,6 +7356,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lagi siapin makeup-nya…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在准备妆容显示"
           }
         }
       }
@@ -5127,6 +7381,12 @@
             "state" : "needs_review",
             "value" : "Menyiapkan kameramu. Kamu juga bisa lanjut secara manual."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在准备相机。你也可以手动继续。"
+          }
         }
       }
     },
@@ -5137,6 +7397,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Menyiapkan makeup rekomendasimu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "正在准备为你推荐的妆容"
           }
         }
       }
@@ -5155,6 +7421,12 @@
             "state" : "needs_review",
             "value" : "Langkah sebelumnya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上一步"
+          }
         }
       }
     },
@@ -5166,6 +7438,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Produk"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "产品"
           }
         }
       }
@@ -5183,6 +7461,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto produk. Geser lingkaran ke warna yang kamu mau."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "产品照片。把圆圈拖到想要的颜色上。"
           }
         }
       }
@@ -5207,6 +7491,12 @@
             "state" : "needs_review",
             "value" : "Puppy"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "狗狗眼"
+          }
         }
       }
     },
@@ -5216,6 +7506,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bandingin hasil Try On sama hasil aslimu, terus dapet tips buat next time."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "把试妆效果和实际成果放在一起对比，获得下次用得上的小建议。"
           }
         }
       }
@@ -5234,6 +7530,12 @@
             "state" : "needs_review",
             "value" : "Direkomendasikan dari pindai matamu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "根据眼部扫描推荐"
+          }
         }
       }
     },
@@ -5250,6 +7552,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Detail referensi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "参考详情"
           }
         }
       }
@@ -5268,6 +7576,12 @@
             "state" : "needs_review",
             "value" : "Impor referensi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "导入参考"
+          }
         }
       }
     },
@@ -5285,6 +7599,12 @@
             "state" : "needs_review",
             "value" : "Referensi tidak bisa dimuat."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法加载参考。"
+          }
         }
       }
     },
@@ -5301,6 +7621,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Segarkan penempatan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "刷新位置"
           }
         }
       }
@@ -5320,6 +7646,12 @@
             "state" : "needs_review",
             "value" : "Hapus foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "移除照片"
+          }
         }
       }
     },
@@ -5331,6 +7663,12 @@
             "state" : "needs_review",
             "value" : "Ulangi pindai awal"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重新进行初次扫描"
+          }
         }
       }
     },
@@ -5340,6 +7678,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hasilmu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "成果"
           }
         }
       }
@@ -5353,6 +7697,12 @@
             "state" : "needs_review",
             "value" : "Ulang"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重拍"
+          }
         }
       }
     },
@@ -5365,6 +7715,12 @@
             "state" : "needs_review",
             "value" : "Foto ulang"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重拍照片"
+          }
         }
       }
     },
@@ -5374,6 +7730,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto ulang, yuk"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重拍一张"
           }
         }
       }
@@ -5391,6 +7753,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Coba lagi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重试"
           }
         }
       }
@@ -5410,6 +7778,12 @@
             "state" : "needs_review",
             "value" : "Coba kamera lagi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重试相机"
+          }
         }
       }
     },
@@ -5428,6 +7802,12 @@
             "state" : "needs_review",
             "value" : "Coba muat lagi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "重新加载"
+          }
         }
       }
     },
@@ -5444,6 +7824,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Kembali ke Jelajahi"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "返回发现"
           }
         }
       }
@@ -5470,6 +7856,12 @@
             "state" : "needs_review",
             "value" : "Rose"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "玫瑰色"
+          }
         }
       }
     },
@@ -5479,6 +7871,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Rosy Nude"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "玫瑰裸色"
           }
         }
       }
@@ -5492,6 +7890,12 @@
             "state" : "needs_review",
             "value" : "Bulat"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "圆脸"
+          }
         }
       }
     },
@@ -5503,6 +7907,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Membulat"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "圆弧眉"
           }
         }
       }
@@ -5521,6 +7931,12 @@
             "state" : "needs_review",
             "value" : "KATALOG CONTOH · KERANGKA"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "示例目录 · 框架"
+          }
         }
       }
     },
@@ -5537,6 +7953,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Data contoh — kerangka detail"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "示例内容 — 详情框架"
           }
         }
       }
@@ -5555,6 +7977,12 @@
             "state" : "needs_review",
             "value" : "Referensi contoh"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "示例参考"
+          }
         }
       }
     },
@@ -5566,6 +7994,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Simpan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保存"
           }
         }
       }
@@ -5588,6 +8022,12 @@
             "state" : "needs_review",
             "value" : "Simpan foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "保存照片"
+          }
         }
       }
     },
@@ -5604,6 +8044,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Simpan belum tersedia"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法保存"
           }
         }
       }
@@ -5623,6 +8069,12 @@
             "state" : "needs_review",
             "value" : "Look tersimpan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已保存的妆容"
+          }
         }
       }
     },
@@ -5639,6 +8091,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Detail look tersimpan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已保存妆容详情"
           }
         }
       }
@@ -5658,6 +8116,12 @@
             "state" : "needs_review",
             "value" : "Hanya tersimpan di perangkat ini. Hapus hasilnya dari Look Saya kapan saja."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "只保存在这台设备上。你可以随时在“我的妆容”里删除。"
+          }
         }
       }
     },
@@ -5675,6 +8139,12 @@
             "state" : "needs_review",
             "value" : "KERANGKA · BELUM DITERAPKAN"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "框架 · 尚未实现"
+          }
         }
       }
     },
@@ -5686,6 +8156,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Flash layar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "屏幕闪光"
           }
         }
       }
@@ -5707,6 +8183,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lihat hasilmu, berdampingan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "并排对比，看看你画得怎么样"
           }
         }
       }
@@ -5743,12 +8225,26 @@
             "state" : "needs_review",
             "value" : "Warna terpilih"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "已选颜色"
+          }
         }
       }
     },
     "Shade" : {
       "comment" : "The name of the shade category.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "色号"
+          }
+        }
+      }
     },
     "Shape" : {
       "extractionState" : "stale",
@@ -5763,7 +8259,15 @@
     },
     "Shape & fill" : {
       "comment" : "A tagline for the brows tool.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眉形与填色"
+          }
+        }
+      }
     },
     "Share photo" : {
       "comment" : "A button that shares the user's try-on photo.",
@@ -5773,6 +8277,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bagikan foto"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "分享照片"
           }
         }
       }
@@ -5806,6 +8316,12 @@
             "state" : "needs_review",
             "value" : "Tampilkan eyeliner rekomendasi"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "显示推荐的眼线"
+          }
         }
       }
     },
@@ -5817,6 +8333,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lihat semua langkah"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "显示全部步骤"
           }
         }
       }
@@ -5839,6 +8361,12 @@
             "state" : "needs_review",
             "value" : "Lihat cara benerinnya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "显示修改方法"
+          }
         }
       }
     },
@@ -5850,6 +8378,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lihat bentuknya"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "显示它的样子"
           }
         }
       }
@@ -5879,6 +8413,12 @@
             "state" : "needs_review",
             "value" : "Lewati kalibrasi dan jelajahi kerangka tutorial"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "跳过校准，查看教程框架"
+          }
         }
       }
     },
@@ -5890,6 +8430,12 @@
             "state" : "needs_review",
             "value" : "Lengkung ramping"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "细挑眉"
+          }
         }
       }
     },
@@ -5900,6 +8446,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lurus ramping"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "细平眉"
           }
         }
       }
@@ -5913,6 +8465,12 @@
             "state" : "needs_review",
             "value" : "Bersudut lembut"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔和棱角眉"
+          }
         }
       }
     },
@@ -5925,6 +8483,12 @@
             "state" : "needs_review",
             "value" : "Lengkung lembut"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔和挑眉"
+          }
         }
       }
     },
@@ -5936,6 +8500,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hitam lembut"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔黑色"
           }
         }
       }
@@ -5955,6 +8525,12 @@
             "state" : "needs_review",
             "value" : "Hitam lembut"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔黑色"
+          }
         }
       }
     },
@@ -5967,12 +8543,26 @@
             "state" : "needs_review",
             "value" : "Cokelat lembut"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔棕色"
+          }
         }
       }
     },
     "Soft flush, fresh glow" : {
       "comment" : "A tagline for the blush tool.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔和红润，清新气色"
+          }
+        }
+      }
     },
     "Soft little taps, no rush. You're doing so good." : {
       "extractionState" : "stale",
@@ -5993,6 +8583,12 @@
             "state" : "needs_review",
             "value" : "Natural lembut"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔和自然眉"
+          }
         }
       }
     },
@@ -6011,6 +8607,12 @@
             "state" : "needs_review",
             "value" : "Nude lembut"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "柔裸色"
+          }
         }
       }
     },
@@ -6021,6 +8623,12 @@
             "state" : "needs_review",
             "value" : "Spoolie"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "螺旋眉刷"
+          }
         }
       }
     },
@@ -6030,6 +8638,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Udah pas"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "非常准"
           }
         }
       }
@@ -6043,6 +8657,12 @@
             "state" : "needs_review",
             "value" : "Kotak"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "方脸"
+          }
         }
       }
     },
@@ -6052,6 +8672,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Mulai"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "开始"
           }
         }
       }
@@ -6089,6 +8715,12 @@
             "state" : "needs_review",
             "value" : "Mulai dari sini"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从这里开始"
+          }
         }
       }
     },
@@ -6098,6 +8730,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Mulai belajar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "开始课程"
           }
         }
       }
@@ -6117,6 +8755,12 @@
             "state" : "needs_review",
             "value" : "Mulai tutorialku"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "开始我的教程"
+          }
         }
       }
     },
@@ -6128,6 +8772,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Mulai tutorial"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "开始教程"
           }
         }
       }
@@ -6147,6 +8797,12 @@
             "state" : "needs_review",
             "value" : "Mulai dari inspirasi ini"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从这个灵感开始"
+          }
         }
       }
     },
@@ -6159,6 +8815,12 @@
             "state" : "needs_review",
             "value" : "Mulai di atas sudut dalam mata, melengkung di atas pinggir luar iris."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从内眼角上方开始，眉峰在虹膜外缘上方。"
+          }
         }
       }
     },
@@ -6170,6 +8832,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Mulai di atas sudut dalam mata, melengkung di atas pinggir luar iris, dan berakhir di garis dari hidung ke sudut luar mata."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从内眼角上方开始，眉峰在虹膜外缘上方，眉尾落在鼻翼到外眼角的延长线上。"
           }
         }
       }
@@ -6202,6 +8870,12 @@
             "state" : "needs_review",
             "value" : "Langkah %1$lld dari %2$lld"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "第 %1$lld 步，共 %2$lld 步"
+          }
         }
       }
     },
@@ -6220,6 +8894,12 @@
             "state" : "needs_review",
             "value" : "LANGKAH %1$lld DARI %2$lld"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "第 %1$lld 步 / 共 %2$lld 步"
+          }
         }
       }
     },
@@ -6229,6 +8909,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Langkah %lld dari 3"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "第 %lld 步，共 3 步"
           }
         }
       }
@@ -6242,6 +8928,12 @@
             "state" : "new",
             "value" : "Step %1$lld: %2$@"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "第 %1$lld 步：%2$@"
+          }
         }
       }
     },
@@ -6251,6 +8943,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Langkah 1 · Senyum lebar"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "第 1 步 · 咧嘴微笑"
           }
         }
       }
@@ -6262,6 +8960,12 @@
             "state" : "needs_review",
             "value" : "Langkah 2 · Dua tepukan ringan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "第 2 步 · 轻拍两下"
+          }
         }
       }
     },
@@ -6272,6 +8976,12 @@
             "state" : "needs_review",
             "value" : "Langkah 3 · Putar-putar ke pelipis"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "第 3 步 · 打圈晕向太阳穴"
+          }
         }
       }
     },
@@ -6281,6 +8991,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pelan-pelan, satu langkah demi satu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "一步一步，按你的节奏来"
           }
         }
       }
@@ -6307,6 +9023,12 @@
             "state" : "needs_review",
             "value" : "Masih agak gelap. Coba hadap ke lampu atau jendela."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "还是有点暗。试着面向台灯或窗户。"
+          }
         }
       }
     },
@@ -6319,6 +9041,12 @@
             "state" : "needs_review",
             "value" : "Lurus"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "平眉"
+          }
         }
       }
     },
@@ -6328,6 +9056,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sunkissed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "日晒感"
           }
         }
       }
@@ -6347,6 +9081,12 @@
             "state" : "needs_review",
             "value" : "SUNRISE"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "SUNRISE"
+          }
         }
       }
     },
@@ -6357,12 +9097,26 @@
             "state" : "needs_review",
             "value" : "Ganti-ganti blush, alis, dan eyeliner langsung di wajahmu, sebelum pegang brush."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "动刷子之前，先在自己脸上实时切换腮红、眉毛和眼线。"
+          }
         }
       }
     },
     "Swipe for more" : {
       "comment" : "A button that opens the tutorial's steps sheet.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "滑动查看更多"
+          }
+        }
+      }
     },
     "Switch camera" : {
       "extractionState" : "manual",
@@ -6377,6 +9131,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Ganti kamera"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "切换摄像头"
           }
         }
       }
@@ -6395,6 +9155,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Beralih ke tutorial manual"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "切换到手动教程"
           }
         }
       }
@@ -6434,6 +9200,12 @@
             "state" : "needs_review",
             "value" : "Ambil foto"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拍照"
+          }
         }
       }
     },
@@ -6446,6 +9218,12 @@
             "state" : "needs_review",
             "value" : "Foto produknya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拍摄产品"
+          }
         }
       }
     },
@@ -6457,6 +9235,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Ambil foto"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拍照"
           }
         }
       }
@@ -6476,6 +9260,12 @@
             "state" : "needs_review",
             "value" : "Tan"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "浅棕"
+          }
         }
       }
     },
@@ -6486,6 +9276,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Ketuk warna pada foto paletmu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "在彩妆盘照片上点选一个颜色"
           }
         }
       }
@@ -6510,6 +9306,12 @@
             "state" : "needs_review",
             "value" : "Tap salah satu buat lihat bentuknya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "点一下物品，看看它长什么样。"
+          }
         }
       }
     },
@@ -6527,6 +9329,12 @@
             "state" : "needs_review",
             "value" : "Ketuk dan geser lingkaran buat pilih warnanya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "点住并拖动圆圈来取色。"
+          }
         }
       }
     },
@@ -6539,6 +9347,12 @@
             "state" : "needs_review",
             "value" : "Taupe"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "灰褐色"
+          }
         }
       }
     },
@@ -6548,6 +9362,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sapuan pelipis"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "扫向太阳穴"
           }
         }
       }
@@ -6567,6 +9387,12 @@
             "state" : "needs_review",
             "value" : "Terakota"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "陶土色"
+          }
         }
       }
     },
@@ -6579,6 +9405,12 @@
             "state" : "needs_review",
             "value" : "Kamera lagi nggak bisa dipakai. Pilih dari foto aja, ya."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "相机不可用。你可以改为选择一张照片。"
+          }
         }
       }
     },
@@ -6590,6 +9422,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lipatannya dekat bulu mata, dan sebagian kelopaknya tertutup lipatan."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "褶皱靠近睫毛根部，褶子盖住了一部分眼皮。"
           }
         }
       }
@@ -6629,6 +9467,12 @@
             "state" : "needs_review",
             "value" : "Jarak antar sudut dalam matamu kurang dari satu lebar mata."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "两个内眼角之间的距离小于一只眼睛的宽度。"
+          }
         }
       }
     },
@@ -6641,6 +9485,12 @@
             "state" : "needs_review",
             "value" : "Jarak antar sudut dalam matamu lebih dari satu lebar mata."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "两个内眼角之间的距离大于一只眼睛的宽度。"
+          }
         }
       }
     },
@@ -6651,6 +9501,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pindai awal belum menghasilkan kecocokan wajah dan hasil mata yang bisa dipakai. Selesaikan dulu sebelum membuka Try On."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "初次扫描没有得到可用的面部拟合和眼型结果。请先完成扫描再打开试妆。"
           }
         }
       }
@@ -6664,6 +9520,12 @@
             "state" : "needs_review",
             "value" : "Rahang lebih lebar dari dahi, jadi wajah bagian bawah kelihatan lebih penuh."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "下颌比额头宽，下半张脸更饱满。"
+          }
         }
       }
     },
@@ -6675,6 +9537,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Panduan live butuh iPhone dengan kamera depan TrueDepth (yang ada Face ID)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时指引需要配备原深感前置摄像头的 iPhone。"
           }
         }
       }
@@ -6694,6 +9562,12 @@
             "state" : "needs_review",
             "value" : "Look-nya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "妆容"
+          }
         }
       }
     },
@@ -6711,6 +9585,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "THE LOOK EDIT"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "妆容精选"
           }
         }
       }
@@ -6735,6 +9615,12 @@
             "state" : "needs_review",
             "value" : "Sudut luar matamu lebih tinggi dari sudut dalam."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "外眼角比内眼角高。"
+          }
         }
       }
     },
@@ -6747,6 +9633,12 @@
             "state" : "needs_review",
             "value" : "Sudut luar matamu lebih rendah dari sudut dalam."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "外眼角比内眼角低。"
+          }
         }
       }
     },
@@ -6758,6 +9650,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Fotonya butuh iPhone dengan kamera depan TrueDepth (yang ada Face ID)."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "拍照需要配备原深感前置摄像头的 iPhone。"
           }
         }
       }
@@ -6777,6 +9675,12 @@
             "state" : "needs_review",
             "value" : "Referensi hanya disimpan di memori selama sesi ini. Hanya foto kamera Sebelum dan Sesudah yang disimpan saat kamu memilih Simpan."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "参考图只在本次使用期间保留在内存中。只有在你选择“保存”时，才会保存相机拍摄的前后对比照。"
+          }
         }
       }
     },
@@ -6793,6 +9697,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Tidak ada referensi untuk ditampilkan."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没有可显示的参考。"
           }
         }
       }
@@ -6817,6 +9727,12 @@
             "state" : "needs_review",
             "value" : "Garis tipis dan rata di sepanjang bulu mata atas, tanpa wing."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "沿上睫毛根部画一条均匀的细线，不拉眼尾。"
+          }
         }
       }
     },
@@ -6834,6 +9750,12 @@
             "state" : "needs_review",
             "value" : "Koleksi ini kosong. Fitur simpan belum diterapkan."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这个合集是空的。保存功能尚未实现。"
+          }
         }
       }
     },
@@ -6850,6 +9772,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Ini metadata contoh untuk menunjukkan navigasi. Bukan hasil pengguna yang diambil atau disimpan. Belum ada gambar yang disimpan."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这是用来演示导航的示例数据，不是拍摄或保存的用户结果。没有保存任何图片。"
           }
         }
       }
@@ -6881,6 +9809,12 @@
             "state" : "needs_review",
             "value" : "Layar ini akan menjelaskan referensi makeup yang dipilih. Katalog hanya data contoh; belum ada rekomendasi personal atau analisis foto."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这个页面会介绍所选的妆容参考。目录是示例数据，没有个性化推荐或照片分析。"
+          }
         }
       }
     },
@@ -6898,6 +9832,12 @@
             "state" : "needs_review",
             "value" : "Tutorial ini belum punya langkah."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "这个教程还没有设置步骤。"
+          }
         }
       }
     },
@@ -6909,6 +9849,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "buat pakai micellar water"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用来蘸卸妆水"
           }
         }
       }
@@ -6946,6 +9892,12 @@
             "state" : "needs_review",
             "value" : "buat rapiin tepinya"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用来修整边缘"
+          }
         }
       }
     },
@@ -6958,6 +9910,12 @@
             "state" : "needs_review",
             "value" : "buat hapus pinggiran kecil"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用来擦小边角"
+          }
         }
       }
     },
@@ -6969,6 +9927,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Alat"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "工具"
           }
         }
       }
@@ -6987,6 +9951,12 @@
             "state" : "needs_review",
             "value" : "Senter"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "手电筒"
+          }
         }
       }
     },
@@ -6999,6 +9969,12 @@
             "state" : "needs_review",
             "value" : "Segitiga"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "三角形脸"
+          }
         }
       }
     },
@@ -7008,6 +9984,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Coba dulu, baru pakai beneran"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上妆之前，先试一试"
           }
         }
       }
@@ -7019,6 +10001,12 @@
             "state" : "needs_review",
             "value" : "Try On live"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "实时试妆"
+          }
         }
       }
     },
@@ -7028,6 +10016,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Try On"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "试妆"
           }
         }
       }
@@ -7041,6 +10035,12 @@
             "state" : "needs_review",
             "value" : "Foto Try On"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "试妆照片"
+          }
         }
       }
     },
@@ -7052,6 +10052,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Nyalakan kamera"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "打开相机"
           }
         }
       }
@@ -7065,12 +10071,26 @@
             "state" : "needs_review",
             "value" : "Coba putar badan biar cahayanya di depanmu."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "转个方向，让光从正面照过来。"
+          }
         }
       }
     },
     "Tutorial" : {
       "comment" : "A button that opens a sheet with a step-by-step guide to using the Try On screen.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "教程"
+          }
+        }
+      }
     },
     "Tutorial flow" : {
       "extractionState" : "manual",
@@ -7086,12 +10106,26 @@
             "state" : "needs_review",
             "value" : "Alur tutorial"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "教程流程"
+          }
         }
       }
     },
     "Up next" : {
       "comment" : "A label for a step that is not yet completed.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "接下来"
+          }
+        }
+      }
     },
     "Upper inner cheek" : {
       "localizations" : {
@@ -7099,6 +10133,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pipi atas bagian dalam"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "脸颊内侧上方"
           }
         }
       }
@@ -7112,6 +10152,12 @@
             "state" : "needs_review",
             "value" : "Naik"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上扬眼"
+          }
         }
       }
     },
@@ -7123,6 +10169,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lurus ke atas"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "上扬平眉"
           }
         }
       }
@@ -7142,6 +10194,12 @@
             "state" : "needs_review",
             "value" : "Pakai inspirasiku sendiri"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "使用我自己的灵感"
+          }
         }
       }
     },
@@ -7154,6 +10212,12 @@
             "state" : "needs_review",
             "value" : "Gores pendek-pendek kayak helai rambut, jangan satu garis panjang."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用像毛发一样的短笔触，不要一笔画到底。"
+          }
         }
       }
     },
@@ -7164,6 +10228,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pakai warna ini"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "使用这个颜色"
           }
         }
       }
@@ -7182,6 +10252,12 @@
             "state" : "needs_review",
             "value" : "Lihat hasil mata / pindai ulang"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "查看眼型结果 / 重新扫描"
+          }
         }
       }
     },
@@ -7193,6 +10269,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Lipatan terlihat"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "明显褶皱"
           }
         }
       }
@@ -7217,6 +10299,12 @@
             "state" : "needs_review",
             "value" : "Hari ini mau belajar apa?"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "今天想学什么？"
+          }
         }
       }
     },
@@ -7229,6 +10317,12 @@
             "state" : "needs_review",
             "value" : "Yang perlu disiapin"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "需要准备什么"
+          }
         }
       }
     },
@@ -7239,6 +10333,12 @@
             "state" : "needs_review",
             "value" : "Menurut kami"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "我们的看法"
+          }
         }
       }
     },
@@ -7248,6 +10348,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Yang udah bagus"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "做得好的地方"
           }
         }
       }
@@ -7261,6 +10367,12 @@
             "state" : "needs_review",
             "value" : "Bingkai putih"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "白色相框"
+          }
         }
       }
     },
@@ -7272,6 +10384,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Berjauhan"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼距宽"
           }
         }
       }
@@ -7285,12 +10403,26 @@
             "state" : "needs_review",
             "value" : "Mata yang berjauhan udah seimbang tanpa wing, jadi eyeliner-nya berhenti di sudut luar."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼距宽的眼睛不拉眼尾会更协调，所以眼线停在外眼角。"
+          }
         }
       }
     },
     "Wings & lines" : {
       "comment" : "A tagline for the Eyeliner tool.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "眼尾与线条"
+          }
+        }
+      }
     },
     "Winter Pink" : {
       "comment" : "Makeup shade name from makeup-reference.database.json",
@@ -7307,6 +10439,12 @@
             "state" : "needs_review",
             "value" : "Pink Winter"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "冬日粉"
+          }
         }
       }
     },
@@ -7316,6 +10454,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hapus ini"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "擦掉"
           }
         }
       }
@@ -7342,6 +10486,12 @@
             "state" : "needs_review",
             "value" : "Hapus pelan-pelan, tunggu kering, terus coba lagi."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "轻轻擦掉，等它干了再试一次。"
+          }
         }
       }
     },
@@ -7353,6 +10503,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "buat hapus yang meleset"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "擦掉画错的地方"
           }
         }
       }
@@ -7379,6 +10535,12 @@
             "state" : "needs_review",
             "value" : "Saat mata terbuka, kulit di bawah alis turun menutupi kelopak, jadi lipatannya tersembunyi atau kelopaknya hampir tertutup."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "睁眼时，眉下的一层皮肤垂下来盖住眼皮，所以褶皱被藏起来，或者大部分眼皮被盖住。"
+          }
         }
       }
     },
@@ -7390,6 +10552,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Saat mata terbuka, kelihatan garis lipatan di kelopak atas, dengan sedikit kulit kelopak antara lipatan dan bulu mata."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "睁眼时，上眼皮能看到一条褶线，褶线和睫毛之间露出一条眼皮。"
           }
         }
       }
@@ -7403,6 +10571,12 @@
             "state" : "needs_review",
             "value" : "Tanpa makeup"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "素颜"
+          }
         }
       }
     },
@@ -7414,6 +10588,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Kelopakmu hooded, jadi garisnya dibuat tipis dan wing-nya kecil sedikit naik."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你说你是内双，所以眼线保持细一点，眼尾小小地上扬。"
           }
         }
       }
@@ -7427,6 +10607,12 @@
             "state" : "needs_review",
             "value" : "Kelopakmu monolid, jadi garisnya makin tebal ke ujung luar biar tetap kelihatan saat mata terbuka."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你说你是单眼皮，所以眼线越往眼尾越粗，睁眼时也能看得见。"
+          }
         }
       }
     },
@@ -7439,6 +10625,12 @@
             "state" : "needs_review",
             "value" : "Nanti kamu tepuk di bagian atas pipi."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你会把它轻拍在脸颊上方。"
+          }
         }
       }
     },
@@ -7450,6 +10642,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "kamu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的"
           }
         }
       }
@@ -7482,6 +10680,12 @@
             "state" : "needs_review",
             "value" : "Fotomu, tersimpan di perangkat ini."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你拍的照片，只保存在这台设备上。"
+          }
         }
       }
     },
@@ -7494,12 +10698,26 @@
             "state" : "needs_review",
             "value" : "Look impianmu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你想要的妆容"
+          }
         }
       }
     },
     "Your expected result" : {
       "comment" : "A title that describes the expected result of the user's makeup.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的预期效果"
+          }
+        }
+      }
     },
     "Your eye shape is not clear enough to pick a bolder line, so a thin natural line is used." : {
       "comment" : "Text describing the reason why a thin natural liner is used when the user's eye shape is not clear enough.",
@@ -7509,6 +10727,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Bentuk matamu belum kebaca jelas, jadi kita pakai garis natural yang tipis dulu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的眼型还不够明确，没法选更浓的线条，所以用了细细的自然眼线。"
           }
         }
       }
@@ -7522,6 +10746,12 @@
             "state" : "needs_review",
             "value" : "Matamu almond, jadi eyeliner-nya ngikutin lengkung alami matamu dan makin tebal ke wing kecil."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你是杏仁眼，所以眼线顺着自然弧度画，到眼尾加一个小上扬。"
+          }
         }
       }
     },
@@ -7533,6 +10763,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Matamu berdekatan, jadi sudut dalamnya tipis aja dan eyeliner-nya makin tebal ke ujung luar."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的眼距较近，所以内眼角画淡一点，眼线越往外越浓。"
           }
         }
       }
@@ -7546,6 +10782,12 @@
             "state" : "needs_review",
             "value" : "Matamu bulat, jadi eyeliner-nya mulai agak ke dalam dari sudut dalam dan memanjang di sudut luar."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你是圆眼，所以眼线从内眼角稍微靠外的位置开始，并拉长眼尾。"
+          }
         }
       }
     },
@@ -7557,6 +10799,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Matamu berjauhan, jadi eyeliner-nya paling tegas di sudut dalam."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的眼距较宽，所以眼线在内眼角最浓。"
           }
         }
       }
@@ -7570,6 +10818,12 @@
             "state" : "needs_review",
             "value" : "Matamu belum kebaca jelas, jadi ini garis natural yang tipis dulu. Coba scan lagi dengan mata rileks dan terbuka, biar eyeliner-nya lebih pas."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "没能清楚地测量你的眼睛，所以这是一条细细的自然眼线。放松并睁开眼睛重新扫描，就能获得为你定制的眼线。"
+          }
         }
       }
     },
@@ -7581,6 +10835,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sudut luar matamu naik, jadi wing-nya pendek dan datar aja."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的外眼角上扬，所以眼尾画得短而平。"
           }
         }
       }
@@ -7599,6 +10859,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Wajahmu. Glow ala kamu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的脸，你的好气色。"
           }
         }
       }
@@ -7631,6 +10897,12 @@
             "state" : "needs_review",
             "value" : "Glow pertamamu menunggu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的第一个好气色在等你"
+          }
         }
       }
     },
@@ -7648,6 +10920,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "RITUAL LIMA LANGKAHMU"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的五步流程"
           }
         }
       }
@@ -7667,6 +10945,12 @@
             "state" : "needs_review",
             "value" : "Jurnal glow-mu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的气色日记"
+          }
         }
       }
     },
@@ -7684,6 +10968,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "SESI GLOW-MU"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的美妆时间"
           }
         }
       }
@@ -7703,6 +10993,12 @@
             "state" : "needs_review",
             "value" : "Glow-mu, terabadikan."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的好气色，已经记录下来。"
+          }
         }
       }
     },
@@ -7720,6 +11016,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Inspirasimu, caramu."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的灵感，你做主。"
           }
         }
       }
@@ -7751,6 +11053,12 @@
             "state" : "needs_review",
             "value" : "Glow berikutnya dimulai di sini"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "下一个好气色从这里开始"
+          }
         }
       }
     },
@@ -7762,6 +11070,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Sudut luar matamu turun, jadi wing-nya ngikutin bulu mata bawah ke arah ujung alis."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的外眼角偏低，所以眼尾顺着下睫毛线朝眉尾方向画。"
           }
         }
       }
@@ -7775,6 +11089,12 @@
             "state" : "needs_review",
             "value" : "HP-mu mulai panas. Istirahat sebentar, yuk."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "手机有点热了，休息一下吧。"
+          }
         }
       }
     },
@@ -7786,6 +11106,12 @@
             "state" : "needs_review",
             "value" : "Rekomendasimu"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "为你推荐"
+          }
         }
       }
     },
@@ -7795,6 +11121,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Hasil dandanmu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的成果"
           }
         }
       }
@@ -7806,6 +11138,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Pakai jari manis, tepuk-tepuk blush-nya pelan aja."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "用无名指轻轻拍上膏状腮红。"
           }
         }
       }
@@ -7825,6 +11163,12 @@
             "state" : "needs_review",
             "value" : "Look tersimpanmu tidak bisa dimuat. Filemu tidak dihapus."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "无法加载你保存的妆容。你的文件没有被删除。"
+          }
         }
       }
     },
@@ -7836,12 +11180,26 @@
             "state" : "needs_review",
             "value" : "Hasil pindai tersimpan memilih gayanya. Warna dan intensitas tetap bisa diatur."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "样式由你保存的扫描结果决定。颜色和浓度仍可调整。"
+          }
         }
       }
     },
     "Your try-on area" : {
       "comment" : "A label describing the area to be fixed.",
-      "isCommentAutoGenerated" : true
+      "isCommentAutoGenerated" : true,
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的试妆区域"
+          }
+        }
+      }
     },
     "Your try-on photo" : {
       "comment" : "The label for the photo that appears in the polaroid.",
@@ -7851,6 +11209,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Foto Try On-mu"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "你的试妆照片"
           }
         }
       }
@@ -7863,6 +11227,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Kelopak atasmu mulus tanpa garis lipatan, dari bulu mata sampai tulang alis."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "从睫毛到眉骨，你的上眼皮平滑，完全没有褶线。"
           }
         }
       }
@@ -7887,6 +11257,12 @@
             "state" : "needs_review",
             "value" : "Youthful"
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "元气"
+          }
         }
       }
     },
@@ -7898,6 +11274,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Zoom"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "缩放"
           }
         }
       }

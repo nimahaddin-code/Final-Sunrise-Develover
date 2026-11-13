@@ -14,7 +14,7 @@ struct BrowOverlay: Identifiable, Hashable, Sendable {
     /// Drawn as a 3D hair mesh on ARKit's face pose when ARKit tracks the face; otherwise as its picture.
     var is3D = false
 
-    static let all: [BrowOverlay] = [
+    static var all: [BrowOverlay] { [
         // Original production overlays remain available before the supplied
         // set; opacity is controlled by the existing intensity slider.
         BrowOverlay(id: "overlay.1", title: String(localized: "Brow 1"), assetName: "brow-overlay-1"),
@@ -26,7 +26,7 @@ struct BrowOverlay: Identifiable, Hashable, Sendable {
         BrowOverlay(id: "supplied.softAngled", title: String(localized: "Soft angled"), assetName: "brow-overlay-soft-angled"),
         BrowOverlay(id: "supplied.softArch", title: String(localized: "Soft arch"), assetName: "brow-overlay-soft-arch"),
         BrowOverlay(id: "supplied.upwardStraight", title: String(localized: "Upward straight"), assetName: "brow-overlay-upward-straight"),
-    ]
+    ] }
     static let standard = all[0]
     /// A picture is nearly opaque, so the eyebrow starts higher than the 0.65 of the shape designs.
     static let defaultIntensity = 0.9

@@ -14,6 +14,24 @@ Developer tools on the feedback screen add `FeedbackPointCheck`: both photos wit
 targets). Pink should sit on the try-on makeup. Test `testPointCheckMarksTheVirtualBlush`; 382 Simulator tests pass. Not
 checked on a device.
 
+## Language picker on home: English, Indonesian, Chinese — Khalish (2026-11-12)
+
+Home has a globe button at the top right (`FeatureHomeView.languageMenu`): a menu with English, Bahasa Indonesia and 简体中文.
+`AppLanguage` (`App/AppLanguage.swift`) keeps the choice in UserDefaults (`dandan.language`); it shows at once, with no
+relaunch, and is kept for the next launch. Until a choice is made the app follows the language iOS picked for it. How it
+reaches the text: `AppRootView` sets `\.locale` for SwiftUI `Text`; `String(localized:)` with one argument resolves, inside the
+app, to two initialisers in `AppLanguage.swift` that read the chosen language's `.lproj` (Foundation's own keeps the launch
+language: a bundle subclass was tried first and is not called by it). So keep writing `String(localized: "…")` with one
+argument; a call with `table:` / `bundle:` / `comment:` goes to Foundation and will not follow the picker. Lists that held
+localized strings in a `static let` are computed now (`browLessons`, `blushLessons`, `linerLessons`, `lipLessons`,
+`BrowOverlay.all`): do not cache localized strings in statics. `select()` also writes `AppleLanguages`, so what iOS draws
+(permission prompts, photo and colour pickers) follows from the next launch only. Chinese is Simplified (`zh-Hans`, added to
+`knownRegions`): 549 catalog strings and the two permission prompts, drafted by AI, all `needs_review`. Not done: the feedback
+messages and score descriptions come from `makeup-feedback.database.json` / `makeup-score.database.json`, which have English
+and Indonesian only, so Chinese shows English there (`FeedbackLanguage.current`). 390 Simulator tests pass (new:
+`testChosenLanguageIsUsedAtOnce`); the menu, the three languages on home, Try On in Chinese and the choice after a relaunch
+were seen on the Simulator (iPhone 17 Pro, iOS 26.5). Not checked on a device; the camera screens were not seen in Chinese.
+
 ## Lips: fourth tool (card, three lipstick shapes, tutorial) — Khalish (2026-11-11)
 
 `TryOnTool.lips` runs through the same one-tool flow as the others. Home: a fourth card on the right (order Eyeliner, Blush,

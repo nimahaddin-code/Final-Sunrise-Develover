@@ -40,6 +40,12 @@
             "state" : "needs_review",
             "value" : "Kamera dipakai buat nampilin makeup langsung di wajahmu dan foto palet makeup biar kamu bisa pilih warna. Nggak ada yang disimpan atau di-upload."
           }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "相机用来把妆容实时显示在你脸上，也可以拍摄彩妆盘来选颜色。不会保存或上传任何内容。"
+          }
         }
       }
     },
@@ -56,6 +62,12 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Biar kamu bisa simpan foto Try On ke galeri."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "让你可以把试妆照片保存到相册。"
           }
         }
       }

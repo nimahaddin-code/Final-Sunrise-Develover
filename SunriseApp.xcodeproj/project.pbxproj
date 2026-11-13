@@ -167,6 +167,7 @@
 		DA7FD4409B946F3081EEFD86 /* EyelinerFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F4D55BA5337E5BFFC436C /* EyelinerFeedback.swift */; };
 		DA7FFDB723B4D0BE4CFF1347 /* BrowFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F660BC5BDAA59F20BF09F /* BrowFeedback.swift */; };
 		DB800B2849D00487C7191B04 /* SunriseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5841E6C956B66A11234989 /* SunriseApp.swift */; };
+		A11CA1E0000000000000A002 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CA1E0000000000000A001 /* AppLanguage.swift */; };
 		DC477A1146A2D472909C8FCA /* NewFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22349FD5446BC601B67803B0 /* NewFlow.swift */; };
 		DFE49476F0DF2E2C54A6BA8C /* HandOcclusionSegmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792C45EC0F1AB54F3358E303 /* HandOcclusionSegmenter.swift */; };
 		E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A92B86027ED154A52F5754 /* ProductCamera.swift */; };
@@ -224,6 +225,7 @@
 		1985CD06870F896A31580E6A /* EyelinerTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerTutorial.swift; sourceTree = "<group>"; };
 		19A31E43DAD88366AB1ECB5C /* AppNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigator.swift; sourceTree = "<group>"; };
 		2050995FB80EEA6772CE79ED /* BlushTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlushTutorial.swift; sourceTree = "<group>"; };
+		A11CA1E0000000000000A001 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		22349FD5446BC601B67803B0 /* NewFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFlow.swift; sourceTree = "<group>"; };
 		224FF6C86731C7630742B3C2 /* CompactOpeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactOpeningView.swift; sourceTree = "<group>"; };
 		231A9D8B5701EDA4305C3266 /* EyeLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeLandmarks.swift; sourceTree = "<group>"; };
@@ -768,6 +770,7 @@
 		B6C4CDC0872398FC76BC80DE /* App */ = {
 			isa = PBXGroup;
 			children = (
+				A11CA1E0000000000000A001 /* AppLanguage.swift */,
 				22349FD5446BC601B67803B0 /* NewFlow.swift */,
 				0EB509C6F62AD9CF0B9F3D96 /* Navigation */,
 				C1810A54CE6D4BC94E7F122D /* AppContainer.swift */,
@@ -1105,6 +1108,7 @@
 				en,
 				Base,
 				id,
+				"zh-Hans",
 			);
 			mainGroup = B28B7AF69320201D1CF206EB;
 			packageReferences = (
@@ -1220,6 +1224,7 @@
 				DA7F57AED0460BD662F840BB /* FeedbackRules.swift in Sources */,
 				DA7F9E634FE8496DBE2F327C /* FaceScan.swift in Sources */,
 				4115CD97F39597A602B21EBA /* FlowPlaceholder.swift in Sources */,
+				A11CA1E0000000000000A002 /* AppLanguage.swift in Sources */,
 				DC477A1146A2D472909C8FCA /* NewFlow.swift in Sources */,
 				74F2F17D8FCCC121CEFB8A41 /* FaceMeshMeasurer.swift in Sources */,
 				A3A721B2BAA472D2516B4213 /* EyeScanLandmarks.swift in Sources */,

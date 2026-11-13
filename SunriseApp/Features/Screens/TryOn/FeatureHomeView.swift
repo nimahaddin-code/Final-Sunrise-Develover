@@ -11,15 +11,20 @@ struct FeatureHomeView: View {
 
     @State private var selected: TryOnTool? = .blush
     @State private var sliderWidth: CGFloat = 0
+    @AppStorage(AppLanguage.key) private var language = AppLanguage.current
 
     private var current: TryOnTool { selected ?? .blush }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Hi, pretty!")
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundStyle(AppColors.onboardingInk)
+                HStack {
+                    Text("Hi, pretty!")
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundStyle(AppColors.onboardingInk)
+                    Spacer()
+                    languageMenu
+                }
                 Text("What do you want to learn today?")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(AppColors.onboardingInk)
@@ -122,6 +127,22 @@ struct FeatureHomeView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $selected)
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { sliderWidth = $0 }
+    }
+
+    /// Top right: the app's language. A choice shows at once and is kept for the next launch.
+    private var languageMenu: some View {
+        Menu {
+            Picker("Language", selection: Binding(get: { language }, set: { $0.select() })) {
+                ForEach(AppLanguage.allCases) { Text(verbatim: $0.name).tag($0) }
+            }
+        } label: {
+            Image(systemName: "globe")
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(AppColors.onboardingInk)
+                .frame(width: 44, height: 44)
+                .glassEffect(.regular.interactive(), in: .circle)
+        }
+        .accessibilityLabel("Language")
     }
 
     private var dots: some View {

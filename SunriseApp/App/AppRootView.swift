@@ -7,6 +7,8 @@ struct AppRootView: View {
     @StateObject private var flow = MakeupFlowStore()
     /// Splash, onboarding and the compact opening run once per launch, and only when the new flow was on at launch.
     @State private var showEntry = UserDefaults.standard.bool(forKey: NewFlow.key)
+    /// Changed by the language button on the home screen.
+    @AppStorage(AppLanguage.key) private var language = AppLanguage.current
 
     var body: some View {
         Group {
@@ -29,6 +31,7 @@ struct AppRootView: View {
             }
         }
         }
+        .environment(\.locale, language.locale)
     }
 
     // Without an eye scan the eyeliner is the natural line.

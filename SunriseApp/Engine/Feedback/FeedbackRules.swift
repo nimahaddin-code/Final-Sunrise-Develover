@@ -67,8 +67,8 @@ struct FeedbackDatabase: Decodable, Sendable {
 
 enum FeedbackLanguage: String, Sendable {
     case id, en
-    /// The app's own language: Indonesian when the app runs in Indonesian, otherwise English.
-    static var current: FeedbackLanguage { Bundle.main.preferredLocalizations.first?.hasPrefix("id") == true ? .id : .en }
+    /// The app's own language: Indonesian when the app runs in Indonesian, otherwise English (the database has no Chinese).
+    static var current: FeedbackLanguage { AppLanguage.current == .indonesian ? .id : .en }
 }
 
 enum FeedbackBand: Int, Comparable, Sendable {
