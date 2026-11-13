@@ -90,8 +90,8 @@ struct FaceFit: Equatable, Sendable {
             hasNose
                 ? ["Starts above your inner eye corner, arches over the outer edge of your iris and ends on the line from your nose to your outer eye corner."]
                 : ["Starts above your inner eye corner and arches over the outer edge of your iris."]
-        case .eyeliner:
-            // Chosen from the eye shape measured in the face scan; see `EyelinerPlan.notes`.
+        case .eyeliner, .lips:
+            // Chosen from the eye shape measured in the face scan; see `EyelinerPlan.notes`. Lips follow the lips themselves.
             []
         case .blush:
             left.noseDepth != nil

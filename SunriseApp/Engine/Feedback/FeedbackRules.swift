@@ -54,8 +54,9 @@ struct FeedbackDatabase: Decodable, Sendable {
         return database
     }
 
-    func tool(_ tool: TryOnTool) -> Tool {
-        switch tool { case .blush: tools.blush; case .eyebrow: tools.brow; case .eyeliner: tools.eyeliner }
+    /// Nil for a tool the database has no rules for yet (lips).
+    func tool(_ tool: TryOnTool) -> Tool? {
+        switch tool { case .blush: tools.blush; case .eyebrow: tools.brow; case .eyeliner: tools.eyeliner; case .lips: nil }
     }
     func rule(_ id: String) -> Rule? {
         [tools.blush, tools.brow, tools.eyeliner].lazy.flatMap { $0.rules + $0.symmetry }.first { $0.id == id }
@@ -66,8 +67,8 @@ struct FeedbackDatabase: Decodable, Sendable {
 
 enum FeedbackLanguage: String, Sendable {
     case id, en
-    /// The app's own language: Indonesian when the app runs in Indonesian, otherwise English.
-    static var current: FeedbackLanguage { Bundle.main.preferredLocalizations.first?.hasPrefix("id") == true ? .id : .en }
+    /// The app's own language: Indonesian when the app runs in Indonesian, otherwise English (the database has no Chinese).
+    static var current: FeedbackLanguage { AppLanguage.current == .indonesian ? .id : .en }
 }
 
 enum FeedbackBand: Int, Comparable, Sendable {

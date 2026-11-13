@@ -33,6 +33,8 @@ struct EyeLandmarkFrame {
     var faceAnchors: [CGPoint] = []
     /// How to map this frame's image pixels to the screen, captured when the frame was submitted.
     var context: FrameContext?
+    /// The lips of the same face (the lipstick overlay reads these; the eyeliner does not).
+    var lips: LipLandmarks?
 
     var eyes: [EyeLandmarks] { [subjectLeft, subjectRight].compactMap { $0 } }
 }

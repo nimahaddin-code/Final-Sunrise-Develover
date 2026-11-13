@@ -169,6 +169,8 @@ struct FeatureCaptureView: View {
                 // The eyeliner is drawn by SwiftUI, not the engine: its target is read from the composed picture.
                 pixels = ScreenPixels(image: image)
             }
+            // The lipstick is a SwiftUI overlay too.
+            if stage == .desired && handoff.tool == .lips { image = home.lips.composed(image) }
             let outline = handoff.tool == .blush ? home.camera.blushGuide.snapshot : nil
             // One moment for everything: the face, its colours, the eyes and the head pose are measured on the camera frame
             // the photo was drawn from, so every point sits on the photo's pixels even if the head moved during the shutter.
@@ -361,6 +363,7 @@ private struct CaptureCameraCard: View {
                                       relay.deliver(frame, face)
                                   })
                     LinerOverlayView(model: home.liner, isVisible: true)
+                    LipOverlayView(model: home.lips, isVisible: true)
                 }
             } else {
                 ProgressView().tint(AppColors.snow)

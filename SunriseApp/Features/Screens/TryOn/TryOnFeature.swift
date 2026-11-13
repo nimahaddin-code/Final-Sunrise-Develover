@@ -19,6 +19,7 @@ extension TryOnTool {
         case .blush: BlushTryOnFeature()
         case .eyeliner: EyelinerTryOnFeature()
         case .eyebrow: BrowTryOnFeature()
+        case .lips: LipsTryOnFeature()
         }
     }
 }

@@ -167,6 +167,7 @@
 		DA7FD4409B946F3081EEFD86 /* EyelinerFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F4D55BA5337E5BFFC436C /* EyelinerFeedback.swift */; };
 		DA7FFDB723B4D0BE4CFF1347 /* BrowFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7F660BC5BDAA59F20BF09F /* BrowFeedback.swift */; };
 		DB800B2849D00487C7191B04 /* SunriseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F5841E6C956B66A11234989 /* SunriseApp.swift */; };
+		A11CA1E0000000000000A002 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11CA1E0000000000000A001 /* AppLanguage.swift */; };
 		DC477A1146A2D472909C8FCA /* NewFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22349FD5446BC601B67803B0 /* NewFlow.swift */; };
 		DFE49476F0DF2E2C54A6BA8C /* HandOcclusionSegmenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792C45EC0F1AB54F3358E303 /* HandOcclusionSegmenter.swift */; };
 		E05B0B76AA74BB5B1B5F4DDE /* ProductCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64A92B86027ED154A52F5754 /* ProductCamera.swift */; };
@@ -192,6 +193,14 @@
 		F7E1A0000000000000000008 /* EyelinerTryOnFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7E1A0000000000000000007 /* EyelinerTryOnFeature.swift */; };
 		F83E4FF1665636FA83213151 /* ARFaceTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF45679699AC7CB5E530CA1C /* ARFaceTrackingManager.swift */; };
 		F88C4B1A73633332F0DE36C2 /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EF702E8CB338F9CCD0196D3 /* AppTypography.swift */; };
+		11B500000000000000000002 /* LipStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B500000000000000000001 /* LipStyle.swift */; };
+		11B500000000000000000004 /* LipsTryOnFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B500000000000000000003 /* LipsTryOnFeature.swift */; };
+		11B500000000000000000006 /* LipShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B500000000000000000005 /* LipShape.swift */; };
+		11B500000000000000000008 /* LipOverlayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B500000000000000000007 /* LipOverlayModel.swift */; };
+		11B50000000000000000000A /* LipsTutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B500000000000000000009 /* LipsTutorial.swift */; };
+		11B50000000000000000000C /* LipStepGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B50000000000000000000B /* LipStepGuide.swift */; };
+		11B50000000000000000000E /* LipsInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B50000000000000000000D /* LipsInfo.swift */; };
+		11B500000000000000000016 /* LipShapeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B500000000000000000015 /* LipShapeTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -216,6 +225,7 @@
 		1985CD06870F896A31580E6A /* EyelinerTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerTutorial.swift; sourceTree = "<group>"; };
 		19A31E43DAD88366AB1ECB5C /* AppNavigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNavigator.swift; sourceTree = "<group>"; };
 		2050995FB80EEA6772CE79ED /* BlushTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlushTutorial.swift; sourceTree = "<group>"; };
+		A11CA1E0000000000000A001 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		22349FD5446BC601B67803B0 /* NewFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewFlow.swift; sourceTree = "<group>"; };
 		224FF6C86731C7630742B3C2 /* CompactOpeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactOpeningView.swift; sourceTree = "<group>"; };
 		231A9D8B5701EDA4305C3266 /* EyeLandmarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyeLandmarks.swift; sourceTree = "<group>"; };
@@ -392,6 +402,14 @@
 		F9A809519AC15D1F2A75FC7E /* MakeupTextureRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupTextureRenderer.swift; sourceTree = "<group>"; };
 		FA9E9F8E46A443A1A5FB7FA7 /* PaletteColorPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaletteColorPicker.swift; sourceTree = "<group>"; };
 		FE3904FB0A58CD5FFD0DF623 /* EyebrowRegionMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyebrowRegionMapper.swift; sourceTree = "<group>"; };
+		11B500000000000000000001 /* LipStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipStyle.swift; sourceTree = "<group>"; };
+		11B500000000000000000003 /* LipsTryOnFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipsTryOnFeature.swift; sourceTree = "<group>"; };
+		11B500000000000000000005 /* LipShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipShape.swift; sourceTree = "<group>"; };
+		11B500000000000000000007 /* LipOverlayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipOverlayModel.swift; sourceTree = "<group>"; };
+		11B500000000000000000009 /* LipsTutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipsTutorial.swift; sourceTree = "<group>"; };
+		11B50000000000000000000B /* LipStepGuide.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipStepGuide.swift; sourceTree = "<group>"; };
+		11B50000000000000000000D /* LipsInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipsInfo.swift; sourceTree = "<group>"; };
+		11B500000000000000000015 /* LipShapeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LipShapeTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -643,6 +661,7 @@
 			isa = PBXGroup;
 			children = (
 				F323752B9D2D5BFEFC07F90E /* GuidedFlowTests.swift */,
+				11B500000000000000000015 /* LipShapeTests.swift */,
 				DA7FA9617B7F6BF2FD420BD1 /* BlushFeedbackTests.swift */,
 				DA7FB78841BE7AE803170E09 /* LineFeedbackTests.swift */,
 				7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */,
@@ -677,6 +696,7 @@
 				ACD2B40CE11CB04E619F8F98 /* Blush */,
 				B1CC2D82DE9FCF71AF94704A /* Brow */,
 				DF23E355C9F6607B2DF98F9B /* Eyeliner */,
+				11B500000000000000000010 /* Lips */,
 				ADB89120005678C69D04A5C3 /* Screens */,
 			);
 			path = Features;
@@ -750,6 +770,7 @@
 		B6C4CDC0872398FC76BC80DE /* App */ = {
 			isa = PBXGroup;
 			children = (
+				A11CA1E0000000000000A001 /* AppLanguage.swift */,
 				22349FD5446BC601B67803B0 /* NewFlow.swift */,
 				0EB509C6F62AD9CF0B9F3D96 /* Navigation */,
 				C1810A54CE6D4BC94E7F122D /* AppContainer.swift */,
@@ -974,6 +995,52 @@
 			path = Engine;
 			sourceTree = "<group>";
 		};
+		11B500000000000000000011 /* TryOn */ = {
+			isa = PBXGroup;
+			children = (
+				11B500000000000000000001 /* LipStyle.swift */,
+				11B500000000000000000003 /* LipsTryOnFeature.swift */,
+			);
+			path = TryOn;
+			sourceTree = "<group>";
+		};
+		11B500000000000000000012 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				11B500000000000000000005 /* LipShape.swift */,
+				11B500000000000000000007 /* LipOverlayModel.swift */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		11B500000000000000000013 /* Tutorial */ = {
+			isa = PBXGroup;
+			children = (
+				11B500000000000000000009 /* LipsTutorial.swift */,
+				11B50000000000000000000B /* LipStepGuide.swift */,
+			);
+			path = Tutorial;
+			sourceTree = "<group>";
+		};
+		11B500000000000000000014 /* Info */ = {
+			isa = PBXGroup;
+			children = (
+				11B50000000000000000000D /* LipsInfo.swift */,
+			);
+			path = Info;
+			sourceTree = "<group>";
+		};
+		11B500000000000000000010 /* Lips */ = {
+			isa = PBXGroup;
+			children = (
+				11B500000000000000000012 /* Engine */,
+				11B500000000000000000014 /* Info */,
+				11B500000000000000000011 /* TryOn */,
+				11B500000000000000000013 /* Tutorial */,
+			);
+			path = Lips;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1041,6 +1108,7 @@
 				en,
 				Base,
 				id,
+				"zh-Hans",
 			);
 			mainGroup = B28B7AF69320201D1CF206EB;
 			packageReferences = (
@@ -1093,6 +1161,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7E0BF763D279D99C37AAC774 /* GuidedFlowTests.swift in Sources */,
+				11B500000000000000000016 /* LipShapeTests.swift in Sources */,
 				DA7FB11FD89B96F28BD673F2 /* BlushFeedbackTests.swift in Sources */,
 				DA7F30D87A097FC1912300C0 /* LineFeedbackTests.swift in Sources */,
 				7F3A91C2D45E6B80A1D00011 /* CameraMessageEngineTests.swift in Sources */,
@@ -1126,6 +1195,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E2EF00000000000000000002 /* FeatureCaptureView.swift in Sources */,
+				11B500000000000000000002 /* LipStyle.swift in Sources */,
+				11B500000000000000000004 /* LipsTryOnFeature.swift in Sources */,
+				11B500000000000000000006 /* LipShape.swift in Sources */,
+				11B500000000000000000008 /* LipOverlayModel.swift in Sources */,
+				11B50000000000000000000A /* LipsTutorial.swift in Sources */,
+				11B50000000000000000000C /* LipStepGuide.swift in Sources */,
+				11B50000000000000000000E /* LipsInfo.swift in Sources */,
 				E2EF00000000000000000006 /* FeedbackView.swift in Sources */,
 				E2EF00000000000000000008 /* LookBriefView.swift in Sources */,
 				E2EF0000000000000000000A /* MakeupFlow.swift in Sources */,
@@ -1148,6 +1224,7 @@
 				DA7F57AED0460BD662F840BB /* FeedbackRules.swift in Sources */,
 				DA7F9E634FE8496DBE2F327C /* FaceScan.swift in Sources */,
 				4115CD97F39597A602B21EBA /* FlowPlaceholder.swift in Sources */,
+				A11CA1E0000000000000A002 /* AppLanguage.swift in Sources */,
 				DC477A1146A2D472909C8FCA /* NewFlow.swift in Sources */,
 				74F2F17D8FCCC121CEFB8A41 /* FaceMeshMeasurer.swift in Sources */,
 				A3A721B2BAA472D2516B4213 /* EyeScanLandmarks.swift in Sources */,

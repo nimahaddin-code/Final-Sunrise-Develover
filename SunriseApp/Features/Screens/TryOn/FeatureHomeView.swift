@@ -1,25 +1,30 @@
 import SwiftUI
 
 /// The first page after the welcome: the onboarding glow with "Hi, pretty!", a swipeable slider of tool cards (Eyeliner,
-/// Blush, Brows; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
+/// Blush, Brows, Lips; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
 /// about it, and a dark "Start lesson" button for the selected tool; the cards themselves are not tappable (swipe only). Plain SwiftUI, no camera.
 struct FeatureHomeView: View {
     let onSelect: (TryOnTool) -> Void
 
-    private static let order: [TryOnTool] = [.eyeliner, .blush, .eyebrow]
+    private static let order: [TryOnTool] = [.eyeliner, .blush, .eyebrow, .lips]
     private static let cardWidthFraction: CGFloat = 0.68
 
     @State private var selected: TryOnTool? = .blush
     @State private var sliderWidth: CGFloat = 0
+    @AppStorage(AppLanguage.key) private var language = AppLanguage.current
 
     private var current: TryOnTool { selected ?? .blush }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Hi, pretty!")
-                    .font(.system(size: 34, weight: .bold))
-                    .foregroundStyle(AppColors.onboardingInk)
+                HStack {
+                    Text("Hi, pretty!")
+                        .font(.system(size: 34, weight: .bold))
+                        .foregroundStyle(AppColors.onboardingInk)
+                    Spacer()
+                    languageMenu
+                }
                 Text("What do you want to learn today?")
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(AppColors.onboardingInk)
@@ -81,6 +86,22 @@ struct FeatureHomeView: View {
                 ForEach(Self.order) { tool in
                     Image(Self.imageName(tool))
                         .resizable().scaledToFit()
+                        .overlay(alignment: .topLeading) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(name(tool))
+                                    .textCase(.uppercase)
+                                    .font(.system(size: 30, weight: .black).width(.expanded))
+                                    .foregroundStyle(Self.titleColor(tool))
+                                    .minimumScaleFactor(0.7)
+                                    .lineLimit(1)
+                                Text(tagline(tool))
+                                    .font(.system(size: 15))
+                                    .foregroundStyle(Self.titleColor(tool).opacity(0.8))
+                                    .lineLimit(1)
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 24)
+                        }
                         .overlay(alignment: .bottomLeading) {
                             HStack(spacing: 6) {
                                 chip(Text("^[\(steps(tool)) step](inflect: true)"))
@@ -106,6 +127,22 @@ struct FeatureHomeView: View {
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $selected)
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { sliderWidth = $0 }
+    }
+
+    /// Top right: the app's language. A choice shows at once and is kept for the next launch.
+    private var languageMenu: some View {
+        Menu {
+            Picker("Language", selection: Binding(get: { language }, set: { $0.select() })) {
+                ForEach(AppLanguage.allCases) { Text(verbatim: $0.name).tag($0) }
+            }
+        } label: {
+            Image(systemName: "globe")
+                .font(.system(size: 18, weight: .medium))
+                .foregroundStyle(AppColors.onboardingInk)
+                .frame(width: 44, height: 44)
+                .glassEffect(.regular.interactive(), in: .circle)
+        }
+        .accessibilityLabel("Language")
     }
 
     private var dots: some View {
@@ -139,6 +176,7 @@ struct FeatureHomeView: View {
         case .eyeliner: "home-card-eyeliner"
         case .blush: "home-card-blush"
         case .eyebrow: "home-card-brows"
+        case .lips: "home-card-lips"
         }
     }
 
@@ -147,6 +185,25 @@ struct FeatureHomeView: View {
         case .eyeliner: "Eyeliner"
         case .blush: "Blush"
         case .eyebrow: "Brows"
+        case .lips: "Lips"
+        }
+    }
+
+    private func tagline(_ tool: TryOnTool) -> LocalizedStringKey {
+        switch tool {
+        case .eyeliner: "Wings & lines"
+        case .blush: "Soft flush, fresh glow"
+        case .eyebrow: "Shape & fill"
+        case .lips: "Colour & shape"
+        }
+    }
+
+    private static func titleColor(_ tool: TryOnTool) -> Color {
+        switch tool {
+        case .eyeliner: Color(red: 0xF2 / 255, green: 0xA6 / 255, blue: 0xC8 / 255)
+        case .blush: Color(red: 0xFC / 255, green: 0xE4 / 255, blue: 0xF4 / 255)
+        case .eyebrow: Color(red: 0x5A / 255, green: 0x2E / 255, blue: 0x12 / 255)
+        case .lips: Color(red: 0xFF / 255, green: 0xE3 / 255, blue: 0xE0 / 255)
         }
     }
 
@@ -155,6 +212,7 @@ struct FeatureHomeView: View {
         case .eyeliner: "A liner shape that suits your eyes."
         case .blush: "A soft flush placed right for your cheeks."
         case .eyebrow: "Fuller, tidy brows that frame your face."
+        case .lips: "A lip colour and shape that suits you."
         }
     }
 
@@ -163,6 +221,7 @@ struct FeatureHomeView: View {
         case .eyeliner: GuidedTutorialModel.linerLessons.count
         case .blush: GuidedTutorialModel.blushLessons.count
         case .eyebrow: GuidedTutorialModel.browLessons.count
+        case .lips: GuidedTutorialModel.lipLessons.count
         }
     }
 

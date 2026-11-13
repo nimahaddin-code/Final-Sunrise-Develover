@@ -52,6 +52,11 @@ final class MediaPipeEyeLandmarkProvider: NSObject, @unchecked Sendable {
     /// Mid-face landmarks used as a rigid reference (unaffected by blinking / eye-skin stretching).
     static let faceAnchorIndices = [168, 6, 197, 195, 5, 4, 1, 129, 358, 98, 327, 234, 454, 127, 356]
 
+    /// The lips as two closed rings (MediaPipe's FACEMESH_LIPS): from the subject's right mouth corner along the upper lip
+    /// to the left corner, then back along the lower lip. Outer edge, and the mouth opening.
+    static let lipOuterIndices = [61, 185, 40, 39, 37, 0, 267, 269, 270, 409, 291, 375, 321, 405, 314, 17, 84, 181, 91, 146]
+    static let lipInnerIndices = [78, 191, 80, 81, 82, 13, 312, 311, 310, 415, 308, 324, 318, 402, 317, 14, 87, 178, 88, 95]
+
     /// A frame that is still unanswered after this long is given up, so a lost callback cannot stall the stream.
     static let inFlightTimeout: CFTimeInterval = 0.5
 
@@ -240,7 +245,8 @@ extension MediaPipeEyeLandmarkProvider: FaceLandmarkerLiveStreamDelegate {
                                      timestamp: TimeInterval(timestampInMilliseconds) / 1000,
                                      subjectLeft: eye(left), subjectRight: eye(right),
                                      providerLatencyMs: (CACurrentMediaTime() - info.start) * 1000,
-                                     faceAnchors: Self.faceAnchorIndices.map(point), context: info.context)
+                                     faceAnchors: Self.faceAnchorIndices.map(point), context: info.context,
+                                     lips: LipLandmarks(outer: Self.lipOuterIndices.map(point), inner: Self.lipInnerIndices.map(point)))
         finish(timestampInMilliseconds, delivered: frame)
     }
 }

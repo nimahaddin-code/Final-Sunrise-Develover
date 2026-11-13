@@ -4,10 +4,10 @@ import SwiftUI
 
 extension GuidedTutorialModel {
     /// The Blush tab's one step: a short title (steps sheet) and the instruction shown over the camera.
-    static let blushLessons = [
+    nonisolated static var blushLessons: [FaceGuideLesson] { [
         FaceGuideLesson(title: String(localized: "Apply and Blend"),
                         instruction: String(localized: "Dab a little blush inside the circle, then blend outward.")),
-    ]
+    ] }
 
     /// `BlushTutorialOverlay`'s animation for each lesson: both dotted outlines with the outward dab.
     static let blushGuideSteps = [1]

@@ -82,14 +82,16 @@ struct FeedbackView: View {
                 VStack(alignment: .leading, spacing: 14) {
                     topBar
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(headline(feedback.score))
+                        // Lips are not scored yet: no "retake" for a result that was never measured.
+                        Text(handoff.tool == .lips ? String(localized: "All done!") : headline(feedback.score))
                             .font(.system(size: 32, weight: .black)).fontWidth(.expanded)
                             .tracking(-0.6)
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
                             .accessibilityAddTraits(.isHeader)
-                        Text(feedback.score == nil ? "Let's take the photo again so we can check it."
-                                                   : "Here's how close you got to your try-on.")
+                        Text(handoff.tool == .lips ? "Compare your lips with your try-on. Scores for lips are coming soon."
+                             : feedback.score == nil ? "Let's take the photo again so we can check it."
+                                                     : "Here's how close you got to your try-on.")
                             .font(.system(size: 15))
                             .foregroundStyle(AppColors.onboardingBody)
                     }
@@ -230,11 +232,13 @@ struct FeedbackView: View {
         case .blush: String(localized: "Blush")
         case .eyeliner: String(localized: "Eyeliner")
         case .eyebrow: String(localized: "Eyebrow")
+        case .lips: String(localized: "Lips")
         }
         let look: String? = switch handoff.tool {
         case .blush: handoff.blushStyle?.title
         case .eyebrow: handoff.browOverlay?.title
         case .eyeliner: String(localized: handoff.linerLook.title)
+        case .lips: handoff.lipStyle.title
         }
         return look.map { "\(tool) · \($0)" } ?? tool
     }

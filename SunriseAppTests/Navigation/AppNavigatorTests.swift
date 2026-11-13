@@ -17,6 +17,29 @@ final class AppNavigatorTests: XCTestCase {
         super.tearDown()
     }
 
+    /// A language picked on the home screen is used at once: by `String(localized:)`, by lists of steps, and by
+    /// names kept as string resources (the eyeliner look).
+    @MainActor func testChosenLanguageIsUsedAtOnce() {
+        let saved = (UserDefaults.standard.object(forKey: AppLanguage.key), UserDefaults.standard.object(forKey: "AppleLanguages"))
+        defer {
+            AppLanguage.english.select()
+            UserDefaults.standard.set(saved.0, forKey: AppLanguage.key)
+            UserDefaults.standard.set(saved.1, forKey: "AppleLanguages")
+        }
+        AppLanguage.indonesian.select()
+        XCTAssertEqual(AppLanguage.current, .indonesian)
+        XCTAssertEqual(String(localized: "Start lesson"), "Mulai belajar")
+        XCTAssertEqual(FeedbackLanguage.current, .id)
+        AppLanguage.chinese.select()
+        XCTAssertEqual(String(localized: "Start lesson"), "开始课程")
+        XCTAssertEqual(FeedbackLanguage.current, .en)
+        XCTAssertEqual(GuidedTutorialModel.browLessons[0].title, "梳理眉毛")
+        let liner = ToolInfo.of(.eyeliner, handoff: TutorialHandoff(tool: .eyeliner, shades: [:], intensities: [:]))
+        XCTAssertTrue(["经典", "猫眼", "狗狗眼", "狐狸眼", "阿拉伯式", "自然"].contains(liner.lookName), liner.lookName)
+        AppLanguage.english.select()
+        XCTAssertEqual(String(localized: "Start lesson"), "Start lesson")
+        XCTAssertEqual(GuidedTutorialModel.browLessons[0].title, "Brush Your Brows")
+    }
     @MainActor func testPreviousWelcomeRevisionMigratesOnce() {
         defaults.set(1,forKey:AppNavigator.welcomeVersionKey)
         let navigator=AppNavigator(defaults:defaults)

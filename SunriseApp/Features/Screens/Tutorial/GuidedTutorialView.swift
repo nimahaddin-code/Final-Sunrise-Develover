@@ -13,6 +13,8 @@ struct TutorialHandoff: Hashable {
     var intensities: [TryOnTool: Double]
     /// Which eyeliner look the person was trying: the tutorial guides that same shape.
     var linerLook: LinerLook = .classic
+    /// Which lipstick shape was tried on.
+    var lipStyle: LipStyle = .natural
     var blushStyle: BlushPlacementStyle? = nil
     var browOverlay: BrowOverlay? = nil
     var hideNaturalBrow = false
@@ -87,16 +89,16 @@ enum TutorialCompare: CaseIterable {
 
 enum TutorialTab: CaseIterable, Identifiable {
     /// In the bottom bar's order.
-    case blush, brows, eyeliner
+    case blush, brows, eyeliner, lips
     var id: Self { self }
     var title: LocalizedStringKey {
-        switch self { case .brows: "Brows"; case .eyeliner: "Eyeliner"; case .blush: "Blush" }
+        switch self { case .brows: "Brows"; case .eyeliner: "Eyeliner"; case .blush: "Blush"; case .lips: "Lips" }
     }
     var tool: TryOnTool {
-        switch self { case .brows: .eyebrow; case .eyeliner: .eyeliner; case .blush: .blush }
+        switch self { case .brows: .eyebrow; case .eyeliner: .eyeliner; case .blush: .blush; case .lips: .lips }
     }
     init(tool: TryOnTool) {
-        switch tool { case .eyebrow: self = .brows; case .eyeliner: self = .eyeliner; case .blush: self = .blush }
+        switch tool { case .eyebrow: self = .brows; case .eyeliner: self = .eyeliner; case .blush: self = .blush; case .lips: self = .lips }
     }
 }
 
@@ -104,10 +106,12 @@ enum TutorialTab: CaseIterable, Identifiable {
     let brow: EyebrowViewModel
     let camera = FaceCameraState()
     let liner = LinerOverlayModel()
+    let lips = LipOverlayModel()
     let relay: LinerFrameRelay
     let handoff: TutorialHandoff
     @Published private(set) var tab: TutorialTab
     @Published private(set) var linerStep = 0
+    @Published private(set) var lipStep = 0
     /// The Brows tab's own step (its five steps are the tutorial's, not the brow model's).
     @Published private(set) var browStep = 0
     @Published private(set) var blushStep = 0
@@ -135,7 +139,7 @@ enum TutorialTab: CaseIterable, Identifiable {
             linerStyle = EyelinerPlanner.style(style, look: handoff.linerLook)
         } else { linerStyle = nil }
         brow = EyebrowViewModel(checker: checker, assessment: assessment, initialRegion: start == .blush ? .blush : .eyebrows, startTutorial: true)
-        relay = LinerFrameRelay(model: liner)
+        relay = LinerFrameRelay(model: liner, lips: lips)
         // The guide points follow the skin when the person pulls the lid or the corner of the eye outward.
         liner.followsPulledLid = true
         applyShade(for: start == .blush ? .blush : .eyebrow)
@@ -150,11 +154,12 @@ enum TutorialTab: CaseIterable, Identifiable {
     }
 
     var stepIndex: Int {
-        switch tab { case .eyeliner: linerStep; case .brows: browStep; case .blush: blushStep }
+        switch tab { case .eyeliner: linerStep; case .brows: browStep; case .blush: blushStep; case .lips: lipStep }
     }
 
-    /// False when the tab has no reference (nothing is drawn rather than a default).
-    var hasGuide: Bool { tab == .eyeliner ? linerStyle != nil : brow.hasRecommendation }
+    /// False when the tab has no reference (nothing is drawn rather than a default). The lips guide follows the lips
+    /// themselves, so it always has one.
+    var hasGuide: Bool { tab == .lips || (tab == .eyeliner ? linerStyle != nil : brow.hasRecommendation) }
 
     var lessons: [FaceGuideLesson] {
         guard hasGuide else {
@@ -163,6 +168,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         if tab == .eyeliner { return Self.linerLessons }
         if tab == .brows { return Self.browLessons }
         if tab == .blush { return Self.blushLessons }
+        if tab == .lips { return Self.lipLessons }
         return brow.lessons
     }
 
@@ -186,7 +192,7 @@ enum TutorialTab: CaseIterable, Identifiable {
 
     /// The step the tool's guide overlay animates for the current lesson.
     var guideStep: Int {
-        let steps = switch tab { case .brows: Self.browGuideSteps; case .blush: Self.blushGuideSteps; case .eyeliner: Array(lessons.indices) }
+        let steps = switch tab { case .brows: Self.browGuideSteps; case .blush: Self.blushGuideSteps; case .eyeliner, .lips: Array(lessons.indices) }
         return steps.indices.contains(stepIndex) ? steps[stepIndex] : stepIndex
     }
 
@@ -206,7 +212,7 @@ enum TutorialTab: CaseIterable, Identifiable {
         // A new side starts with its guide on.
         guideHidden = false
         compare = Self.sideLayout(side: new, guideHidden: false)
-        switch tab { case .eyeliner: linerStep = step; case .brows: browStep = step; case .blush: blushStep = step }
+        switch tab { case .eyeliner: linerStep = step; case .brows: browStep = step; case .blush: blushStep = step; case .lips: lipStep = step }
     }
 
     /// The brow/blush preview configuration for the camera. Eyeliner is drawn by its own overlay, so the face-mesh
@@ -234,8 +240,8 @@ enum TutorialTab: CaseIterable, Identifiable {
             if !compare.showsTryOn { value.browOverlay = nil }
         }
         // The eyeliner tab needs no brow/blush fit. Marking it "launch fit" keeps the brow pipeline from scanning every frame
-        // with Vision on the camera's session queue, which delays the frames the eyeliner reads.
-        if tab == .eyeliner {
+        // with Vision on the camera's session queue, which delays the frames the eyeliner reads. The same goes for lips.
+        if tab == .eyeliner || tab == .lips {
             value.usesLaunchFit = true
             value.showGuide = false; value.showMakeupPreview = false; value.tutorialStep = nil
             return value
@@ -293,7 +299,8 @@ enum TutorialTab: CaseIterable, Identifiable {
         linerStep = 0
         browStep = 0
         blushStep = 0
-        if new != .eyeliner {
+        lipStep = 0
+        if new == .blush || new == .brows {
             brow.select(new == .blush ? .blush : .eyebrows)
             applyShade(for: new.tool)
             brow.beginTutorial()
@@ -305,7 +312,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     func advance() -> Bool {
         if perSide && stepIndex + 1 >= lessons.count && side == .leading { moveTo(side: .trailing, step: 0); return false }
         guard stepIndex + 1 < lessons.count else { return true }
-        switch tab { case .eyeliner: linerStep += 1; case .brows: browStep += 1; case .blush: blushStep += 1 }
+        switch tab { case .eyeliner: linerStep += 1; case .brows: browStep += 1; case .blush: blushStep += 1; case .lips: lipStep += 1 }
         return false
     }
 
@@ -313,7 +320,7 @@ enum TutorialTab: CaseIterable, Identifiable {
     func retreat() -> Bool {
         if perSide && stepIndex == 0 && side == .trailing { moveTo(side: .leading, step: lessons.count - 1); return false }
         guard stepIndex > 0 else { return true }
-        switch tab { case .eyeliner: linerStep -= 1; case .brows: browStep -= 1; case .blush: blushStep -= 1 }
+        switch tab { case .eyeliner: linerStep -= 1; case .brows: browStep -= 1; case .blush: blushStep -= 1; case .lips: lipStep -= 1 }
         return false
     }
 
@@ -323,6 +330,8 @@ enum TutorialTab: CaseIterable, Identifiable {
         active = false
         relay.setEnabled(false)
         liner.stop()
+        relay.setLipsEnabled(false)
+        lips.stop()
         camera.stopSession?()
         camera.suspend()
     }
@@ -334,7 +343,19 @@ enum TutorialTab: CaseIterable, Identifiable {
         brow.configuration.previewIntensity = Float(min(max(strength, 0), 1))
     }
 
+    /// The lips overlay runs on the Lips tab for both halves: the look draws from it, and the guide follows its lips.
+    private func syncLips() {
+        guard active, tab == .lips, !photoMode else {
+            relay.setLipsEnabled(false)
+            lips.setStyle(nil, shade: nil, intensity: 1)
+            return
+        }
+        relay.setLipsEnabled(true)
+        lips.setStyle(handoff.lipStyle, shade: handoff.shades[.lips], intensity: handoff.intensities[.lips] ?? TryOnHomeModel.defaultIntensity)
+    }
+
     private func syncLiner() {
+        syncLips()
         guard active, tab == .eyeliner, !photoMode, let linerStyle else {
             relay.setEnabled(false)
             liner.setStyle(nil, shade: nil, intensity: 1)
@@ -640,6 +661,15 @@ private struct TutorialScreen: View {
                                            showsLower: model.linerShowsLower, teachesWing: model.linerTeachesWing)
                                 .id(index)
                         }
+                    } else if model.tab == .lips {
+                        if let side = model.compare.side(of: .tryOn) {
+                            LipOverlayView(model: model.lips, isVisible: true, visibleSide: side)
+                        }
+                        if let side = model.compare.side(of: .guide) {
+                            LipStepGuide(model: model.lips, step: index, style: model.handoff.lipStyle,
+                                         paused: advisor.pausesAnimation, dimmed: advisor.isDimmed, side: side)
+                                .id(index)
+                        }
                     }
                 }
                 .animation(.easeInOut(duration: 0.25), value: model.compare)
@@ -779,6 +809,7 @@ private struct SideDoneCard: View {
         case .blush: ("Left cheek done!", "Now the same on your right cheek, so both sides match.", "Do my right cheek")
         case .brows: ("Left brow done!", "Now the same on your right brow, so both sides match.", "Do my right brow")
         case .eyeliner: ("Left eye done!", "Now the same on your right eye, so both sides match.", "Do my right eye")
+        case .lips: ("Left side done!", "Now the same on the right side of your lips, so both sides match.", "Do my right side")
         }
     }
 

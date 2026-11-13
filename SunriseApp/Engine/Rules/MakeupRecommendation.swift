@@ -1,7 +1,7 @@
 import Foundation
 
 enum MakeupCategory: String, CaseIterable, Identifiable, Sendable {
-    case eyebrow, blush, eyeliner
+    case eyebrow, blush, eyeliner, lips
 
     var id: String { rawValue }
 
@@ -10,6 +10,7 @@ enum MakeupCategory: String, CaseIterable, Identifiable, Sendable {
         case .eyebrow: "Eyebrow"
         case .blush: "Blush"
         case .eyeliner: "Eyeliner"
+        case .lips: "Lips"
         }
     }
 
@@ -18,6 +19,7 @@ enum MakeupCategory: String, CaseIterable, Identifiable, Sendable {
         case .eyebrow: "eyebrow"
         case .blush: "paintbrush.pointed"
         case .eyeliner: "eye"
+        case .lips: "mouth"
         }
     }
 }
@@ -42,6 +44,7 @@ enum MakeupPalette {
         case .eyebrow: databaseShades(category:"eyebrow")
         case .blush: databaseShades(category:"blush")
         case .eyeliner: [brown, plum, navy, black]
+        case .lips: lipShades
         }
     }
 
