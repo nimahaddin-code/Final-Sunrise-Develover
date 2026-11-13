@@ -8,6 +8,8 @@ struct FeedbackView: View {
     let handoff: TutorialHandoff
     @ObservedObject var store: MakeupFlowStore
     let provider: any MakeupFeedbackProviding
+    /// -Nimah: where the finished look is saved once the feedback is shown (My Looks); nil saves nothing.
+    var looks: MyLookStore? = nil
     let onBackToTutorial: () -> Void
     let onDone: () -> Void
     @State private var progress = 0.0
@@ -16,6 +18,8 @@ struct FeedbackView: View {
     /// The result photo lined up with the Before photo, the try-on taken at the desired-look shutter (`PhotoAlignment`).
     @State private var alignedResult: UIImage?
     @AppStorage(DeveloperTools.key) private var developerTools = false
+    /// The small note after saving to My Looks.
+    @State private var toast: SaveToast?
 
     var body: some View {
         Group {
@@ -39,7 +43,39 @@ struct FeedbackView: View {
                                                 blushStyle: handoff.blushStyle, linerLook: handoff.linerLook,
                                                 shade: handoff.shades[handoff.tool],
                                                 desiredScan: store.desiredScan, resultScan: store.resultScan)
-            feedback = await provider.feedback(for: request) { value in progress = value }
+            let measured = await provider.feedback(for: request) { value in progress = value }
+            feedback = measured
+            // Saved once per visit, when the feedback is on screen; a run left before this point saves nothing.
+            if let looks { await save(measured, to: looks) }
+        }
+        .overlay(alignment: .top) {
+            if let toast {
+                SaveToastView(toast: toast)
+                    .padding(.top, AppSpacing.small)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .animation(.easeInOut(duration: 0.25), value: toast)
+        .task(id: toast) {
+            guard let toast else { return }
+            AccessibilityNotification.Announcement(toast.spoken).post()
+            try? await Task.sleep(for: .seconds(2.5))
+            self.toast = nil
+        }
+    }
+
+    /// The photos as they are shown here (cropped and lined up), JPEG, with the scores and messages by id.
+    private func save(_ feedback: MakeupFeedback, to looks: MyLookStore) async {
+        let draft = MyLookDraft(feedback: feedback, handoff: handoff, date: Date(),
+                                expectedJPEG: MyLookDraft.jpeg(focused(store.desired ?? store.bare)),
+                                resultJPEG: MyLookDraft.jpeg(focused(store.alignedResult ?? alignedResult ?? store.result)))
+        do {
+            try await looks.save(draft)
+            toast = .saved
+        } catch MyLookStore.StoreError.storageFull {
+            toast = .storageFull
+        } catch {
+            toast = .failed
         }
     }
 
@@ -255,6 +291,44 @@ struct FeedbackView: View {
 }
 
 /// Before (the try-on photo) and After (the result) in one frame, split by a line the person drags.
+/// -Nimah: what happened when the look was saved to My Looks.
+enum SaveToast: Equatable {
+    case saved, storageFull, failed
+
+    var text: LocalizedStringKey {
+        switch self {
+        case .saved: "Saved to My Looks"
+        case .storageFull: "Your phone's storage is full, this look wasn't saved."
+        case .failed: "This look couldn't be saved."
+        }
+    }
+
+    var spoken: String {
+        switch self {
+        case .saved: String(localized: "Saved to My Looks")
+        case .storageFull: String(localized: "Your phone's storage is full, this look wasn't saved.")
+        case .failed: String(localized: "This look couldn't be saved.")
+        }
+    }
+
+    var symbol: String { self == .saved ? "checkmark.circle.fill" : "exclamationmark.triangle.fill" }
+}
+
+struct SaveToastView: View {
+    let toast: SaveToast
+
+    var body: some View {
+        Label(toast.text, systemImage: toast.symbol)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(AppColors.onboardingInk)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(.white, in: Capsule())
+            .shadow(color: .black.opacity(0.1), radius: 10, y: 4)
+            .padding(.horizontal, 20)
+    }
+}
+
 /// -Nimah: developer check that the feedback reads the right spots. Each photo with the points measured on it: a sparse
 /// grid of face-mesh points (white), the eye centres (cyan) and, pink, what the feedback takes as the target: on Expected
 /// the points the virtual makeup changed, on Result the target of every mark. Pink should sit exactly on the try-on makeup;

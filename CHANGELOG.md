@@ -1,3 +1,8 @@
+## 2026-11-13 — My Looks: saved looks -Nimah
+
+- Each finished feedback is saved on the phone (`MyLookStore`): photos, scores, shade, strength, rule ids; same look = one entry with attempts.
+- Toast on the feedback screen; protected files, left out of backups. UI for My Looks comes next.
+
 ## Tutorial steps sheet: current step only, tap outside closes — 2026-11-13
 
 `TutorialStepsSheet` shows only the step being done (no sideways paging, no page dots), so it always matches the camera

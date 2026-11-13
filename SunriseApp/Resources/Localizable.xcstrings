@@ -8125,6 +8125,16 @@
         }
       }
     },
+    "Saved to My Looks" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tersimpan di My Looks"
+          }
+        }
+      }
+    },
     "SCAFFOLD · NOT IMPLEMENTED" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9795,6 +9805,16 @@
         }
       }
     },
+    "This look couldn't be saved." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Look ini belum bisa disimpan."
+          }
+        }
+      }
+    },
     "This screen will explain the chosen makeup reference. The catalog is sample data; no personalized recommendation or photo analysis is available." : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11094,6 +11114,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "手机有点热了，休息一下吧。"
+          }
+        }
+      }
+    },
+    "Your phone's storage is full, this look wasn't saved." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Memori HP-mu penuh, look ini belum tersimpan."
           }
         }
       }

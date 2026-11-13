@@ -56,7 +56,7 @@ struct AppRootView: View {
             GuidedTutorialView(checker:container.faceTracking,assessment:assessment,plan:plan,handoff:handoff,
                                onFinished: { navigator.open(.capture(.result, handoff), in: .tryOn) })
         case .feedback(let handoff):
-            FeedbackView(handoff: handoff, store: flow, provider: container.feedback,
+            FeedbackView(handoff: handoff, store: flow, provider: container.feedback, looks: container.myLooks,
                          onBackToTutorial: {
                              flow.result = nil
                              navigator.restartTutorial()

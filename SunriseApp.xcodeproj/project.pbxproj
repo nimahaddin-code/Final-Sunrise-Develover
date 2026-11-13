@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D7100000000000000000002 /* MyLook.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000001 /* MyLook.swift */; };
+		4D7100000000000000000004 /* MyLookStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000003 /* MyLookStore.swift */; };
+		4D7100000000000000000006 /* MyLookStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7100000000000000000005 /* MyLookStoreTests.swift */; };
 		00C25255FB0A55CD254DAB5C /* FaceTrackingAvailabilityChecking.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC6DBACE90DF9F4964DBD3ED /* FaceTrackingAvailabilityChecking.swift */; };
 		033A5C6F22B5AC3CD0D490DB /* LiveGuideDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541EF3DA9C3035E1029E3BF3 /* LiveGuideDiagnostics.swift */; };
 		08141B51E306391DEED79934 /* LidFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD93F3E7DA4BDAA776A4A5A /* LidFlow.swift */; };
@@ -214,6 +217,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4D7100000000000000000001 /* MyLook.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLook.swift; sourceTree = "<group>"; };
+		4D7100000000000000000003 /* MyLookStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLookStore.swift; sourceTree = "<group>"; };
+		4D7100000000000000000005 /* MyLookStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyLookStoreTests.swift; sourceTree = "<group>"; };
 		06E4E253B30DEDB244405B20 /* EyelinerGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyelinerGeometryTests.swift; sourceTree = "<group>"; };
 		087F06F4A4D4BC010EF4C720 /* MakeupRecommendation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MakeupRecommendation.swift; sourceTree = "<group>"; };
 		0C2A5C04A75A9061E0632676 /* ImageToViewMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageToViewMapping.swift; sourceTree = "<group>"; };
@@ -431,6 +437,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D7100000000000000000010 /* MyLooks */ = {
+			isa = PBXGroup;
+			children = (
+				4D7100000000000000000001 /* MyLook.swift */,
+				4D7100000000000000000003 /* MyLookStore.swift */,
+			);
+			path = MyLooks;
+			sourceTree = "<group>";
+		};
 		0EB509C6F62AD9CF0B9F3D96 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
@@ -662,6 +677,7 @@
 			children = (
 				F323752B9D2D5BFEFC07F90E /* GuidedFlowTests.swift */,
 				11B500000000000000000015 /* LipShapeTests.swift */,
+				4D7100000000000000000005 /* MyLookStoreTests.swift */,
 				DA7FA9617B7F6BF2FD420BD1 /* BlushFeedbackTests.swift */,
 				DA7FB78841BE7AE803170E09 /* LineFeedbackTests.swift */,
 				7F3A91C2D45E6B80A1D00010 /* CameraMessageEngineTests.swift */,
@@ -697,6 +713,7 @@
 				B1CC2D82DE9FCF71AF94704A /* Brow */,
 				DF23E355C9F6607B2DF98F9B /* Eyeliner */,
 				11B500000000000000000010 /* Lips */,
+				4D7100000000000000000010 /* MyLooks */,
 				ADB89120005678C69D04A5C3 /* Screens */,
 			);
 			path = Features;
@@ -1162,6 +1179,7 @@
 			files = (
 				7E0BF763D279D99C37AAC774 /* GuidedFlowTests.swift in Sources */,
 				11B500000000000000000016 /* LipShapeTests.swift in Sources */,
+				4D7100000000000000000006 /* MyLookStoreTests.swift in Sources */,
 				DA7FB11FD89B96F28BD673F2 /* BlushFeedbackTests.swift in Sources */,
 				DA7F30D87A097FC1912300C0 /* LineFeedbackTests.swift in Sources */,
 				7F3A91C2D45E6B80A1D00011 /* CameraMessageEngineTests.swift in Sources */,
@@ -1196,6 +1214,8 @@
 			files = (
 				E2EF00000000000000000002 /* FeatureCaptureView.swift in Sources */,
 				11B500000000000000000002 /* LipStyle.swift in Sources */,
+				4D7100000000000000000002 /* MyLook.swift in Sources */,
+				4D7100000000000000000004 /* MyLookStore.swift in Sources */,
 				11B500000000000000000004 /* LipsTryOnFeature.swift in Sources */,
 				11B500000000000000000006 /* LipShape.swift in Sources */,
 				11B500000000000000000008 /* LipOverlayModel.swift in Sources */,
