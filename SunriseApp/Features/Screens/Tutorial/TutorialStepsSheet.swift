@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// The tutorial's steps sheet ("Tutorial"): one step per page with its picture and a Done / Now / Up next badge; swipe
-/// sideways for the other steps (was a vertical list behind "Swipe for more"). It opens on the step being done and follows
-/// it. Pictures are the design team's stills (`TutorialStepsSheet.imageName(tab:step:)`).
+/// The tutorial's steps sheet ("Tutorial"): the step being done, with its picture and a Done / Now / Up next badge. It
+/// follows the camera screen's step; there is no paging to other steps. Pictures are the design team's stills (`TutorialStepsSheet.imageName(tab:step:)`).
 struct TutorialStepsSheet: View {
     struct Step {
         let title: Text
@@ -18,38 +17,24 @@ struct TutorialStepsSheet: View {
     /// The step being done; `steps.count` when the side is finished (every step reads "Done").
     let current: Int
     let onClose: () -> Void
-    @State private var page = 0
 
     private var shownStep: Int { min(current, steps.count - 1) }
 
     var body: some View {
         VStack(spacing: 0) {
             header
-            TabView(selection: $page) {
-                ForEach(steps.indices, id: \.self) { index in
-                    row(steps[index], index: index)
-                        .padding(.horizontal, AppSpacing.large)
-                        .padding(.top, AppSpacing.small)
-                        .frame(maxHeight: .infinity, alignment: .top)
-                        .tag(index)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            if steps.count > 1 {
-                HStack(spacing: 6) {
-                    ForEach(steps.indices, id: \.self) { index in
-                        Capsule()
-                            .fill(index == page ? AppColors.dandanPink : Color.black.opacity(0.15))
-                            .frame(width: index == page ? 18 : 6, height: 6)
-                    }
-                }
-                .animation(.easeInOut(duration: 0.2), value: page)
+            // Only the step being done, so the sheet always matches the camera screen (no paging between steps).
+            if steps.indices.contains(shownStep) {
+                row(steps[shownStep], index: shownStep)
+                .padding(.horizontal, AppSpacing.large)
+                .padding(.top, AppSpacing.small)
                 .padding(.bottom, AppSpacing.medium)
-                .accessibilityHidden(true)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .id(shownStep)
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.2), value: shownStep)
             }
         }
-        .onAppear { page = shownStep }
-        .onChange(of: current) { _, _ in withAnimation { page = shownStep } }
         .presentationBackground(.white)
         .presentationCornerRadius(28)
         .environment(\.colorScheme, .light)

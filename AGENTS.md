@@ -1,3 +1,11 @@
+## Tutorial steps sheet: current step only, tap outside closes — 2026-11-13
+
+`TutorialStepsSheet` shows only the step being done (no sideways paging, no page dots), so it always matches the camera
+screen. A tap outside the sheet closes it (the background is no longer interactive while it is up). The swipe on the
+camera between steps (`stepSwipe`) is removed: Back / Next move between steps. The sheet still opens by itself once at the
+start, now about 0.45 s after the screen appears so the push has finished. 383 Simulator tests pass; not checked on a
+device.
+
 ## Eyeliner tutorial: wing looks teach the wing, others the lash curve — 2026-11-12
 
 The team grouped the six eyeliner looks (`LinerLook.hasWing`): winged = Classic, Cat, Puppy, Foxy; no wing = Arabian,

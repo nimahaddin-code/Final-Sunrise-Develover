@@ -433,14 +433,16 @@ private struct TutorialScreen: View {
         .sheet(isPresented: $showsSteps) {
             TutorialStepsSheet(steps: stepTexts, current: currentStepInSheet) { showsSteps = false }
                 .presentationDetents([TutorialStepsSheet.compact], selection: $stepsDetent)
-                .presentationBackgroundInteraction(.enabled(upThrough: TutorialStepsSheet.compact))
-                .presentationContentInteraction(.resizes)
                 .presentationDragIndicator(.visible)
         }
         .onAppear {
             visible = true; model.activate(); advisor.start(); light.resume()
-            // The steps sheet opens by itself at the start (by design), over the bottom bar until it is closed.
-            if model.perSide && !openedSteps { openedSteps = true; showsSteps = true }
+            // The steps sheet opens by itself once, at the start, after the push has finished (presenting during the push
+            // can be dropped). A tap outside it or its close button closes it.
+            if model.perSide && !openedSteps {
+                openedSteps = true
+                Task { try? await Task.sleep(for: .milliseconds(450)); if visible && !sideDone { showsSteps = true } }
+            }
         }
         .onDisappear { visible = false; showsSteps = false; model.deactivate(); advisor.stop(); light.turnOff() }
         .onChange(of: scenePhase) { _, phase in
@@ -458,8 +460,6 @@ private struct TutorialScreen: View {
         VStack(spacing: 0) {
             card
                 .frame(maxHeight: .infinity)
-                .contentShape(Rectangle())
-                .simultaneousGesture(stepSwipe)
             bottomBar
                 .padding(.horizontal, AppSpacing.medium)
                 .padding(.vertical, AppSpacing.small)
@@ -506,22 +506,6 @@ private struct TutorialScreen: View {
     /// The tutorial is over: the result photo in the flow, the photo screen otherwise.
     private func finish() {
         if let onFinished { leave(onFinished) } else { model.enterPhoto() }
-    }
-
-    /// Swipe left for the next step, right for the previous one, within the side being done: a swipe never finishes a side
-    /// or leaves the tutorial (Next / Finish and Back do that).
-    private var stepSwipe: some Gesture {
-        DragGesture(minimumDistance: 30).onEnded { value in
-            let dx = value.translation.width, dy = value.translation.height
-            guard !sideDone, !model.photoMode, abs(dx) > 60, abs(dx) > abs(dy) * 1.5 else { return }
-            withAnimation(.easeInOut(duration: 0.2)) {
-                if dx < 0 {
-                    if !model.isSideLastStep { _ = model.advance() }
-                } else if model.stepIndex > 0 {
-                    _ = model.retreat()
-                }
-            }
-        }
     }
 
     private func back() {
