@@ -1,3 +1,12 @@
+## Feedback: smiling is a note, not a retake — -Nimah (2026-11-13)
+
+Device test: a relaxed face (Youthful) read as smiling (ARKit `mouthSmileLeft` or `Right` > 0.3 on either photo) and the
+blocking `capture.smiling` check hid all feedback behind "Retake the photo". `capture.smiling` is now `blocking: false` in
+`makeup-feedback.database.json` with note wording, so the scores and fixes show. The limit (0.3) is unchanged. The note goes
+to `MakeupFeedback.notes` and My Looks, but the feedback screen does not list photo notes while there is a score (the
+"Photo tips" card was removed on 2026-11-09), so it is not visible there. 414 Simulator tests pass (test updated:
+`testSmilingIsANoteAndTheFeedbackStillShows`); not checked on a device.
+
 ## Blush: five looks from the design, then Youthful — -Nimah (2026-11-13)
 
 Try On offers six blush looks (`BlushPlacementStyle.referenceLooks`, in this order): Cheekbone, Apple, Sunkissed, Lifted,
