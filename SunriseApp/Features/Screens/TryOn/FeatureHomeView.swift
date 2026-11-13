@@ -5,6 +5,9 @@ import SwiftUI
 /// about it, and a dark "Start lesson" button for the selected tool; the cards themselves are not tappable (swipe only). Plain SwiftUI, no camera.
 struct FeatureHomeView: View {
     let onSelect: (TryOnTool) -> Void
+    /// -Nimah: the saved looks shown under the tool cards (nil: no My Looks row).
+    var looks: MyLookStore? = nil
+    var onOpenLook: (UUID) -> Void = { _ in }
 
     private static let order: [TryOnTool] = [.eyeliner, .blush, .eyebrow, .lips]
     private static let cardWidthFraction: CGFloat = 0.68
@@ -53,6 +56,11 @@ struct FeatureHomeView: View {
             }
             .padding(.horizontal, AppSpacing.large)
             .padding(.top, AppSpacing.medium)
+
+            if let looks {
+                MyLooksSection(store: looks, onOpen: onOpenLook)
+                    .padding(.top, AppSpacing.medium)
+            }
 
             Spacer(minLength: AppSpacing.medium)
 

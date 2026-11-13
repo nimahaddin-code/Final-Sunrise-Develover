@@ -15,6 +15,29 @@ New descriptions and names have Indonesian and Chinese drafts (`needs_review`); 
 like the other look names. A saved choice of a legacy style maps Apple / centre cheek to Apple and cheekbone / high
 cheekbone to Cheekbone. Sizes are untuned guesses on synthetic faces; nothing checked on a device.
 
+## My Looks: home row, saved look detail, Try again — -Nimah (2026-11-13)
+
+PRD "My Looks", prompt 2. Home shows "My Looks" under the tool's name and line (`MyLooksSection`, Features/MyLooks/
+MyLookViews.swift): one card per saved look, newest first (result photo cropped to the tool's area, title, tool symbol,
+relative date, a small score ring and an up/down arrow against the attempt before), reloaded when Home shows; with none, a
+card "Your first look will show up here. Try one!". Long-press: Rename (alert, 30 characters) and Delete (confirmation
+"Delete this look?" / "The photos and the result will be removed from your phone."). A card opens `AppRoute.myLook(id)`:
+`MyLookDetailView` loads the look and shows `FeedbackView` read only (`SavedLookActions`: back, a privacy line, Try again
+and a ⋯ menu with Rename / Delete; nothing is measured or saved there). Its messages are told again from the saved rule
+ids by `MyLookFeedback.feedback`: each rule now keeps its kind (fix, note, praise), the cards it was on, whether it was a top
+message, and the words that filled it (`MakeupFeedback.Item.values`, new); words of the database vocabulary are said in the
+app's current language (`MyLookFeedback.translate`).
+
+Try again: decided with the user, the try-on's measured target (the desired photo's `FaceScan`) is now saved with the look
+as `target.scan` (`MyLookTarget`: packed floats + blush outline, lzfse, same protection, deleted with the look; this widens
+the PRD's "only photos and results are kept"). Try again rebuilds the handoff (tool, look, shade incl. a product colour,
+strength; `MyLookFeedback.handoff`), puts the saved expected photo and target into the flow and opens the tutorial; the next
+feedback is scored against that target and updates the same look (attempt + 1). A look without a target (schema 1) starts
+again from Try On. Schema 2 saves the photos whole (`expected.jpg`, `result.jpg` as taken, matching the marks, and
+`compare.jpg`, the result lined up for the slider); schema 1 photos were cropped and are shown as they are. Simulator tests
+pass (new: target round trip, feedback told again in en and id, rules kept with cards and words, Try again choices, score
+arrow); the home row, detail and Try again to a scored feedback need a device.
+
 ## My Looks: saved looks (model + storage) — -Nimah (2026-11-13)
 
 PRD "My Looks", prompt 1. Every feedback that finishes is saved on the phone: `MyLook` (Features/MyLooks/MyLook.swift)

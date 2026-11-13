@@ -3,6 +3,11 @@
 - Try On offers Cheekbone, Apple, Sunkissed, Lifted, Soft Sweep, then Youthful; three new `blush.look.*` presets sized like the others.
 - Each look works through capture, brief, tutorial and feedback; new look icons drawn as three-quarter faces. Not checked on a device.
 
+## 2026-11-13 — My Looks: home row, detail, Try again -Nimah
+
+- Home lists saved looks (score, arrow, date); long-press to rename or delete. A card opens the saved feedback, read only.
+- Try again goes straight to the tutorial and is scored against the saved try-on target; the same look is updated.
+
 ## 2026-11-13 — My Looks: saved looks -Nimah
 
 - Each finished feedback is saved on the phone (`MyLookStore`): photos, scores, shade, strength, rule ids; same look = one entry with attempts.
