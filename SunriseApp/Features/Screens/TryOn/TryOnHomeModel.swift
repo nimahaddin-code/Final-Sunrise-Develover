@@ -159,7 +159,14 @@ final class LinerFrameRelay: @unchecked Sendable {
             .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &observationBag)
         if let raw=UserDefaults.standard.string(forKey:"dandan.blush.look"),let look=BlushPlacementStyle(rawValue:raw),look.isReferenceLook {blushLook=look}
-        else {blushLook = brow.selectedBlush?.style == .wideHorizontal ? .sunkissed:(brow.selectedBlush?.style == .centerCheek || brow.selectedBlush?.style == .apple ? .youthful:.lifted)}
+        else {
+            switch brow.selectedBlush?.style {
+            case .wideHorizontal?: blushLook = .sunkissed
+            case .centerCheek?, .apple?: blushLook = .appleLook
+            case .cheekbone?, .highLift?: blushLook = .cheekboneLook
+            default: blushLook = .lifted
+            }
+        }
 
     }
 
@@ -256,7 +263,7 @@ final class LinerFrameRelay: @unchecked Sendable {
         recordLiveState()
     }
 
-    // -Nimah: Three requested creative looks override the initial style, retaining personal scan fitting.
+    // -Nimah: The offered looks (`referenceLooks`) override the initial style, retaining personal scan fitting.
     func choose(blush look:BlushPlacementStyle) {
         guard look.isReferenceLook,canTry(.blush) else {return}
         blushLook=look;UserDefaults.standard.set(look.rawValue,forKey:"dandan.blush.look")

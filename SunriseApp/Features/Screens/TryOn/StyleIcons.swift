@@ -37,35 +37,67 @@ struct BrowStyleIcon: View {
     }
 }
 
-/// A peach disc with an eye, a nose and the blush of one look on the cheek.
+/// A peach disc with a face in three-quarter view (looking left: brow, eye, nose, lips, hair at the right) and the blush of
+/// one look on the cheek, after the design's look pictures (2026-11-13).
 struct BlushStyleIcon: View {
     let look: BlushPlacementStyle
 
-    /// Centre (fractions of the disc), size and tilt (degrees) of the blush patch.
-    private var patch: (x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat, tilt: CGFloat) {
+    /// Centre (fractions of the disc), size and tilt (degrees, negative = rising to the right) of the blush patch.
+    var patch: (x: CGFloat, y: CGFloat, w: CGFloat, h: CGFloat, tilt: CGFloat) {
         switch look {
-        case .sunkissed: (0.52, 0.64, 0.74, 0.22, 0)
-        case .lifted: (0.62, 0.56, 0.5, 0.22, -28)
-        default: (0.56, 0.64, 0.42, 0.34, 0)
+        case .cheekboneLook: (0.62, 0.6, 0.46, 0.17, -28)
+        case .appleLook: (0.5, 0.64, 0.3, 0.28, 0)
+        case .sunkissed: (0.4, 0.56, 0.96, 0.18, 0)
+        case .lifted: (0.68, 0.5, 0.42, 0.16, -55)
+        case .softSweep: (0.6, 0.65, 0.5, 0.2, -6)
+        default: (0.52, 0.64, 0.38, 0.3, 0)
         }
     }
 
     var body: some View {
         Canvas { context, size in
+            let w = size.width, h = size.height
+            func pt(_ x: CGFloat, _ y: CGFloat) -> CGPoint { CGPoint(x: x * w, y: y * h) }
             let p = patch
             context.drawLayer { layer in
-                layer.addFilter(.blur(radius: size.width * 0.07))
-                var blob = Path(ellipseIn: CGRect(x: -p.w * size.width / 2, y: -p.h * size.height / 2,
-                                                  width: p.w * size.width, height: p.h * size.height))
+                layer.addFilter(.blur(radius: w * 0.06))
+                var blob = Path(ellipseIn: CGRect(x: -p.w * w / 2, y: -p.h * h / 2, width: p.w * w, height: p.h * h))
                 blob = blob.applying(CGAffineTransform(rotationAngle: p.tilt * .pi / 180))
-                    .applying(CGAffineTransform(translationX: p.x * size.width, y: p.y * size.height))
-                layer.fill(blob, with: .color(StylePalette.blush.opacity(0.85)))
+                    .applying(CGAffineTransform(translationX: p.x * w, y: p.y * h))
+                layer.fill(blob, with: .color(StylePalette.blush.opacity(0.8)))
             }
-            var lid = Path()
-            lid.move(to: CGPoint(x: size.width * 0.52, y: size.height * 0.4))
-            lid.addQuadCurve(to: CGPoint(x: size.width * 0.8, y: size.height * 0.4),
-                             control: CGPoint(x: size.width * 0.66, y: size.height * 0.3))
-            context.stroke(lid, with: .color(StylePalette.brow), style: StrokeStyle(lineWidth: 1.2, lineCap: .round))
+            // Hair along the right edge.
+            var hair = Path()
+            hair.move(to: pt(0.8, 0))
+            hair.addQuadCurve(to: pt(0.86, 0.62), control: pt(0.92, 0.3))
+            hair.addQuadCurve(to: pt(0.78, 1), control: pt(0.8, 0.82))
+            hair.addLine(to: pt(1, 1)); hair.addLine(to: pt(1, 0)); hair.closeSubpath()
+            context.fill(hair, with: .color(StylePalette.brow.opacity(0.85)))
+            // Brow and eye.
+            var brow = Path()
+            brow.move(to: pt(0.34, 0.3))
+            brow.addQuadCurve(to: pt(0.7, 0.29), control: pt(0.52, 0.2))
+            context.stroke(brow, with: .color(StylePalette.brow), style: StrokeStyle(lineWidth: w * 0.045, lineCap: .round))
+            var eye = Path()
+            eye.move(to: pt(0.38, 0.41))
+            eye.addQuadCurve(to: pt(0.64, 0.41), control: pt(0.51, 0.31))
+            eye.addQuadCurve(to: pt(0.38, 0.41), control: pt(0.51, 0.48))
+            context.fill(eye, with: .color(.white))
+            let iris = w * 0.1
+            context.fill(Path(ellipseIn: CGRect(x: 0.5 * w - iris / 2, y: 0.4 * h - iris / 2, width: iris, height: iris)),
+                         with: .color(StylePalette.brow))
+            context.stroke(eye, with: .color(StylePalette.brow.opacity(0.8)), lineWidth: 0.8)
+            // Nose line and lips, toward the left edge.
+            var nose = Path()
+            nose.move(to: pt(0.24, 0.4))
+            nose.addQuadCurve(to: pt(0.15, 0.6), control: pt(0.2, 0.52))
+            nose.addQuadCurve(to: pt(0.26, 0.63), control: pt(0.18, 0.66))
+            context.stroke(nose, with: .color(StylePalette.brow.opacity(0.55)), style: StrokeStyle(lineWidth: 0.9, lineCap: .round))
+            var lips = Path()
+            lips.move(to: pt(0.17, 0.78))
+            lips.addQuadCurve(to: pt(0.36, 0.78), control: pt(0.27, 0.72))
+            lips.addQuadCurve(to: pt(0.17, 0.78), control: pt(0.27, 0.86))
+            context.fill(lips, with: .color(Color(red: 0.78, green: 0.5, blue: 0.48)))
         }
         .accessibilityHidden(true)
     }
