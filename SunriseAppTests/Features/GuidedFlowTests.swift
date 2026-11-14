@@ -175,4 +175,17 @@ extension GuidedFlowTests {
         XCTAssertFalse(geometry.dots.contains(CGPoint(x: 200, y: 180)), "no dot toward a wing")
         XCTAssertNil(geometry.tipIndex)
     }
+
+    /// -Nimah, device test 2026-11-13: the desired-look photo came out without the blush. Its shutter waits for a picture with
+    /// the makeup on the face; a plain read (the result photo) takes the next picture.
+    func testDesiredShutterWaitsForAPictureWithTheMakeup() {
+        let desired = ScreenReader(needsMakeup: true) { _ in }
+        let plain = ScreenReader { _ in }
+        let early = ScreenReader.split([desired, plain], makeup: false)
+        XCTAssertTrue(early.now.count == 1 && early.now[0] === plain)
+        XCTAssertTrue(early.waiting.count == 1 && early.waiting[0] === desired)
+        let drawn = ScreenReader.split(early.waiting, makeup: true)
+        XCTAssertTrue(drawn.now.count == 1 && drawn.now[0] === desired)
+        XCTAssertTrue(drawn.waiting.isEmpty)
+    }
 }

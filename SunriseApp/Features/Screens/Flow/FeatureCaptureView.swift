@@ -21,6 +21,8 @@ struct FeatureCaptureView: View {
     /// -Nimah: the face measured at the shutter, for the blush feedback.
     @State private var scanned: FaceScan?
     @State private var shooting = false
+    /// -Nimah: the desired-look shutter found no picture with the look on the face; the camera stays on for another try.
+    @State private var filterMissing = false
     @State private var diagnostics: CaptureDiagnostics?
     @State private var bareImage: UIImage?
     @State private var visible = false
@@ -100,7 +102,9 @@ struct FeatureCaptureView: View {
     }
 
     private var hint: some View {
-        Label("Fit your whole face inside the line", systemImage: "face.smiling")
+        Label(filterMissing ? "The filter isn't on your face yet. Hold still and take it again."
+                            : "Fit your whole face inside the line",
+              systemImage: filterMissing ? "exclamationmark.triangle" : "face.smiling")
             .font(.footnote.weight(.medium))
             .foregroundStyle(AppColors.snow)
             .multilineTextAlignment(.center)
@@ -108,6 +112,10 @@ struct FeatureCaptureView: View {
             .padding(.vertical, 10)
             .background(.black.opacity(0.35), in: Capsule())
     }
+
+    /// Blush and brows are drawn by the makeup engine: their desired photo must be a picture with the look on the face.
+    /// (Eyeliner and lips are drawn into the photo afterwards.)
+    private var needsEngineMakeup: Bool { stage == .desired && (handoff.tool == .blush || handoff.tool == .eyebrow) }
 
     private func activate() {
         guard captured == nil else { return }
@@ -154,14 +162,22 @@ struct FeatureCaptureView: View {
             report.layerShown = makeup.map { !$0.beautyLayer.isHidden } ?? false
             report.engineOn = makeup?.beauty?.isDrawing ?? false
             report.framesBefore = makeup?.beauty?.presentedFrames ?? 0
+            filterMissing = false
             if let makeup, let engine = makeup.beauty, report.layerShown {
                 let started = Date()
-                shot = await engine.readScreen()
-                if shot == nil { report.readTries += 1; shot = await engine.readScreen() }
+                shot = await engine.readScreen(needsMakeup: needsEngineMakeup)
+                if shot == nil { report.readTries += 1; shot = await engine.readScreen(needsMakeup: needsEngineMakeup) }
                 pixels = shot?.pixels
                 report.readTries += 1
                 report.readMilliseconds = Int(Date().timeIntervalSince(started) * 1000)
                 report.read = pixels != nil ? .read : .timedOut
+            }
+            // Device test 2026-11-13: an Expected photo came out without the blush. The plain camera is never the desired
+            // look for blush and brows: without a picture that has the look on the face, the camera stays on.
+            if needsEngineMakeup && pixels == nil {
+                diagnostics = report
+                filterMissing = true
+                return
             }
             var image = pixels?.image(scale: view.window?.screen.scale ?? 3) ?? bare
             if stage == .desired && handoff.tool == .eyeliner {

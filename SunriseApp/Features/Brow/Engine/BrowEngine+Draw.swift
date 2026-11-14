@@ -252,7 +252,7 @@ extension BeautyBlushEngine {
         #if !targetEnvironment(simulator)
         drawable.addPresentedHandler { [weak self] _ in self?.queue.async { [weak self] in self?.presentedFrames += 1 } }
         #endif
-        copyForReaders(drawable.texture,command,frame:frame)
+        copyForReaders(drawable.texture,command,frame:frame,makeup:(strip != nil || hair3D) && visible>0.9)
         command.present(drawable)
         let ts=frame.timestamp
         if strip != nil && fresh && visible>0.9 {pigmentFrames += 1;if lastError?.hasPrefix("brow_tracker_unavailable:") != true {lastError=nil}}

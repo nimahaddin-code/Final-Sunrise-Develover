@@ -7,6 +7,43 @@ until Home appears again (`opening`). Steps and minutes per card are computed on
 New string "Opens Try On" (accessibility hint) not in the catalog. 409 of 410 Simulator tests pass; the failing
 `BlushFeedbackTests.testPlacementAndShadeCardsComeFromTheScoreDatabase` fails on the branch without this change too. Swipe
 and tap feel not checked on a device.
+## Desired photo always has the look on — -Nimah (2026-11-13)
+
+Device test (Cheekbone blush): the Expected photo was the plain camera, so the slider showed no filter and the feedback had
+no target (1%, "Not found yet" on both cards). The shutter took the engine's next picture, which can be drawn before the
+look is on the face (just opened, cheek landmarks not ready, face lost for a frame), and when no picture came it silently
+fell back to the plain snapshot. Now the desired shutter for blush and brows asks for a picture with the makeup drawn
+(`readScreen(needsMakeup:)`; `copyForReaders(makeup:)` is true for blush when tracked with full opacity and pigment on, for
+brows when the strip or 3D hair is drawn and visible; `ScreenReader.split`). Without one in two tries (about 3 s) no photo
+is taken: the camera stays on and the hint says "The filter isn't on your face yet. Hold still and take it again."
+Eyeliner and lips (drawn into the photo afterwards) and the result photo are unchanged. Not confirmed on a device which
+of the causes it was; the developer read-out still shows the shutter details. 415 Simulator tests pass.
+
+## Feedback: smiling is a note, not a retake — -Nimah (2026-11-13)
+
+Device test: a relaxed face (Youthful) read as smiling (ARKit `mouthSmileLeft` or `Right` > 0.3 on either photo) and the
+blocking `capture.smiling` check hid all feedback behind "Retake the photo". `capture.smiling` is now `blocking: false` in
+`makeup-feedback.database.json` with note wording, so the scores and fixes show. The limit (0.3) is unchanged. The note goes
+to `MakeupFeedback.notes` and My Looks, but the feedback screen does not list photo notes while there is a score (the
+"Photo tips" card was removed on 2026-11-09), so it is not visible there. 414 Simulator tests pass (test updated:
+`testSmilingIsANoteAndTheFeedbackStillShows`); not checked on a device.
+
+## Blush: five looks from the design, then Youthful — -Nimah (2026-11-13)
+
+Try On offers six blush looks (`BlushPlacementStyle.referenceLooks`, in this order): Cheekbone, Apple, Sunkissed, Lifted,
+Soft Sweep (the design's five) and Youthful (kept at the end, the user's choice). New cases `cheekboneLook`, `appleLook`,
+`softSweep` with presets `blush.look.cheekbone` / `.apple` / `.soft_sweep` in `makeup-reference.database.json`: copies of
+Youthful (same strength, softness, edge feather, eye clearance) with their own place in the measured cheek corridor:
+Cheekbone a diagonal band toward the temple (16°, slight curve), Apple a round patch (same reach across and up), Soft Sweep
+a wide flat oval going outward (5°). The old `.cheekbone` / `.apple` cases stay the face-shape catalog's research presets
+(`blush.cheekbone` / `blush.apple`), so their raw values were not reused. Being reference looks, the new ones get the
+landmark cheek fit, the target outline on the desired-look photo, the tutorial overlay, the brief and the feedback
+(`tools.blush.looks` in `makeup-feedback.database.json` lists their raw values; no look-only rules for them; the score
+database is the same for every look). Titles are the look name only; the flow adds "blush" (`styleTitle`: "Cheekbone
+blush"). `BlushStyleIcon` now draws a face in three-quarter view (brow, eye, nose, lips, hair) with each look's patch.
+New descriptions and names have Indonesian and Chinese drafts (`needs_review`); "Cheekbone" now stays English in Indonesian,
+like the other look names. A saved choice of a legacy style maps Apple / centre cheek to Apple and cheekbone / high
+cheekbone to Cheekbone. Sizes are untuned guesses on synthetic faces; nothing checked on a device.
 
 ## My Looks: home row, saved look detail, Try again — -Nimah (2026-11-13)
 

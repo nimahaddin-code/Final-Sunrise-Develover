@@ -967,6 +967,56 @@ final class MakeupPreferenceTests:XCTestCase {
             }
         }
     }
+    // MARK: Blush looks from the design (2026-11-13)
+
+    func testTryOnOffersTheFiveDesignLooksThenYouthful() throws {
+        XCTAssertEqual(BlushPlacementStyle.referenceLooks,[.cheekboneLook,.appleLook,.sunkissed,.lifted,.softSweep,.youthful])
+        XCTAssertEqual(BlushPlacementStyle.referenceLooks.map(\.title),["Cheekbone","Apple","Sunkissed","Lifted","Soft Sweep","Youthful"])
+        let landmarkKeys=["landmark_center_across","landmark_center_up","landmark_radius_across","landmark_radius_up","landmark_edge_feather","landmark_eye_clearance","curvature"]
+        let youthful=try XCTUnwrap(MakeupRuleDatabase.blush(.youthful))
+        for look in BlushPlacementStyle.referenceLooks {
+            let preset=try XCTUnwrap(MakeupRuleDatabase.blush(look),"\(look) has a blush.look preset")
+            XCTAssertTrue(preset.id.hasPrefix("blush.look."))
+            for key in landmarkKeys {XCTAssertNotNil(preset.parameters[key],"\(look) \(key)")}
+            // Same strength, softness and edges as the first three looks.
+            for key in ["max_alpha","radial_power","mask_edge_feather","falloff_smoothstep_mix","eye_margin","landmark_edge_feather","landmark_eye_clearance","blend_distance"] {
+                XCTAssertEqual(preset.number(key),youthful.number(key),"\(look) \(key)")
+            }
+        }
+        // The face-shape catalog keeps its research presets.
+        XCTAssertEqual(MakeupRuleDatabase.blushID(.cheekbone),"blush.cheekbone")
+        XCTAssertEqual(MakeupRuleDatabase.blushID(.apple),"blush.apple")
+    }
+    func testDesignBlushLooksSitWhereTheirPicturesShow() throws {
+        let region=try BrowFixture().region()
+        let cheeks=try XCTUnwrap(BlushCheekLandmarks(points:cheekPoints()))
+        func field(_ look:BlushPlacementStyle) throws -> BlushPigmentField {
+            try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:look,cheeks:cheeks)?.pigmentFields.first)
+        }
+        let cheekbone=try field(.cheekboneLook),apple=try field(.appleLook),sweep=try field(.softSweep),lifted=try field(.lifted)
+        // Angles: Lifted rises most, Cheekbone is a diagonal band, Soft Sweep nearly flat, Apple a level round patch.
+        XCTAssertGreaterThan(lifted.angle,cheekbone.angle);XCTAssertGreaterThan(cheekbone.angle,sweep.angle)
+        XCTAssertGreaterThan(sweep.angle,0);XCTAssertEqual(apple.angle,0)
+        let applePreset=try XCTUnwrap(MakeupRuleDatabase.blush(.appleLook))
+        XCTAssertEqual(applePreset.number("landmark_radius_across"),applePreset.number("landmark_radius_up"),"Apple is round in the cheek")
+        XCTAssertGreaterThan(sweep.radius.x/sweep.radius.y,apple.radius.x/apple.radius.y,"Soft Sweep is a wider oval than Apple")
+        XCTAssertGreaterThan(cheekbone.center.x*cheekbone.side,apple.center.x*apple.side,"Cheekbone sits further out than Apple")
+        XCTAssertGreaterThan(cheekbone.center.y,apple.center.y,"and higher, on the cheekbone")
+        for look in BlushPlacementStyle.referenceLooks where look != .sunkissed {
+            XCTAssertNil(BlushPlacementGenerator.make(region:region,style:look,cheeks:cheeks)?.noseBridge,"only Sunkissed crosses the nose")
+        }
+    }
+    func testFeedbackDatabaseKnowsEveryOfferedBlushLook() throws {
+        let url=try XCTUnwrap(Bundle.main.url(forResource:"makeup-feedback.database",withExtension:"json"))
+        let json=try XCTUnwrap(JSONSerialization.jsonObject(with:Data(contentsOf:url)) as? [String:Any])
+        let blush=try XCTUnwrap((json["tools"] as? [String:Any])?["blush"] as? [String:Any])
+        let looks=try XCTUnwrap(blush["looks"] as? [String])
+        XCTAssertEqual(Set(looks),Set(BlushPlacementStyle.referenceLooks.map(\.rawValue)))
+    }
+    @MainActor func testEachBlushLookIconPutsTheBlushSomewhereElse() {
+        let patches=BlushPlacementStyle.referenceLooks.map {look in let p=BlushStyleIcon(look:look).patch;return [p.x,p.y,p.w,p.h,p.tilt]}
+        XCTAssertEqual(Set(patches).count,BlushPlacementStyle.referenceLooks.count)
+    }
     func testLandmarkCheekFitFollowsTheMeasuredFaceAndFallsBackWhenUnusable() throws {
         let region=try BrowFixture().region()
         let narrow=try XCTUnwrap(BlushPlacementGenerator.make(region:region,style:.youthful,cheeks:BlushCheekLandmarks(points:cheekPoints(edge:0.06))))

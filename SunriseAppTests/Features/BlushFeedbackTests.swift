@@ -246,10 +246,12 @@ final class BlushFeedbackTests: XCTestCase {
         }
     }
 
-    func testSmilingStopsTheCheckAndAsksForARetake() throws {
+    /// Device test 2026-11-13: a relaxed face read as smiling and hid all feedback. Smiling is now a note, not a retake.
+    func testSmilingIsANoteAndTheFeedbackStillShows() throws {
         let feedback = try evaluate(after: scan(blushCentres: targets, radius: outerRadius, strength: 12, smile: 0.6))
-        XCTAssertNil(feedback.score)
-        XCTAssertEqual(feedback.items.map(\.title), ["Smiling"])
+        XCTAssertGreaterThanOrEqual(try XCTUnwrap(feedback.score), 0.9)
+        XCTAssertEqual(feedback.notes.map(\.title), ["Smiling"])
+        XCTAssertTrue(feedback.items.contains { $0.title == "Blush placement is right" })
     }
 
     func testNoDesiredPhotoExplainsWhy() throws {

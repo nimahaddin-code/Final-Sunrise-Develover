@@ -634,7 +634,7 @@
     },
     {
       "id": "capture.smiling",
-      "blocking": true,
+      "blocking": false,
       "photo": "either",
       "tools": [
         "blush"
@@ -643,13 +643,14 @@
       "message": {
         "id": {
           "title": "Sedang tersenyum",
-          "say": "Senyum mengangkat pipi, jadi posisi blush ikut bergeser. Untuk diukur, pasang wajah santai tanpa senyum."
+          "say": "Kamu sedikit senyum di foto, jadi pipi ikut terangkat dan posisi blush bisa terbaca agak bergeser. Lain kali pasang wajah santai saat difoto."
         },
         "en": {
           "title": "Smiling",
-          "say": "A smile lifts the cheeks and moves the blush with them. For the check, keep a relaxed face without smiling."
+          "say": "You were smiling a little in the photo, which lifts the cheeks, so the blush may read slightly off. Keep a relaxed face next time."
         }
-      }
+      },
+      "note": "Device test 2026-11-13: a relaxed face read as smiling and blocked all feedback; now a note."
     },
     {
       "id": "capture.mouth_open",
@@ -769,7 +770,10 @@
       "looks": [
         "youthful",
         "sunkissed",
-        "lifted"
+        "lifted",
+        "cheekboneLook",
+        "appleLook",
+        "softSweep"
       ],
       "praise": [
         {
