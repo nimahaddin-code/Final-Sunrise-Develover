@@ -1,3 +1,13 @@
+## Home: cards open Try On, no Start lesson button — Khalish (2026-11-13)
+
+`FeatureHomeView` has no "Start lesson" button. Each tool card is a `Button` (`CardPressStyle`: 0.97 scale while pressed)
+inside the slider, so a swipe cancels the tap. Tap the centred card = `onSelect(tool)`; tap a peeking card = it scrolls to
+the centre (`tap(_:)`). Taps are ignored while the slider scrolls or settles (`onScrollPhaseChange`) and after one open
+until Home appears again (`opening`). Steps and minutes per card are computed once (`meta`, again on a language change).
+New string "Opens Try On" (accessibility hint) not in the catalog. 409 of 410 Simulator tests pass; the failing
+`BlushFeedbackTests.testPlacementAndShadeCardsComeFromTheScoreDatabase` fails on the branch without this change too. Swipe
+and tap feel not checked on a device.
+
 ## My Looks: home row, saved look detail, Try again — -Nimah (2026-11-13)
 
 PRD "My Looks", prompt 2. Home shows "My Looks" under the tool's name and line (`MyLooksSection`, Features/MyLooks/

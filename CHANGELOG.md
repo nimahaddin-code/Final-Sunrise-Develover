@@ -1,3 +1,8 @@
+## 2026-11-13 — Home: tap a card to open Try On — Khalish
+
+- No "Start lesson" button: tap the centred tool card to open Try On; tap a side card to bring it to the centre.
+- Taps while the slider moves are ignored, a double tap opens once, the card shrinks a little while pressed.
+
 ## 2026-11-13 — My Looks: home row, detail, Try again -Nimah
 
 - Home lists saved looks (score, arrow, date); long-press to rename or delete. A card opens the saved feedback, read only.

@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// The first page after the welcome: the onboarding glow with "Hi, pretty!", a swipeable slider of tool cards (Eyeliner,
-/// Blush, Brows, Lips; Blush first in view; steps and minutes as chips inside each card), the selected tool's name and a line
-/// about it, and a dark "Start lesson" button for the selected tool; the cards themselves are not tappable (swipe only). Plain SwiftUI, no camera.
+/// Blush, Brows, Lips; Blush first in view; steps and minutes as chips inside each card) and the selected tool's name and a line
+/// about it. Tap the centred card to open Try On for it; tap a side card to bring it to the centre. Plain SwiftUI, no camera.
 struct FeatureHomeView: View {
     let onSelect: (TryOnTool) -> Void
     /// -Nimah: the saved looks shown under the tool cards (nil: no My Looks row).
@@ -14,6 +14,10 @@ struct FeatureHomeView: View {
 
     @State private var selected: TryOnTool? = .blush
     @State private var sliderWidth: CGFloat = 0
+    @State private var isScrolling = false
+    @State private var opening = false
+    /// Steps and minutes per tool, computed once (and again when the language changes) instead of on every body pass.
+    @State private var meta: [TryOnTool: (steps: Int, minutes: Int)] = FeatureHomeView.makeMeta()
     @AppStorage(AppLanguage.key) private var language = AppLanguage.current
 
     private var current: TryOnTool { selected ?? .blush }
@@ -63,27 +67,24 @@ struct FeatureHomeView: View {
             }
 
             Spacer(minLength: AppSpacing.medium)
-
-            Button { onSelect(current) } label: {
-                HStack(spacing: 8) {
-                    Text("Start lesson")
-                    Image(systemName: "arrow.right").accessibilityHidden(true)
-                }
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 56)
-                .background(AppColors.buttonInk, in: Capsule())
-                .shadow(color: .black.opacity(0.18), radius: 12, y: 6)
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, AppSpacing.large)
-            .padding(.bottom, AppSpacing.medium)
         }
+        .padding(.bottom, AppSpacing.medium)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .background { OnboardingGlow() }
         .preferredColorScheme(.light)
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear { opening = false }
+        .onChange(of: language) { meta = Self.makeMeta() }
+    }
+
+    private func tap(_ tool: TryOnTool) {
+        guard !isScrolling, !opening else { return }
+        if tool == current {
+            opening = true
+            onSelect(tool)
+        } else {
+            withAnimation(.snappy) { selected = tool }
+        }
     }
 
     // MARK: Slider
@@ -92,7 +93,8 @@ struct FeatureHomeView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             LazyHStack(spacing: 0) {
                 ForEach(Self.order) { tool in
-                    Image(Self.imageName(tool))
+                    Button { tap(tool) } label: {
+                        Image(Self.imageName(tool))
                         .resizable().scaledToFit()
                         .overlay(alignment: .topLeading) {
                             VStack(alignment: .leading, spacing: 4) {
@@ -112,11 +114,14 @@ struct FeatureHomeView: View {
                         }
                         .overlay(alignment: .bottomLeading) {
                             HStack(spacing: 6) {
-                                chip(Text("^[\(steps(tool)) step](inflect: true)"))
-                                chip(Text("\(minutes(tool)) min"))
+                                chip(Text("^[\(meta[tool]?.steps ?? 0) step](inflect: true)"))
+                                chip(Text("\(meta[tool]?.minutes ?? 0) min"))
                             }
                             .padding(16)
                         }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(CardPressStyle())
                     // The container already excludes the content margins below, so this is cardWidthFraction of the slider.
                     .containerRelativeFrame(.horizontal)
                     .scrollTransition(.interactive, axis: .horizontal) { content, phase in
@@ -125,6 +130,7 @@ struct FeatureHomeView: View {
                             .opacity(phase.isIdentity ? 1 : 0.6)
                     }
                     .accessibilityLabel(name(tool))
+                    .accessibilityHint("Opens Try On")
                     .accessibilityAddTraits(selected == tool ? .isSelected : [])
                     .id(tool)
                 }
@@ -134,6 +140,7 @@ struct FeatureHomeView: View {
         .contentMargins(.horizontal, sliderWidth * (1 - Self.cardWidthFraction) / 2, for: .scrollContent)
         .scrollTargetBehavior(.viewAligned)
         .scrollPosition(id: $selected)
+        .onScrollPhaseChange { _, phase in isScrolling = phase != .idle }
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { sliderWidth = $0 }
     }
 
@@ -224,7 +231,11 @@ struct FeatureHomeView: View {
         }
     }
 
-    private func steps(_ tool: TryOnTool) -> Int {
+    private static func makeMeta() -> [TryOnTool: (steps: Int, minutes: Int)] {
+        Dictionary(uniqueKeysWithValues: order.map { ($0, (steps(for: $0), minutes(for: $0))) })
+    }
+
+    private static func steps(for tool: TryOnTool) -> Int {
         switch tool {
         case .eyeliner: GuidedTutorialModel.linerLessons.count
         case .blush: GuidedTutorialModel.blushLessons.count
@@ -233,7 +244,16 @@ struct FeatureHomeView: View {
         }
     }
 
-    private func minutes(_ tool: TryOnTool) -> Int {
+    private static func minutes(for tool: TryOnTool) -> Int {
         ToolInfo.of(tool, handoff: TutorialHandoff(tool: tool, shades: [:], intensities: [:])).minutes
+    }
+}
+
+/// Pressed feedback for a tool card: a slight shrink while the finger is down.
+private struct CardPressStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.snappy(duration: 0.15), value: configuration.isPressed)
     }
 }
