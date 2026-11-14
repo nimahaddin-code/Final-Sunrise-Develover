@@ -130,6 +130,7 @@ final class MyLookStoreTests: XCTestCase {
         XCTAssertEqual(look.schemaVersion, 0)
         XCTAssertEqual(look.attemptCount, 1)
         XCTAssertEqual(look.defaultTitle, "Cat eyeliner")
+        XCTAssertFalse(look.isFavorite)
         XCTAssertTrue(look.previousScores.isEmpty)
         XCTAssertNil(look.score.overall)
     }
@@ -282,5 +283,25 @@ final class MyLookStoreTests: XCTestCase {
         XCTAssertEqual(MyLookCard.trend(look), 1)
         look.previousScores = [MyLook.Score(overall: 0.9, date: Date())]
         XCTAssertEqual(MyLookCard.trend(look), -1)
+    }
+
+    // MARK: My Looks page
+
+    func testFavouriteIsKeptAndSurvivesARetry() async throws {
+        let store = store()
+        let look = try await store.save(draft())
+        XCTAssertFalse(look.isFavorite)
+        let hearted = try await store.setFavorite(look.id, true)
+        XCTAssertTrue(hearted.isFavorite)
+        let again = try await store.save(draft(score: 0.9))
+        XCTAssertTrue(again.isFavorite, "trying the look again keeps its heart")
+        let unhearted = try await store.setFavorite(look.id, false)
+        XCTAssertFalse(unhearted.isFavorite)
+    }
+
+    func testTileColourFromTheSavedShade() {
+        XCTAssertNotNil(MyLookTile.color("#F2A68C"))
+        XCTAssertNil(MyLookTile.color("F2A68C"))
+        XCTAssertNil(MyLookTile.color(nil))
     }
 }

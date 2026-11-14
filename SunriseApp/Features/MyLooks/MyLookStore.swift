@@ -114,6 +114,15 @@ actor MyLookStore {
         return look
     }
 
+    /// The heart on the My Looks page.
+    @discardableResult
+    func setFavorite(_ id: UUID, _ favorite: Bool) throws -> MyLook {
+        guard var look = get(id) else { throw StoreError.notFound }
+        look.isFavorite = favorite
+        try write(look, to: folder(id))
+        return look
+    }
+
     /// Removes the look and both photos.
     func delete(_ id: UUID) throws {
         let folder = folder(id)

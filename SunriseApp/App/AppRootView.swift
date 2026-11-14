@@ -22,7 +22,8 @@ struct AppRootView: View {
             FeatureHomeView(onSelect: { tool in
                 flow.reset()
                 navigator.open(.tryOn(tool), in: .tryOn)
-            }, looks: container.myLooks, onOpenLook: { id in navigator.open(.myLook(id), in: .tryOn) })
+            }, looks: container.myLooks, onOpenLook: { id in navigator.open(.myLook(id), in: .tryOn) },
+               onOpenMyLooks: { navigator.open(.myLooks, in: .tryOn) })
                 .navigationDestination(for: AppRoute.self, destination: destination)
             }
             // Hands are busy with makeup: the screen stays on from Try On to feedback; home lets it sleep again.
@@ -55,6 +56,15 @@ struct AppRootView: View {
         }
     }
 
+    /// "Redo This Look" on the My Looks page: the same as Try again from the look's detail.
+    private func redo(_ id: UUID) async {
+        let store = container.myLooks
+        guard let look = await store.get(id) else { return }
+        let expected = await store.photo(look, .expected).flatMap(UIImage.init(data:))
+        let target = await store.target(look)
+        retry(look, expected: expected, target: target)
+    }
+
     @ViewBuilder private func destination(_ route: AppRoute) -> some View {
         switch route {
         case .tryOn(let tool):
@@ -85,7 +95,12 @@ struct AppRootView: View {
         case .myLook(let id):
             MyLookDetailView(id: id, store: container.myLooks, onRetry: { look, expected, target in
                 retry(look, expected: expected, target: target)
-            }, onDeleted: { navigator.returnToRoot(of: .tryOn) }, onBack: { navigator.goBack(in: .tryOn) })
+            }, onDeleted: { navigator.goBack(in: .tryOn) }, onBack: { navigator.goBack(in: .tryOn) })
+        case .myLooks:
+            MyLooksPage(store: container.myLooks, onBack: { navigator.goBack(in: .tryOn) },
+                        onOpen: { id in navigator.open(.myLook(id), in: .tryOn) },
+                        onRedo: { id in Task { await redo(id) } },
+                        onFindLook: { navigator.returnToRoot(of: .tryOn) })
         }
     }
 }

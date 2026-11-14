@@ -18,6 +18,8 @@ enum AppRoute: Hashable {
     case feedback(TutorialHandoff)
     /// -Nimah: a saved look from My Looks, read only, with Try again.
     case myLook(UUID)
+    /// -Nimah: the My Looks page: every saved look, favourites, rename, redo and delete.
+    case myLooks
 }
 
 /// Which photo the capture screen takes.

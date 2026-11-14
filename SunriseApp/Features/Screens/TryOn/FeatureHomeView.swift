@@ -8,6 +8,7 @@ struct FeatureHomeView: View {
     /// -Nimah: the saved looks shown under the tool cards (nil: no My Looks row).
     var looks: MyLookStore? = nil
     var onOpenLook: (UUID) -> Void = { _ in }
+    var onOpenMyLooks: () -> Void = {}
 
     private static let order: [TryOnTool] = [.eyeliner, .blush, .eyebrow, .lips]
     private static let cardWidthFraction: CGFloat = 0.68
@@ -62,7 +63,7 @@ struct FeatureHomeView: View {
             .padding(.top, AppSpacing.medium)
 
             if let looks {
-                MyLooksSection(store: looks, onOpen: onOpenLook)
+                MyLooksSection(store: looks, onOpen: onOpenLook, onSeeAll: onOpenMyLooks)
                     .padding(.top, AppSpacing.medium)
             }
 

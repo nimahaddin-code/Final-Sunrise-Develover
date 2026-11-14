@@ -181,6 +181,16 @@
         }
       }
     },
+    "%lld%% intensity" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "intensitas %lld%%"
+          }
+        }
+      }
+    },
     "01 Pink" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -771,6 +781,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "正在自动对齐妆容 · 请保持脸部可见"
+          }
+        }
+      }
+    },
+    "All (%lld)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Semua (%lld)"
           }
         }
       }
@@ -2230,6 +2250,16 @@
         }
       }
     },
+    "Choose a name you'll remember." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Kasih nama yang gampang kamu ingat."
+          }
+        }
+      }
+    },
     "Choose a photo, then select a tutorial style yourself. No automatic makeup analysis is included." : {
       "comment" : "-Nimah: MVP source copy.",
       "extractionState" : "manual",
@@ -2719,6 +2749,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "请先完成面部扫描。如果这个脸型还没有参考，妆容会保持关闭。"
+          }
+        }
+      }
+    },
+    "Complete your first tutorial to save your look here." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Selesaikan tutorial pertamamu biar look-nya tersimpan di sini."
           }
         }
       }
@@ -3228,6 +3268,26 @@
         }
       }
     },
+    "Delete %lld looks?" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hapus %lld look?"
+          }
+        }
+      }
+    },
+    "Delete (%lld)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hapus (%lld)"
+          }
+        }
+      }
+    },
     "Delete look" : {
       "comment" : "-Nimah: MVP source copy.",
       "extractionState" : "manual",
@@ -3248,6 +3308,26 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "删除妆容"
+          }
+        }
+      }
+    },
+    "Delete Look" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hapus look"
+          }
+        }
+      }
+    },
+    "Delete Looks" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hapus look"
           }
         }
       }
@@ -3949,6 +4029,36 @@
         }
       }
     },
+    "Favorites" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Favorit"
+          }
+        }
+      }
+    },
+    "Favorites (%lld)" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Favorit (%lld)"
+          }
+        }
+      }
+    },
+    "Favourite" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Jadikan favorit"
+          }
+        }
+      }
+    },
     "Feather-light strokes, okay? Slow is smooth, and smooth is pretty." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4078,6 +4188,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Isi tipis-tipis dari tengah sampai ujung alis."
+          }
+        }
+      }
+    },
+    "Find a Look" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cari look"
           }
         }
       }
@@ -4873,6 +4993,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "有点暗。点一下补光灯，或者面向窗户。"
+          }
+        }
+      }
+    },
+    "Its photo and score will be removed from this phone. You can't undo this." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Foto dan skornya bakal dihapus dari HP ini. Ini nggak bisa dibatalkan."
           }
         }
       }
@@ -6145,6 +6275,16 @@
         }
       }
     },
+    "My looks" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Look Saya"
+          }
+        }
+      }
+    },
     "My tutorial" : {
       "comment" : "-Nimah: MVP source copy.",
       "extractionState" : "manual",
@@ -6459,6 +6599,16 @@
         }
       }
     },
+    "No favourites yet" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Belum ada favorit"
+          }
+        }
+      }
+    },
     "No lipstick" : {
       "localizations" : {
         "id" : {
@@ -6471,6 +6621,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "不涂口红"
+          }
+        }
+      }
+    },
+    "No looks yet" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Belum ada look"
           }
         }
       }
@@ -7694,6 +7854,16 @@
         }
       }
     },
+    "Redo This Look" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ulangi look ini"
+          }
+        }
+      }
+    },
     "Reference detail" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8333,6 +8503,16 @@
         }
       }
     },
+    "Score %lld, %lld%% intensity" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Skor %lld, intensitas %lld%%"
+          }
+        }
+      }
+    },
     "Screen flash" : {
       "comment" : "A button that toggles the screen flash.",
       "isCommentAutoGenerated" : true,
@@ -8347,6 +8527,26 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "屏幕闪光"
+          }
+        }
+      }
+    },
+    "See all" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lihat semua"
+          }
+        }
+      }
+    },
+    "See All Looks" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Lihat semua look"
           }
         }
       }
@@ -8385,6 +8585,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Glow-nya mulai kelihatan, kan? Percaya prosesnya, semuanya mulai nyatu."
+          }
+        }
+      }
+    },
+    "Select looks" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pilih look"
           }
         }
       }
@@ -9541,6 +9751,16 @@
         }
       }
     },
+    "Tap ♡ on a look you love to keep it here." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tap ♡ di look yang kamu suka biar tersimpan di sini."
+          }
+        }
+      }
+    },
     "Taupe" : {
       "comment" : "Name of a brow shade.",
       "isCommentAutoGenerated" : true,
@@ -9903,6 +10123,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "参考图只在本次使用期间保留在内存中。只有在你选择“保存”时，才会保存相机拍摄的前后对比照。"
+          }
+        }
+      }
+    },
+    "Their photos and scores will be removed from this phone. You can't undo this." : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Foto dan skornya bakal dihapus dari HP ini. Ini nggak bisa dibatalkan."
           }
         }
       }
@@ -10364,6 +10594,16 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "教程流程"
+          }
+        }
+      }
+    },
+    "Unfavourite" : {
+      "localizations" : {
+        "id" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hapus dari favorit"
           }
         }
       }

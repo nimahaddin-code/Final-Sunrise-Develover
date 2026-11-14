@@ -1,3 +1,17 @@
+## My Looks page (design) — -Nimah (2026-11-14)
+
+The design's "My looks" page, `AppRoute.myLooks` (`MyLooksPage` in Features/MyLooks/MyLookViews.swift), opened by "See all"
+on the home row: back, the pencil (pick several looks, then "Delete (n)"), "My looks", an All (n) / Favorites (n) switch
+and a two-column grid (`MyLookTile`: the result photo, the score in a dark ring top left, a heart top right, the look's own
+icon from Try On (`MyLookIcon`: blush, brow, eyeliner, lips), the title, the shade's dot and "60% intensity"). A tap opens
+the saved look; long-press: Favourite / Unfavourite, Rename ("Choose a name you'll remember."), Redo This Look (the same as
+Try again, `AppRootView.redo`) and Delete ("Delete this look?" / "Its photo and score will be removed from this phone. You
+can't undo this." / "Delete Look"). Empty: "No looks yet" with the three icons and "Find a Look" (home); no favourites: "No
+favourites yet" and "See All Looks". `MyLook.isFavorite` (new, defaults to false for older files; kept on a retry) and
+`MyLookStore.setFavorite`. Deleting from a look's detail now goes back one screen (the page or home). The pencil's
+behaviour is a guess (the design shows only the button). 417 Simulator tests pass; the page, menu and empty state were
+seen on the Simulator with sample looks; not checked on a device.
+
 ## Home: cards open Try On, no Start lesson button — Khalish (2026-11-13)
 
 `FeatureHomeView` has no "Start lesson" button. Each tool card is a `Button` (`CardPressStyle`: 0.97 scale while pressed)
