@@ -1,3 +1,8 @@
+## 2026-11-14 — My Looks page -Nimah
+
+- New page from "See all": All / Favorites, a grid with score, heart, icon, shade and strength; empty states.
+- Long-press: Favourite, Rename, Redo This Look, Delete; the pencil picks several looks to delete.
+
 ## 2026-11-13 — Home: tap a card to open Try On — Khalish
 
 - No "Start lesson" button: tap the centred tool card to open Try On; tap a side card to bring it to the centre.

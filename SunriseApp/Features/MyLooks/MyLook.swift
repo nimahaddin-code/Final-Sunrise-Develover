@@ -73,6 +73,8 @@ struct MyLook: Codable, Identifiable, Hashable, Sendable {
     var createdAt: Date
     var updatedAt: Date
     var attemptCount = 1
+    /// Kept under "Favorites" on the My Looks page (the heart).
+    var isFavorite = false
     var shades: [Shade] = []
     var intensity: Double?
     var faceShape: String?
@@ -116,7 +118,7 @@ extension MyLook {
     }
 
     private enum CodingKeys: String, CodingKey {
-        case schemaVersion, id, tool, lookId, title, defaultTitle, createdAt, updatedAt, attemptCount, shades, intensity,
+        case schemaVersion, id, tool, lookId, title, defaultTitle, createdAt, updatedAt, attemptCount, isFavorite, shades, intensity,
              faceShape, eyeShape, score, rules, marks, previousScores, language, expectedPhoto, resultPhoto, comparePhoto,
              targetScan
     }
@@ -133,6 +135,7 @@ extension MyLook {
         createdAt = try c.decode(Date.self, forKey: .createdAt)
         updatedAt = try c.decodeIfPresent(Date.self, forKey: .updatedAt) ?? createdAt
         attemptCount = try c.decodeIfPresent(Int.self, forKey: .attemptCount) ?? 1
+        isFavorite = try c.decodeIfPresent(Bool.self, forKey: .isFavorite) ?? false
         shades = try c.decodeIfPresent([Shade].self, forKey: .shades) ?? []
         intensity = try c.decodeIfPresent(Double.self, forKey: .intensity)
         faceShape = try c.decodeIfPresent(String.self, forKey: .faceShape)
